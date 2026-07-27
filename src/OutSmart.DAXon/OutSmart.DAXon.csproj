@@ -26,6 +26,7 @@
   <ItemGroup>
     <!-- LogicalName pinned to the names the previous build produced (LocateResource matches by suffix,
          but keep them byte-stable anyway) -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
     <EmbeddedResource Include="data\casevariants.xml" LogicalName="Net.Sf.Saxon.casevariants.xml" />
     <EmbeddedResource Include="data\categories.xml" LogicalName="Net.Sf.Saxon.categories.xml" />
     <EmbeddedResource Include="data\unicodeBlocks.xml" LogicalName="Net.Sf.Saxon.unicodeBlocks.xml" />
