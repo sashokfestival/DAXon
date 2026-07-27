@@ -1,0 +1,505 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Text;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Values;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Expressions.Instructions;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Trees.Linked
+{
+    public class LinkedTreeBuilder : Builder
+    {
+        private ParentNodeImpl currentNode;
+        private INodeFactory nodeFactory;
+        private int[] size = new int[100]; // stack of number of children for each open node
+        private int depth = 0;
+        private List<NodeImpl[]> arrays = new List<NodeImpl[]>(20); // reusable arrays for creating nodes
+        private readonly Stack<NamespaceMap> namespaceStack = new Stack<NamespaceMap>();
+        private bool allocateSequenceNumbers = true;
+        private int nextNodeNumber = 1;
+
+        public override NodeInfo CurrentRoot
+        {
+            get
+            {
+                NodeInfo physicalRoot = currentRoot;
+                if (physicalRoot is DocumentImpl && ((DocumentImpl)physicalRoot).IsImaginary())
+                {
+                    return ((DocumentImpl)physicalRoot).DocumentElement;
+                }
+                else
+                {
+                    return physicalRoot;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        /// <summary>
+        /// Notify a comment
+        /// </summary>
+        public virtual ParentNodeImpl CurrentParentNode => currentNode;
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        /// <summary>
+        /// Notify a comment
+        /// </summary>
+        public virtual NodeImpl CurrentLeafNode => (NodeImpl)currentNode.LastChild;
+        public LinkedTreeBuilder(PipelineConfiguration pipe) : base(pipe)
+        {
+            nodeFactory = DefaultNodeFactory.THE_INSTANCE;
+        }
+
+        public LinkedTreeBuilder(PipelineConfiguration pipe, Durability durability) : base(pipe)
+        {
+            this.durability = durability;
+            nodeFactory = DefaultNodeFactory.THE_INSTANCE;
+        }
+
+        public override void SetDurability(Durability durability)
+        {
+            if (this.durability != Durability.MUTABLE)
+            {
+                this.durability = durability; // TODO: mutability and durability should be orthogonal
+            }
+        }
+
+        public override void Reset()
+        {
+            base.Reset();
+            currentNode = null;
+            nodeFactory = DefaultNodeFactory.THE_INSTANCE;
+            depth = 0;
+            allocateSequenceNumbers = true;
+            nextNodeNumber = 1;
+        }
+
+        public virtual void SetAllocateSequenceNumbers(bool allocate)
+        {
+            allocateSequenceNumbers = allocate;
+        }
+
+        public virtual void SetNodeFactory(INodeFactory factory)
+        {
+            nodeFactory = factory;
+        }
+
+        /// <summary>
+        /// Open the stream of IReceiver events
+        /// </summary>
+        public override void Open()
+        {
+            started = true;
+            depth = 0;
+            size[depth] = 0;
+            if (arrays == null)
+            {
+                arrays = new List<NodeImpl[]>(20);
+            }
+
+            if (useEventLocation)
+            {
+                object copier = GetPipelineConfiguration().GetComponent(typeof(ICopyInformee).GetName());
+                if (copier is LocationCopier)
+                {
+                    SetSystemId(((LocationCopier)copier).GetSystemId());
+                }
+            }
+
+            base.Open();
+        }
+
+        /// <summary>
+        /// Open the stream of IReceiver events
+        /// </summary>
+        public override void StartDocument(int properties)
+        {
+            DocumentImpl doc = new DocumentImpl();
+            doc.SetMutable(durability == Durability.MUTABLE);
+            currentRoot = doc;
+            doc.SetSystemId(GetSystemId());
+            doc.SetBaseURI(BaseURI);
+            doc.SetConfiguration(config);
+            currentNode = doc;
+            depth = 0;
+            size[depth] = 0;
+            if (arrays == null)
+            {
+                arrays = new List<NodeImpl[]>(20);
+            }
+
+            doc.SetRawSequenceNumber(0);
+            if (lineNumbering)
+            {
+                doc.SetLineNumbering();
+            }
+        }
+
+        /// <summary>
+        /// Notify the end of the document
+        /// </summary>
+        public override void EndDocument()
+        {
+            currentNode.Compact(size[depth]);
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        public override void Dispose()
+        {
+            if (currentNode == null)
+            {
+                return; // can be called twice on an error path
+            }
+
+            currentNode.Compact(size[depth]);
+            currentNode = null;
+
+            // we're not going to use this Builder again so give the garbage collector
+            // something to play with
+            arrays = null;
+            base.Dispose();
+            nodeFactory = DefaultNodeFactory.THE_INSTANCE;
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap suppliedAttributes, NamespaceMap namespaces, ILocation location, int properties)
+        {
+
+            if (currentNode == null)
+            {
+                StartDocument(ReceiverOption.NONE);
+                ((DocumentImpl)currentRoot).SetImaginary(true);
+            }
+
+            bool isNilled = ReceiverOption.Contains(properties, ReceiverOption.NILLED_ELEMENT);
+            namespaceStack.Push(namespaces);
+            bool isTopWithinEntity = false;
+            isTopWithinEntity = location is ISourceLocator && ((ISourceLocator)location).LevelInEntity == 0;
+            AttributeInfo xmlId = suppliedAttributes.Get(NamespaceUri.XML, "id");
+            if (xmlId != null && Whitespace.ContainsWhitespace(StringTool.CodePoints(xmlId.Value)))
+            {
+                suppliedAttributes = suppliedAttributes.Put(new AttributeInfo(xmlId.GetNodeName(), xmlId.GetType(), Whitespace.Trim(xmlId.Value), xmlId.GetLocation(), xmlId.GetProperties()));
+            }
+
+            if (location.GetSystemId() == null)
+            {
+
+                // Bug 5800
+                location = new Loc(GetSystemId(), location.GetLineNumber(), location.GetColumnNumber());
+            }
+
+            ElementImpl elem = nodeFactory.MakeElementNode(currentNode, elemName, type, isNilled, suppliedAttributes, namespaceStack.Peek(), pipe, location, allocateSequenceNumbers ? nextNodeNumber++ : -1);
+
+            // the initial array used for pointing to children will be discarded when the exact number
+            // of children in known. Therefore, it can be reused. So we allocate an initial array from
+            // a pool of reusable arrays. A nesting depth of >20 is so rare that we don't bother.
+            while (depth >= arrays.Count)
+            {
+                arrays.Add(new NodeImpl[20]);
+            }
+
+            elem.SetChildren(arrays[depth]);
+            currentNode.AddChild(elem, size[depth]++);
+            if (depth >= size.Length - 1)
+            {
+                Array.Resize(ref size, size.Length * 2);
+            }
+
+            size[++depth] = 0;
+            if (currentNode is ITreeInfo)
+            {
+                ((DocumentImpl)currentNode).DocumentElement = elem;
+            }
+
+            if (isTopWithinEntity)
+            {
+                currentNode.PhysicalRoot.MarkTopWithinEntity(elem);
+            }
+
+            currentNode = elem;
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        public override void EndElement()
+        {
+
+            currentNode.Compact(size[depth]);
+            depth--;
+            currentNode = (ParentNodeImpl)currentNode.GetParent();
+            namespaceStack.Pop();
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        public override void Characters(UnicodeString chars, ILocation locationId, int properties)
+        {
+
+            if (!chars.IsEmpty())
+            {
+                UnicodeString t = chars.Tidy();
+                NodeInfo prev = currentNode.GetNthChild(size[depth] - 1);
+                if (prev is TextImpl)
+                {
+                    ((TextImpl)prev).AppendStringValue(t);
+                }
+                else
+                {
+                    TextImpl n = nodeFactory.MakeTextNode(currentNode, t);
+
+                    //TextImpl n = new TextImpl(chars.toString());
+                    currentNode.AddChild(n, size[depth]++);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        public override void ProcessingInstruction(string name, UnicodeString remainder, ILocation locationId, int properties)
+        {
+            ProcInstImpl pi = new ProcInstImpl(name, remainder.Tidy());
+            currentNode.AddChild(pi, size[depth]++);
+            pi.SetLocation(locationId.GetSystemId(), locationId.GetLineNumber(), locationId.GetColumnNumber());
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        /// <summary>
+        /// Notify a comment
+        /// </summary>
+        public override void Comment(UnicodeString chars, ILocation locationId, int properties)
+        {
+            CommentImpl comment = new CommentImpl(chars.Tidy());
+            currentNode.AddChild(comment, size[depth]++);
+            comment.SetLocation(locationId.GetSystemId(), locationId.GetLineNumber(), locationId.GetColumnNumber());
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        /// <summary>
+        /// Notify a comment
+        /// </summary>
+        public virtual void GraftElement(ElementImpl element)
+        {
+            currentNode.AddChild(element, size[depth]++);
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        /// <summary>
+        /// Notify a comment
+        /// </summary>
+        /// <summary>
+        /// Set an unparsed entity URI for the document
+        /// </summary>
+        public override void SetUnparsedEntity(string name, string uri, string publicId)
+        {
+            if (((DocumentImpl)currentRoot).GetUnparsedEntity(name) == null)
+            {
+
+                // bug 2187
+                ((DocumentImpl)currentRoot).SetUnparsedEntity(name, uri, publicId);
+            }
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        /// <summary>
+        /// Notify a comment
+        /// </summary>
+        /// <summary>
+        /// Set an unparsed entity URI for the document
+        /// </summary>
+        public override BuilderMonitor GetBuilderMonitor()
+        {
+            return new LinkedBuilderMonitor(this);
+        }
+
+        /// <summary>
+        /// Close the stream of IReceiver events
+        /// </summary>
+        /// <summary>
+        /// Notify the start of an element
+        /// </summary>
+        /// <summary>
+        /// Notify the end of an element
+        /// </summary>
+        /// <summary>
+        /// Notify a text node. Adjacent text nodes must have already been merged
+        /// </summary>
+        /// <summary>
+        /// Notify a processing instruction
+        /// </summary>
+        /// <summary>
+        /// Notify a comment
+        /// </summary>
+        /// <summary>
+        /// Set an unparsed entity URI for the document
+        /// </summary>
+        // Inner class DefaultNodeFactory. This creates the nodes in the tree.
+        // It can be overridden, e.g. when building the stylesheet tree
+        private class DefaultNodeFactory : INodeFactory
+        {
+            public static DefaultNodeFactory THE_INSTANCE = new DefaultNodeFactory();
+            public virtual ElementImpl MakeElementNode(NodeInfo parent, INodeName nodeName, ISchemaType elementType, bool isNilled, IAttributeMap attlist, NamespaceMap namespaces, PipelineConfiguration pipe, ILocation locationId, int sequenceNumber)
+            {
+                ElementImpl e = new ElementImpl();
+                e.SetNamespaceMap(namespaces);
+                e.Initialise(nodeName, elementType, attlist, parent, sequenceNumber);
+                if (isNilled)
+                {
+                    e.SetNilled();
+                }
+
+                if (locationId != Loc.NONE && sequenceNumber >= 0)
+                {
+                    string baseURI = locationId.GetSystemId();
+                    int lineNumber = locationId.GetLineNumber();
+                    int columnNumber = locationId.GetColumnNumber();
+                    e.SetLocation(baseURI, lineNumber, columnNumber);
+                }
+
+                return e;
+            }
+
+            public virtual TextImpl MakeTextNode(NodeInfo parent, UnicodeString content)
+            {
+                return new TextImpl(content);
+            }
+        }
+    }
+}

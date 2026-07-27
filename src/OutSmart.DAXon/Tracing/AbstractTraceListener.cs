@@ -1,0 +1,369 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Expressions.Instructions;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Lib;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees;
+using OutSmart.DAXon.Trees.Utilities;
+using OutSmart.DAXon.Values;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Tracing
+{
+    public abstract class AbstractTraceListener : StandardDiagnostics, ITraceListener
+    {
+        private static readonly StringBuilder spaceBuffer = new StringBuilder("                ");
+        protected int indent = 0;
+        protected int detail = TraceLevel.NORMAL;
+        protected Logger @out = new StandardLogger();
+        private Stack<object> stack = new Stack<object>();
+
+        /// <summary>
+        /// Called at start of a transformation
+        /// </summary>
+        protected virtual string OpeningAttributes => "";
+        public virtual void SetLevelOfDetail(int level)
+        {
+            this.detail = level;
+        }
+
+        /// <summary>
+        /// Called at start of a transformation
+        /// </summary>
+        public void Open(Controller controller)
+        {
+            @out.Info(Spaces(indent++) + "<trace " + "saxon-version=\"" + Core.Version.ProductVersion + "\" " + OpeningAttributes + '>');
+        }
+
+        /// <summary>
+        /// Called at end of a transformation
+        /// </summary>
+        public void Dispose()
+        {
+            @out.Info(Spaces(indent--) + "</trace>");
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        public void Enter(ITraceable info, Dictionary<string, object> properties, IXPathContext context)
+        {
+            if (IsApplicable(info))
+            {
+                stack.Push(info);
+                ILocation loc = GetLocation(info);
+                string file = AbbreviateLocationURI(loc.GetSystemId());
+                string elementTag = Tag(info);
+                StringBuilder msg = new StringBuilder(AbstractTraceListener.Spaces(indent) + '<' + elementTag);
+                if (info is Expression && !((Expression)info).IsInstruction() && !properties.ContainsKey("expr"))
+                {
+                    properties.Put("expr", ((Expression)info).ToShortString());
+                }
+
+                foreach (KeyValuePair<string, object> entry in properties.EntrySet())
+                {
+                    object val = entry.Value;
+                    if (val is StructuredQName)
+                    {
+                        val = ((StructuredQName)val).DisplayName;
+                    }
+                    else if (val is StringValue)
+                    {
+                        val = ((StringValue)val).UnicodeStringValue;
+                    }
+
+                    if (val != null)
+                    {
+                        msg.Append(' ').Append(entry.Key).Append("=").Append(Escape(val.ToString()));
+                    }
+                }
+
+                msg.Append(" line=\"").Append(loc.GetLineNumber()).Append('"');
+                int col = loc.GetColumnNumber();
+                if (col >= 0)
+                {
+                    msg.Append(" column=\"").Append(loc.GetColumnNumber()).Append('"');
+                }
+
+                msg.Append(" module=").Append(Escape(file));
+                msg.Append(">");
+                @out.Info(msg.ToString());
+                indent++;
+            }
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        public static ILocation GetLocation(ITraceable info)
+        {
+            ILocation rawLocation = info.GetLocation();
+            if (rawLocation is XPathParser.NestedLocation)
+            {
+                ILocation container = ((XPathParser.NestedLocation)rawLocation).GetContainingLocation();
+                if (container is AttributeLocation)
+                {
+                    return container;
+                }
+            }
+
+            return rawLocation;
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        public virtual string Escape(string @in)
+        {
+            if (@in == null)
+            {
+                return "\"\"";
+            }
+
+            char quot = @in.Contains("\"") ? '\'' : '"';
+            string collapsed = Whitespace.CollapseWhitespace(@in);
+            StringBuilder sb = new StringBuilder(collapsed.Length + 10).Append(quot);
+            for (int i = 0; i < collapsed.Length; i++)
+            {
+                char c = collapsed[i];
+                if (c == '<')
+                {
+                    sb.Append("&lt;");
+                }
+                else if (c == '>')
+                {
+                    sb.Append("&gt;");
+                }
+                else if (c == '&')
+                {
+                    sb.Append("&amp;");
+                }
+                else if (c == quot)
+                {
+                    sb.Append(quot == '"' ? "&quot;" : "&apos;");
+                }
+                else if (c == '\n')
+                {
+                    sb.Append("&#xA;");
+                }
+                else if (c == '\r')
+                {
+                    sb.Append("&#xD;");
+                }
+                else if (c == '\t')
+                {
+                    sb.Append("&#x9;");
+                }
+                else
+                {
+                    sb.Append(c);
+                }
+            }
+
+            return sb.Append(quot).ToString();
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        public void Leave(ITraceable info)
+        {
+            if (IsApplicable(info))
+            {
+                stack.Pop();
+                indent--;
+                @out.Info(AbstractTraceListener.Spaces(indent) + "</" + Tag(info) + '>');
+            }
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        protected virtual bool IsApplicable(ITraceable info)
+        {
+            return Level(info) <= detail;
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        protected virtual string Tag(ITraceable info)
+        {
+            return "expr";
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        protected virtual int Level(ITraceable info)
+        {
+            if (info is ITraceableComponent || info is ApplyTemplates || info is CallTemplate)
+            {
+                return 1;
+            }
+
+            if (info is Expression && (((Expression)info).IsInstruction() || ((Expression)info).IsCallOn(typeof(TransformFn))))
+            {
+                return 2;
+            }
+
+            return 3;
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called when an item becomes the context item
+        /// </summary>
+        public void StartCurrentItem(IItem item)
+        {
+            if (item is NodeInfo && detail > 0)
+            {
+                stack.Push(item);
+                NodeInfo curr = (NodeInfo)item;
+                @out.Info(AbstractTraceListener.Spaces(indent) + "<source node=\"" + Navigator.GetPath(curr) + "\" line=\"" + curr.GetLineNumber() + "\" file=\"" + AbbreviateLocationURI(curr.GetSystemId()) + "\">");
+            }
+
+            indent++;
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        public void EndCurrentItem(IItem item)
+        {
+            indent--;
+            if (item is NodeInfo && detail > 0)
+            {
+                NodeInfo curr = (NodeInfo)item;
+                @out.Info(AbstractTraceListener.Spaces(indent) + "</source><!-- " + Navigator.GetPath(curr) + " -->");
+                stack.Pop();
+            }
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        protected static string Spaces(int n)
+        {
+            n = System.Math.Max(n, 0);
+            while (spaceBuffer.Length < n)
+            {
+                spaceBuffer.Append(AbstractTraceListener.spaceBuffer);
+            }
+
+            return spaceBuffer.Substring(0, n);
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        public void SetOutputDestination(Logger stream)
+        {
+            @out = stream;
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        public virtual Logger GetOutputDestination()
+        {
+            return @out;
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        public object Checkpoint()
+        {
+            return stack.Count;
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        public void Recover(object checkpoint, XPathException error)
+        {
+            @out.Info(AbstractTraceListener.Spaces(indent) + "<error code='" + error.ErrorCodeQName.GetLocalPart() + "'>" + error.GetMessage() + "</error>");
+            while (stack.Count > (int)checkpoint)
+            {
+                int size = stack.Count;
+                object o = stack.Peek();
+                if (o is ITraceable)
+                {
+                    Leave((ITraceable)o);
+                }
+                else if (o is IItem)
+                {
+                    EndCurrentItem((IItem)o);
+                }
+
+                if (stack.Count == size)
+                {
+                    stack.Pop();
+                }
+            }
+
+            @out.Info(AbstractTraceListener.Spaces(indent) + "<catch/>");
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        public void EndRuleSearch(object rule, Mode mode, IItem item)
+        {
+        }
+
+        /// <summary>
+        /// Called when an instruction in the stylesheet gets processed
+        /// </summary>
+        /// <summary>
+        /// Called after a node of the source tree got processed
+        /// </summary>
+        // do nothing
+        /// <summary>
+        /// Method called when a search for a template rule is about to start
+        /// </summary>
+        public void StartRuleSearch()
+        {
+        }
+    }
+}

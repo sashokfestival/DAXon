@@ -1,0 +1,381 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions.Elaboration;
+using OutSmart.DAXon.Expressions.Instructions;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Values.Arrays;
+using OutSmart.DAXon.Values.Maps;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Tracing;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Values;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Expressions
+{
+    /// <summary>
+    /// A lookup expression is an expression of the form A?*, where A must be a map or an array
+    /// </summary>
+    public class LookupAllExpression : UnaryExpression
+    {
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        public override double Cost => BaseExpression.Cost + 1;
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        public override int ImplementationMethod => ITERATE_METHOD;
+        public LookupAllExpression(Expression lhs) : base(lhs)
+        {
+        }
+
+        protected override OperandRole GetOperandRole()
+        {
+            return OperandRole.INSPECT;
+        }
+
+        public override ItemType GetItemType()
+        {
+            ItemType lhs = BaseExpression.GetItemType();
+            if (lhs is MapType)
+            {
+                return ((MapType)lhs).ValueType.PrimaryType;
+            }
+            else if (lhs is ArrayItemType)
+            {
+                return ((ArrayItemType)lhs).MemberType.PrimaryType;
+            }
+            else
+            {
+                return AnyItemType.GetInstance();
+            }
+        }
+
+        public override UType GetStaticUType(UType contextItemType)
+        {
+            return GetItemType().GetUType();
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
+        {
+            Configuration config = visitor.GetConfiguration();
+            TypeHierarchy th = config.GetTypeHierarchy();
+
+            // Check the first operand
+            GetOperand().TypeCheck(visitor, contextInfo);
+            ItemType containerType = BaseExpression.GetItemType();
+            bool isArrayLookup = containerType is ArrayItemType;
+            bool isMapLookup = containerType is MapType || containerType is IRecordType;
+            if (!isArrayLookup && !isMapLookup)
+            {
+                if (th.Relationship(containerType, MapType.ANY_MAP_TYPE) == Affinity.DISJOINT && th.Relationship(containerType, ArrayItemType.GetInstance()) == Affinity.DISJOINT)
+                {
+                    if (Cardinality.AllowsZero(BaseExpression.GetCardinality()))
+                    {
+                        visitor.IssueWarning("The left-hand operand of '?' must be a map or an array; the expression can succeed only if the operand is an empty sequence " + containerType, DAXonErrorCode.SXWN9026, GetLocation());
+                    }
+                    else
+                    {
+                        throw new XPathException("The left-hand operand of '?' must be a map or an array; " + "the supplied expression is of type " + containerType, "XPTY0004").WithLocation(GetLocation()).AsTypeError().WithFailingExpression(this);
+                    }
+                }
+            }
+
+            if (BaseExpression is Literal)
+            {
+                try
+                {
+                    return new Literal(SequenceTool.ToGroundedValue(Iterate(visitor.MakeDynamicContext())));
+                }
+                catch (UncheckedXPathException e)
+                {
+                    throw e.GetXPathException();
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
+        {
+            GetOperand().Optimize(visitor, contextItemType);
+            if (BaseExpression is Literal)
+            {
+                try
+                {
+                    return new Literal(SequenceTool.ToGroundedValue(Iterate(visitor.MakeDynamicContext())));
+                }
+                catch (UncheckedXPathException e)
+                {
+                    throw e.GetXPathException();
+                }
+            }
+
+
+            // See W3C bug 30228. In the interests of keeping certain tests streamable, we do a rewrite of [A,B,C]?*
+            // to (A, B, C).
+            if (BaseExpression is SquareArrayConstructor)
+            {
+                IList<Expression> children = new List<Expression>();
+                foreach (Operand o in BaseExpression.Operands())
+                {
+                    children.Add(o.GetChildExpression().Copy(new RebindingMap()));
+                }
+
+                Expression[] childExpressions = children.ToArray(new Expression[0]);
+                Block block = new Block(childExpressions);
+                ExpressionTool.CopyLocationInfo(this, block);
+                return block;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        public override Expression Copy(RebindingMap rebindings)
+        {
+            return new LookupAllExpression(BaseExpression.Copy(rebindings));
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// Determine the static cardinality of the expression
+        /// </summary>
+        protected override int ComputeCardinality()
+        {
+            return StaticProperty.ALLOWS_ZERO_OR_MORE;
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// Is this expression the same as another expression?
+        /// </summary>
+        public override bool Equals(object other)
+        {
+            if (!(other is LookupAllExpression))
+            {
+                return false;
+            }
+
+            LookupAllExpression p = (LookupAllExpression)other;
+            return BaseExpression.IsEqual(p.BaseExpression);
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        protected override int ComputeHashCode()
+        {
+            return "LookupAll".GetHashCode() ^ BaseExpression.GetHashCode();
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override ISequenceIterator Iterate(IXPathContext context)
+        {
+            return new LookupAllIterator(this, BaseExpression.Iterate(context));
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override void Export(ExpressionPresenter destination)
+        {
+            destination.StartElement("lookupAll", this);
+            BaseExpression.Export(destination);
+            destination.EndElement();
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override string ToString()
+        {
+            return ExpressionTool.Parenthesize(BaseExpression) + "?*";
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override string ToShortString()
+        {
+            return BaseExpression.ToShortString() + "?*";
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override Elaborator GetElaborator()
+        {
+            return new LookupAllElaborator();
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public class LookupAllElaborator : PullElaborator
+        {
+            public override IPullEvaluator ElaborateForPull()
+            {
+                LookupAllExpression expr = (LookupAllExpression)GetExpression();
+                IPullEvaluator baseEval = expr.BaseExpression.MakeElaborator().ElaborateForPull();
+                return (context) => new LookupAllIterator(expr, baseEval.Iterate(context));
+            }
+        }
+
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        private class LookupAllIterator : ISequenceIterator
+        {
+            readonly LookupAllExpression expr;
+            readonly ISequenceIterator level0;
+            IEnumerator<IGroundedValue> level1forArrays;
+            IEnumerator<KeyValuePair> level1forMaps;
+            ISequenceIterator level2;
+            public LookupAllIterator(LookupAllExpression expr, ISequenceIterator baseIterator)
+            {
+                level0 = baseIterator;
+                level1forArrays = null;
+                level1forMaps = null;
+                level2 = null;
+                this.expr = expr;
+            }
+
+            public virtual IItem Next()
+            {
+                if (level2 == null)
+                {
+                    if (level1forArrays == null && level1forMaps == null)
+                    {
+                        IItem lhs = level0.Next();
+                        if (lhs == null)
+                        {
+                            return null;
+                        }
+                        else if (lhs is ArrayItem)
+                        {
+                            level1forArrays = ((ArrayItem)lhs).Members().IIterator();
+                            return Next();
+                        }
+                        else if (lhs is MapItem)
+                        {
+                            level1forMaps = ((MapItem)lhs).KeyValuePairs().IIterator();
+                            return Next();
+                        }
+                        else
+                        {
+                            try
+                            {
+                                LookupExpression.MustBeArrayOrMap(expr, lhs);
+                            }
+                            catch (XPathException e)
+                            {
+                                throw new UncheckedXPathException(e);
+                            }
+
+                            return null;
+                        }
+                    }
+                    else if (level1forArrays != null && level1forArrays.MoveNext())
+                    {
+                        IGroundedValue nextEntry = level1forArrays.Current;
+                        level2 = nextEntry.Iterate();
+                    }
+                    else if (level1forMaps != null && level1forMaps.MoveNext())
+                    {
+                        KeyValuePair nextEntry = level1forMaps.Current;
+                        IGroundedValue value = nextEntry.value;
+                        level2 = value.Iterate();
+                    }
+                    else
+                    {
+                        level1forMaps = null;
+                        level1forArrays = null;
+                    }
+
+                    return Next();
+                }
+                else
+                {
+                    IItem nextItem = level2.Next();
+                    if (nextItem == null)
+                    {
+                        level2 = null;
+                        return Next();
+                    }
+                    else
+                    {
+                        return nextItem;
+                    }
+                }
+            }
+
+            public virtual void Dispose()
+            {
+                if (level0 != null)
+                {
+                    level0.Dispose();
+                }
+
+                if (level2 != null)
+                {
+                    level2.Dispose();
+                }
+            }
+        }
+    }
+}

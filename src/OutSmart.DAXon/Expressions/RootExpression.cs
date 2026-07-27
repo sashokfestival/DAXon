@@ -1,0 +1,396 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Expressions.Elaboration;
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Patterns;
+using OutSmart.DAXon.Tracing;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees.Iterators;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Expressions
+{
+    public class RootExpression : Expression
+    {
+        private bool contextMaybeUndefined = true;
+        private bool doneWarnings = false;
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        public override int ImplementationMethod => EVALUATE_METHOD;
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_CONTEXT_DOCUMENT;
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override string ExpressionName => "root";
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override string StreamerName => "RootExpression";
+        public RootExpression()
+        {
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
+        {
+            TypeHierarchy th = visitor.GetConfiguration().GetTypeHierarchy();
+            if (contextInfo == null || contextInfo.GetItemType() == null || contextInfo.GetItemType().Equals(ErrorType.GetInstance()))
+            {
+                throw new XPathException(NoContextMessage() + ": the context item is absent").WithErrorCode("XPDY0002").AsTypeError().WithLocation(GetLocation());
+            }
+            else if (!doneWarnings && contextInfo.IsParentless() && th.Relationship(contextInfo.GetItemType(), NodeKindTest.DOCUMENT) == Affinity.DISJOINT)
+            {
+                visitor.IssueWarning(NoContextMessage() + ": the context item is parentless and is not a document node", DAXonErrorCode.SXWN9026, GetLocation());
+                doneWarnings = true;
+            }
+
+            contextMaybeUndefined = contextInfo.IsPossiblyAbsent();
+            if (th.IsSubType(contextInfo.GetItemType(), NodeKindTest.DOCUMENT))
+            {
+
+                // this rewrite is important for streamability analysis
+                ContextItemExpression cie = new ContextItemExpression();
+                ExpressionTool.CopyLocationInfo(this, cie);
+                cie.SetStaticInfo(contextInfo);
+                return cie;
+            }
+
+            Affinity relation = th.Relationship(contextInfo.GetItemType(), AnyNodeTest.GetInstance());
+            if (relation == Affinity.DISJOINT)
+            {
+                throw new XPathException(NoContextMessage() + ": the context item is not a node").WithErrorCode("XPTY0020").AsTypeError().WithLocation(GetLocation());
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
+        {
+
+            // repeat the check: in XSLT insufficient information is available the first time
+            return TypeCheck(visitor, contextItemType);
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        protected override int ComputeSpecialProperties()
+        {
+            return StaticProperty.ORDERED_NODESET | StaticProperty.CONTEXT_DOCUMENT_NODESET | StaticProperty.SINGLE_DOCUMENT_NODESET | StaticProperty.NO_NODES_NEWLY_CREATED;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        public virtual bool IsContextPossiblyUndefined()
+        {
+            return contextMaybeUndefined;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        protected virtual string NoContextMessage()
+        {
+            return "Leading '/' selects nothing";
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Is this expression the same as another expression?
+        /// </summary>
+        public override bool Equals(object other)
+        {
+            return other is RootExpression;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        protected override int ComputeCardinality()
+        {
+            return StaticProperty.EXACTLY_ONE;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        public override ItemType GetItemType()
+        {
+            return NodeKindTest.DOCUMENT;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        public override UType GetStaticUType(UType contextItemType)
+        {
+            return UType.DOCUMENT;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        protected override int ComputeHashCode()
+        {
+            return "RootExpression".GetHashCode();
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public virtual NodeInfo GetNode(IXPathContext context)
+        {
+            IItem current = context.GetContextItem();
+            if (current == null)
+            {
+                DynamicError("Finding root of tree: the context item is absent", "XPDY0002", context);
+            }
+
+            if (current is NodeInfo)
+            {
+                NodeInfo doc = ((NodeInfo)current).Root;
+                if (doc.GetNodeKind() != Types.Type.DOCUMENT)
+                {
+                    DynamicError("The root of the tree containing the context item is not a document node", "XPDY0050", context);
+                }
+
+                return doc;
+            }
+
+            TypeError("Finding root of tree: the context item is not a node", "XPTY0020", context);
+
+            // dummy return; we never get here
+            return null;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override Expression Copy(RebindingMap rebindings)
+        {
+            RootExpression exp = new RootExpression();
+            ExpressionTool.CopyLocationInfo(this, exp);
+            return exp;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override Patterns.Pattern ToPattern(Configuration config)
+        {
+            return new NodeTestPattern(NodeKindTest.DOCUMENT);
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
+        {
+            if (pathMapNodeSet == null)
+            {
+                ContextItemExpression cie = new ContextItemExpression();
+                ExpressionTool.CopyLocationInfo(this, cie);
+                pathMapNodeSet = new PathMap.PathMapNodeSet(pathMap.MakeNewRoot(cie));
+            }
+
+            return pathMapNodeSet.CreateArc(AxisInfo.ANCESTOR_OR_SELF, NodeKindTest.DOCUMENT);
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override string ToString()
+        {
+            return "(/)";
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override void Export(ExpressionPresenter destination)
+        {
+            destination.StartElement("root", this);
+            destination.EndElement();
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override ISequenceIterator Iterate(IXPathContext context)
+        {
+            return SingletonIterator.MakeIterator(GetNode(context));
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override IItem EvaluateItem(IXPathContext context)
+        {
+            return GetNode(context);
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override bool EffectiveBooleanValue(IXPathContext context)
+        {
+            return GetNode(context) != null;
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        public override Elaborator GetElaborator()
+        {
+            return new RootExprElaborator();
+        }
+
+        /// <summary>
+        /// Type-check the expression.
+        /// </summary>
+        /// <summary>
+        /// Specify that the expression returns a singleton
+        /// </summary>
+        /// <summary>
+        /// get HashCode for comparing two expressions
+        /// </summary>
+        /// <summary>
+        /// Elaborator for a root expression ({@code /})
+        /// </summary>
+        public class RootExprElaborator : ItemElaborator
+        {
+            public override IItemEvaluator ElaborateForItem()
+            {
+                RootExpression expr = (RootExpression)GetExpression();
+                return (context) => expr.GetNode(context);
+            }
+        }
+    }
+}

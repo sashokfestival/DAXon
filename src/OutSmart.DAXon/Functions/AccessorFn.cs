@@ -1,0 +1,355 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Expressions.Elaboration;
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Values;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Functions
+{
+    /// <summary>
+    /// This class supports the get_X_from_Y functions defined in XPath 2.0
+    /// </summary>
+    public abstract class AccessorFn : ScalarSystemFunction
+    {
+
+        public abstract Component ComponentId { get; }
+        public override IntegerValue[] IntegerBounds
+        {
+            get
+            {
+                switch (ComponentId)
+                {
+                    case Component.YEAR:
+                        return new IntegerValue[]
+                        {
+                        Int64Value.MakeIntegerValue(-100000),
+                        Int64Value.MakeIntegerValue(+100000)
+                        };
+                    case Component.MONTH:
+                        return new IntegerValue[]
+                        {
+                        Int64Value.MakeIntegerValue(-11),
+                        Int64Value.MakeIntegerValue(+11)
+                        };
+                    case Component.DAY:
+                        return new IntegerValue[]
+                        {
+                        Int64Value.MakeIntegerValue(-31),
+                        Int64Value.MakeIntegerValue(+31)
+                        };
+                    case Component.HOURS:
+                        return new IntegerValue[]
+                        {
+                        Int64Value.MakeIntegerValue(-24),
+                        Int64Value.MakeIntegerValue(+24)
+                        };
+                    case Component.MINUTES:
+                        return new IntegerValue[]
+                        {
+                        Int64Value.MakeIntegerValue(-59),
+                        Int64Value.MakeIntegerValue(+59)
+                        };
+                    case Component.SECONDS:
+                        return new IntegerValue[]
+                        {
+                        Int64Value.MakeIntegerValue(-59),
+                        Int64Value.MakeIntegerValue(+59)
+                        };
+                    default:
+                        return null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public override AtomicValue Evaluate(IItem item, IXPathContext context)
+        {
+            return ((AtomicValue)item).GetComponent(ComponentId);
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public override Elaborator GetElaborator()
+        {
+            return new AccessorFnElaborator();
+        }
+        public enum Component
+        {
+            YEAR,
+            MONTH,
+            DAY,
+            HOURS,
+            MINUTES,
+            SECONDS,
+            TIMEZONE,
+            LOCALNAME,
+            NAMESPACE,
+            PREFIX,
+            MICROSECONDS,
+            NANOSECONDS,
+            WHOLE_SECONDS,
+            YEAR_ALLOWING_ZERO
+            , ERA
+            , INSTANT_SECONDS
+            , OFFSET_SECONDS
+            , MONTH_OF_YEAR
+            , DAY_OF_MONTH
+            , DAY_OF_YEAR
+            , DAY_OF_WEEK
+            , ALIGNED_DAY_OF_WEEK_IN_MONTH
+            , ALIGNED_DAY_OF_WEEK_IN_YEAR
+            , ALIGNED_WEEK_OF_MONTH
+            , ALIGNED_WEEK_OF_YEAR
+            , YEAR_OF_ERA
+            , PROLEPTIC_MONTH
+            , EPOCH_DAY
+            , CLOCK_HOUR_OF_DAY
+            , CLOCK_HOUR_OF_AMPM
+            , HOUR_OF_DAY
+            , HOUR_OF_AMPM
+            , MILLI_OF_SECOND
+            , MILLI_OF_DAY
+            , MICRO_OF_SECOND
+            , MICRO_OF_DAY
+            , NANO_OF_SECOND
+            , NANO_OF_DAY
+            , MINUTE_OF_HOUR
+            , MINUTE_OF_DAY
+            , SECOND_OF_MINUTE
+            , SECOND_OF_DAY
+            , AMPM_OF_DAY
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class YearFromDateTime : AccessorFn
+        {
+            public override Component ComponentId => Component.YEAR;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class MonthFromDateTime : AccessorFn
+        {
+            public override Component ComponentId => Component.MONTH;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class DayFromDateTime : AccessorFn
+        {
+            public override Component ComponentId => Component.DAY;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class HoursFromDateTime : AccessorFn
+        {
+            public override Component ComponentId => Component.HOURS;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class MinutesFromDateTime : AccessorFn
+        {
+            public override Component ComponentId => Component.MINUTES;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class SecondsFromDateTime : AccessorFn
+        {
+            public override Component ComponentId => Component.SECONDS;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class TimezoneFromDateTime : AccessorFn
+        {
+            public override Component ComponentId => Component.TIMEZONE;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class YearFromDate : AccessorFn
+        {
+            public override Component ComponentId => Component.YEAR;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class MonthFromDate : AccessorFn
+        {
+            public override Component ComponentId => Component.MONTH;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class DayFromDate : AccessorFn
+        {
+            public override Component ComponentId => Component.DAY;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class TimezoneFromDate : AccessorFn
+        {
+            public override Component ComponentId => Component.TIMEZONE;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class HoursFromTime : AccessorFn
+        {
+            public override Component ComponentId => Component.HOURS;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class MinutesFromTime : AccessorFn
+        {
+            public override Component ComponentId => Component.MINUTES;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class SecondsFromTime : AccessorFn
+        {
+            public override Component ComponentId => Component.SECONDS;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class TimezoneFromTime : AccessorFn
+        {
+            public override Component ComponentId => Component.TIMEZONE;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class YearsFromDuration : AccessorFn
+        {
+            public override Component ComponentId => Component.YEAR;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class MonthsFromDuration : AccessorFn
+        {
+            public override Component ComponentId => Component.MONTH;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class DaysFromDuration : AccessorFn
+        {
+            public override Component ComponentId => Component.DAY;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class HoursFromDuration : AccessorFn
+        {
+            public override Component ComponentId => Component.HOURS;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class MinutesFromDuration : AccessorFn
+        {
+            public override Component ComponentId => Component.MINUTES;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class SecondsFromDuration : AccessorFn
+        {
+            public override Component ComponentId => Component.SECONDS;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class LocalNameFromQName : AccessorFn
+        {
+            public override Component ComponentId => Component.LOCALNAME;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class PrefixFromQName : AccessorFn
+        {
+            public override Component ComponentId => Component.PREFIX;
+        }
+
+        /// <summary>
+        /// Evaluate the expression
+        /// </summary>
+        public class NamespaceUriFromQName : AccessorFn
+        {
+            public override Component ComponentId => Component.NAMESPACE;
+        }
+
+        /// <summary>
+        /// Elaborator for accessor functions such as hours-from-date-Time, minutes-from-duration
+        /// </summary>
+        public class AccessorFnElaborator : ItemElaborator
+        {
+            public override IItemEvaluator ElaborateForItem()
+            {
+                SystemFunctionCall fnc = (SystemFunctionCall)GetExpression();
+                AccessorFn fn = (AccessorFn)fnc.TargetFunction;
+                Component component = fn.ComponentId;
+                IItemEvaluator argEval = fnc.GetArg(0).MakeElaborator().ElaborateForItem();
+                bool nullable = Cardinality.AllowsZero(fnc.GetArg((0)).GetCardinality());
+                return (context) =>
+                {
+                    AtomicValue @base = ((AtomicValue)argEval.Eval(context));
+                    if (nullable && @base == null)
+                    {
+                        return null;
+                    }
+
+                    return @base.GetComponent(component);
+                };
+            }
+        }
+    }
+}

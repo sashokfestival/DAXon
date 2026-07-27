@@ -1,0 +1,458 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.XQuery;
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Internal.Net;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Lib;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Streams;
+using System.IO;
+namespace OutSmart.DAXon.Resources
+{
+    public abstract class AbstractResourceCollection : IResourceCollection
+    {
+        protected Configuration config;
+        protected string collectionURI;
+        protected URIQueryParameters @params = null;
+        protected bool noExceptions = false;
+
+        public virtual string CollectionURI => collectionURI;
+        public AbstractResourceCollection(Configuration config)
+        {
+            this.config = config;
+        }
+
+        public static void CheckNotNull(string collectionURI, IXPathContext context)
+        {
+            if (collectionURI == null)
+            {
+                throw new XPathException("No default collection has been defined").WithErrorCode("FODC0002").WithXPathContext(context);
+            }
+        }
+
+        public virtual bool IsStable(IXPathContext context)
+        {
+            if (@params == null)
+            {
+                return false;
+            }
+
+            bool? stable = @params.Stable;
+            if (!stable.HasValue)
+            {
+                return context.GetConfiguration().GetBooleanProperty(Feature<bool>.STABLE_COLLECTION_URI);
+            }
+            else
+            {
+                return stable.Value;
+            }
+        }
+
+        public virtual void RegisterContentType(string contentType, IResourceFactory factory)
+        {
+            config.RegisterMediaType(contentType, factory);
+        }
+
+        protected virtual ParseOptions OptionsFromQueryParameters(URIQueryParameters @params, IXPathContext context)
+        {
+            ParseOptions options = context.GetConfiguration().GetParseOptions();
+            if (@params != null)
+            {
+                int? v = @params.GetValidationMode();
+                if (v.HasValue)
+                {
+                    options = options.WithSchemaValidationMode(v.Value);
+                }
+
+                bool? xInclude = @params.XInclude;
+                if (xInclude.HasValue)
+                {
+                    options = options.WithXIncludeAware(xInclude.Value);
+                }
+
+                ISpaceStrippingRule stripSpace = @params.SpaceStrippingRule;
+                if (stripSpace != null)
+                {
+                    options = options.WithSpaceStrippingRule(stripSpace);
+                }
+
+                // If the URI requested suppression of errors, or that errors should be treated
+                // as warnings, we set up a special ErrorListener to achieve this
+                int onError = URIQueryParameters.ON_ERROR_FAIL;
+                if (@params.OnError.HasValue)
+                {
+                    onError = @params.OnError.Value;
+                }
+
+                Controller controller = context.GetController();
+                IErrorReporter oldErrorReporter = controller == null ? context.GetConfiguration().MakeErrorReporter() : controller.ErrorReporter;
+                options = SetupErrorHandlingForCollection(options, onError, oldErrorReporter);
+            }
+
+            return options;
+        }
+
+        public static ParseOptions SetupErrorHandlingForCollection(ParseOptions options, int onError, IErrorReporter oldErrorReporter)
+        {
+            if (onError == URIQueryParameters.ON_ERROR_IGNORE)
+            {
+                options = options.WithErrorReporter(new ErrorSuppressor());
+            }
+            else if (onError == URIQueryParameters.ON_ERROR_WARNING)
+            {
+                options = options.WithErrorReporter(new ErrorAsWarningReporter(oldErrorReporter));
+            }
+
+            return options;
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        protected virtual InputDetails GetInputDetails(string resourceURI)
+        {
+            InputDetails inputDetails = new InputDetails();
+            try
+            {
+                inputDetails.resourceUri = resourceURI;
+                URI uri = new URI(resourceURI);
+                if ("file".Equals(uri.Scheme))
+                {
+                    if (@params != null && @params.ContentType != null)
+                    {
+                        inputDetails.contentType = @params.ContentType;
+                    }
+                    else
+                    {
+                        inputDetails.contentType = GuessContentTypeFromName(resourceURI);
+                    }
+                }
+                else
+                {
+                    URLConnection connection = ResourceLoader.UrlConnection(uri.ToURL());
+                    inputDetails.contentType = connection.ContentType;
+                    inputDetails.encoding = connection.ContentEncoding;
+                    foreach (string param in inputDetails.contentType.Replace(" ", "").Split(";"))
+                    {
+                        if (param.StartsWith("charset=", StringComparison.Ordinal))
+                        {
+                            inputDetails.encoding = param.Split("=", 2)[1];
+                        }
+                        else
+                        {
+                            inputDetails.contentType = param;
+                        }
+                    }
+                }
+
+                if (inputDetails.contentType == null || config.GetResourceFactoryForMediaType(inputDetails.contentType) == null)
+                {
+                    System.IO.Stream stream;
+                    if ("file".Equals(uri.Scheme))
+                    {
+                        string file = new Uri(uri.ToString()).LocalPath;
+                        stream = new FileStream(file, FileMode.Open, FileAccess.Read);
+                        if (new FileInfo(file).Length <= 1024)
+                        {
+                            inputDetails.binaryContent = BinaryResource.ReadBinaryFromStream(stream, resourceURI);
+                            stream.Dispose();
+                            stream = new MemoryStream(inputDetails.binaryContent);
+                        }
+                    }
+                    else
+                    {
+                        stream = ResourceLoader.UrlStream(config, uri.ToString());
+                    }
+
+                    inputDetails.contentType = GuessContentTypeFromContent(stream);
+                    stream.Dispose();
+                }
+
+                if (@params != null && @params.OnError.HasValue)
+                {
+                    inputDetails.onError = @params.OnError.Value;
+                }
+
+                return inputDetails;
+            }
+            catch (URISyntaxException e)
+            {
+                throw new XPathException(e?.Message);
+            }
+            catch (IOException e)
+            {
+                throw new XPathException(e?.Message);
+            }
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        protected virtual string GuessContentTypeFromName(string resourceURI)
+        {
+            string contentTypeFromName = URLConnection.GuessContentTypeFromName(resourceURI);
+            string extension = null;
+            if (contentTypeFromName == null)
+            {
+                extension = GetFileExtension(resourceURI);
+                if (extension != null)
+                {
+                    contentTypeFromName = config.GetMediaTypeForFileExtension(extension);
+                }
+            }
+
+            return contentTypeFromName;
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        protected virtual string GuessContentTypeFromContent(System.IO.Stream stream)
+        {
+            try
+            {
+                stream = InputStreamMarker.EnsureMarkSupported(stream);
+                return URLConnection.GuessContentTypeFromStream(stream);
+            }
+            catch (IOException err)
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        private string GetFileExtension(string name)
+        {
+            int i = name.LastIndexOf('.');
+            int p = System.Math.Max(name.LastIndexOf('/'), name.LastIndexOf('\\'));
+            if (i > p && i + 1 < name.Length)
+            {
+                return name.Substring(i + 1);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        public virtual IResource MakeResource(IXPathContext context, InputDetails details)
+        {
+            IResourceFactory factory = null;
+            string contentType = details.contentType;
+            if (contentType != null)
+            {
+                factory = context.GetConfiguration().GetResourceFactoryForMediaType(contentType);
+            }
+
+            if (factory == null)
+            {
+                factory = BinaryResource.FACTORY;
+            }
+
+            return factory.MakeResource(context, details);
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        public virtual IResource MakeTypedResource(IXPathContext context, IResource basicResource)
+        {
+            string mediaType = basicResource.ContentType;
+            IResourceFactory factory = config.GetResourceFactoryForMediaType(mediaType);
+            if (factory == null)
+            {
+                return basicResource;
+            }
+
+            if (basicResource is BinaryResource)
+            {
+                InputDetails details = new InputDetails();
+                details.binaryContent = ((BinaryResource)basicResource).Data;
+                details.contentType = mediaType;
+                details.resourceUri = basicResource.ResourceURI;
+                return factory.MakeResource(context, details);
+            }
+            else if (basicResource is UnparsedTextResource)
+            {
+                InputDetails details = new InputDetails();
+                details.characterContent = ((UnparsedTextResource)basicResource).Content;
+                details.contentType = mediaType;
+                details.resourceUri = basicResource.ResourceURI;
+                return factory.MakeResource(context, details);
+            }
+            else
+            {
+                return basicResource;
+            }
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        public virtual IResource MakeResource(IXPathContext context, string resourceURI)
+        {
+            InputDetails details = GetInputDetails(resourceURI);
+            return MakeResource(context, details);
+        }
+
+        /// <summary>
+        /// Options for parsing the content of an XML resource
+        /// </summary>
+        public virtual bool StripWhitespace(ISpaceStrippingRule rules)
+        {
+            return false;
+        }
+        public virtual IEnumerator<string> GetResourceURIs(IXPathContext arg0) => throw new NotImplementedException();
+        public virtual IEnumerator<IResource> GetResources(IXPathContext arg0) => throw new NotImplementedException();
+
+        private class ErrorSuppressor : IErrorReporter
+        {
+            public virtual void Report(IXmlProcessingError error)
+            {
+            }
+        }
+
+        private class ErrorAsWarningReporter : IErrorReporter
+        {
+            private readonly IErrorReporter originalErrorReporter;
+            public ErrorAsWarningReporter(IErrorReporter originalErrorReporter)
+            {
+                this.originalErrorReporter = originalErrorReporter;
+            }
+
+            public virtual void Report(IXmlProcessingError error)
+            {
+                if (error.IsWarning())
+                {
+                    originalErrorReporter.Report(error);
+                }
+                else
+                {
+                    originalErrorReporter.Report(error.AsWarning());
+                    XmlProcessingIncident supp = new XmlProcessingIncident("The document will be excluded from the collection", DAXonErrorCode.SXWN9050).AsWarning();
+                    supp.SetLocation(error.GetLocation());
+                    originalErrorReporter.Report(supp);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Information about a resource
+        /// </summary>
+        public class InputDetails
+        {
+            /// <summary>
+            /// The URI of the resource
+            /// </summary>
+            public string resourceUri;
+            /// <summary>
+            /// The binary content of the resource
+            /// </summary>
+            public byte[] binaryContent;
+            /// <summary>
+            /// The character content of the resource
+            /// </summary>
+            public string characterContent;
+            /// <summary>
+            /// The media type of the resource
+            /// </summary>
+            public string contentType;
+            /// <summary>
+            /// The encoding of the resource (if it is text, represented in binary)
+            /// </summary>
+            public string encoding;
+            /// <summary>
+            /// Options for parsing the content of an XML resource
+            /// </summary>
+            public ParseOptions parseOptions;
+            public int onError = URIQueryParameters.ON_ERROR_FAIL;
+            public virtual System.IO.Stream GetInputStream(Configuration config)
+            {
+                return ResourceLoader.UrlStream(config, resourceUri);
+            }
+
+            public virtual byte[] ObtainBinaryContent(Configuration config)
+            {
+                if (binaryContent != null)
+                {
+                    return binaryContent;
+                }
+                else if (characterContent != null)
+                {
+                    string e = encoding != null ? encoding : "UTF-8";
+                    return BinaryResource.Encode(characterContent, e);
+                }
+                else
+                {
+                    try
+                    {
+                        using (System.IO.Stream stream = GetInputStream(config))
+                        {
+                            return BinaryResource.ReadBinaryFromStream(stream, resourceUri);
+                        }
+                    }
+                    catch (IOException e)
+                    {
+                        throw new XPathException(e?.Message);
+                    }
+                }
+            }
+
+            public virtual string ObtainCharacterContent(Configuration config)
+            {
+                if (characterContent != null)
+                {
+                    return characterContent;
+                }
+                else if (binaryContent != null && encoding != null)
+                {
+                    return BinaryResource.Decode(binaryContent, encoding);
+                }
+                else
+                {
+                    try
+                    {
+                        System.IO.Stream stream = GetInputStream(config);
+                        string enc = encoding;
+                        if (enc == null)
+                        {
+                            stream = InputStreamMarker.EnsureMarkSupported(stream);
+                            enc = EncodingDetector.InferStreamEncoding(stream, "UTF-8", null);
+                        }
+
+                        return characterContent = CatalogCollection.MakeStringFromStream(stream, enc);
+                    }
+                    catch (IOException e)
+                    {
+                        if (onError == URIQueryParameters.ON_ERROR_FAIL)
+                        {
+                            throw new XPathException(e?.Message);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

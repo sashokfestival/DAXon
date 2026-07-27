@@ -1,0 +1,552 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Transformation.Packages;
+using OutSmart.DAXon.Trees.Linked;
+using OutSmart.DAXon.Trees.Tiny;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Values;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Lib;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Jaxp.Transform;
+using System.IO;
+namespace OutSmart.DAXon.Xslt
+{
+    public class StylesheetModule
+    {
+        private readonly StyleElement rootElement;
+        private int precedence;
+        private int minImportPrecedence;
+        private StylesheetModule importer;
+        bool wasIncluded;
+        // the value of the inputTypeAnnotations attribute on this module, combined with the values
+        // on all imported/included modules. This is a combination of the bit-significant values
+        // ANNOTATION_STRIP and ANNOTATION_PRESERVE.
+        private int inputTypeAnnotations = 0;
+        // A list of all the declarations in the stylesheet and its descendants, in increasing precedence order
+        protected IList<ComponentDeclaration> topLevel = new List<ComponentDeclaration>();
+
+        public virtual StylesheetModule Importer
+        {
+            get => importer; set
+            {
+                this.importer = value;
+            }
+        }
+
+        public virtual StyleElement RootElement => rootElement;
+
+        public virtual XSLModuleRoot StylesheetElement => (XSLModuleRoot)rootElement;
+
+        public virtual int Precedence => wasIncluded ? importer.Precedence : precedence;
+
+        public virtual int MinImportPrecedence
+        {
+            get => this.minImportPrecedence; set
+            {
+                this.minImportPrecedence = value;
+            }
+        }
+
+        public virtual int InputTypeAnnotations
+        {
+            get => inputTypeAnnotations; set
+            {
+                inputTypeAnnotations |= value;
+                if (inputTypeAnnotations == (XSLModuleRoot.ANNOTATION_STRIP | XSLModuleRoot.ANNOTATION_PRESERVE))
+                {
+                    GetPrincipalStylesheetModule().CompileError("One stylesheet module specifies input-type-annotations='strip', " + "another specifies input-type-annotations='preserve'", "XTSE0265");
+                }
+
+                if (value == XSLModuleRoot.ANNOTATION_STRIP)
+                {
+                    GetPrincipalStylesheetModule().GetStylesheetPackage().SetStripsTypeAnnotations(true);
+                }
+            }
+        }
+        public StylesheetModule(StyleElement rootElement, int precedence)
+        {
+            this.rootElement = rootElement;
+            this.precedence = precedence;
+        }
+
+        public static DocumentImpl LoadStylesheetModule(ResolvedResource styleSource, bool topLevelModule, Compilation compilation, NestedIntegerValue precedence)
+        {
+            string systemId = styleSource.SystemId;
+            DocumentKey docURI = systemId == null ? null : new DocumentKey(systemId);
+            if (systemId != null && compilation.ImportStack.Contains(docURI))
+            {
+                throw new XPathException("The stylesheet module includes/imports itself directly or indirectly", "XTSE0180");
+            }
+
+            compilation.ImportStack.Push(docURI);
+            Configuration config = compilation.GetConfiguration();
+            PipelineConfiguration pipe = config.MakePipelineConfiguration();
+            pipe.SetErrorReporter(compilation.GetCompilerInfo().ErrorReporter);
+            LinkedTreeBuilder styleBuilder = new LinkedTreeBuilder(pipe, Durability.LASTING);
+            styleBuilder.SetSystemId(styleSource.SystemId);
+
+            //styleBuilder.freezeSystemIdAndBaseURI();
+            styleBuilder.SetNodeFactory(compilation.GetStyleNodeFactory(topLevelModule));
+            styleBuilder.SetLineNumbering(true);
+            UseWhenFilter useWhenFilter = new UseWhenFilter(compilation, styleBuilder, precedence);
+            useWhenFilter.SetSystemId(styleSource.SystemId);
+            StylesheetSpaceStrippingRule rule = new StylesheetSpaceStrippingRule(config.GetNamePool());
+            Stripper styleStripper = new Stripper(rule, useWhenFilter);
+            CommentStripper commentStripper = new CommentStripper(styleStripper);
+            if (compilation.GetCompilerInfo().XsltVersion == 40)
+            {
+                NamePool pool = config.GetNamePool();
+                commentStripper.SetSkippedElementTest((name) => name.ObtainFingerprint(pool) == StandardNames.XSL_NOTE);
+            }
+
+
+            // build the stylesheet document
+            DocumentImpl doc;
+            ParseOptions options = MakeStylesheetParseOptions(styleSource, pipe);
+            try
+            {
+                // Direct XmlReaderToReceiver pump (ActiveStreamSource); no SAX XMLReader fabricated.
+                Sender.Send(styleSource, commentStripper, options);
+                doc = (DocumentImpl)styleBuilder.CurrentRoot;
+                styleBuilder.Reset();
+                compilation.ImportStack.Pop();
+                return doc;
+            }
+            catch (XPathException err)
+            {
+                if (topLevelModule && !err.HasBeenReported())
+                {
+
+                    // bug 2244
+                    compilation.ReportError(err);
+                }
+
+                throw err;
+            }
+            finally
+            {
+                if (options.IsPleaseCloseAfterUse())
+                {
+                    ParseOptions.Dispose(styleSource);
+                }
+            }
+        }
+
+        private static ParseOptions MakeStylesheetParseOptions(ResolvedResource styleSource, PipelineConfiguration pipe)
+        {
+            ParseOptions options = new ParseOptions();
+            options = options.WithSchemaValidationMode(Validation.STRIP).WithDTDValidationMode(Validation.STRIP).WithLineNumbering(true).WithSpaceStrippingRule(NoElementsSpaceStrippingRule.GetInstance()).WithErrorReporter(pipe.GetErrorReporter());
+            return options;
+        }
+
+        public static PreparedStylesheet LoadStylesheet(ResolvedResource styleSource, Compilation compilation)
+        {
+            string systemId = styleSource.SystemId;
+            DocumentKey docURI = systemId == null ? null : new DocumentKey(systemId);
+            if (systemId != null && compilation.ImportStack.Contains(docURI))
+            {
+                throw new XPathException("The stylesheet module includes/imports itself directly or indirectly", "XTSE0180");
+            }
+
+            compilation.ImportStack.Push(docURI);
+            compilation.SetMinimalPackageData();
+            Configuration config = compilation.GetConfiguration();
+            PipelineConfiguration pipe = config.MakePipelineConfiguration();
+            pipe.SetErrorReporter(compilation.GetCompilerInfo().ErrorReporter);
+            LinkedTreeBuilder styleBuilder = new LinkedTreeBuilder(pipe, Durability.LASTING);
+            styleBuilder.SetSystemId(styleSource.SystemId);
+
+            //styleBuilder.freezeSystemIdAndBaseURI();
+            styleBuilder.SetNodeFactory(compilation.GetStyleNodeFactory(true));
+            styleBuilder.SetLineNumbering(true);
+
+            // Pipeline for source XSLT code
+            IReceiver sourcePipeline;
+            UseWhenFilter useWhenFilter = new UseWhenFilter(compilation, styleBuilder, NestedIntegerValue.TWO);
+            useWhenFilter.SetSystemId(styleSource.SystemId);
+            StylesheetSpaceStrippingRule rule = new StylesheetSpaceStrippingRule(config.GetNamePool());
+            Stripper styleStripper = new Stripper(rule, useWhenFilter);
+            CommentStripper commentStripper = new CommentStripper(styleStripper);
+            if (compilation.GetCompilerInfo().XsltVersion == 40)
+            {
+                NamePool pool = config.GetNamePool();
+                commentStripper.SetSkippedElementTest((name) => name.ObtainFingerprint(pool) == StandardNames.XSL_NOTE);
+            }
+
+
+            // Pipeline for compiled XSLT code
+            TinyBuilder packageBuilder = new TinyBuilder(pipe);
+            packageBuilder.SetSystemId(styleSource.SystemId);
+            CheckSumFilter checksummer = new CheckSumFilter(packageBuilder);
+            checksummer.SetCheckExistingChecksum(true);
+            Valve valve = new Valve(NamespaceUri.SAXON_XSLT_EXPORT, commentStripper, checksummer);
+            sourcePipeline = valve;
+
+            // build the stylesheet document
+            ParseOptions options = MakeStylesheetParseOptions(styleSource, pipe);
+            try
+            {
+                // The stylesheet is parsed by the same direct XmlReaderToReceiver pump as source documents
+                // (ActiveStreamSource); no SAX XMLReader is fabricated (config.GetStyleParser retired — the
+                // fabricated parser was already ignored by the delivery path).
+                Sender.Send(styleSource, sourcePipeline, options);
+                NodeInfo doc;
+                if (valve.WasDiverted())
+                {
+
+                    // Implies we have loaded a pre-compiled package
+                    if (!checksummer.IsChecksumCorrect())
+                    {
+                        throw new XPathException("Compiled package cannot be loaded: incorrect checksum");
+                    }
+
+                    IIPackageLoader loader = config.MakePackageLoader();
+                    StylesheetPackage pack = loader.LoadPackageDoc(packageBuilder.CurrentRoot);
+                    compilation.SetPackageData(pack);
+                    PreparedStylesheet pss = new PreparedStylesheet(compilation);
+                    pack.CheckForAbstractComponents();
+                    pack.UpdatePreparedStylesheet(pss);
+
+                    return pss;
+                }
+                else
+                {
+
+                    // We loaded source XSLT (could be xsl:package or xsl:stylesheet or an LRE...
+                    doc = styleBuilder.CurrentRoot;
+                    styleBuilder.Reset();
+                    compilation.ImportStack.Pop();
+                    PreparedStylesheet pss = new PreparedStylesheet(compilation);
+                    PrincipalStylesheetModule psm = compilation.CompilePackage(new ResolvedResource { Node = doc });
+                    if (compilation.ErrorCount > 0)
+                    {
+                        XPathException e = new XPathException("Errors were reported during stylesheet compilation");
+                        e.SetHasBeenReported(true); // only intended as an exception message, not something to report to ErrorListener
+                        throw e;
+                    }
+
+                    psm.GetStylesheetPackage().CheckForAbstractComponents();
+                    psm.GetStylesheetPackage().UpdatePreparedStylesheet(pss);
+                    pss.AddPackage(compilation.GetPackageData());
+                    return pss;
+                }
+            }
+            catch (XPathException err)
+            {
+                if (!err.HasBeenReported())
+                {
+
+                    // bug 2244
+                    compilation.ReportError(err);
+                }
+
+                throw err;
+            }
+            finally
+            {
+                if (options.IsPleaseCloseAfterUse())
+                {
+                    ParseOptions.Dispose(styleSource);
+                }
+            }
+        }
+
+        // Source-free stylesheet load (P5): parse a System.Xml.XmlReader straight into the style tree via
+        // Sender.Send(XmlReader), without constructing a JAXP StreamSource. Mirrors LoadStylesheet(Source):
+        // same pipeline (use-when filter, stylesheet stripper, comment stripper, Valve for precompiled SEF
+        // packages) — only the parse-delivery differs. External entities resolve via the XmlReader's resolver.
+        public static PreparedStylesheet LoadStylesheet(global::System.Xml.XmlReader reader, string systemId, Compilation compilation)
+        {
+            DocumentKey docURI = systemId == null ? null : new DocumentKey(systemId);
+            if (systemId != null && compilation.ImportStack.Contains(docURI))
+            {
+                throw new XPathException("The stylesheet module includes/imports itself directly or indirectly", "XTSE0180");
+            }
+
+            compilation.ImportStack.Push(docURI);
+            compilation.SetMinimalPackageData();
+            Configuration config = compilation.GetConfiguration();
+            PipelineConfiguration pipe = config.MakePipelineConfiguration();
+            pipe.SetErrorReporter(compilation.GetCompilerInfo().ErrorReporter);
+            LinkedTreeBuilder styleBuilder = new LinkedTreeBuilder(pipe, Durability.LASTING);
+            styleBuilder.SetSystemId(systemId);
+            styleBuilder.SetNodeFactory(compilation.GetStyleNodeFactory(true));
+            styleBuilder.SetLineNumbering(true);
+
+            // Pipeline for source XSLT code
+            IReceiver sourcePipeline;
+            UseWhenFilter useWhenFilter = new UseWhenFilter(compilation, styleBuilder, NestedIntegerValue.TWO);
+            useWhenFilter.SetSystemId(systemId);
+            StylesheetSpaceStrippingRule rule = new StylesheetSpaceStrippingRule(config.GetNamePool());
+            Stripper styleStripper = new Stripper(rule, useWhenFilter);
+            CommentStripper commentStripper = new CommentStripper(styleStripper);
+            if (compilation.GetCompilerInfo().XsltVersion == 40)
+            {
+                NamePool pool = config.GetNamePool();
+                commentStripper.SetSkippedElementTest((name) => name.ObtainFingerprint(pool) == StandardNames.XSL_NOTE);
+            }
+
+            // Pipeline for compiled XSLT code
+            TinyBuilder packageBuilder = new TinyBuilder(pipe);
+            packageBuilder.SetSystemId(systemId);
+            CheckSumFilter checksummer = new CheckSumFilter(packageBuilder);
+            checksummer.SetCheckExistingChecksum(true);
+            Valve valve = new Valve(NamespaceUri.SAXON_XSLT_EXPORT, commentStripper, checksummer);
+            sourcePipeline = valve;
+
+            ParseOptions options = new ParseOptions().WithSchemaValidationMode(Validation.STRIP).WithDTDValidationMode(Validation.STRIP).WithLineNumbering(true).WithSpaceStrippingRule(NoElementsSpaceStrippingRule.GetInstance()).WithErrorReporter(pipe.GetErrorReporter());
+            try
+            {
+                Sender.Send(reader, systemId, sourcePipeline, options);
+                NodeInfo doc;
+                if (valve.WasDiverted())
+                {
+                    // Implies we have loaded a pre-compiled package
+                    if (!checksummer.IsChecksumCorrect())
+                    {
+                        throw new XPathException("Compiled package cannot be loaded: incorrect checksum");
+                    }
+
+                    IIPackageLoader loader = config.MakePackageLoader();
+                    StylesheetPackage pack = loader.LoadPackageDoc(packageBuilder.CurrentRoot);
+                    compilation.SetPackageData(pack);
+                    PreparedStylesheet pss = new PreparedStylesheet(compilation);
+                    pack.CheckForAbstractComponents();
+                    pack.UpdatePreparedStylesheet(pss);
+                    return pss;
+                }
+                else
+                {
+                    doc = styleBuilder.CurrentRoot;
+                    styleBuilder.Reset();
+                    compilation.ImportStack.Pop();
+                    PreparedStylesheet pss = new PreparedStylesheet(compilation);
+                    PrincipalStylesheetModule psm = compilation.CompilePackage(new ResolvedResource { Node = doc });
+                    if (compilation.ErrorCount > 0)
+                    {
+                        XPathException e = new XPathException("Errors were reported during stylesheet compilation");
+                        e.SetHasBeenReported(true);
+                        throw e;
+                    }
+
+                    psm.GetStylesheetPackage().CheckForAbstractComponents();
+                    psm.GetStylesheetPackage().UpdatePreparedStylesheet(pss);
+                    pss.AddPackage(compilation.GetPackageData());
+                    return pss;
+                }
+            }
+            catch (XPathException err)
+            {
+                if (!err.HasBeenReported())
+                {
+                    compilation.ReportError(err);
+                }
+
+                throw err;
+            }
+        }
+
+        public static ResolvedResource GetAssociatedStylesheet(Configuration config, IResourceResolver resolver, ResolvedResource source, string media, string title, string charset)
+        {
+            PIGrabber grabber = new PIGrabber(new Sink(config.MakePipelineConfiguration()));
+            grabber.SetFactory(config);
+            grabber.SetCriteria(media, title);
+            grabber.SetBaseURI(source.SystemId);
+            grabber.SetResourceResolver(resolver);
+            try
+            {
+                Sender.Send(source, grabber, null); // this parse will be aborted when the first start tag is found
+            }
+            catch (XPathException err)
+            {
+                if (grabber.IsTerminated())
+                {
+                }
+                else
+                {
+                    throw new XPathException("Failed while looking for xml-stylesheet PI", err);
+                }
+            }
+
+            try
+            {
+                ResolvedResource[] sources = (ResolvedResource[])grabber.AssociatedStylesheets;
+                if (sources == null)
+                {
+                    throw new XPathException("No matching <?xml-stylesheet?> processing instruction found");
+                }
+
+                return CompositeStylesheet(config, source.SystemId, sources);
+            }
+            catch (TransformerException err)
+            {
+                if (err is XPathException)
+                {
+                    throw (XPathException)err;
+                }
+                else
+                {
+                    throw new XPathException(err?.Message);
+                }
+            }
+        }
+
+        private static ResolvedResource CompositeStylesheet(Configuration config, string baseURI, ResolvedResource[] sources)
+        {
+            if (sources.Length == 1)
+            {
+                return sources[0];
+            }
+            else if (sources.Length == 0)
+            {
+                throw new XPathException("No stylesheets were supplied");
+            }
+
+
+            // create a new top-level stylesheet that imports all the others
+            StringBuilder sb = new StringBuilder(250);
+            sb.Append("<xsl:stylesheet version='1.0' ");
+            sb.Append(" xmlns:xsl='" + NamespaceConstant.XSLT + "'>");
+            foreach (ResolvedResource source in sources)
+            {
+                sb.Append("<xsl:import href='").Append(source.SystemId).Append("'/>");
+            }
+
+            sb.Append("</xsl:stylesheet>");
+            return new ResolvedResource { TextReader = new StringReader(sb.ToString()), SystemId = baseURI };
+        }
+
+        public virtual PrincipalStylesheetModule GetPrincipalStylesheetModule()
+        {
+            return importer.GetPrincipalStylesheetModule();
+        }
+
+        public virtual Configuration GetConfiguration()
+        {
+            return rootElement.GetConfiguration();
+        }
+
+        public virtual void SetWasIncluded()
+        {
+            wasIncluded = true;
+        }
+
+        public virtual void SpliceIncludes()
+        {
+            if (topLevel == null || topLevel.Count == 0)
+            {
+                topLevel = new List<ComponentDeclaration>(50);
+            }
+
+            minImportPrecedence = precedence;
+            StyleElement previousElement = rootElement;
+            foreach (NodeInfo child in StylesheetElement.Children())
+            {
+                if (child.GetNodeKind() == Types.Type.TEXT)
+                {
+
+                    // in an embedded stylesheet, white space nodes may still be there
+                    if (!Whitespace.IsAllWhite(child.UnicodeStringValue))
+                    {
+                        previousElement.CompileError("No character data is allowed between top-level elements", "XTSE0120");
+                    }
+                }
+                else if (child is DataElement)
+                {
+                    if (((DataElement)child).GetNodeName().GetNamespaceUri().IsEmpty())
+                    {
+                        Loc loc = new Loc(child);
+                        previousElement.CompileError("Top-level elements must be in a namespace: " + ((DataElement)child).GetNodeName().GetLocalPart() + " is not", "XTSE0130", loc);
+                    }
+                }
+                else
+                {
+                    previousElement = (StyleElement)child;
+                    if (child is XSLGeneralIncorporate)
+                    {
+                        XSLGeneralIncorporate xslinc = (XSLGeneralIncorporate)child;
+                        xslinc.ProcessAttributes();
+
+                        // get the included stylesheet. This follows the URL, builds a tree, and splices
+                        // in any indirectly-included stylesheets.
+                        xslinc.ValidateInstruction();
+                        int errors = ((XSLGeneralIncorporate)child).GetCompilation().ErrorCount;
+                        StylesheetModule inc = xslinc.GetIncludedStylesheet(this, precedence);
+                        if (inc == null)
+                        {
+                            return; // error has been reported
+                        }
+
+                        errors = ((XSLGeneralIncorporate)child).GetCompilation().ErrorCount - errors;
+                        if (errors > 0)
+                        {
+                            xslinc.CompileError("Reported " + errors + (errors == 1 ? " error" : " errors") + " in " + (xslinc.IsImport() ? "imported" : "included") + " stylesheet module", "XTSE0165");
+                        }
+
+
+                        // after processing the imported stylesheet and any others it brought @in,
+                        // adjust the import precedence of this stylesheet if necessary
+                        if (xslinc.IsImport())
+                        {
+                            precedence = inc.Precedence + 1;
+                        }
+                        else
+                        {
+                            precedence = inc.Precedence;
+                            inc.MinImportPrecedence = minImportPrecedence;
+                            inc.SetWasIncluded();
+                        }
+
+
+                        // copy the top-level elements of the included stylesheet into the top level of this
+                        // stylesheet. Normally we add these elements at the end, in order, but if the precedence
+                        // of an element is less than the precedence of the previous element, we promote it.
+                        // This implements the requirement in the spec that when xsl:include is used to
+                        // include a stylesheet, any xsl:import elements in the included document are moved
+                        // up in the including document to after any xsl:import elements in the including
+                        // document.
+                        IList<ComponentDeclaration> incchildren = inc.topLevel;
+                        foreach (ComponentDeclaration decl in incchildren)
+                        {
+                            int last = topLevel.Count - 1;
+                            if (last < 0 || decl.Precedence >= topLevel[last].Precedence)
+                            {
+                                topLevel.Add(decl);
+                            }
+                            else
+                            {
+                                while (last >= 0 && decl.Precedence < topLevel[last].Precedence)
+                                {
+                                    last--;
+                                }
+
+                                topLevel.Add(last + 1, decl);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ComponentDeclaration decl = new ComponentDeclaration(this, (StyleElement)child);
+                        topLevel.Add(decl);
+                    }
+                }
+            }
+        }
+    }
+}

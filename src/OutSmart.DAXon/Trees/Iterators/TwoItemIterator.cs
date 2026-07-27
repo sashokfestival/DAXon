@@ -1,0 +1,64 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Ported from upstream net/sf/saxon/tree/iter/TwoItemIterator.java (replaces the Phase 4.8c throwing stub).
+
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Values;
+
+namespace OutSmart.DAXon.Trees.Iterators
+{
+    /// <summary>An iterator over a pair of items.</summary>
+    public class TwoItemIterator : ISequenceIterator, ILookaheadIterator, IGroundedIterator, ILastPositionFinder
+    {
+        private readonly IItem one;
+        private readonly IItem two;
+        private int pos = 0;
+
+        public virtual bool HasNext => pos < 2;
+
+        public TwoItemIterator(IItem one, IItem two)
+        {
+            this.one = one;
+            this.two = two;
+        }
+
+        public virtual bool SupportsHasNext() => true;
+
+        public virtual IItem Next()
+        {
+            switch (pos++)
+            {
+                case 0: return one;
+                case 1: return two;
+                default: return null;
+            }
+        }
+
+        public virtual bool SupportsGetLength() => true;
+
+        public virtual int GetLength() => 2;
+
+        public virtual bool IsActuallyGrounded() => true;
+
+        public virtual IGroundedValue Materialize() => new SequenceExtent.Of<IItem>(new IItem[] { one, two });
+
+        public virtual IGroundedValue GetResidue()
+        {
+            switch (pos)
+            {
+                case 0: return new SequenceExtent.Of<IItem>(new IItem[] { one, two });
+                case 1: return two;
+                default: return EmptySequence.GetInstance();
+            }
+        }
+
+        public virtual void Close() { }
+        public virtual void Discharge() { }
+        public virtual void Dispose() { }
+    }
+}

@@ -1,0 +1,44 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Types;using OutSmart.DAXon.Functions;
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Xslt
+{
+    /// <summary>
+    /// An xsl:merge-key element in the stylesheet. <br>
+    /// </summary>
+    public class XSLMergeKey : XSLSortOrMergeKey
+    {
+
+        //    protected boolean seesAvuncularVariables() {
+        //        return false;
+        //    }
+        //    public SourceBinding bindVariable(StructuredQName qName) {
+        //    }
+        protected virtual ItemType ReturnedItemType => null;
+        public override void PrepareAttributes()
+        {
+            base.PrepareAttributes();
+            if (stable != null)
+            {
+                CompileError("The @stable attribute is not allowed in xsl:merge-key", "XTSE0090");
+            }
+        }
+
+        protected override string GetErrorCode()
+        {
+            return "XTSE3200";
+        }
+    }
+}

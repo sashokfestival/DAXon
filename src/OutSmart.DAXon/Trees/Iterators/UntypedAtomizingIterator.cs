@@ -1,0 +1,72 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Expressions;using OutSmart.DAXon.Functions;
+
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Values;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Trees.Iterators
+{
+    public class UntypedAtomizingIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
+    {
+        private readonly ISequenceIterator @base;
+
+        public virtual bool HasNext => ((ILookaheadIterator)@base).HasNext;
+        public UntypedAtomizingIterator(ISequenceIterator @base)
+        {
+            this.@base = @base;
+        }
+
+        public virtual AtomicValue Next()
+        {
+            try
+            {
+                IItem nextSource = @base.Next();
+                if (nextSource == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return (AtomicValue)nextSource.Atomize();
+                }
+            }
+            catch (XPathException e)
+            {
+                throw new UncheckedXPathException(e);
+            }
+        }
+
+        public virtual void Dispose()
+        {
+            @base.Dispose();
+        }
+
+        public virtual bool SupportsGetLength()
+        {
+            return SequenceTool.SupportsGetLength(@base);
+        }
+
+        public virtual int GetLength()
+        {
+            return SequenceTool.GetLength(@base);
+        }
+
+        public virtual bool SupportsHasNext()
+        {
+            return @base is ILookaheadIterator && ((ILookaheadIterator)@base).SupportsHasNext();
+        }
+        IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow: must delegate to the real covariant AtomicValue Next(), NOT default(null) = silent empty atomization
+    }
+}

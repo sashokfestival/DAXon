@@ -1,0 +1,42 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using System;using OutSmart.DAXon.Functions;
+
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Transformation
+{
+    /// <summary>
+    /// Exception thrown when there are problems with the license file
+    /// </summary>
+    public class LicenseException : Exception
+    {
+        public const int EXPIRED = 1;
+        public const int INVALID = 2;
+        public const int NOT_FOUND = 3;
+        public const int WRONG_FEATURES = 4;
+        public const int CANNOT_READ = 5;
+        public const int WRONG_CONFIGURATION = 6;
+        private int reason;
+
+        public virtual int Reason
+        {
+            get => reason; set
+            {
+                this.reason = value;
+            }
+        }
+        public LicenseException(string message, int reason) : base(message)
+        {
+            this.reason = reason;
+        }
+    }
+}

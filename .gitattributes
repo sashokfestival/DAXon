@@ -1,0 +1,5 @@
+# Byte-faithful checkout everywhere: the test suite byte-compares port output against
+# committed etalons (acceptance/library/*/expected.out, acceptance/probes/expected/*.txt,
+# acceptance/Examples/*/out.json). CRLF autoconversion (core.autocrlf=true) breaks those
+# gates on fresh Windows clones, so no text conversion for anything in this repo.
+* -text

@@ -1,0 +1,164 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions.Elaboration;
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Tracing;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Internal.Collections;
+using static OutSmart.DAXon.Expressions.Flwor.Clause.ClauseName;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Expressions.Instructions;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Expressions.Flwor
+{
+    /// <summary>
+    /// A "let" clause in a FLWOR expression
+    /// </summary>
+    public class DiagnosticClause : Clause
+    {
+        private Operand sequenceOp;
+        private IPullEvaluator evaluator;
+        public override ClauseName ClauseKey => DIAG;
+
+        //    }
+        public virtual Expression Sequence => sequenceOp.GetChildExpression();
+
+        public override LocalVariableBinding[] RangeVariables => new LocalVariableBinding[]
+            {
+            };
+
+        public virtual IPullEvaluator GetEvaluator()
+        {
+            if (evaluator == null)
+            {
+                evaluator = Sequence.MakeElaborator().ElaborateForPull();
+            }
+
+            return evaluator;
+        }
+
+        public override Clause Copy(FLWORExpression flwor, RebindingMap rebindings)
+        {
+            DiagnosticClause diag2 = new DiagnosticClause();
+            diag2.Location = Location;
+            diag2.SetPackageData(GetPackageData());
+            diag2.InitSequence(flwor, Sequence.Copy(rebindings));
+            return diag2;
+        }
+
+        public virtual void InitSequence(FLWORExpression flwor, Expression sequence)
+        {
+            sequenceOp = new Operand(flwor, sequence, IsRepeated() ? OperandRole.REPEAT_NAVIGATE : OperandRole.NAVIGATE);
+        }
+
+        public override TuplePull GetPullStream(TuplePull @base, IXPathContext context)
+        {
+            return new DiagnosticClausePull(@base, this);
+        }
+
+        public override TuplePush GetPushStream(TuplePush destination, Outputter output, IXPathContext context)
+        {
+            return new DiagnosticClausePush(output, destination, this);
+        }
+
+        public override void ProcessOperands(IOperandProcessor processor)
+        {
+            processor.ProcessOperand(sequenceOp);
+        }
+
+        //    }
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        public override void TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
+        {
+        }
+
+        //    }
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        //
+        public override void GatherVariableReferences(ExpressionVisitor visitor, IBinding binding, IList<VariableReference> references)
+        {
+            ExpressionTool.GatherVariableReferences(Sequence, binding, references);
+        }
+
+        //    }
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        //
+        public override void RefineVariableType(ExpressionVisitor visitor, IList<VariableReference> references, Expression returnExpr)
+        {
+            Expression seq = Sequence;
+            ItemType actualItemType = seq.GetItemType();
+            foreach (VariableReference @ref in references)
+            {
+                @ref.RefineVariableType(actualItemType, Sequence.GetCardinality(), seq is Literal ? ((Literal)seq).GroundedValue : null, seq.GetSpecialProperties());
+                ExpressionTool.ResetStaticProperties(returnExpr);
+            }
+        }
+
+        //    }
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        //
+        public override void AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
+        {
+            PathMap.PathMapNodeSet varPath = Sequence.AddToPathMap(pathMap, pathMapNodeSet);
+        }
+
+        //    }
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        //
+        public override void Explain(ExpressionPresenter @out)
+        {
+            @out.StartElement("trace");
+            Sequence.Export(@out);
+            @out.EndElement();
+        }
+
+        //    }
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        //
+        public override string ToShortString()
+        {
+            StringBuilder fsb = new StringBuilder(64);
+            fsb.Append("trace ");
+            fsb.Append(Sequence.ToShortString());
+            return fsb.ToString();
+        }
+
+        //    }
+        /// <summary>
+        /// Type-check the expression
+        /// </summary>
+        //
+        public override string ToString()
+        {
+            StringBuilder fsb = new StringBuilder(64);
+            fsb.Append("trace ");
+            fsb.Append(Sequence.ToString());
+            return fsb.ToString();
+        }
+    }
+}

@@ -1,0 +1,356 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Functions;
+
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees.Tiny;
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Collections;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Patterns
+{
+    public class NodeKindTest : NodeTest
+    {
+        public static readonly NodeKindTest DOCUMENT = new NodeKindTest(Types.Type.DOCUMENT);
+        public static readonly NodeKindTest ELEMENT = new NodeKindTest(Types.Type.ELEMENT);
+        public static readonly NodeKindTest ATTRIBUTE = new NodeKindTest(Types.Type.ATTRIBUTE);
+        public static readonly NodeKindTest TEXT = new NodeKindTest(Types.Type.TEXT);
+        public static readonly NodeKindTest COMMENT = new NodeKindTest(Types.Type.COMMENT);
+        public static readonly NodeKindTest PROCESSING_INSTRUCTION = new NodeKindTest(Types.Type.PROCESSING_INSTRUCTION);
+        public static readonly NodeKindTest NAMESPACE = new NodeKindTest(Types.Type.NAMESPACE);
+        private readonly int kind;
+        private readonly UType uType;
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        public override double DefaultPriority => -0.5;
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        public override int PrimitiveType => kind;
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        public override ISchemaType ContentType
+        {
+            get
+            {
+                switch (kind)
+                {
+                    case Types.Type.DOCUMENT:
+                        return AnyType.INSTANCE;
+                    case Types.Type.ELEMENT:
+                        return AnyType.INSTANCE;
+                    case Types.Type.ATTRIBUTE:
+                        return AnySimpleType.INSTANCE;
+                    case Types.Type.COMMENT:
+                        return BuiltInAtomicType.STRING;
+                    case Types.Type.TEXT:
+                        return BuiltInAtomicType.UNTYPED_ATOMIC;
+                    case Types.Type.PROCESSING_INSTRUCTION:
+                        return BuiltInAtomicType.STRING;
+                    case Types.Type.NAMESPACE:
+                        return BuiltInAtomicType.STRING;
+                    default:
+                        throw new InvalidOperationException("Unknown node kind");
+                }
+            }
+        }
+        private NodeKindTest(int nodeKind)
+        {
+            kind = nodeKind;
+            uType = UType.FromTypeCode(nodeKind);
+        }
+
+        public virtual int GetNodeKind()
+        {
+            return kind;
+        }
+
+        public override UType GetUType()
+        {
+            return UType.FromTypeCode(kind); // runtime: live recompute (override of NodeTest virtual); static-init-safe
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        public static NodeTest MakeNodeKindTest(int kind)
+        {
+            switch (kind)
+            {
+                case Types.Type.DOCUMENT:
+                    return DOCUMENT;
+                case Types.Type.ELEMENT:
+                    return ELEMENT;
+                case Types.Type.ATTRIBUTE:
+                    return ATTRIBUTE;
+                case Types.Type.COMMENT:
+                    return COMMENT;
+                case Types.Type.TEXT:
+                    return TEXT;
+                case Types.Type.PROCESSING_INSTRUCTION:
+                    return PROCESSING_INSTRUCTION;
+                case Types.Type.NAMESPACE:
+                    return NAMESPACE;
+                case Types.Type.NODE:
+                    return AnyNodeTest.GetInstance();
+                default:
+                    throw new ArgumentException("Unknown node kind " + kind + " in NodeKindTest");
+            }
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        public override bool Matches(IItem item, TypeHierarchy th)
+        {
+            return item is NodeInfo && kind == ((NodeInfo)item).GetNodeKind();
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        public override bool Matches(int nodeKind, INodeName name, ISchemaType annotation)
+        {
+            return kind == nodeKind;
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        public override IIntPredicateProxy GetMatcher(INodeVectorTree tree)
+        {
+            byte[] nodeKindArray = tree.NodeKindArray;
+            if (kind == Types.Type.TEXT)
+            {
+                return IntPredicateLambda.Of((nodeNr) =>
+                {
+                    int k = nodeKindArray[nodeNr];
+                    return k == Types.Type.TEXT || k == Types.Type.WHITESPACE_TEXT;
+                });
+            }
+            else
+            {
+                return IntPredicateLambda.Of((nodeNr) => (nodeKindArray[nodeNr] & 0x0f) == kind);
+            }
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        public override bool Test(NodeInfo node)
+        {
+            return node.GetNodeKind() == kind;
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        public override IAtomicType GetAtomizedItemType()
+        {
+            switch (kind)
+            {
+                case Types.Type.DOCUMENT:
+                    return BuiltInAtomicType.UNTYPED_ATOMIC;
+                case Types.Type.ELEMENT:
+                    return BuiltInAtomicType.ANY_ATOMIC;
+                case Types.Type.ATTRIBUTE:
+                    return BuiltInAtomicType.ANY_ATOMIC;
+                case Types.Type.COMMENT:
+                    return BuiltInAtomicType.STRING;
+                case Types.Type.TEXT:
+                    return BuiltInAtomicType.UNTYPED_ATOMIC;
+                case Types.Type.PROCESSING_INSTRUCTION:
+                    return BuiltInAtomicType.STRING;
+                case Types.Type.NAMESPACE:
+                    return BuiltInAtomicType.STRING;
+                default:
+                    throw new InvalidOperationException("Unknown node kind");
+            }
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        public override string ToString()
+        {
+            return Describe(kind);
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        public static string Describe(int kind)
+        {
+            switch (kind)
+            {
+                case Types.Type.DOCUMENT:
+                    return "document-node()";
+                case Types.Type.ELEMENT:
+                    return "element()";
+                case Types.Type.ATTRIBUTE:
+                    return "attribute()";
+                case Types.Type.COMMENT:
+                    return "comment()";
+                case Types.Type.TEXT:
+                    return "text()";
+                case Types.Type.PROCESSING_INSTRUCTION:
+                    return "processing-instruction()";
+                case Types.Type.NAMESPACE:
+                    return "namespace-node()";
+                default:
+                    return "** error **";
+            }
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        public static string NodeKindName(int kind)
+        {
+            switch (kind)
+            {
+                case Types.Type.DOCUMENT:
+                    return "document";
+                case Types.Type.ELEMENT:
+                    return "element";
+                case Types.Type.ATTRIBUTE:
+                    return "attribute";
+                case Types.Type.COMMENT:
+                    return "comment";
+                case Types.Type.TEXT:
+                    return "text";
+                case Types.Type.PROCESSING_INSTRUCTION:
+                    return "processing-instruction";
+                case Types.Type.NAMESPACE:
+                    return "namespace";
+                default:
+                    return "** error **";
+            }
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        /// <summary>
+        /// Returns a hash code value for the object.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return kind;
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        /// <summary>
+        /// Indicates whether some other object is "equal to" this one.
+        /// </summary>
+        public override bool Equals(object other)
+        {
+            return other is NodeKindTest && ((NodeKindTest)other).kind == kind;
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        /// <summary>
+        /// Indicates whether some other object is "equal to" this one.
+        /// </summary>
+        public override string ExplainMismatch(IItem item, TypeHierarchy th)
+        {
+            string explanation = base.ExplainMismatch(item, th);
+            if (explanation != null)
+            {
+                return explanation;
+            }
+
+            if (item is NodeInfo)
+            {
+                UType actualKind = UType.GetUType(item);
+                if (!GetUType().Overlaps(actualKind))
+                {
+                    return ("The supplied value is " + actualKind.ToStringWithIndefiniteArticle());
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            else
+            {
+                return ("The supplied value is " + Err.DescribeGenre(item.GetGenre()));
+            }
+        }
+
+        /// <summary>
+        /// Make a test for a given kind of node
+        /// </summary>
+        /// <summary>
+        /// Determine the default priority of this node test when used on its own as a Pattern
+        /// </summary>
+        /// <summary>
+        /// Indicates whether some other object is "equal to" this one.
+        /// </summary>
+        public override string ToShortString()
+        {
+            switch (GetNodeKind())
+            {
+                case Types.Type.ELEMENT:
+                    return "*";
+                case Types.Type.ATTRIBUTE:
+                    return "@*";
+                case Types.Type.DOCUMENT:
+                    return "/";
+                default:
+                    return ToString();
+            }
+        }
+    }
+}

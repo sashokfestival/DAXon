@@ -1,0 +1,22 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+using OutSmart.DAXon.Core;
+using System;
+using System.Collections.Generic;
+using OutSmart.DAXon.Model;
+
+// Phase 7.8: UnicodeChar.cs re-included into project. Stub removed to avoid CS0101.
+// namespace OutSmart.DAXon.Text
+// {
+//     public class UnicodeChar { public UnicodeChar() {} public UnicodeChar(int cp) {} }
+// }
+
+namespace OutSmart.DAXon.Functions
+{
+    public class PackageLoaderHE { public PackageLoaderHE() { } public PackageLoaderHE(Configuration config) { } }
+}

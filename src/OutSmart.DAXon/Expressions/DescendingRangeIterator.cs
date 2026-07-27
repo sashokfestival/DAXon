@@ -1,0 +1,127 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Model;using OutSmart.DAXon.Functions;
+
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees;
+using OutSmart.DAXon.Values;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Trees.Iterators;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Expressions
+{
+    public class DescendingRangeIterator : RangeIterator, IAtomicIterator, IReversibleIterator, ILastPositionFinder, ILookaheadIterator
+    {
+        long start;
+        long step;
+        long currentValue;
+        long limit;
+
+        public override IntegerValue First => new Int64Value(start);
+
+        public bool HasNext => currentValue - step >= limit;
+        public DescendingRangeIterator(long start, long step, long end)
+        {
+
+            //        if (start - end > int.MaxValue) {
+            //            throw new UncheckedXPathException("Saxon limit on sequence length exceeded (2^31)", "XPDY0130");
+            //        }
+            this.start = start;
+            this.step = step;
+            currentValue = start + step;
+            limit = end;
+            if (step != 1)
+            {
+                limit = start + ((end - start) / step) * step;
+            }
+        }
+
+        public override bool IsActuallyGrounded()
+        {
+            return true;
+        }
+
+        // Closed-form total of the whole descending range for fn:sum (a negative-step series).
+        // False once iteration has begun or on overflow — the caller then iterates.
+        internal bool TryComputeTotal(out long total)
+        {
+            total = 0;
+            return currentValue == start + step && Values.IntegerRange.TrySum(start, -step, limit, out total);
+        }
+
+        public override IGroundedValue Materialize()
+        {
+            return new IntegerRange(start, -step, limit);
+        }
+
+        public override IGroundedValue GetResidue()
+        {
+            return new IntegerRange(currentValue, -step, limit);
+        }
+
+        public override IntegerValue GetLast()
+        {
+            return new Int64Value(limit);
+        }
+
+        public override IntegerValue GetMin()
+        {
+            return new Int64Value(limit);
+        }
+
+        public override IntegerValue GetMax()
+        {
+            return new Int64Value(start);
+        }
+
+        public override IntegerValue GetStep()
+        {
+            return new Int64Value(-step);
+        }
+
+        public bool SupportsHasNext()
+        {
+            return true;
+        }
+
+        public new IntegerValue Next()
+        {
+            OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
+            currentValue -= step;
+            if (currentValue < limit)
+            {
+                return null;
+            }
+
+            return Int64Value.MakeIntegerValue(currentValue);
+        }
+
+        public bool SupportsGetLength()
+        {
+            return true;
+        }
+
+        public int GetLength()
+        {
+            return (int)((start - limit) + 1);
+        }
+
+        public IAtomicIterator GetReverseIterator()
+        {
+            return new AscendingRangeIterator(start, step, limit);
+        }
+        AtomicValue IAtomicIterator.Next() => Next();
+        ISequenceIterator IReversibleIterator.GetReverseIterator() => GetReverseIterator();
+        IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
+    }
+}
+

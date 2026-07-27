@@ -1,0 +1,144 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using System;
+using OutSmart.DAXon.Functions;
+
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Model
+{
+    public class CodedName : INodeName
+    {
+        private readonly int fingerprint;
+        private readonly string prefix;
+        private readonly NamePool pool;
+
+        public virtual string DisplayName => (prefix.Length == 0) ? GetLocalPart() : prefix + ":" + GetLocalPart();
+
+        public virtual int Fingerprint => fingerprint;
+        public CodedName(int fingerprint, string prefix, NamePool pool)
+        {
+
+            //        if (fingerprint >> 20 != 0) {
+            //            throw new global::System.ArgumentException();
+            //        }
+            this.fingerprint = fingerprint;
+            this.prefix = prefix;
+            this.pool = pool;
+        }
+
+        public virtual string GetPrefix()
+        {
+            return prefix;
+        }
+
+        public virtual NamespaceUri GetNamespaceUri()
+        {
+            return pool.GetURI(fingerprint);
+        }
+
+        public virtual string GetLocalPart()
+        {
+            return pool.GetLocalName(fingerprint);
+        }
+
+        public virtual StructuredQName GetStructuredQName()
+        {
+            StructuredQName qn = pool.GetUnprefixedQName(fingerprint);
+            if ((prefix.Length == 0))
+            {
+                return qn;
+            }
+            else
+            {
+                return new StructuredQName(prefix, qn.GetNamespaceUri(), qn.GetLocalPart());
+            }
+        }
+
+        public virtual bool HasURI(NamespaceUri ns)
+        {
+            return pool.GetStructuredQName(fingerprint).HasURI(ns);
+        }
+
+        public virtual NamespaceBinding GetNamespaceBinding()
+        {
+            return new NamespaceBinding(prefix, pool.GetURI(fingerprint));
+        }
+
+        public virtual bool HasFingerprint()
+        {
+            return true;
+        }
+
+        public virtual int ObtainFingerprint(NamePool namePool)
+        {
+            return fingerprint;
+        }
+
+        /// <summary>
+        /// Returns a hash code value for the object.
+        /// </summary>
+        public override int GetHashCode()
+        {
+            return StructuredQName.ComputeHashCode(GetNamespaceUri(), GetLocalPart());
+        }
+
+        /// <summary>
+        /// Indicates whether some other object is "equal to" this one.
+        /// </summary>
+        public override bool Equals(object obj)
+        {
+            if (obj is INodeName)
+            {
+                INodeName n = (INodeName)obj;
+                if (n.HasFingerprint())
+                {
+                    return Fingerprint == n.Fingerprint;
+                }
+                else
+                {
+                    return n.GetLocalPart().Equals(GetLocalPart()) && n.HasURI(GetNamespaceUri());
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether some other object is "equal to" this one.
+        /// </summary>
+        public virtual bool IsIdentical(IIdentityComparable other)
+        {
+            return other is INodeName && this.Equals(other) && this.GetPrefix().Equals(((INodeName)other).GetPrefix());
+        }
+
+        /// <summary>
+        /// Indicates whether some other object is "equal to" this one.
+        /// </summary>
+        public virtual int IdentityHashCode()
+        {
+            return GetHashCode() ^ GetPrefix().GetHashCode();
+        }
+
+        /// <summary>
+        /// Indicates whether some other object is "equal to" this one.
+        /// </summary>
+        public override string ToString()
+        {
+            return DisplayName;
+        }
+
+        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
+        public virtual string GetURI() => throw new NotImplementedException();
+    }
+}

@@ -1,0 +1,353 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Serialization.CharCodes;
+using OutSmart.DAXon.Values;
+using OutSmart.DAXon.Collections;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Text
+{
+    public class StringTool
+    {
+        public static int GetStringLength(string s)
+        {
+            int n = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                int c = s.CharAt(i);
+                if (c < 55296 || c > 56319)
+                {
+                    n++; // don't count high surrogates, i.e. D800 to DBFF
+                }
+            }
+
+            return n;
+        }
+
+        public static int[] Expand(UnicodeString s)
+        {
+            int[] array = new int[s.Length32()];
+            s.Copy32bit(array, 0);
+            return array;
+        }
+
+        public static bool ContainsSurrogates(string str)
+        {
+            for (int i = 0; i < str.Length; i++)
+            {
+                if (UTF16CharacterSet.IsSurrogate(str.CharAt(i)))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static UnicodeString FromCodePoints(int[] codes, int used)
+        {
+            UnicodeBuilder sb = new UnicodeBuilder();
+            for (int i = 0; i < used; i++)
+            {
+                sb.Append(codes[i]);
+            }
+
+            return sb.ToUnicodeString();
+        }
+
+        public static UnicodeString FromCharSequence(string chars)
+        {
+            int uLength = StringTool.GetStringLength(chars);
+            if (uLength == chars.Length)
+            {
+
+                // No surrogate pairs
+                return new BMPString(chars.ToString());
+            }
+            else
+            {
+                byte[] triples = new byte[uLength * 3];
+                for (int i = 0, j = 0; i < chars.Length; i++)
+                {
+                    char c = chars.CharAt(i);
+                    if (UTF16CharacterSet.IsSurrogate(c))
+                    {
+                        int cp = UTF16CharacterSet.CombinePair(c, chars.CharAt(++i));
+                        triples[j++] = (byte)((cp >> 16) & 0xff);
+                        triples[j++] = (byte)((cp >> 8) & 0xff);
+                        triples[j++] = (byte)(cp & 0xff);
+                    }
+                    else
+                    {
+                        triples[j++] = 0;
+                        triples[j++] = (byte)((c >> 8) & 0xff);
+                        triples[j++] = (byte)(c & 0xff);
+                    }
+                }
+
+                return new Twine24(triples);
+            }
+        }
+
+        public static UnicodeString FromLatin1(string str)
+        {
+            byte[] bytes = new byte[str.Length];
+            for (int i = 0; i < str.Length; i++)
+            {
+                bytes[i] = (byte)(str[i] & 0xff);
+            }
+
+            return new Twine8(bytes);
+        }
+
+        public static IIntIterator CodePoints(string value)
+        {
+            return new AnonymousIntIterator(null, value);
+        }
+
+        public static string DiagnosticDisplay(string s)
+        {
+            StringBuilder fsb = new StringBuilder(s.Length);
+            for (int i = 0, len = s.Length; i < len; i++)
+            {
+                char c = s[i];
+                if (c >= 0x20 && c <= 0x7e)
+                {
+                    fsb.Append(c);
+                }
+                else
+                {
+                    fsb.Append("\\u");
+                    for (int shift = 12; shift >= 0; shift -= 4)
+                    {
+                        fsb.Append("0123456789ABCDEF"[(c >> shift) & 0xF]);
+                    }
+                }
+            }
+
+            return fsb.ToString();
+        }
+
+        public static void PrependWideChar(StringBuilder builder, int ch)
+        {
+            if (ch > 0xffff)
+            {
+                char[] pair = new char[]
+                {
+                    UTF16CharacterSet.HighSurrogate(ch),
+                    UTF16CharacterSet.LowSurrogate(ch)
+                };
+                builder.Insert(0, pair);
+            }
+            else
+            {
+                builder.Insert(0, (char)ch);
+            }
+        }
+
+        public static void PrependRepeated(StringBuilder builder, char ch, int count)
+        {
+            char[] array = new char[count];
+            ArrayTools.Fill(array, ch);
+            builder.Insert(0, array);
+        }
+
+        public static void AppendRepeated(StringBuilder builder, char ch, int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                builder.Append(ch);
+            }
+        }
+
+        public static int LastCodePoint(UnicodeString str)
+        {
+            return str.CodePointAt(str.Length() - 1);
+        }
+
+        public static long LastIndexOf(UnicodeString str, int codePoint)
+        {
+            for (long i = str.Length() - 1; i >= 0; i--)
+            {
+                if (str.CodePointAt(i) == codePoint)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        public static UnicodeString Compress(char[] @in, int offset, int len, bool compressWS)
+        {
+            if (len == 0)
+            {
+                return EmptyUnicodeString.GetInstance();
+            }
+
+            int max = 255;
+            int end = offset + len;
+            bool allWhite = compressWS;
+            int surrogates = 0;
+
+            // Find the maximum code value, and test whether all-white or surrogate
+            int k = offset;
+            if (compressWS)
+            {
+                while (k < end)
+                {
+                    int c = @in[k];
+                    if (!Whitespace.IsWhite(c))
+                    {
+                        allWhite = false;
+                        break;
+                    }
+
+                    k++;
+                }
+
+                if (allWhite)
+                {
+                    return CompressedWhitespace.CompressWS(@in, offset, len);
+                }
+            }
+
+            while (k < end)
+            {
+                int c = @in[k++];
+                max |= c;
+                if (UTF16CharacterSet.IsSurrogate(c))
+                {
+                    surrogates++;
+                }
+            }
+
+            if (max < 256)
+            {
+                byte[] array = new byte[len];
+                for (int i = offset, j = 0; i < end;)
+                {
+                    array[j++] = (byte)@in[i++];
+                }
+
+                return new Twine8(array); //Use of `new String(@in, offset, len).getBytes(StandardCharsets.ISO_8859_1)` is slower
+            }
+
+            if (surrogates == 0)
+            {
+                char[] array = ArrayTools.CopyOfRange(@in, offset, offset + len);
+                return new Twine16(array);
+            }
+            else
+            {
+                byte[] array = new byte[3 * (len - surrogates / 2)];
+                for (int i = offset, j = 0; i < end;)
+                {
+                    char c = @in[i++];
+                    if (UTF16CharacterSet.IsSurrogate(c))
+                    {
+                        int cp = UTF16CharacterSet.CombinePair(c, @in[i++]);
+                        array[j++] = (byte)((cp & 0xffffff) >> 16);
+                        array[j++] = (byte)((cp & 0xffff) >> 8);
+                        array[j++] = (byte)(cp & 0xff);
+                    }
+                    else
+                    {
+                        array[j++] = (byte)0;
+                        array[j++] = (byte)((c & 0xffff) >> 8);
+                        array[j++] = (byte)(c & 0xff);
+                    }
+                }
+
+                return new Twine24(array);
+            }
+        }
+
+        public static void Copy8to16(byte[] source, int sourcePos, char[] dest, int destPos, int count)
+        {
+            int last = sourcePos + count;
+            for (int i = sourcePos, j = destPos; i < last;)
+            {
+                dest[j++] = (char)(source[i++] & 0xff);
+            }
+        }
+
+        public static void Copy8to24(byte[] source, int sourcePos, byte[] dest, int destPos, int count)
+        {
+            int last = sourcePos + count;
+            for (int i = sourcePos, j = destPos * 3; i < last;)
+            {
+                dest[j++] = 0;
+                dest[j++] = 0;
+                dest[j++] = source[i++];
+            }
+        }
+
+        public static void Copy16to24(char[] source, int sourcePos, byte[] dest, int destPos, int count)
+        {
+            int last = sourcePos + count;
+            for (int i = sourcePos, j = destPos * 3; i < last;)
+            {
+                char c = source[i++];
+                dest[j++] = 0;
+                dest[j++] = (byte)((c >> 8) & 0xff);
+                dest[j++] = (byte)(c & 0xff);
+            }
+        }
+
+        private sealed class AnonymousIntIterator : AbstractIntIterator
+        {
+
+            private readonly StringTool parent;
+            private readonly string value;
+            int i = 0;
+            bool expectingLowSurrogate;
+            public AnonymousIntIterator(StringTool parent, string value)
+            {
+                this.parent = parent;
+                this.value = value;
+            }
+            public override bool HasNext()
+            {
+                return i < value.Length;
+            }
+
+            public override int Next()
+            {
+                int c = value.CharAt(i++);
+                if (UTF16CharacterSet.IsHighSurrogate(c))
+                {
+                    try
+                    {
+                        int d = HasNext() ? value.CharAt(i++) : -1;
+                        if (!UTF16CharacterSet.IsLowSurrogate(d))
+                        {
+                            throw new InvalidOperationException("Unmatched surrogate code value " + c + " at position " + i);
+                        }
+
+                        return UTF16CharacterSet.CombinePair((char)c, (char)d);
+                    }
+                    catch (IndexOutOfRangeException e)
+                    {
+                        throw new InvalidOperationException("Invalid surrogate at end of string");
+                    }
+                }
+                else
+                {
+                    return c;
+                }
+            }
+        }
+    }
+}

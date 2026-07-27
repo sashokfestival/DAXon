@@ -1,0 +1,90 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Text;
+using OutSmart.DAXon.Trees.Iterators;
+using OutSmart.DAXon.Values;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Transformation;
+namespace OutSmart.DAXon.Regex
+{
+    /// <summary>
+    /// A ATokenIterator is an iterator over the strings that result from tokenizing a string using a regular expression
+    /// </summary>
+    public class ATokenIterator : IAtomicIterator
+    {
+        private readonly UnicodeString input;
+        private readonly REMatcher matcher;
+        private StringValue current;
+        private int prevEnd;
+        /// <summary>
+        /// Construct an ATokenIterator.
+        /// </summary>
+        public ATokenIterator(UnicodeString input, REMatcher matcher)
+        {
+            this.input = input;
+            this.matcher = matcher;
+            prevEnd = 0;
+        }
+
+        /// <summary>
+        /// Construct an ATokenIterator.
+        /// </summary>
+        public virtual StringValue Next()
+        {
+            if (prevEnd < 0)
+            {
+                current = null;
+                return null;
+            }
+
+            bool matched;
+            try
+            {
+                matched = matcher.Match(input, prevEnd);
+            }
+            catch (RecursionDepthError)
+            {
+                // Same conversion as ARegexIterator: iterator protocol, so unchecked wrap.
+                throw new UncheckedXPathException(ARegularExpression.StackOverflowError());
+            }
+
+            if (matched)
+            {
+                int start = matcher.GetParenStart(0);
+                current = new StringValue(input.Substring(prevEnd, start));
+                prevEnd = matcher.GetParenEnd(0);
+            }
+            else
+            {
+                current = new StringValue(input.Substring(prevEnd));
+                prevEnd = -1;
+            }
+
+            return CurrentStringValue();
+        }
+
+        /// <summary>
+        /// Construct an ATokenIterator.
+        /// </summary>
+        private StringValue CurrentStringValue()
+        {
+            return current;
+        }
+        AtomicValue IAtomicIterator.Next() => Next();
+        IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
+        public virtual void Dispose() { }
+    }
+}
+

@@ -1,0 +1,111 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Types;using OutSmart.DAXon.Functions;
+
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Values;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Expressions
+{
+    /// <summary>
+    /// Function to test castability to a union type
+    /// </summary>
+    public class UnionCastableFunction : UnionConstructorFunction
+    {
+
+        public override IFunctionItemType FunctionItemType => new SpecificFunctionType(new SequenceType[] { SequenceType.ANY_SEQUENCE }, SequenceType.SINGLE_BOOLEAN);
+        public UnionCastableFunction(IUnionType targetType, INamespaceResolver resolver, bool allowEmpty) : base(targetType, resolver, allowEmpty)
+        {
+        }
+
+        public override StructuredQName GetFunctionName()
+        {
+            return null;
+        }
+
+        private bool EffectiveBooleanValue(ISequenceIterator iter, IXPathContext context)
+        {
+
+            // This method does its own atomization so that it can distinguish between atomization
+            // failures and casting failures
+            int count = 0;
+            for (IItem item; (item = iter.Next()) != null;)
+            {
+                if (item is NodeInfo)
+                {
+                    IAtomicSequence atomizedValue = item.Atomize();
+                    int length = SequenceTool.GetLength(atomizedValue);
+                    count += length;
+                    if (count > 1)
+                    {
+                        return false;
+                    }
+
+                    if (length != 0)
+                    {
+                        AtomicValue av = atomizedValue.Head();
+                        if (!Castable(av, context))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else if (item is AtomicValue)
+                {
+                    AtomicValue av = (AtomicValue)item;
+                    count++;
+                    if (count > 1)
+                    {
+                        return false;
+                    }
+
+                    if (!Castable(av, context))
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    throw new XPathException("Input to 'castable' operator cannot be atomized", "XPTY0004");
+                }
+            }
+
+            return count != 0 || allowEmpty;
+        }
+
+        private bool Castable(AtomicValue value, IXPathContext context)
+        {
+            try
+            {
+                Cast(value, context);
+                return true;
+            }
+            catch (XPathException err)
+            {
+                return false;
+            }
+        }
+
+        // Java returns BooleanValue via covariant return; net472 must keep the base signature — the
+        // previous `public BooleanValue Call` HID UnionConstructorFunction.Call, so `castable as
+        // <union>` executed the base CAST (returning the value / throwing FORG0001) instead of the
+        // boolean check (xs-numeric castable tests).
+        public override ISequence Call(IXPathContext context, ISequence[] args)
+        {
+            bool value = EffectiveBooleanValue(args[0].Iterate(), context);
+            return BooleanValue.Get(value);
+        }
+    }
+}

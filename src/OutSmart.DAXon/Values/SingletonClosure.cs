@@ -1,0 +1,155 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Expressions;using OutSmart.DAXon.Functions;
+
+using OutSmart.DAXon.Expressions.Elaboration;
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees.Iterators;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Values
+{
+    public class SingletonClosure : Closure, ISequence
+    {
+        private bool built = false;
+        private IItem value = null;
+        public SingletonClosure(Expression exp, IPullEvaluator inputEvaluator, IXPathContext context)
+        {
+            SetInputEvaluator(inputEvaluator);
+            savedXPathContext = context.NewContext();
+            savedXPathContext.Origin = this;
+            SaveContext(exp, context); //Instrumentation.count("SingletonClosure.new()");
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public override ISequenceIterator Iterate()
+        {
+            try
+            {
+                IItem item = AsItem();
+                if (item == null)
+                {
+                    return EmptyIterator.GetInstance();
+                }
+                else if (learningEvaluator != null)
+                {
+                    return new ReportingSingletonIterator(item, learningEvaluator, serialNumber);
+                }
+                else
+                {
+                    return new SingletonIterator(item);
+                }
+            }
+            catch (XPathException e)
+            {
+                throw new UncheckedXPathException(e);
+            }
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public override IItem Head()
+        {
+            try
+            {
+                return AsItem();
+            }
+            catch (UncheckedXPathException e)
+            {
+                throw e.GetXPathException();
+            }
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public virtual IItem AsItem()
+        {
+            lock (this)
+            {
+
+                // bug 6161
+                if (!built)
+                {
+                    value = inputEvaluator.Iterate(savedXPathContext).Next();
+                    built = true;
+                    savedXPathContext = null; // release variables saved in the context to the garbage collector
+                    if (learningEvaluator != null)
+                    {
+                        learningEvaluator.ReportCompletion(serialNumber);
+
+                        learningEvaluator = null;
+                    }
+                }
+
+                return value;
+            }
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public virtual IItem ItemAt(int n)
+        {
+            if (n != 0)
+            {
+                return null;
+            }
+
+            return AsItem();
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public virtual int GetLength()
+        {
+            return AsItem() == null ? 0 : 1;
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public override IGroundedValue Materialize()
+        {
+            try
+            {
+                return SequenceTool.ItemOrEmpty(AsItem());
+            }
+            catch (UncheckedXPathException e)
+            {
+                throw e.GetXPathException();
+            }
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public override ISequence MakeRepeatable()
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// Evaluate the expression in a given context to return an iterator over a sequence
+        /// </summary>
+        public virtual bool IsBuilt()
+        {
+            return built;
+        }
+    }
+}

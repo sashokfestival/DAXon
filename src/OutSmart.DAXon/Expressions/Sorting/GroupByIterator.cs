@@ -1,0 +1,372 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//import com.saxonica.ee.stream.ManualGroupIterator;
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Expressions.Elaboration;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Lib;
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees.Iterators;
+using OutSmart.DAXon.Trees.Tiny;
+using OutSmart.DAXon.Values;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Expressions.Sorting
+{
+    public class GroupByIterator : IGroupIterator, ILastPositionFinder, ILookaheadIterator
+    {
+        private ISequenceIterator population;
+        protected Expression keyExpression;
+        private IStringCollator collator;
+        private IXPathContext keyContext;
+        private int position = 0;
+        protected IList<IList<IItem>> groups = new List<IList<IItem>>(40);
+        protected IList<IAtomicSequence> groupKeys = new List<IAtomicSequence>(40);
+        protected bool composite;
+
+        public virtual bool HasNext => position < groups.Count;
+        public GroupByIterator(ISequenceIterator population, Expression keyExpression, IXPathContext keyContext, IStringCollator collator, bool composite)
+        {
+            this.population = population;
+            this.keyExpression = keyExpression;
+            this.keyContext = keyContext;
+            this.collator = collator;
+            this.composite = composite;
+            if (composite)
+            {
+                BuildIndexedGroupsComposite();
+            }
+            else
+            {
+                BuildIndexedGroups();
+            }
+        }
+
+        public GroupByIterator()
+        {
+        }
+
+        private void BuildIndexedGroups()
+        {
+            Dictionary<IAtomicMatchKey, IList<IItem>> index = new Dictionary<IAtomicMatchKey, IList<IItem>>(40);
+            IXPathContext c2 = keyContext.NewMinorContext();
+            IFocusIterator focus = c2.TrackFocus(population);
+            int implicitTimezone = c2.GetImplicitTimezone();
+            // Fast path for group-by="childName": the key atomize(child::NAME) otherwise allocates an
+            // Atomizer + Axis iterator and runs the atomize pipeline for every item. When the item is
+            // an untyped Tiny node the fused iterator reads the matching children's string values
+            // straight from the Tiny arrays as xs:untypedAtomic — byte-identical, no pipeline.
+            int fusedFp = FusedChildAtomizer.MatchAtomizer(keyExpression, out int ffp) ? ffp : -1;
+            FusedChildAtomizer.ChildUntypedIterator fusedIter = fusedFp >= 0 ? new FusedChildAtomizer.ChildUntypedIterator() : null;
+
+            // The key evaluator is per-population constant, so it is built once here —
+            // Expression.Iterate would re-elaborate the whole evaluator chain on every item.
+            // A statically singleton key also skips the per-item iterator.
+            Elaborator keyElab = keyExpression.MakeElaborator();
+            IItemEvaluator keyItem = !Cardinality.AllowsMany(keyExpression.GetCardinality()) ? keyElab.ElaborateForItem() : null;
+            IPullEvaluator keyPull = keyItem == null ? keyElab.ElaborateForPull() : null;
+            IItem item;
+            while ((item = focus.Next()) != null)
+            {
+                ISequenceIterator keys;
+                if (fusedIter != null && item is TinyParentNodeImpl tp && tp.tree.TypeArray == null)
+                {
+                    fusedIter.Reset(tp, fusedFp);   // reuse one iterator across all items (fully drained each time)
+                    keys = fusedIter;
+                }
+                else if (keyItem != null)
+                {
+                    AtomicValue single = (AtomicValue)keyItem(c2);
+                    if (single != null)
+                    {
+                        ProcessKey(index, single, item, true, implicitTimezone);
+                    }
+
+                    continue;
+                }
+                else
+                {
+                    keys = keyPull.Iterate(c2);
+                }
+
+                bool firstKey = true;
+                while (true)
+                {
+                    AtomicValue key = (AtomicValue)keys.Next();
+                    if (key == null)
+                    {
+                        break;
+                    }
+
+                    ProcessKey(index, key, item, firstKey, implicitTimezone);
+                    firstKey = false;
+                }
+            }
+        }
+
+        private void ProcessKey(Dictionary<IAtomicMatchKey, IList<IItem>> index, AtomicValue key, IItem item, bool firstKey, int implicitTimezone)
+        {
+            IAtomicMatchKey comparisonKey;
+            if (key.IsNaN())
+            {
+                comparisonKey = DistinctValues.NaN_MATCH_KEY;
+            }
+            else
+            {
+                comparisonKey = key.GetXPathMatchKey(collator, implicitTimezone);
+            }
+
+            IList<IItem> g = index.Get(comparisonKey);
+            if (g == null)
+            {
+                IList<IItem> newGroup = new Grp(item);
+                groups.Add(newGroup);
+                groupKeys.Add(key);
+                index.Put(comparisonKey, newGroup);
+            }
+            else
+            {
+                if (firstKey)
+                {
+                    g.Add(item);
+                }
+                else
+                {
+
+                    // if this is not the first key value for this item, we
+                    // check whether the item is already in this group before
+                    // adding it again. If it @is in this group, then we know
+                    // it will be at the end.
+                    if (g[g.Count - 1] != item)
+                    {
+                        g.Add(item);
+                    }
+                }
+            }
+        }
+
+        private void BuildIndexedGroupsComposite()
+        {
+            Dictionary<CompositeAtomicKey, IList<IItem>> index = new Dictionary<CompositeAtomicKey, IList<IItem>>(40);
+            IXPathContext c2 = keyContext.NewMinorContext();
+            IFocusIterator focus = c2.TrackFocus(population);
+            int implicitTimezone = c2.GetImplicitTimezone();
+            IPullEvaluator keyPull = keyExpression.MakeElaborator().ElaborateForPull();   // per-population constant
+            IItem item;
+            while ((item = focus.Next()) != null)
+            {
+                ISequenceIterator keys = keyPull.Iterate(c2);
+                IList<IAtomicMatchKey> ckList = new List<IAtomicMatchKey>();
+                IList<AtomicValue> compositeKey = new List<AtomicValue>();
+                while (true)
+                {
+                    AtomicValue key = (AtomicValue)keys.Next();
+                    if (key == null)
+                    {
+                        break;
+                    }
+
+                    compositeKey.Add(key);
+                    IAtomicMatchKey comparisonKey;
+                    if (key.IsNaN())
+                    {
+                        comparisonKey = DistinctValues.NaN_MATCH_KEY;
+                    }
+                    else
+                    {
+                        comparisonKey = key.GetXPathMatchKey(collator, implicitTimezone);
+                    }
+
+                    ckList.Add(comparisonKey);
+                }
+
+                CompositeAtomicKey cak = new CompositeAtomicKey(ckList);
+                IList<IItem> g = index.Get(cak);
+                if (g == null)
+                {
+                    IList<IItem> newGroup = new Grp(item);
+                    groups.Add(newGroup);
+                    groupKeys.Add(new AtomicArray(compositeKey));
+                    index.Put(cak, newGroup);
+                }
+                else
+                {
+                    g.Add(item);
+                }
+            }
+        }
+
+        public virtual IAtomicSequence GetCurrentGroupingKey()
+        {
+            lock (this)
+            {
+                IAtomicSequence val = groupKeys[position - 1];
+                if (val == null)
+                {
+                    return EmptyAtomicSequence.GetInstance();
+                }
+                else
+                {
+                    return val;
+                }
+            }
+        }
+
+        public virtual IGroundedValue CurrentGroup()
+        {
+            return SequenceExtent.MakeSequenceExtent(groups[position - 1]);
+        }
+
+        public virtual IList<IItem> GetCurrentGroup()
+        {
+            return groups[position - 1];
+        }
+
+        public virtual bool SupportsHasNext()
+        {
+            return true;
+        }
+
+        public virtual IItem Next()
+        {
+            if (position >= 0 && position < groups.Count)
+            {
+                position++;
+                return Current();
+            }
+            else
+            {
+                position = -1;
+                return null;
+            }
+        }
+
+        private IItem Current()
+        {
+            if (position < 1)
+            {
+                return null;
+            }
+
+
+            // return the initial item of the current group
+            return groups[position - 1][0];
+        }
+
+        public virtual bool SupportsGetLength()
+        {
+            return true;
+        }
+
+        /// <summary>
+        /// Get the last position (that @is, the number of groups)
+        /// </summary>
+        public virtual int GetLength()
+        {
+            return groups.Count;
+        }
+        public virtual void Dispose() { }
+
+        // A group always has at least one member, and the overwhelming majority of groups in a
+        // large for-each-group are singletons. Grp stores the first member inline and allocates the
+        // tail List only when a second member is actually added -- so a singleton group costs one
+        // object instead of a List plus its backing array (~900K arrays saved on the csv_group
+        // shape). It implements the IList<IItem> contract the group consumers use (Count, indexer,
+        // enumeration, Add during build); structural mutation is never performed on a built group.
+        private sealed class Grp : IList<IItem>
+        {
+            private readonly IItem first;
+            private List<IItem> rest;   // null until a second member is added
+
+            internal Grp(IItem first)
+            {
+                this.first = first;
+            }
+
+            public int Count => rest == null ? 1 : rest.Count + 1;
+            public bool IsReadOnly => false;
+
+            public IItem this[int index]
+            {
+                get => index == 0 ? first : rest[index - 1];
+                set => throw new NotSupportedException();
+            }
+
+            public void Add(IItem item)
+            {
+                if (rest == null)
+                {
+                    rest = new List<IItem>(4);
+                }
+
+                rest.Add(item);
+            }
+
+            public IEnumerator<IItem> GetEnumerator()
+            {
+                yield return first;
+                if (rest != null)
+                {
+                    foreach (IItem x in rest)
+                    {
+                        yield return x;
+                    }
+                }
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public int IndexOf(IItem item)
+            {
+                if (Equals(first, item))
+                {
+                    return 0;
+                }
+
+                if (rest != null)
+                {
+                    int i = rest.IndexOf(item);
+                    if (i >= 0)
+                    {
+                        return i + 1;
+                    }
+                }
+
+                return -1;
+            }
+
+            public bool Contains(IItem item)
+            {
+                return IndexOf(item) >= 0;
+            }
+
+            public void CopyTo(IItem[] array, int arrayIndex)
+            {
+                array[arrayIndex++] = first;
+                if (rest != null)
+                {
+                    rest.CopyTo(array, arrayIndex);
+                }
+            }
+
+            public void Insert(int index, IItem item) => throw new NotSupportedException();
+            public void RemoveAt(int index) => throw new NotSupportedException();
+            public bool Remove(IItem item) => throw new NotSupportedException();
+            public void Clear() => throw new NotSupportedException();
+        }
+    }
+}

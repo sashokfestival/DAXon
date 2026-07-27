@@ -1,0 +1,558 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//import com.saxonica.ee.validate.SkipValidator;
+using OutSmart.DAXon.Internal.Functional;
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Text;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees.Utilities;
+using OutSmart.DAXon.Values;
+using OutSmart.DAXon.Collections;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Trees.Tiny
+{
+    public class TinyElementImpl : TinyParentNodeImpl
+    {
+
+        public override NamespaceMap AllNamespaces => tree.namespaceMaps[tree.beta[nodeNr]];
+        public TinyElementImpl(TinyTree tree, int nodeNr) : base(tree, nodeNr)
+        {
+        }
+
+        public override int GetNodeKind()
+        {
+            return Types.Type.ELEMENT;
+        }
+
+        public override string GetBaseURI()
+        {
+            if (tree.UniformBaseUri != null)
+            {
+                return tree.UniformBaseUri;
+            }
+
+            lock (tree)
+            {
+                if (tree.knownBaseUris == null)
+                {
+                    tree.knownBaseUris = new IntHashMap<string>();
+                }
+
+                string uri = tree.knownBaseUris[nodeNr];
+                if (uri == null)
+                {
+                    uri = Navigator.GetBaseURI(this, (n) => tree.IsTopWithinEntity(((TinyElementImpl)n).NodeNumber));
+                    tree.knownBaseUris.Put(nodeNr, uri);
+                }
+
+                return uri;
+            }
+        }
+
+        public override ISchemaType GetSchemaType()
+        {
+            return tree.GetSchemaType(nodeNr);
+        }
+
+        public override IAtomicSequence Atomize()
+        {
+            return tree.GetTypedValueOfElement(this);
+        }
+
+        public override NamespaceBinding[] GetDeclaredNamespaces(NamespaceBinding[] buffer)
+        {
+            TinyNodeImpl parent = GetParent();
+            if (parent != null && parent.GetNodeKind() == Types.Type.ELEMENT)
+            {
+                return AllNamespaces.GetDifferences(parent.AllNamespaces, false);
+            }
+            else
+            {
+                return AllNamespaces.NamespaceBindings;
+            }
+        }
+
+        public virtual bool HasUniformNamespaces()
+        {
+            return false; // TODO: temporarily
+            //        int nr = nodeNr;
+            //        int ns = tree.beta[nr];
+            //        TinyElementImpl anc = this;
+            //        while (ns == -1) {
+            //            if (parent instanceof TinyDocumentImpl) {
+            //                return !tree.usesNamespaces;
+            //            } else {
+            //                nr = parent.nodeNr;
+            //                ns = tree.beta[nr];
+            //                anc = (TinyElementImpl)parent;
+            //            }
+            //        }
+            //        // Find the first namespace binding with a different parent
+            //        while (ns < tree.numberOfNamespaces && tree.namespaceParent[ns] == nr) {
+            //            ns++;
+            //        }
+            //        // Return true if none is found, or if the element owning this namespace binding
+            //        // is outside the subtree
+        }
+
+        public override string GetAttributeValue(NamespaceUri uri, string local)
+        {
+            int a = tree.alpha[nodeNr];
+            if (a < 0)
+            {
+                return null;
+            }
+
+            NamePool pool = GetNamePool();
+            while (a < tree.numberOfAttributes && tree.attParent[a] == nodeNr)
+            {
+                int nc = tree.attCode[a];
+
+                // Avoid allocating a name code for an ad-hoc request
+                StructuredQName name = pool.GetUnprefixedQName(nc);
+                if (name.GetLocalPart().Equals(local) && name.HasURI(uri))
+                {
+                    return tree.attValue[a];
+                }
+
+                a++;
+            }
+
+            return null;
+        }
+
+        public virtual string GetAttributeValue(int fp)
+        {
+
+            // NB: Used from generated bytecode
+            int a = tree.alpha[nodeNr];
+            if (a < 0)
+            {
+                return null;
+            }
+
+            while (a < tree.numberOfAttributes && tree.attParent[a] == nodeNr)
+            {
+                if (fp == (tree.attCode[a] & NamePool.FP_MASK))
+                {
+                    return tree.attValue[a].ToString();
+                }
+
+                a++;
+            }
+
+            return null;
+        }
+
+        private int SubtreeSize()
+        {
+            int next = tree.next[nodeNr];
+            while (next < nodeNr)
+            {
+                if (next < 0)
+                {
+                    return tree.numberOfNodes - nodeNr;
+                }
+
+                next = tree.next[next];
+            }
+
+            return nodeNr - next;
+        }
+
+        public override void Copy(IReceiver receiver, int copyOptions, ILocation location)
+        {
+            bool copyTypes = CopyOptions.Includes(copyOptions, CopyOptions.TYPE_ANNOTATIONS);
+            bool copyForUpdate = CopyOptions.Includes(copyOptions, CopyOptions.FOR_UPDATE);
+            short level = -1;
+            bool closePending = false;
+            short startLevel = tree.depth[nodeNr];
+            bool disallowNamespaceSensitiveContent = ((copyOptions & CopyOptions.TYPE_ANNOTATIONS) != 0) && ((copyOptions & CopyOptions.ALL_NAMESPACES) == 0);
+            Configuration config = tree.GetConfiguration();
+            NamePool pool = config.GetNamePool();
+            int next = nodeNr;
+            Func<NodeInfo, Object> informee = receiver.GetPipelineConfiguration().CopyInformee;
+            ISchemaType elementType = Untyped.INSTANCE;
+            ISimpleType attributeType = BuiltInAtomicType.UNTYPED_ATOMIC;
+            do
+            {
+
+                // determine node depth
+                short nodeLevel = tree.depth[next];
+
+                // extra close required?
+                if (closePending)
+                {
+                    level++;
+                }
+
+
+                // close former elements
+                for (; level > nodeLevel; level--)
+                {
+                    receiver.EndElement();
+                }
+
+
+                // new node level
+                level = nodeLevel;
+
+                // output depends on node kind
+                int kind = tree.nodeKind[next];
+                switch (kind)
+                {
+                    case Types.Type.ELEMENT:
+                    case Types.Type.TEXTUAL_ELEMENT:
+                        {
+                            int receiverOptions = ReceiverOption.BEQUEATH_INHERITED_NAMESPACES_ONLY;
+                            if (copyForUpdate)
+                            {
+                                receiverOptions |= ReceiverOption.MUTABLE_TREE;
+                            }
+
+
+                            // start element
+                            if (copyTypes)
+                            {
+                                elementType = tree.GetSchemaType(next);
+                                if (disallowNamespaceSensitiveContent)
+                                {
+                                    try
+                                    {
+                                        CheckNotNamespaceSensitiveElement(elementType, next);
+                                    }
+                                    catch (CopyNamespaceSensitiveException e)
+                                    {
+                                        throw e.WithErrorCode(receiver.GetPipelineConfiguration().IsXSLT() ? "XTTE0950" : "XQTY0086");
+                                    }
+                                }
+                            }
+
+                            if (informee != null)
+                            {
+                                ILocation loc = (ILocation)informee.Apply(tree.GetNode(next));
+                                if (loc != null)
+                                {
+                                    location = loc;
+                                }
+                            }
+
+                            int nameCode = tree.nameCode[next];
+                            int fp = nameCode & NamePool.FP_MASK;
+                            string prefix = tree.GetPrefix(next);
+                            if (location.GetLineNumber() < tree.GetLineNumber(next))
+                            {
+                                string systemId = location.GetSystemId() == null ? GetSystemId() : location.GetSystemId();
+                                location = new Loc(systemId, tree.GetLineNumber(next), GetColumnNumber());
+                            }
+
+
+                            // decide on namespaces
+                            NamespaceMap namespaces = NamespaceMap.EmptyMap();
+                            bool addAttributeNamespaces = false;
+                            if (tree.usesNamespaces)
+                            {
+                                if ((copyOptions & CopyOptions.ALL_NAMESPACES) != 0)
+                                {
+                                    if (kind == Types.Type.TEXTUAL_ELEMENT)
+                                    {
+                                        int parent = GetParentNodeNr(tree, next);
+                                        namespaces = tree.namespaceMaps[tree.beta[parent]];
+                                    }
+                                    else
+                                    {
+                                        namespaces = tree.namespaceMaps[tree.beta[next]];
+                                    }
+                                }
+                                else
+                                {
+                                    addAttributeNamespaces = true;
+                                    NamespaceUri uri = pool.GetURI(nameCode);
+                                    if (!uri.IsEmpty())
+                                    {
+                                        namespaces = NamespaceMap.Of(prefix, uri);
+                                    }
+                                }
+                            }
+
+                            if (kind == Types.Type.TEXTUAL_ELEMENT)
+                            {
+                                closePending = false;
+                                receiver.StartElement(new CodedName(fp, prefix, pool), elementType, EmptyAttributeMap.GetInstance(), namespaces, location, receiverOptions);
+
+                                // output characters
+                                UnicodeString value = TinyTextImpl.GetStringValue(tree, next);
+                                receiver.Characters(value, location, ReceiverOption.WHOLE_TEXT_NODE);
+                                receiver.EndElement();
+                            }
+                            else
+                            {
+
+                                // there is an element to close
+                                closePending = true;
+
+                                // output attributes
+                                IAttributeMap attributes;
+                                int att = tree.alpha[next];
+                                if (att >= 0)
+                                {
+                                    IList<AttributeInfo> attributeInfoList = new List<AttributeInfo>(8);
+                                    while (att < tree.numberOfAttributes && tree.attParent[att] == next)
+                                    {
+                                        int attCode = tree.attCode[att];
+                                        int attfp = attCode & NamePool.FP_MASK;
+                                        if (copyTypes)
+                                        {
+                                            attributeType = tree.GetAttributeType(att);
+                                            if (disallowNamespaceSensitiveContent)
+                                            {
+                                                try
+                                                {
+                                                    CheckNotNamespaceSensitiveAttribute(attributeType, att);
+                                                }
+                                                catch (CopyNamespaceSensitiveException e)
+                                                {
+                                                    throw e.WithErrorCode(receiver.GetPipelineConfiguration().IsXSLT() ? "XTTE0950" : "XQTY0086");
+                                                }
+                                            }
+                                        }
+
+                                        string attPrefix = tree.prefixPool.GetPrefix(attCode >> 20);
+                                        int attProps = ReceiverOption.NOT_A_DUPLICATE;
+                                        if (tree.IsIdAttribute(att))
+                                        {
+                                            attProps |= ReceiverOption.IS_ID;
+                                        }
+
+                                        if (tree.IsIdrefAttribute(att))
+                                        {
+                                            attProps |= ReceiverOption.IS_IDREF;
+                                        }
+
+                                        attributeInfoList.Add(new AttributeInfo(new CodedName(attfp, attPrefix, pool), attributeType, tree.attValue[att], location, attProps));
+                                        if (addAttributeNamespaces && !(attPrefix.Length == 0))
+                                        {
+                                            namespaces = namespaces.Put(attPrefix, pool.GetURI(attCode));
+                                        }
+
+                                        att++;
+                                    }
+
+                                    attributes = SequenceTool.AttributeMapFromList(attributeInfoList);
+                                }
+                                else
+                                {
+                                    attributes = EmptyAttributeMap.GetInstance();
+                                }
+
+
+                                // see bug 2209
+                                receiver.StartElement(new CodedName(fp, prefix, pool), elementType, attributes, namespaces, location, receiverOptions);
+                            }
+
+                            break;
+                        }
+
+                    case Types.Type.TEXT:
+                        {
+
+                            // don't close text nodes
+                            closePending = false;
+
+                            // output characters
+                            UnicodeString value = TinyTextImpl.GetStringValue(tree, next);
+                            receiver.Characters(value, location, ReceiverOption.WHOLE_TEXT_NODE);
+                            break;
+                        }
+
+                    case Types.Type.WHITESPACE_TEXT:
+                        {
+
+                            // don't close text nodes
+                            closePending = false;
+
+                            // output characters
+                            long compressedValue = ((long)tree.alpha[next] << 32) | ((long)tree.beta[next] & 0xffffffff);
+                            UnicodeString value = new CompressedWhitespace(compressedValue);
+                            receiver.Characters(value, location, ReceiverOption.WHOLE_TEXT_NODE);
+                            break;
+                        }
+
+                    case Types.Type.COMMENT:
+                        {
+
+                            // don't close text nodes
+                            closePending = false;
+
+                            // output copy of comment
+                            int start = tree.alpha[next];
+                            int len = tree.beta[next];
+                            if (len > 0)
+                            {
+                                receiver.Comment(tree.commentBuffer.Substring(start, start + len), location, ReceiverOption.NONE);
+                            }
+                            else
+                            {
+                                receiver.Comment(EmptyUnicodeString.GetInstance(), Loc.NONE, ReceiverOption.NONE);
+                            }
+
+                            break;
+                        }
+
+                    case Types.Type.PROCESSING_INSTRUCTION:
+                        {
+
+                            // don't close text nodes
+                            closePending = false;
+
+                            // output copy of PI
+                            NodeInfo pi = tree.GetNode(next);
+                            receiver.ProcessingInstruction(pi.GetLocalPart(), pi.UnicodeStringValue, location, ReceiverOption.NONE);
+                            break;
+                        }
+
+                    case Types.Type.PARENT_POINTER:
+                        {
+                            closePending = false;
+                            break;
+                        }
+                }
+
+                next++;
+            }
+            while (next < tree.numberOfNodes && tree.depth[next] > startLevel);
+
+            // close all remaining elements
+            if (closePending)
+            {
+                level++;
+            }
+
+            for (; level > startLevel; level--)
+            {
+                receiver.EndElement();
+            }
+        }
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //    }
+        protected virtual void CheckNotNamespaceSensitiveElement(ISchemaType type, int nodeNr)
+        {
+            if (type is ISimpleType && ((ISimpleType)type).IsNamespaceSensitive())
+            {
+                if (type.IsAtomicType())
+                {
+                    throw new CopyNamespaceSensitiveException("Cannot copy QName or NOTATION values without copying namespaces");
+                }
+                else
+                {
+
+                    // For a union or list type, we need to check whether the actual value is namespace-sensitive
+                    IAtomicSequence value = tree.GetTypedValueOfElement(nodeNr);
+                    foreach (AtomicValue val in value)
+                    {
+                        if (val.PrimitiveType.IsNamespaceSensitive())
+                        {
+                            throw new CopyNamespaceSensitiveException("Cannot copy QName or NOTATION values without copying namespaces");
+                        }
+                    }
+                }
+            }
+        }
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //    }
+        private void CheckNotNamespaceSensitiveAttribute(ISimpleType type, int nodeNr)
+        {
+            if (type.IsNamespaceSensitive())
+            {
+                if (type.IsAtomicType())
+                {
+                    throw new CopyNamespaceSensitiveException("Cannot copy QName or NOTATION values without copying namespaces");
+                }
+                else
+                {
+
+                    // For a union or list type, we need to check whether the actual value is namespace-sensitive
+                    IAtomicSequence value = tree.GetTypedValueOfAttribute(null, nodeNr);
+                    foreach (AtomicValue val in value)
+                    {
+                        if (val.PrimitiveType.IsNamespaceSensitive())
+                        {
+                            throw new CopyNamespaceSensitiveException("Cannot copy QName or NOTATION values without copying namespaces");
+                        }
+                    }
+                }
+            }
+        }
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //    }
+        //    }
+        public override bool IsId()
+        {
+
+            // this looks very inefficient, but the method isn't actually used...
+            return tree.IsIdElement(nodeNr);
+        }
+
+        //
+        //
+        //
+        //
+        //
+        //
+        //
+        //    }
+        //    }
+        public override bool IsIdref()
+        {
+            return tree.IsIdrefElement(nodeNr);
+        }
+
+        private bool IsSkipValidator(IReceiver r)
+        {
+            return false;
+        } //    private class LocalAttributeMap implements IAttributeMap {
+        //
+        //        private final boolean typed;
+        //
+        //        public LocalAttributeMap(boolean typed) {
+        //            this.typed = typed;
+        //
+    }
+}

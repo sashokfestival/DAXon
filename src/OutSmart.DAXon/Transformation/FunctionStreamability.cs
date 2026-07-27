@@ -1,0 +1,71 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using System;using OutSmart.DAXon.Functions;
+
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Transformation
+{
+    /// <summary>
+    /// Enumeration class giving the different streamability categories defined for stylesheet functions in XSLT 3.0
+    /// </summary>
+    public enum FunctionStreamability
+    {
+        // UNCLASSIFIED("unclassified")
+        UNCLASSIFIED,
+        // ABSORBING("absorbing")
+        ABSORBING,
+        // INSPECTION("inspection")
+        INSPECTION,
+        // FILTER("filter")
+        FILTER,
+        // SHALLOW_DESCENT("shallow-descent")
+        SHALLOW_DESCENT,
+        // DEEP_DESCENT("deep-descent")
+        DEEP_DESCENT,
+        // ASCENT("ascent")
+        ASCENT
+
+        // --------------------
+        // TODO enum body members
+        // public String streamabilityStr;
+        // public boolean isConsuming() {
+        //     return this == ABSORBING || this == SHALLOW_DESCENT || this == DEEP_DESCENT;
+        // }
+        // public boolean isStreaming() {
+        //     return this != UNCLASSIFIED;
+        // }
+        // FunctionStreamability(String v) {
+        //     streamabilityStr = v;
+        // }
+        // public static FunctionStreamability of(String v) {
+        //     switch(v) {
+        //         case "unclassified":
+        //             return UNCLASSIFIED;
+        //         case "absorbing":
+        //             return ABSORBING;
+        //         case "inspection":
+        //             return INSPECTION;
+        //         case "filter":
+        //             return FILTER;
+        //         case "shallow-descent":
+        //             return SHALLOW_DESCENT;
+        //         case "deep-descent":
+        //             return DEEP_DESCENT;
+        //         case "ascent":
+        //             return ASCENT;
+        //         default:
+        //             throw new global::System.ArgumentException();
+        //     }
+        // }
+        // --------------------
+    }
+}

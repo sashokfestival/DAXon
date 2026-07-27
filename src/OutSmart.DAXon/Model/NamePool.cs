@@ -1,0 +1,208 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Model
+{
+    public sealed class NamePool
+    {
+        public const int FP_MASK = 0xfffff;
+        // Since fingerprints in the range 0-1023 belong to predefined names, user-defined names
+        // will always have a fingerprint above this range, which can be tested by a mask.
+        public const int USER_DEFINED_MASK = 0xffc00;
+        // Limit: maximum number of fingerprints
+        private static readonly int MAX_FINGERPRINT = FP_MASK;
+        // A map from QNames to fingerprints
+        private readonly Dictionary<StructuredQName, int> qNameToInteger = new Dictionary<StructuredQName, int>(1000);
+        // A map from fingerprints to QNames
+        private readonly Dictionary<int, StructuredQName> integerToQName = new Dictionary<int, StructuredQName>(1000);
+        // Next fingerprint available to be allocated. Starts at 1024 as low-end fingerprints are statically allocated to system-defined
+        // names
+        private readonly AtomicCounter unique = new AtomicCounter(1024);
+        // A map containing suggested prefixes for particular URIs
+        private readonly Dictionary<NamespaceUri, string> suggestedPrefixes = new Dictionary<NamespaceUri, string>();
+        /// <summary>
+        /// Create a NamePool
+        /// </summary>
+        public NamePool()
+        {
+        }
+
+        public void SuggestPrefix(string prefix, NamespaceUri uri)
+        {
+            suggestedPrefixes.Put(uri, prefix);
+        }
+
+        public StructuredQName GetUnprefixedQName(int nameCode)
+        {
+            int fp = nameCode & FP_MASK;
+            if ((fp & USER_DEFINED_MASK) == 0)
+            {
+                return StandardNames.GetUnprefixedQName(fp);
+            }
+
+            return integerToQName.Get(fp);
+        }
+
+        public StructuredQName GetStructuredQName(int fingerprint)
+        {
+            return GetUnprefixedQName(fingerprint);
+        }
+
+        public static bool IsPrefixed(int nameCode)
+        {
+            return (nameCode & 0x3ff00000) != 0;
+        }
+
+        public string SuggestPrefixForURI(NamespaceUri uri)
+        {
+            if (uri.Equals(NamespaceUri.XML))
+            {
+                return "xml";
+            }
+
+            return suggestedPrefixes.Get(uri);
+        }
+
+        public int AllocateFingerprint(NamespaceUri uri, string local)
+        {
+            lock (this)
+            {
+                if (NamespaceUri.IsReserved(uri) || NamespaceUri.SAXON.Equals(uri))
+                {
+                    int fp = StandardNames.GetFingerprint(uri, local);
+                    if (fp != -1)
+                    {
+                        return fp;
+                    }
+                }
+
+                StructuredQName qName = new StructuredQName("", uri, local);
+                int existing = qNameToInteger.GetOrDefault(qName, -1);
+                if (existing >= 0)
+                {
+                    return existing;
+                }
+
+                long nextUnique = unique.AndIncrement;
+                if (nextUnique > MAX_FINGERPRINT)
+                {
+                    throw new NamePoolLimitException("Too many distinct names in NamePool");
+                }
+
+                int next = (int)nextUnique;
+                int existing2 = qNameToInteger.PutIfAbsent(qName, next);
+                if (KeyWasAbsent(existing2))
+                {
+                    integerToQName.Put(next, qName);
+                    return next;
+                }
+                else
+                {
+                    return existing;
+                }
+            }
+        }
+
+        private static bool KeyWasAbsent(int result)
+        {
+            return result == 0;
+        }
+
+        public NamespaceUri GetURI(int nameCode)
+        {
+            int fp = nameCode & FP_MASK;
+            if ((fp & USER_DEFINED_MASK) == 0)
+            {
+                return StandardNames.GetURI(fp);
+            }
+
+            return GetUnprefixedQName(fp).GetNamespaceUri();
+        }
+
+        public string GetLocalName(int nameCode)
+        {
+            return GetUnprefixedQName(nameCode).GetLocalPart();
+        }
+
+        public string GetDisplayName(int nameCode)
+        {
+            return GetStructuredQName(nameCode).DisplayName;
+        }
+
+        public string GetClarkName(int nameCode)
+        {
+            return GetUnprefixedQName(nameCode).ClarkName;
+        }
+
+        public string GetEQName(int nameCode)
+        {
+            return GetUnprefixedQName(nameCode).EQName;
+        }
+
+        public int AllocateClarkName(string expandedName)
+        {
+            NamespaceUri @namespace;
+            string localName;
+            if (expandedName[0] == '{')
+            {
+                int closeBrace = expandedName.IndexOf('}');
+                if (closeBrace < 0)
+                {
+                    throw new ArgumentException("No closing '}' in Clark name");
+                }
+
+                @namespace = NamespaceUri.Of(expandedName.Substring(1, closeBrace - 1) /*Java substring(begin,END) -> C# (start,LENGTH)*/);
+                if (closeBrace == expandedName.Length)
+                {
+                    throw new ArgumentException("Missing local part in Clark name");
+                }
+
+                localName = expandedName.Substring(closeBrace + 1);
+            }
+            else
+            {
+                @namespace = NamespaceUri.NULL;
+                localName = expandedName;
+            }
+
+            return AllocateFingerprint(@namespace, localName);
+        }
+
+        public int GetFingerprint(NamespaceUri uri, string localName)
+        {
+
+            // A read-only version of allocate()
+            if (NamespaceUri.IsReserved(uri) || uri.Equals(NamespaceUri.SAXON))
+            {
+                int fp = StandardNames.GetFingerprint(uri, localName);
+                if (fp != -1)
+                {
+                    return fp; // otherwise, look for the name in this namepool
+                }
+            }
+
+            return qNameToInteger.GetOrDefault(new StructuredQName("", uri, localName), -1);
+        }
+
+        /// <summary>
+        /// Unchecked Exception raised when some limit in the design of the name pool is exceeded
+        /// </summary>
+        public class NamePoolLimitException : Exception
+        {
+            public NamePoolLimitException(string message) : base(message)
+            {
+            }
+        }
+    }
+}

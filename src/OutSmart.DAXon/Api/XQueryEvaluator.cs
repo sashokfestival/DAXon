@@ -1,0 +1,475 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Expressions.Instructions;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.XQuery;
+using OutSmart.DAXon.Api.Streams;
+using OutSmart.DAXon.Serialization;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees.Tiny;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Internal.Collections;
+using OutSmart.DAXon.Internal.Functional;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Lib;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Jaxp.Transform;
+using OutSmart.DAXon.Internal.Streams;
+using OutSmart.DAXon.Values;
+namespace OutSmart.DAXon.Api
+{
+    public class XQueryEvaluator : AbstractDestination, IEnumerable<XdmItem>
+    {
+        private readonly Processor processor;
+        private readonly XQueryExpression expression;
+        private readonly DynamicQueryContext context;
+        private Controller controller; // used only when making direct calls to global functions
+        private IDestination destination;
+        private HashSet<XdmNode> updatedDocuments;
+        private Builder sourceTreeBuilder;
+
+        public virtual IEnumerator<XdmNode> UpdatedDocuments => updatedDocuments.IIterator();
+
+        public virtual DynamicQueryContext UnderlyingQueryContext => context;
+        public XQueryEvaluator(Processor processor, XQueryExpression expression)
+        {
+            this.processor = processor;
+            this.expression = expression;
+            this.context = new DynamicQueryContext(expression.GetConfiguration());
+        }
+
+        public virtual void SetSchemaValidationMode(ValidationMode mode)
+        {
+            if (mode != null)
+            {
+                context.SchemaValidationMode = mode.GetNumber();
+            }
+        }
+
+        public virtual ValidationMode GetSchemaValidationMode()
+        {
+            return (ValidationMode)context.SchemaValidationMode;
+        }
+
+        internal virtual void SetSource(ResolvedResource source)
+        {
+            if (source.Node != null)
+            {
+                SetContextItem(new XdmNode(source.Node));
+            }
+            else
+            {
+                SetContextItem(processor.NewDocumentBuilder().Build(source));
+            }
+        }
+
+        public virtual void SetContextItem(XdmItem item)
+        {
+            if (item != null)
+            {
+                GlobalContextRequirement gcr = expression.GetExecutable().GlobalContextRequirement;
+                if (gcr != null && !gcr.IsExternal())
+                {
+                    throw new DAXonApiException("The context item for the query is not defined as external");
+                }
+
+                context.ContextItem = item.UnderlyingValue;
+            }
+        }
+
+        public virtual XdmItem GetContextItem()
+        {
+            IItem item = context.ContextItem;
+            if (item == null)
+            {
+                return null;
+            }
+
+            return (XdmItem)XdmValue.Wrap(item);
+        }
+
+        public virtual void SetExternalVariable(QName name, XdmValue value)
+        {
+            try
+            {
+                context.SetParameter(name.GetStructuredQName(), value == null ? null : ((ISequence)value.UnderlyingValue).Materialize());
+            }
+            catch (XPathException e)
+            {
+                throw new DAXonApiUncheckedException(e);
+            }
+        }
+
+        public virtual XdmValue GetExternalVariable(QName name)
+        {
+            IGroundedValue oval = context.GetParameter(name.GetStructuredQName());
+            if (oval == null)
+            {
+                return null;
+            }
+
+            return XdmValue.Wrap(oval);
+        }
+
+        public virtual void SetURIResolver(URIResolver resolver)
+        {
+            context.ResourceResolver = new ResourceResolverWrappingURIResolver(resolver);
+        }
+
+        public virtual URIResolver GetURIResolver()
+        {
+            IResourceResolver rr = context.ResourceResolver;
+            if (rr is ResourceResolverWrappingURIResolver)
+            {
+                return ((ResourceResolverWrappingURIResolver)rr).WrappedURIResolver;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        public virtual void SetResourceResolver(IResourceResolver resolver)
+        {
+            context.ResourceResolver = resolver;
+        }
+
+        public virtual IResourceResolver GetResourceResolver()
+        {
+            return context.ResourceResolver;
+        }
+
+        public virtual void SetUnparsedTextResolver(IUnparsedTextURIResolver resolver)
+        {
+            context.UnparsedTextURIResolver = resolver;
+        }
+
+        public virtual IUnparsedTextURIResolver GetUnparsedTextURIResolver()
+        {
+            return context.UnparsedTextURIResolver;
+        }
+
+        public virtual void SetErrorListener(ErrorListener listener)
+        {
+            context.SetErrorListener(listener);
+        }
+
+        public virtual ErrorListener GetErrorListener()
+        {
+            return context.GetErrorListener();
+        }
+
+        public virtual void SetErrorReporter(IErrorReporter reporter)
+        {
+            context.ErrorReporter = reporter;
+        }
+
+        public virtual IErrorReporter GetErrorReporter()
+        {
+            return context.ErrorReporter;
+        }
+
+        public virtual void SetTraceListener(ITraceListener listener)
+        {
+            context.SetTraceListener(listener);
+        }
+
+        public virtual ITraceListener GetTraceListener()
+        {
+            return context.GetTraceListener();
+        }
+
+        public virtual void SetTraceFunctionDestination(Logger stream)
+        {
+            context.TraceFunctionDestination = stream;
+        }
+
+        public virtual Logger GetTraceFunctionDestination()
+        {
+            return context.TraceFunctionDestination;
+        }
+
+        public virtual void SetDestination(IDestination destination)
+        {
+            this.destination = destination;
+        }
+
+        public virtual void Run()
+        {
+            try
+            {
+                if (expression.IsUpdateQuery())
+                {
+                    HashSet<IMutableNodeInfo> docs = expression.RunUpdate(context);
+                    updatedDocuments = new HashSet<XdmNode>();
+                    foreach (IMutableNodeInfo doc in docs)
+                    {
+                        updatedDocuments.Add(XdmItem.WrapItem(doc));
+                    }
+                }
+                else
+                {
+                    if (destination == null)
+                    {
+                        throw new InvalidOperationException("No destination supplied");
+                    }
+
+                    Run(destination); //                Result receiver;
+                    //                if (destination instanceof Serializer) {
+                    //                    //context.set
+                    //                } else {
+                    //                }
+                    //                expression.run(context, receiver, null);
+                    //                destination.close();
+                }
+            }
+            catch (TransformerException e)
+            {
+                throw new DAXonApiException(e);
+            }
+            catch (UncheckedXPathException e)
+            {
+                throw new DAXonApiException(e.GetXPathException());
+            }
+        }
+
+        public virtual void Run(IDestination destination)
+        {
+            if (expression.IsUpdateQuery())
+            {
+                throw new InvalidOperationException("Query is updating");
+            }
+
+            try
+            {
+                IReceiver @out = GetDestinationReceiver(destination);
+                expression.Run(context, @out, null);
+                destination.CloseAndNotify();
+            }
+            catch (TransformerException e)
+            {
+                throw new DAXonApiException(e);
+            }
+        }
+
+        public virtual void RunStreamed(ResolvedResource source, IDestination destination)
+        {
+            if (expression.IsUpdateQuery())
+            {
+                throw new InvalidOperationException("Query is updating; cannot run with streaming");
+            }
+
+            Configuration config = context.GetConfiguration();
+            if (config.IsTiming())
+            {
+                string systemId = source.SystemId;
+                if (systemId == null)
+                {
+                    systemId = "";
+                }
+
+                config.Logger.Info("Processing streamed input " + systemId);
+            }
+
+            try
+            {
+                IReceiver receiver = GetDestinationReceiver(destination);
+                expression.RunStreamed(context, source, receiver, null);
+                destination.CloseAndNotify();
+            }
+            catch (TransformerException e)
+            {
+                throw new DAXonApiException(e);
+            }
+        }
+
+        public virtual XdmValue Evaluate()
+        {
+            if (expression.IsUpdateQuery())
+            {
+                throw new InvalidOperationException("Query is updating");
+            }
+
+            try
+            {
+                ISequenceIterator iter = expression.IIterator(context);
+                return XdmValue.Wrap(SequenceTool.ToGroundedValue(iter));
+            }
+            catch (UncheckedXPathException e)
+            {
+                throw new DAXonApiException(e.GetXPathException());
+            }
+            catch (XPathException e)
+            {
+                throw new DAXonApiException(e);
+            }
+        }
+
+        public virtual XdmItem EvaluateSingle()
+        {
+            try
+            {
+                ISequenceIterator iter = expression.IIterator(context);
+                IItem next = iter.Next();
+                return next == null ? null : (XdmItem)XdmValue.Wrap(next);
+            }
+            catch (UncheckedXPathException e)
+            {
+                throw new DAXonApiException(e.GetXPathException());
+            }
+            catch (XPathException e)
+            {
+                throw new DAXonApiException(e);
+            }
+        }
+
+        public XdmSequenceIterator<XdmItem> IIterator()
+        {
+            if (expression.IsUpdateQuery())
+            {
+                throw new InvalidOperationException("Query is updating");
+            }
+
+            try
+            {
+                return new XdmSequenceIterator<XdmItem>(expression.IIterator(context));
+            }
+            catch (XPathException e)
+            {
+                throw new DAXonApiUncheckedException(e);
+            }
+        }
+
+        public virtual XdmStream<XdmItem> Stream()
+        {
+            return IIterator().Stream();
+        }
+
+        private IReceiver GetDestinationReceiver(IDestination destination)
+        {
+            Executable exec = expression.GetExecutable();
+            PipelineConfiguration pipe = expression.GetConfiguration().MakePipelineConfiguration();
+            IReceiver @out = destination.GetReceiver(pipe, exec.PrimarySerializationProperties);
+            if (Configuration.IsAssertionsEnabled())
+            {
+                return new RegularSequenceChecker(@out, true);
+            }
+            else
+            {
+                return @out;
+            }
+        }
+
+        public override IReceiver GetReceiver(PipelineConfiguration pipe, SerializationProperties @params)
+        {
+            if (destination == null)
+            {
+                throw new InvalidOperationException("No destination has been supplied");
+            }
+
+            try
+            {
+                if (controller == null)
+                {
+                    controller = expression.NewController(context);
+                }
+                else
+                {
+                    context.InitializeController(controller);
+                }
+            }
+            catch (XPathException e)
+            {
+                throw new DAXonApiException(e);
+            }
+
+            sourceTreeBuilder = controller.MakeBuilder();
+            sourceTreeBuilder.SetDurability(Durability.LASTING);
+            if (sourceTreeBuilder is TinyBuilder)
+            {
+                ((TinyBuilder)sourceTreeBuilder).SetStatistics(context.GetConfiguration().GetTreeStatistics().SOURCE_DOCUMENT_STATISTICS);
+            }
+
+            IReceiver @out = controller.MakeStripper(sourceTreeBuilder);
+            SequenceNormalizer sn = @params.MakeSequenceNormalizer(@out);
+            sn.OnClose(() =>
+            {
+                NodeInfo doc = sourceTreeBuilder.CurrentRoot;
+                if (doc == null)
+                {
+                    throw new DAXonApiException("No source document has been built by the previous pipeline stage");
+                }
+
+                doc.GetTreeInfo().SpaceStrippingRule = controller.SpaceStrippingRule;
+                SetSource(new ResolvedResource { Node = doc });
+                sourceTreeBuilder = null;
+                Run(destination);
+                destination.CloseAndNotify();
+            });
+            return sn;
+        }
+
+        public override void Dispose()
+        {
+        }
+
+        public virtual XdmValue CallFunction(QName function, params XdmValue[] arguments)
+        {
+            UserFunction fn = expression.MainModule.GetUserDefinedFunction(function.GetNamespaceUri(), function.LocalName, arguments.Length);
+            if (fn == null)
+            {
+                throw new DAXonApiException("No function with name " + function.EQName + " and arity " + arguments.Length + " has been declared in the query");
+            }
+
+            try
+            {
+                if (controller == null)
+                {
+                    controller = expression.NewController(context);
+                }
+                else
+                {
+                    context.InitializeController(controller);
+                }
+
+                Configuration config = processor.UnderlyingConfiguration;
+                TypeHierarchy th = config.GetTypeHierarchy();
+                ISequence[] vr = SequenceTool.MakeSequenceArray(arguments.Length);
+                for (int i = 0; i < arguments.Length; i++)
+                {
+                    Values.SequenceType type = fn.GetParameterDefinitions()[i].GetRequiredType();
+                    IGroundedValue gVal = (IGroundedValue)arguments[i].UnderlyingValue;
+                    if (!type.Matches(gVal, th))
+                    {
+                        int pos = i;
+                        Func<RoleDiagnostic> role = () => new RoleDiagnostic(RoleDiagnostic.FUNCTION, function.GetStructuredQName().DisplayName, pos);
+                        gVal = th.ApplyFunctionConversionRules(gVal, type, role, Loc.NONE);
+                    }
+
+                    vr[i] = gVal;
+                }
+
+                ISequence result = fn.Call(vr, controller);
+                return XdmValue.Wrap(result);
+            }
+            catch (XPathException e)
+            {
+                throw new DAXonApiException(e);
+            }
+        }
+        public IEnumerator<XdmItem> GetEnumerator() => throw new NotImplementedException();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw new NotImplementedException();
+    }
+}

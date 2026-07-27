@@ -1,0 +1,669 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Expressions.Sorting;
+using OutSmart.DAXon.Collections;
+using OutSmart.DAXon.Internal.Collections;
+using OutSmart.DAXon.Internal.Functional;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Internal;
+using System.IO;
+namespace OutSmart.DAXon.Text
+{
+    public class ZenoString : UnicodeString
+    {
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public static readonly ZenoString EMPTY = new ZenoString();
+        private IList<UnicodeString> segments = new List<UnicodeString>();
+        private IList<long> offsets = new List<long>();
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override int Width
+        {
+            get
+            {
+                int maxWidth = 7;
+                foreach (UnicodeString entry in segments)
+                {
+                    int width = entry.Width;
+                    if (width == 24)
+                    {
+                        return 24;
+                    }
+                    else
+                    {
+                        maxWidth = System.Math.Max(maxWidth, width);
+                    }
+                }
+
+                return maxWidth;
+            }
+        }
+        /// <summary>
+        /// Private constructor creating an empty ZenoString (containing an empty list of segments)
+        /// </summary>
+        private ZenoString()
+        {
+        }
+
+        /// <summary>
+        /// Private constructor creating a ZenoString with a single segment
+        /// </summary>
+        private ZenoString(UnicodeString content)
+        {
+            segments.Add(content);
+            offsets.Add(0);
+        }
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public static ZenoString Of(UnicodeString content)
+        {
+            if (content is ZenoString)
+            {
+                return (ZenoString)content;
+            }
+            else if (content.IsEmpty())
+            {
+                return new ZenoString();
+            }
+            else
+            {
+                return new ZenoString(content);
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        private int SegmentForOffset(long offset)
+        {
+            if (segments.Count == 0)
+            {
+                throw new IndexOutOfRangeException("ZenoString is empty");
+            }
+
+            int result = BinarySearch(offset, 0, offsets.Count - 1);
+            if (result < 0)
+            {
+                throw new IndexOutOfRangeException("Index " + offset + " out of range 0-" + (Length() - 1));
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        private int BinarySearch(long offset, int start, int end)
+        {
+            if (start == end)
+            {
+                long s = offsets[start];
+                long e = s + segments[start].Length();
+                if (s <= offset && e > offset)
+                {
+                    return start;
+                }
+                else
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                int mid = start + (end - start + 1) / 2;
+                if (offsets[mid] > offset)
+                {
+                    return BinarySearch(offset, start, mid - 1);
+                }
+                else
+                {
+                    return BinarySearch(offset, mid, end);
+                }
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override IIntIterator CodePoints()
+        {
+            if (IsEmpty())
+            {
+                return EmptyIntIterator.GetInstance();
+            }
+
+            return new AnonymousIntIterator(this);
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override long Length()
+        {
+            int i = segments.Count - 1;
+            return i < 0 ? 0 : offsets[i] + segments[i].Length();
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override bool IsEmpty()
+        {
+            return segments.IsEmpty();
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override long IndexOf(int codePoint, long from)
+        {
+            from = System.Math.Max(from, 0);
+            if (from >= Length())
+            {
+                return -1;
+            }
+
+            int first = SegmentForOffset(from);
+            for (int i = first; i < segments.Count; i++)
+            {
+                UnicodeString segment = segments[i];
+                long offset = offsets[i];
+                long pos = segment.IndexOf(codePoint, i == first ? from - offset : 0);
+                if (pos >= 0)
+                {
+                    return pos + offset;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override long IndexWhere(Func<int, bool> predicate, long from)
+        {
+            int first = SegmentForOffset(from);
+            for (int i = first; i < segments.Count; i++)
+            {
+                UnicodeString segment = segments[i];
+                long offset = offsets[i];
+                long pos = segment.IndexWhere(predicate, i == first ? from - offset : 0);
+                if (pos >= 0)
+                {
+                    return pos + offset;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override int CodePointAt(long index)
+        {
+            int entry = SegmentForOffset(index);
+            UnicodeString segment = segments[entry];
+            return segment.CodePointAt(index - offsets[entry]);
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override UnicodeString Substring(long start, long end)
+        {
+            CheckSubstringBounds(start, end);
+            if (start == end)
+            {
+                return EmptyUnicodeString.GetInstance();
+            }
+            else if (start + 1 == end)
+            {
+                return new UnicodeChar(CodePointAt(start));
+            }
+
+            int first = SegmentForOffset(start);
+            int last = SegmentForOffset(end - 1);
+            if (first == last)
+            {
+                UnicodeString segment = segments[first];
+                long offset = offsets[first];
+                return segment.Substring(start - offset, end - offset);
+            }
+            else
+            {
+                ZenoString z = ZenoString.Of(segments[first].Substring(start - offsets[first]));
+                for (int i = first + 1; i < last; i++)
+                {
+                    z = (ZenoString)z.Concat(segments[i]);
+                }
+
+                return z.Concat(segments[last].Prefix(end - offsets[last]));
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override bool HasSubstring(UnicodeString other, long offset)
+        {
+
+            // Override inherited implementation because codePointAt(n) is relatively expensive
+            if (offset < 0 || offset > Length())
+            {
+                throw new IndexOutOfRangeException();
+            }
+
+            long len = other.Length();
+            if (len + offset > Length())
+            {
+                return false;
+            }
+
+            long end = offset + len;
+            int first = SegmentForOffset(offset);
+            int last = SegmentForOffset(end - 1);
+            if (first == last)
+            {
+                UnicodeString segment = segments[first];
+                long segmentOffset = offsets[first];
+                return segment.HasSubstring(other, offset - segmentOffset);
+            }
+            else
+            {
+                return Substring(offset, end).Equals(other);
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override UnicodeString Concat(UnicodeString other)
+        {
+
+            // Here's the critical decision - whether or not to merge the new string with the last
+            // segment of the previous one
+            if (IsEmpty())
+            {
+                return other is ZenoString ? (ZenoString)other : new ZenoString(other);
+            }
+            else if (other.IsEmpty())
+            {
+                return this;
+            }
+
+            if (other is ZenoString)
+            {
+                ZenoString z = new ZenoString();
+                z.segments = new List<UnicodeString>(segments);
+                z.segments.AddAll(((ZenoString)other).segments);
+                z.offsets = new List<long>(offsets);
+                long len = Length();
+                foreach (long offset in ((ZenoString)other).offsets)
+                {
+                    z.offsets.Add(offset + len);
+                }
+
+                return (len < 32 || other.Length() < 32 ? z.Consolidate0() : z);
+            }
+            else
+            {
+                ZenoString z = new ZenoString();
+                z.segments = new List<UnicodeString>(segments);
+                z.offsets = new List<long>(offsets);
+                z.segments.Add(other);
+                z.offsets.Add(Length());
+                return z.Consolidate0();
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override void Copy8bit(byte[] target, int offset)
+        {
+            foreach (UnicodeString us in segments)
+            {
+                us.Copy8bit(target, offset);
+                offset += us.Length32();
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override void Copy16bit(char[] target, int offset)
+        {
+            foreach (UnicodeString us in segments)
+            {
+                us.Copy16bit(target, offset);
+                offset += us.Length32();
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override void Copy24bit(byte[] target, int offset)
+        {
+            foreach (UnicodeString us in segments)
+            {
+                us.Copy24bit(target, offset);
+                offset += (us.Length32() * 3);
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override void Copy32bit(int[] target, int offset)
+        {
+            foreach (UnicodeString us in segments)
+            {
+                us.Copy32bit(target, offset);
+                offset += us.Length32();
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        private ZenoString Consolidate()
+        {
+
+            // internal, so works in-situ
+            int i = segments.Count - 2;
+            long prevLength = segments[i + 1].Length();
+            while (i >= 0)
+            {
+                long thisLength = segments[i].Length();
+                long nextLength = i == 0 ? 0 : segments[i - 1].Length();
+                if ((thisLength <= prevLength && thisLength <= nextLength) || thisLength + prevLength <= 32)
+                {
+                    segments[i] = ConcatSegments(segments[i], segments[i + 1]);
+                    segments.RemoveAt(i + 1);
+                    offsets.RemoveAt(i + 1);
+                    prevLength = segments[i].Length();
+                }
+                else
+                {
+                    prevLength = thisLength;
+                }
+
+                i--;
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public virtual void WriteSegments(IUnicodeWriter writer)
+        {
+            foreach (UnicodeString str in segments)
+            {
+                writer.Write(str);
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public static UnicodeString ConcatSegments(UnicodeString left, UnicodeString right)
+        {
+            if (left.Width <= 8 && right.Width <= 8)
+            {
+                byte[] newByteArray = new byte[left.Length32() + right.Length32()];
+                left.Copy8bit(newByteArray, 0);
+                right.Copy8bit(newByteArray, left.Length32());
+                return new Twine8(newByteArray);
+            }
+            else if (left.Width <= 16 && right.Width <= 16)
+            {
+                char[] newCharArray = new char[left.Length32() + right.Length32()];
+                left.Copy16bit(newCharArray, 0);
+                right.Copy16bit(newCharArray, left.Length32());
+                return new Twine16(newCharArray);
+            }
+            else
+            {
+                byte[] newByteArray = new byte[(left.Length32() + right.Length32()) * 3];
+                left.Copy24bit(newByteArray, 0);
+                right.Copy24bit(newByteArray, left.Length32() * 3);
+                return new Twine24(newByteArray);
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        private ZenoString Consolidate0()
+        {
+
+            // internal, so works in-situ
+            for (int i = segments.Count - 2; i >= 0; i--)
+            {
+                double nextLength = segments[i + 1].Length() * 1.1;
+                if (segments[i].Length() < nextLength)
+                {
+                    segments[i] = ConcatSegments(segments[i], segments[i + 1]);
+                    segments.RemoveAt(i + 1);
+                    offsets.RemoveAt(i + 1);
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        private ZenoString Consolidate1()
+        {
+
+            // internal, so works in-situ
+            int halfway = segments.Count / 2;
+            for (int i = 0; i < (halfway - 1); i++)
+            {
+                if (segments[i].Length() + segments[i + 1].Length() < (32 << i))
+                {
+                    UnicodeString merged = segments[i].Concat(segments[i + 1]);
+                    segments.RemoveAt(i + 1);
+                    offsets.RemoveAt(i + 1);
+                    segments[i] = merged;
+                }
+            }
+
+            int distance = 0;
+            for (int i = segments.Count - 1; i > halfway; i--)
+            {
+                if (segments[i].Length() + segments[i - 1].Length() < (32 << (distance++)))
+                {
+                    UnicodeString merged = segments[i - 1].Concat(segments[i]);
+                    segments.RemoveAt(i);
+                    offsets.RemoveAt(i);
+                    segments[i - 1] = merged;
+                }
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override UnicodeString Economize()
+        {
+            int segs = segments.Count;
+            if (segs == 0)
+            {
+                return EmptyUnicodeString.GetInstance();
+            }
+            else if (segs == 1)
+            {
+                return segments[0];
+            }
+            else if (segs < 32 && Length() < 256 && Width <= 16)
+            {
+
+                // Return a single wrapped Java String, for economy of any subsequent toString() operations.
+                return new BMPString(ToString());
+            }
+            else
+            {
+                return this;
+            }
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (UnicodeString str in segments)
+            {
+                sb.Append(str.ToString());
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        public virtual IList<long> DebugSegmentLengths()
+        {
+            IList<long> result = new List<long>(segments.Count);
+            foreach (UnicodeString str in segments)
+            {
+                result.Add(str.Length());
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        // Diagnostic method
+        private void ShowSegmentLengths()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (UnicodeString str in segments)
+            {
+                sb.Append(str.Length() + ", ");
+            }
+
+            Console.Error.WriteLine(sb);
+        }
+
+        /// <summary>
+        /// An empty ZenoString
+        /// </summary>
+        private void VerifySegmentLengths()
+        {
+            long total = 0;
+            for (int i = 0; i < segments.Count; i++)
+            {
+                if (offsets[i] != total)
+                {
+                    ShowSegmentLengths();
+                    throw new InvalidOperationException("Bad offset for segment " + i);
+                }
+
+                total += segments[i].Length();
+            }
+        }
+
+        private sealed class AnonymousIntIterator : AbstractIntIterator
+        {
+
+            private readonly ZenoString parent;
+            private IEnumerator<UnicodeString> outerIterator;
+            private UnicodeString outerLookahead;
+            private bool outerLookaheadFilled;
+            IIntIterator innerIterator;
+            int cpLookahead;
+            bool cpLookaheadFilled;
+            public AnonymousIntIterator(ZenoString parent)
+            {
+                this.parent = parent;
+                this.outerIterator = parent.segments.IIterator();
+            }
+
+            private bool OuterHasNext()
+            {
+                if (!outerLookaheadFilled && outerIterator.MoveNext())
+                {
+                    outerLookahead = outerIterator.Current;
+                    outerLookaheadFilled = true;
+                }
+
+                return outerLookaheadFilled;
+            }
+
+            private UnicodeString OuterNext()
+            {
+                if (!outerLookaheadFilled)
+                {
+                    outerIterator.MoveNext();
+                    outerLookahead = outerIterator.Current;
+                }
+
+                outerLookaheadFilled = false;
+                return outerLookahead;
+            }
+
+            public override bool HasNext()
+            {
+                if (cpLookaheadFilled)
+                {
+                    return true;
+                }
+
+                while (true)
+                {
+                    if (innerIterator != null && innerIterator.MoveNext())
+                    {
+                        cpLookahead = innerIterator.Current;
+                        cpLookaheadFilled = true;
+                        return true;
+                    }
+                    else if (OuterHasNext())
+                    {
+                        innerIterator = OuterNext().CodePoints();
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            public override int Next()
+            {
+                cpLookaheadFilled = false;
+                return cpLookahead;
+            }
+        }
+    }
+}

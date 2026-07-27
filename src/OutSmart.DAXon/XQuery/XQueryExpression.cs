@@ -1,0 +1,695 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Internal.Functional;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Expressions.Elaboration;
+using OutSmart.DAXon.Expressions.Instructions;
+using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Lib;
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Serialization;
+using OutSmart.DAXon.Tracing;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Trees.Iterators;
+using OutSmart.DAXon.Types;
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Expressions.Parsing;
+using OutSmart.DAXon.Functions;
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Jaxp.Transform;
+using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
+using OutSmart.DAXon.Internal.Streams;
+using System.IO;
+namespace OutSmart.DAXon.XQuery
+{
+    public class XQueryExpression : ILocation, IExpressionOwner, ITraceableComponent
+    {
+        protected Expression expression;
+        protected SlotManager stackFrameMap;
+        protected Executable executable;
+        protected QueryModule mainModule;
+        protected IPullEvaluator pullEvaluator = null;
+        protected IPushEvaluator pushEvaluator = null;
+
+        public virtual string TracingTag => "query";
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual QueryModule MainModule => mainModule;
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual StructuredQName[] ExternalVariableNames
+        {
+            get
+            {
+                IList<StructuredQName> list = stackFrameMap.VariableMap;
+                StructuredQName[] names = new StructuredQName[stackFrameMap.NumberOfVariables];
+                for (int i = 0; i < names.Length; i++)
+                {
+                    names[i] = list[i];
+                }
+
+                return names;
+            }
+        }
+        public XQueryExpression(Expression exp, QueryModule mainModule, bool streaming)
+        {
+            Executable exec = mainModule.GetExecutable();
+            Configuration config = mainModule.GetConfiguration();
+            stackFrameMap = config.MakeSlotManager();
+            executable = exec;
+            this.mainModule = mainModule;
+            exp.SetRetainedStaticContext(mainModule.MakeRetainedStaticContext());
+            try
+            {
+                ExpressionVisitor visitor = ExpressionVisitor.Make(mainModule);
+                Optimizer optimizer = visitor.ObtainOptimizer();
+                visitor.SetOptimizeForStreaming(streaming);
+                exp = exp.Simplify();
+                exp.CheckForUpdatingSubexpressions();
+                GlobalContextRequirement contextReq = exec.GlobalContextRequirement;
+                Types.ItemType req = contextReq == null ? AnyItemType.GetInstance() : contextReq.RequiredItemType;
+                ContextItemStaticInfo cit = config.MakeContextItemStaticInfo(req, true);
+                Expression e2 = exp.TypeCheck(visitor, cit);
+                if (e2 != exp)
+                {
+                    e2.SetRetainedStaticContext(exp.GetRetainedStaticContext());
+                    e2.ParentExpression = null;
+                    exp = e2;
+                }
+
+                if (optimizer.IsOptionSet(OptimizerOptions.MISCELLANEOUS))
+                {
+                    e2 = exp.Optimize(visitor, cit);
+                    if (e2 != exp)
+                    {
+                        e2.SetRetainedStaticContext(exp.GetRetainedStaticContext());
+                        e2.ParentExpression = null;
+                        exp = e2;
+                    }
+                }
+
+                if (optimizer.IsOptionSet(OptimizerOptions.LOOP_LIFTING))
+                {
+                    e2 = LoopLifter.Process(exp, visitor, cit);
+                    if (e2 != exp)
+                    {
+                        e2.SetRetainedStaticContext(exp.GetRetainedStaticContext());
+                        e2.ParentExpression = null;
+                        exp = e2;
+                    }
+                }
+            }
+            catch (XPathException err)
+            {
+
+                //err.printStackTrace();
+                mainModule.ReportStaticError(err);
+                throw err;
+            }
+
+            ExpressionTool.AllocateSlots(exp, 0, stackFrameMap);
+            ExpressionTool.ComputeEvaluationModesForUserFunctionCalls(exp);
+            foreach (GlobalVariable var in GetPackageData().GlobalVariableList)
+            {
+                Expression top = var.GetBody();
+                if (top != null)
+                {
+                    ExpressionTool.ComputeEvaluationModesForUserFunctionCalls(top);
+                }
+            }
+
+            expression = exp;
+            executable.SetConfiguration(config);
+        }
+
+        public virtual Expression GetExpression()
+        {
+            return expression;
+        }
+
+        public virtual Expression GetBody()
+        {
+            return GetExpression();
+        }
+
+        public virtual Expression GetChildExpression()
+        {
+            return expression;
+        }
+
+        public virtual void SetBody(Expression expression)
+        {
+            SetChildExpression(expression);
+        }
+
+        public virtual StructuredQName GetObjectName()
+        {
+            return null;
+        }
+
+        public virtual ILocation GetLocation()
+        {
+            return this;
+        }
+
+        public virtual PackageData GetPackageData()
+        {
+            return mainModule.GetPackageData();
+        }
+
+        public virtual Configuration GetConfiguration()
+        {
+            return mainModule.GetConfiguration();
+        }
+
+        public virtual bool UsesContextItem()
+        {
+            if (ExpressionTool.DependsOnFocus(expression))
+            {
+                return true;
+            }
+
+            IList<GlobalVariable> map = GetPackageData().GlobalVariableList;
+            if (map != null)
+            {
+                foreach (GlobalVariable var in map)
+                {
+                    Expression select = var.GetBody();
+                    if (select != null && ExpressionTool.DependsOnFocus(select))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public virtual bool IsUpdateQuery()
+        {
+            return false;
+        }
+
+        public virtual SlotManager GetStackFrameMap()
+        {
+            return stackFrameMap;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual void ExplainPathMap()
+        {
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual IList<object> Evaluate(DynamicQueryContext env)
+        {
+            if (IsUpdateQuery())
+            {
+                throw new XPathException("Cannot call evaluate() on an updating query");
+            }
+
+            List<object> list = new List<object>(100);
+            SequenceTool.Supply(IIterator(env), (item) => list.Add(SequenceTool.ConvertToJava(item)));
+            return list;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual object EvaluateSingle(DynamicQueryContext env)
+        {
+            if (IsUpdateQuery())
+            {
+                throw new XPathException("Cannot call evaluateSingle() on an updating query");
+            }
+
+            ISequenceIterator iter = IIterator(env);
+            IItem item = iter.Next();
+            if (item == null)
+            {
+                return null;
+            }
+
+            return SequenceTool.ConvertToJava(item);
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual ISequenceIterator IIterator(DynamicQueryContext env)
+        {
+            if (IsUpdateQuery())
+            {
+                throw new XPathException("Cannot call iterator() on an updating query");
+            }
+
+            if (!env.GetConfiguration().IsCompatible(GetExecutable().GetConfiguration()))
+            {
+                throw new XPathException("The query must be compiled and executed under the same Configuration", DAXonErrorCode.SXXP0004);
+            }
+
+            Controller controller = NewController(env);
+            try
+            {
+                IItem contextItem = controller.GlobalContextItem;
+                if (contextItem is NodeInfo && ((NodeInfo)contextItem).GetTreeInfo().IsTyped() && !GetExecutable().IsSchemaAware())
+                {
+                    throw new XPathException("A typed input document can only be used with a schema-aware query");
+                }
+
+                XPathContextMajor context = InitialContext(env, controller);
+
+                // In tracing/debugging mode, evaluate all the global variables first
+                if (controller.GetTraceListener() != null)
+                {
+                    controller.PreEvaluateGlobals(context);
+                }
+
+                context.OpenStackFrame(stackFrameMap);
+                ISequenceIterator iterator = GetExpressionIterator(context);
+                if (iterator is IGroundedIterator && ((IGroundedIterator)iterator).IsActuallyGrounded())
+                {
+                    return iterator;
+                }
+                else
+                {
+                    return new ErrorReportingIterator(iterator, controller.ErrorReporter, GetLocation());
+                }
+            }
+            catch (XPathException err)
+            {
+                TransformerException terr = err;
+                while (terr.GetException() is TransformerException)
+                {
+                    terr = (TransformerException)terr.GetException();
+                }
+
+                XPathException de = XPathException.MakeXPathException(terr);
+                controller.ReportFatalError(de);
+                throw de;
+            }
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        protected virtual ISequenceIterator GetExpressionIterator(IXPathContext context)
+        {
+            lock (this)
+            {
+                if (pullEvaluator == null)
+                {
+                    pullEvaluator = expression.MakeElaborator().ElaborateForPull();
+                }
+            }
+
+            return pullEvaluator.Iterate(context);
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual void Run(DynamicQueryContext env, Result result, Properties outputProperties)
+        {
+            if (IsUpdateQuery())
+            {
+                throw new XPathException("Cannot call run() on an updating query");
+            }
+
+            if (!env.GetConfiguration().IsCompatible(GetExecutable().GetConfiguration()))
+            {
+                throw new XPathException("The query must be compiled and executed under the same Configuration", DAXonErrorCode.SXXP0004);
+            }
+
+            IItem contextItem = env.ContextItem;
+            if (contextItem is NodeInfo && ((NodeInfo)contextItem).GetTreeInfo().IsTyped() && !GetExecutable().IsSchemaAware())
+            {
+                throw new XPathException("A typed input document can only be used with a schema-aware query");
+            }
+
+            Controller controller = NewController(env);
+            controller.OpenTraceEpisode();
+            if (result is IReceiver)
+            {
+                ((IReceiver)result).GetPipelineConfiguration().SetController(controller);
+            }
+
+            Properties actualProperties = ValidateOutputProperties(controller, outputProperties);
+            XPathContextMajor context = InitialContext(env, controller);
+
+            // In tracing/debugging mode, evaluate all the global variables first
+            ITraceListener tracer = controller.GetTraceListener();
+            if (tracer != null)
+            {
+                controller.PreEvaluateGlobals(context);
+            }
+
+            context.OpenStackFrame(stackFrameMap);
+            bool mustClose = result is StreamResult && ((StreamResult)result).GetOutputStream() == null;
+            IReceiver @out;
+            if (result is IReceiver)
+            {
+                @out = (IReceiver)result;
+            }
+            else
+            {
+                SerializerFactory sf = context.GetConfiguration().SerializerFactory;
+                PipelineConfiguration pipe = controller.MakePipelineConfiguration();
+                pipe.SetHostLanguage(HostLanguage.XQUERY);
+                @out = sf.GetReceiver(result, new SerializationProperties(actualProperties), pipe);
+            }
+
+            ComplexContentOutputter dest = new ComplexContentOutputter(@out);
+            dest.Open();
+
+            // Run the query
+            try
+            {
+                ProcessQuery(dest, context);
+            }
+            catch (XPathException err)
+            {
+                controller.ReportFatalError(err);
+                throw err;
+            }
+            finally
+            {
+                try
+                {
+                    controller.CloseTraceEpisode();
+                    dest.Dispose();
+                }
+                catch (XPathException e)
+                {
+                    e.ToString();
+                }
+            }
+
+            if (result is StreamResult)
+            {
+                CloseStreamIfNecessary((StreamResult)result, mustClose);
+            }
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        protected virtual void ProcessQuery(Outputter dest, IXPathContext context)
+        {
+            try
+            {
+                lock (this)
+                {
+                    if (pushEvaluator == null)
+                    {
+                        pushEvaluator = expression.MakeElaborator().ElaborateForPush();
+                    }
+                }
+
+                Expression.DispatchTailCall(pushEvaluator.ProcessLeavingTail(dest, context));
+            }
+            catch (UncheckedXPathException e)
+            {
+                throw e.GetXPathException();
+            }
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        protected virtual void CloseStreamIfNecessary(StreamResult result, bool mustClose)
+        {
+            if (mustClose)
+            {
+                System.IO.Stream os = result.GetOutputStream();
+                if (os != null)
+                {
+                    try
+                    {
+                        os.Dispose();
+                    }
+                    catch (IOException err)
+                    {
+                        throw new XPathException(err?.Message);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual void RunStreamed(DynamicQueryContext dynamicEnv, ResolvedResource source, Result result, Properties outputProperties)
+        {
+            throw new XPathException("Streaming requires Saxon-EE");
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        protected virtual Properties ValidateOutputProperties(Controller controller, Properties outputProperties)
+        {
+
+            // Validate the serialization properties requested
+            Properties baseProperties = controller.GetExecutable().PrimarySerializationProperties.GetProperties();
+            SerializerFactory sf = controller.GetConfiguration().SerializerFactory;
+            if (outputProperties != null)
+            {
+                foreach (string key in outputProperties.StringPropertyNames())
+                {
+                    string value = outputProperties.GetProperty(key);
+                    try
+                    {
+                        value = sf.CheckOutputProperty(key, value);
+                        baseProperties.SetProperty(key, value);
+                    }
+                    catch (XPathException dynamicError)
+                    {
+                        outputProperties.Remove(key);
+                        XmlProcessingException err = new XmlProcessingException(dynamicError);
+                        err.SetWarning(true);
+                        controller.ErrorReporter.Report(err);
+                    }
+                }
+            }
+
+            if (baseProperties.GetProperty("method") == null)
+            {
+
+                // XQuery forces the default method to XML, unlike XSLT where it depends on the contents of the result tree
+                baseProperties.SetProperty("method", "xml");
+            }
+
+            return baseProperties;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual HashSet<IMutableNodeInfo> RunUpdate(DynamicQueryContext dynamicEnv)
+        {
+            throw new XPathException("Calling runUpdate() on a non-updating query");
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual void RunUpdate(DynamicQueryContext dynamicEnv, IUpdateAgent agent)
+        {
+            throw new XPathException("Calling runUpdate() on a non-updating query");
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        protected virtual XPathContextMajor InitialContext(DynamicQueryContext dynamicEnv, Controller controller)
+        {
+            IItem contextItem = controller.GlobalContextItem;
+            XPathContextMajor context = controller.NewXPathContext();
+            if (contextItem != null)
+            {
+                ManualIterator single = new ManualIterator(contextItem);
+                context.SetCurrentIterator(single);
+                controller.GlobalContextItem = contextItem;
+            }
+
+            return context;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual Controller NewController(DynamicQueryContext env)
+        {
+            Controller controller = new Controller(executable.GetConfiguration(), executable);
+            env.InitializeController(controller);
+
+            // Arm the Processor-wide cooperative deadline for this query run. A module loaded via
+            // fn:load-xquery-module overrides this by inheriting the caller's deadline (see there).
+            if (executable.GetConfiguration().GetProcessor() is OutSmart.DAXon.Api.Processor p)
+            {
+                controller.SetTimeout(p.TransformTimeout);
+            }
+
+            return controller;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual void Explain(ExpressionPresenter @out)
+        {
+            @out.StartElement("query");
+            mainModule.GetKeyManager().ExportKeys(@out, null);
+            GetExecutable().ExplainGlobalVariables(@out);
+            mainModule.ExplainGlobalFunctions(@out);
+            @out.StartElement("body");
+            expression.Export(@out);
+            @out.EndElement();
+            @out.EndElement();
+            @out.Dispose();
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual Executable GetExecutable()
+        {
+            return executable;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual void SetAllowDocumentProjection(bool allowed)
+        {
+            if (allowed)
+            {
+                throw new NotSupportedException("Document projection requires Saxon-EE");
+            }
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual bool IsDocumentProjectionAllowed()
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual string GetPublicId()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual string GetSystemId()
+        {
+            return mainModule.GetSystemId();
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual int GetLineNumber()
+        {
+            return -1;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual int GetColumnNumber()
+        {
+            return -1;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual ILocation SaveLocation()
+        {
+            return this;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual HostLanguage GetHostLanguage()
+        {
+            return HostLanguage.XQUERY;
+        }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        public virtual void SetChildExpression(Expression expr)
+        {
+            expression = expr;
+        }
+
+        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
+        public virtual void GatherProperties(Action<string, object> consumer) { throw new NotImplementedException(); }
+
+        /// <summary>
+        /// Output the path map of the query for diagnostics
+        /// </summary>
+        private class ErrorReportingIterator : ISequenceIterator
+        {
+            private readonly ISequenceIterator @base;
+            private readonly IErrorReporter reporter;
+            private readonly ILocation location;
+            public ErrorReportingIterator(ISequenceIterator @base, IErrorReporter reporter, ILocation location)
+            {
+                this.@base = @base;
+                this.reporter = reporter;
+                this.location = location;
+            }
+
+            public virtual IItem Next()
+            {
+                try
+                {
+                    return @base.Next();
+                }
+                catch (UncheckedXPathException e1)
+                {
+                    XPathException xe = e1.GetXPathException().MaybeWithLocation(location);
+                    XmlProcessingException err = new XmlProcessingException(xe);
+                    reporter.Report(err);
+                    xe.SetHasBeenReported(true);
+                    throw e1;
+                }
+            }
+
+            public virtual void Dispose()
+            {
+                @base.Dispose();
+            }
+        }
+    }
+}

@@ -1,0 +1,36 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Model;using OutSmart.DAXon.Functions;
+
+using OutSmart.DAXon.Internal.Collections;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+namespace OutSmart.DAXon.Trees.Iterators
+{
+    /// <summary>
+    /// Class ListIterator, iterates over a sequence of items held in a Java List.
+    /// </summary>
+    public class NodeListIterator : ListIterator.Of<NodeInfo>, IAxisIterator
+    {
+        public NodeListIterator(IList<NodeInfo> list) : base(list)
+        {
+        }
+
+        public new NodeInfo Next()
+        {
+            return (NodeInfo)base.Next();
+        }
+        IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
+        public override void Dispose() { }
+    }
+}
+
+

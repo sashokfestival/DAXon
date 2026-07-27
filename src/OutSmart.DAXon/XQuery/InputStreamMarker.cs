@@ -1,0 +1,22 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+using System;
+using System.Collections.Generic;
+using OutSmart.DAXon.Model;
+
+namespace OutSmart.DAXon.XQuery
+{
+    using System.IO;
+    public class InputStreamMarker
+    {
+        public InputStreamMarker() { }
+        public InputStreamMarker(Stream s) { }
+        public static Stream EnsureMarkSupported(Stream s) => s;
+        public Stream Reset() => throw new NotImplementedException("STUB: InputStreamMarker.Reset not ported (excluded stub)");
+    }
+}

@@ -1,0 +1,196 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Model;using OutSmart.DAXon.Functions;
+
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Text;
+using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Types;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+
+namespace OutSmart.DAXon.Events
+{
+    public abstract class Event
+    {
+        public virtual void Replay(IReceiver @out)
+        {
+        }
+
+        /// <summary>
+        /// Event representing start of document
+        /// </summary>
+        public class StartDocument : Event
+        {
+            int properties;
+            public StartDocument(int properties)
+            {
+                this.properties = properties;
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.StartDocument(properties);
+            }
+        }
+
+        /// <summary>
+        /// Event representing end of document
+        /// </summary>
+        public class EndDocument : Event
+        {
+            public EndDocument()
+            {
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.EndDocument();
+            }
+        }
+
+        /// <summary>
+        /// Event representing the start of an element (including attributes or namespaces)
+        /// </summary>
+        public class StartElement : Event
+        {
+            INodeName name;
+            ISchemaType type;
+            IAttributeMap attributes;
+            NamespaceMap namespaces;
+            ILocation location;
+            int properties;
+            public StartElement(INodeName name, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
+            {
+                this.name = name;
+                this.type = type;
+                this.attributes = attributes;
+                this.namespaces = namespaces;
+                this.location = location;
+                this.properties = properties;
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.StartElement(name, type, attributes, namespaces, location, properties);
+            }
+
+            public virtual void Replay(IReceiver @out, int newProps)
+            {
+                @out.StartElement(name, type, attributes, namespaces, location, newProps);
+            }
+
+            public virtual int GetProperties()
+            {
+                return properties;
+            }
+        }
+
+        /// <summary>
+        /// Event representing the end of an element
+        /// </summary>
+        public class EndElement : Event
+        {
+            public EndElement()
+            {
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.EndElement();
+            }
+        }
+
+        /// <summary>
+        /// Event representing a text node
+        /// </summary>
+        public class Text : Event
+        {
+            UnicodeString content;
+            ILocation location;
+            int properties;
+            public Text(UnicodeString content, ILocation location, int properties)
+            {
+                this.content = content;
+                this.location = location;
+                this.properties = properties;
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.Characters(content, location, properties);
+            }
+        }
+
+        /// <summary>
+        /// Event representing a comment node
+        /// </summary>
+        public class Comment : Event
+        {
+            UnicodeString content;
+            ILocation location;
+            int properties;
+            public Comment(UnicodeString content, ILocation location, int properties)
+            {
+                this.content = content;
+                this.location = location;
+                this.properties = properties;
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.Comment(content, location, properties);
+            }
+        }
+
+        /// <summary>
+        /// Event representing a processing instruction node
+        /// </summary>
+        public class ProcessingInstruction : Event
+        {
+            string target;
+            UnicodeString content;
+            ILocation location;
+            int properties;
+            public ProcessingInstruction(string target, UnicodeString content, ILocation location, int properties)
+            {
+                this.target = target;
+                this.content = content;
+                this.location = location;
+                this.properties = properties;
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.ProcessingInstruction(target, content, location, properties);
+            }
+        }
+
+        public class Append : Event
+        {
+            IItem item;
+            ILocation location;
+            int properties;
+            public Append(IItem item, ILocation location, int properties)
+            {
+                this.item = item;
+                this.location = location;
+                this.properties = properties;
+            }
+
+            public override void Replay(IReceiver @out)
+            {
+                @out.Append(item, location, properties);
+            }
+        }
+    }
+}

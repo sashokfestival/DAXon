@@ -1,0 +1,120 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Patterns;
+using OutSmart.DAXon.Trees.Iterators;
+using OutSmart.DAXon.Trees.Tiny;
+using OutSmart.DAXon.Types;
+using System;
+using System.Collections.Generic;
+
+namespace OutSmart.DAXon.Trees.Wrappers
+{
+    // Faithful port of net.sf.saxon.tree.wrapper.SpaceStrippedDocument (Saxon 12.9). Was a hollow stub whose
+    // Wrap threw, so ANY stylesheet with xsl:strip-space crashed in Controller.PrepareInputTree.
+    // A view of a real document in which selected whitespace text nodes are treated as stripped.
+    public class SpaceStrippedDocument : GenericTreeInfo
+    {
+        private readonly ISpaceStrippingRule strippingRule;
+        private readonly bool preservesSpace;
+        private readonly bool _containsAssertions;
+        private readonly ITreeInfo underlyingTree;
+
+        public virtual ISpaceStrippingRule StrippingRule => strippingRule;
+
+        public override IEnumerator<string> UnparsedEntityNames => underlyingTree.UnparsedEntityNames;
+
+        public SpaceStrippedDocument(ITreeInfo doc, ISpaceStrippingRule strippingRule) : base(doc.GetConfiguration())
+        {
+            SetRootNode(Wrap(doc.GetRootNode()));
+            this.strippingRule = strippingRule;
+            this.underlyingTree = doc;
+            preservesSpace = FindPreserveSpace(doc);
+            _containsAssertions = FindAssertions(doc);
+        }
+
+        public virtual SpaceStrippedNode Wrap(NodeInfo node)
+        {
+            return SpaceStrippedNode.MakeWrapper(node, this, null);
+        }
+
+        public override bool IsTyped() => underlyingTree.IsTyped();
+
+        public override NodeInfo SelectID(string id, bool getParent)
+        {
+            NodeInfo n = underlyingTree.SelectID(id, false);
+            if (n == null)
+            {
+                return null;
+            }
+            else
+            {
+                return Wrap(n);
+            }
+        }
+
+        public override Durability GetDurability() => underlyingTree.GetDurability();
+
+        public override String[] GetUnparsedEntity(string name) => underlyingTree.GetUnparsedEntity(name);
+
+        // Scan the document in advance for xml:space="preserve" (cheaper than checking every whitespace text node)
+        private static bool FindPreserveSpace(ITreeInfo doc)
+        {
+            if (doc is TinyTree)
+            {
+                // Optimisation - see bug 2929. Makes a vast difference especially if there are few attributes in the tree
+                return ((TinyTree)doc).HasXmlSpacePreserveAttribute();
+            }
+            else
+            {
+                IAxisIterator iter = doc.GetRootNode().IterateAxis(AxisInfo.DESCENDANT, NodeKindTest.ELEMENT);
+                NodeInfo node;
+                while ((node = iter.Next()) != null)
+                {
+                    string val = node.GetAttributeValue(NamespaceUri.XML, "space");
+                    if ("preserve".Equals(val))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        // Whether the wrapped document contains any nodes annotated with complex types that define assertions
+        private static bool FindAssertions(ITreeInfo doc)
+        {
+            if (doc.IsTyped())
+            {
+                IAxisIterator iter = doc.GetRootNode().IterateAxis(AxisInfo.DESCENDANT, NodeKindTest.ELEMENT);
+                while (true)
+                {
+                    NodeInfo node = iter.Next();
+                    if (node == null)
+                    {
+                        return false;
+                    }
+
+                    ISchemaType type = node.GetSchemaType();
+                    if (type.IsComplexType() && ((IComplexType)type).HasAssertions())
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public virtual bool ContainsPreserveSpace() => preservesSpace;
+
+        public virtual bool ContainsAssertions() => _containsAssertions;
+    }
+}

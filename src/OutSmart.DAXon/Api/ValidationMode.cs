@@ -1,0 +1,70 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Lib;using OutSmart.DAXon.Functions;
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Collections;
+namespace OutSmart.DAXon.Api
+{
+    /// <summary>
+    /// Enumeration class defining different schema validation (or construction) modes
+    /// </summary>
+    public enum ValidationMode
+    {
+        /// <summary>
+        /// Strict validation
+        /// </summary>
+        STRICT,
+        /// <summary>
+        /// Lax validation
+        /// </summary>
+        LAX,
+        /// <summary>
+        /// Preserve existing type annotations if any
+        /// </summary>
+        PRESERVE,
+        /// <summary>
+        /// Remove any existing type annotations, mark as untyped
+        /// </summary>
+        STRIP,
+        /// <summary>
+        /// Value indication no preference: the choice is defined elsewhere
+        /// </summary>
+        DEFAULT
+
+        // --------------------
+        // TODO enum body members
+        // private final int number;
+        // ValidationMode(int number) {
+        //     this.number = number;
+        // }
+        // protected int getNumber() {
+        //     return number;
+        // }
+        // protected static ValidationMode get(int number) {
+        //     switch(number) {
+        //         case Validation.STRICT:
+        //             return STRICT;
+        //         case Validation.LAX:
+        //             return LAX;
+        //         case Validation.STRIP:
+        //             return STRIP;
+        //         case Validation.PRESERVE:
+        //             return PRESERVE;
+        //         case Validation.DEFAULT:
+        //         default:
+        //             return DEFAULT;
+        //     }
+        // }
+        // --------------------
+    }
+}
