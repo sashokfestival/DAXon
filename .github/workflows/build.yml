@@ -1,0 +1,96 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build
+        run: dotnet build OutSmart.DAXon.sln -c Release
+
+      - name: Smoke test
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/smoke"
+          cat > "$RUNNER_TEMP/smoke/Smoke.csproj" <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <PropertyGroup>
+              <OutputType>Exe</OutputType>
+              <TargetFramework>net472</TargetFramework>
+              <LangVersion>7.3</LangVersion>
+            </PropertyGroup>
+            <ItemGroup>
+              <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="All" />
+              <Reference Include="OutSmart.DAXon">
+                <HintPath>$(DaxonDll)</HintPath>
+              </Reference>
+            </ItemGroup>
+          </Project>
+          EOF
+          cat > "$RUNNER_TEMP/smoke/Program.cs" <<'EOF'
+          using System;
+          using System.IO;
+          using OutSmart.DAXon.Api;
+
+          static class Smoke
+          {
+              static int Main()
+              {
+                  string sheet =
+                      "<xsl:stylesheet xmlns:xsl='http://www.w3.org/1999/XSL/Transform' version='3.0' expand-text='yes'>" +
+                      "<xsl:output method='xml' omit-xml-declaration='yes'/>" +
+                      "<xsl:template match=\".[. instance of map(*)]\">" +
+                        "<out>" +
+                          "<xsl:for-each-group select='?rows?*' group-by='?dept'>" +
+                            "<dept id='{current-grouping-key()}' n='{count(current-group())}'/>" +
+                          "</xsl:for-each-group>" +
+                          "<masked>{replace('SKU-12345', '[0-9]+', '#')}</masked>" +
+                        "</out>" +
+                      "</xsl:template></xsl:stylesheet>";
+                  string json = "{\"rows\":[{\"dept\":\"A\"},{\"dept\":\"B\"},{\"dept\":\"A\"}]}";
+
+                  var proc = new Processor();
+                  XdmItem input = proc.NewJsonBuilder().Build(json);
+                  XsltExecutable exe = proc.NewXsltCompiler().Compile(new StringReader(sheet), "urn:sheet");
+
+                  var tr = exe.Load30();
+                  var w = new StringWriter();
+                  tr.SetGlobalContextItem(input, true);
+                  tr.ApplyTemplates(input, proc.NewSerializer(w));
+                  string got = w.ToString();
+
+                  const string want = "<out><dept id=\"A\" n=\"2\"/><dept id=\"B\" n=\"1\"/><masked>SKU-#</masked></out>";
+                  Console.WriteLine("got : " + got);
+                  if (got != want)
+                  {
+                      Console.WriteLine("want: " + want);
+                      Console.WriteLine("SMOKE FAILED");
+                      return 1;
+                  }
+                  Console.WriteLine("SMOKE OK");
+                  return 0;
+              }
+          }
+          EOF
+          dotnet run --project "$RUNNER_TEMP/smoke/Smoke.csproj" -c Release \
+            -p:DaxonDll="$GITHUB_WORKSPACE/src/OutSmart.DAXon/bin/Release/net472/OutSmart.DAXon.dll"
+
+      - name: Upload assembly
+        uses: actions/upload-artifact@v4
+        with:
+          name: OutSmart.DAXon-net472
+          path: src/OutSmart.DAXon/bin/Release/net472/OutSmart.DAXon.dll
+          if-no-files-found: error
