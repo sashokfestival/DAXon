@@ -16,6 +16,10 @@ Saxonica at <https://github.com/Saxonica/Saxon-HE> (see also <https://www.saxoni
 
 ## Build
 
+Prebuilt assembly: [latest release](https://github.com/sashokfestival/DAXon/releases/latest).
+
+Or build it yourself:
+
 ```
 dotnet build OutSmart.DAXon.sln -c Release
 ```
