@@ -69,6 +69,22 @@ which the .NET `XmlReader` cannot parse. Hostile inputs cannot kill the process:
 and compile-time deadlines, input-size caps and adaptive stack guards turn deep recursion / deep
 JSON / deep regex nesting into catchable coded errors.
 
+## How this port was produced
+
+The translation from the Saxon-HE 12.9 Java sources, and the subsequent refactoring,
+hardening and performance work, were carried out with AI assistance — Anthropic's Claude
+(Opus 4.8 and Fable 5) — under human direction and review.
+
+Nothing was taken on the model's word. Every change to the engine had to pass:
+
+- the **W3C QT3 (XPath/XQuery 3.1) and XSLT 3.0 conformance corpora** — 38 537 cases
+  passing against a fixed, documented set of 17 known failures (XML 1.1 input documents,
+  which the .NET `XmlReader` cannot parse);
+- **byte-identity gates** — selected transform outputs compared byte-for-byte against
+  Java Saxon-HE running the same inputs;
+- a spec-derived suite of 489 cases, a multi-threaded equality battery on one shared
+  `Processor`, and a set of robustness probes (deadlines, caches, stack guards).
+
 ## License & attribution
 
 Licensed under the **Mozilla Public License, Version 2.0** — see [`LICENSE`](LICENSE).
