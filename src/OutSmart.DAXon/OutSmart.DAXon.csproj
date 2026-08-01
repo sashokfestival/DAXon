@@ -43,7 +43,13 @@
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/sashokfestival/DAXon</PackageProjectUrl>
     <RepositoryUrl>https://github.com/sashokfestival/DAXon</RepositoryUrl>
+    <PackageTags>xslt xpath xquery xml transformation saxon xslt3 netframework net472</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Repo-root README ships inside the package (nuget.org package page renders it). -->
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
   <ItemGroup>
     <!-- LogicalName pinned to the names the previous build produced (LocateResource matches by suffix,
          but keep them byte-stable anyway) -->
