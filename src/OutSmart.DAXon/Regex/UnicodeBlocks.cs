@@ -21,7 +21,6 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.Globalization;
 using System.IO;
@@ -43,13 +42,13 @@ namespace OutSmart.DAXon.Regex
         public static IntSet GetBlock(string name)
         {
             UnicodeBlocks instance = GetInstance();
-            IntSet cc = instance.blocks.Get(name);
+            IntSet cc = instance.blocks.GetOrDefault(name);
             if (cc != null)
             {
                 return cc;
             }
 
-            cc = instance.blocks.Get(NormalizeBlockName(name));
+            cc = instance.blocks.GetOrDefault(NormalizeBlockName(name));
             return cc;
         }
 
@@ -98,7 +97,7 @@ namespace OutSmart.DAXon.Regex
             }
             catch (XPathException e)
             {
-                throw new RESyntaxException("Failed to process unicodeBlocks.xml: " + e.GetMessage());
+                throw new RESyntaxException("Failed to process unicodeBlocks.xml: " + e.Message);
             }
 
             IAxisIterator iter = doc.GetRootNode().IterateAxis(AxisInfo.DESCENDANT, new NameTest(Types.Type.ELEMENT, NamespaceUri.NULL, "block", config.GetNamePool()));
@@ -131,7 +130,7 @@ namespace OutSmart.DAXon.Regex
                     }
                 }
 
-                blocks.Put(blockName, range);
+                blocks[blockName] = range;
             }
         }
 

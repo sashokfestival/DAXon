@@ -52,9 +52,6 @@ namespace OutSmart.DAXon.Xslt
             return redundant;
         }
 
-        /// <summary>
-        /// Validate the attributes on this instruction
-        /// </summary>
         public override void PrepareAttributes()
         {
             string name = null;
@@ -87,9 +84,6 @@ namespace OutSmart.DAXon.Xslt
             SetObjectName(MakeQName(name, null, "name"));
         }
 
-        /// <summary>
-        /// Validate the attributes on this instruction
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             if (validated)
@@ -174,9 +168,6 @@ namespace OutSmart.DAXon.Xslt
             validated = true;
         }
 
-        /// <summary>
-        /// Validate the attributes on this instruction
-        /// </summary>
         /* error path: see character-map-027 */
         private void CheckCircularity(XSLCharacterMap origin)
         {
@@ -206,9 +197,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Validate the attributes on this instruction
-        /// </summary>
         /* error path: see character-map-027 */
         public virtual void Assemble(IntHashMap<string> map)
         {
@@ -227,9 +215,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Validate the attributes on this instruction
-        /// </summary>
         /* error path: see character-map-027 */
         public override void CompileDeclaration(Compilation compilation, ComponentDeclaration decl)
         {

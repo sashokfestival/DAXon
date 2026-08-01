@@ -47,17 +47,17 @@ namespace OutSmart.DAXon.Functions
             Register("pi", 0, (e) => e.Populate(() => new PiFn(), BuiltInAtomicType.DOUBLE, ONE, 0));
 
             // Arity 1
-            Reg1("sin", System.Math.Sin);
-            Reg1("cos", System.Math.Cos);
-            Reg1("tan", System.Math.Tan);
-            Reg1("asin", System.Math.Asin);
-            Reg1("acos", System.Math.Acos);
-            Reg1("atan", System.Math.Atan);
-            Reg1("sqrt", System.Math.Sqrt);
-            Reg1("log", System.Math.Log);
-            Reg1("log10", System.Math.Log10);
-            Reg1("exp", System.Math.Exp);
-            Reg1("exp10", (input) => System.Math.Pow(10, input));
+            Reg1("sin", Math.Sin);
+            Reg1("cos", Math.Cos);
+            Reg1("tan", Math.Tan);
+            Reg1("asin", Math.Asin);
+            Reg1("acos", Math.Acos);
+            Reg1("atan", Math.Atan);
+            Reg1("sqrt", Math.Sqrt);
+            Reg1("log", Math.Log);
+            Reg1("log10", Math.Log10);
+            Reg1("exp", Math.Exp);
+            Reg1("exp10", (input) => Math.Pow(10, input));
 
             // Arity 2
             Register("pow", 2, (e) => e.Populate(() => new PowFn(), BuiltInAtomicType.DOUBLE, OPT, CARD0)
@@ -76,7 +76,7 @@ namespace OutSmart.DAXon.Functions
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
-                return new DoubleValue(System.Math.PI);
+                return new DoubleValue(Math.PI);
             }
         }
 
@@ -177,11 +177,11 @@ namespace OutSmart.DAXon.Functions
                     {
                         // fdlibm (= Java Math.pow) special-cases y==0.5 for x>0 as sqrt(x); .NET's CRT
                         // pow runs the general (much slower) path. Same guard, same result.
-                        result = new DoubleValue(System.Math.Sqrt(dx));
+                        result = new DoubleValue(Math.Sqrt(dx));
                     }
                     else
                     {
-                        result = new DoubleValue(System.Math.Pow(dx, dy));
+                        result = new DoubleValue(Math.Pow(dx, dy));
                     }
                 }
 
@@ -246,10 +246,10 @@ namespace OutSmart.DAXon.Functions
 
                             if (dy == 0.5 && dx > 0)
                             {
-                                return new DoubleValue(System.Math.Sqrt(dx));
+                                return new DoubleValue(Math.Sqrt(dx));
                             }
 
-                            return new DoubleValue(System.Math.Pow(dx, dy));
+                            return new DoubleValue(Math.Pow(dx, dy));
                         }
                         catch (XPathException e)
                         {
@@ -267,7 +267,7 @@ namespace OutSmart.DAXon.Functions
             {
                 NumericValue y = (NumericValue)arguments[0].Head();
                 NumericValue x = (NumericValue)arguments[1].Head();
-                double result = System.Math.Atan2(y.GetDoubleValue(), x.GetDoubleValue());
+                double result = Math.Atan2(y.GetDoubleValue(), x.GetDoubleValue());
                 return new DoubleValue(result);
             }
 
@@ -303,7 +303,7 @@ namespace OutSmart.DAXon.Functions
                             IItem pre1 = eager1 ? xEval.Eval(context) : null;
                             NumericValue y = (NumericValue)(eager0 ? pre0 : yEval.Eval(context));
                             NumericValue x = (NumericValue)(eager1 ? pre1 : xEval.Eval(context));
-                            return new DoubleValue(System.Math.Atan2(y.GetDoubleValue(), x.GetDoubleValue()));
+                            return new DoubleValue(Math.Atan2(y.GetDoubleValue(), x.GetDoubleValue()));
                         }
                         catch (XPathException e)
                         {

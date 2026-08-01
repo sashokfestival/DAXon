@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Text;
@@ -17,8 +16,8 @@ using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Functions
 {
 
-    // Runtime 2026-06-10: fn:substring-after - same pattern as SubstringBefore above (real SubstringAfter.cs is
-    // excluded only because its SubstringAfterFnElaborator : StringElaborator drags the StringElaborator cluster).
+    // fn:substring-after: same pattern as SubstringBefore above (the full upstream port is excluded only
+    // because its elaborator drags the StringElaborator cluster).
     public class SubstringAfter : CollatingFunctionFixed
     {
         public SubstringAfter() { }

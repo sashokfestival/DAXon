@@ -11,7 +11,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,62 +26,26 @@ namespace OutSmart.DAXon.Values.Maps
     {
         public static readonly MapType ANY_MAP_TYPE = new MapType(BuiltInAtomicType.ANY_ATOMIC, SequenceType.ANY_SEQUENCE);
         public static readonly MapType EMPTY_MAP_TYPE = new MapType(BuiltInAtomicType.ANY_ATOMIC, SequenceType.ANY_SEQUENCE, true);
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public static readonly SequenceType OPTIONAL_MAP_ITEM = SequenceType.MakeSequenceType(ANY_MAP_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public static readonly SequenceType SINGLE_MAP_ITEM = SequenceType.MakeSequenceType(ANY_MAP_TYPE, StaticProperty.ALLOWS_ONE);
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public static readonly SequenceType SEQUENCE_OF_MAPS = SequenceType.MakeSequenceType(ANY_MAP_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         private readonly IPlainType keyType;
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         private readonly SequenceType valueType;
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         private readonly bool mustBeEmpty;
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public virtual IPlainType KeyType => keyType;
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public virtual SequenceType ValueType => valueType;
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public override string BasicAlphaCode => "FM";
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public override double DefaultPriority => keyType.GetNormalizedDefaultPriority() * valueType.PrimaryType.GetNormalizedDefaultPriority();
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
         public override SequenceType[] ArgumentTypes => new SequenceType[]
             {
                 SequenceType.MakeSequenceType(BuiltInAtomicType.ANY_ATOMIC, StaticProperty.EXACTLY_ONE)
             };
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
         public override SequenceType ResultType
         {
             get
@@ -99,9 +62,6 @@ namespace OutSmart.DAXon.Values.Maps
                 }
             }
         }
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public MapType(IPlainType keyType, SequenceType valueType)
         {
             this.keyType = keyType;
@@ -109,9 +69,6 @@ namespace OutSmart.DAXon.Values.Maps
             this.mustBeEmpty = false;
         }
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public MapType(IAtomicType keyType, SequenceType valueType, bool mustBeEmpty)
         {
             this.keyType = keyType;
@@ -119,41 +76,26 @@ namespace OutSmart.DAXon.Values.Maps
             this.mustBeEmpty = mustBeEmpty;
         }
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public override Genre GetGenre()
         {
             return Genre.MAP;
         }
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public override bool IsMapType()
         {
             return true;
         }
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public override bool IsArrayType()
         {
             return false;
         }
 
-        /// <summary>
-        /// A type that allows a sequence of zero or one map items
-        /// </summary>
         public override bool IsAtomizable(TypeHierarchy th)
         {
             return false;
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
         public override bool Matches(IItem item, TypeHierarchy th)
         {
             if (!(item is MapItem))
@@ -180,17 +122,11 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
         public virtual int GetArity()
         {
             return 1;
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
         public override string ToString()
         {
             if (this == ANY_MAP_TYPE)
@@ -208,14 +144,11 @@ namespace OutSmart.DAXon.Values.Maps
                 sb.Append(keyType.ToString());
                 sb.Append(", ");
                 sb.Append(valueType.ToString());
-                sb.Append(")");
+                sb.Append(')');
                 return sb.ToString();
             }
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
         public string ToExportString()
         {
             if (this == ANY_MAP_TYPE)
@@ -233,14 +166,11 @@ namespace OutSmart.DAXon.Values.Maps
                 sb.Append(keyType.ToExportString());
                 sb.Append(", ");
                 sb.Append(valueType.ToExportString());
-                sb.Append(")");
+                sb.Append(')');
                 return sb.ToString();
             }
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
         /// <summary>
         /// Test whether this function type equals another function type
         /// </summary>
@@ -260,23 +190,11 @@ namespace OutSmart.DAXon.Values.Maps
             return false;
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             return keyType.GetHashCode() ^ valueType.GetHashCode();
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Affinity Relationship(IFunctionItemType other, TypeHierarchy th)
         {
             if (other == AnyFunctionType.GetInstance())
@@ -348,12 +266,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             if (item is MapItem)
@@ -383,12 +295,6 @@ namespace OutSmart.DAXon.Values.Maps
             return null;
         }
 
-        /// <summary>
-        /// Test whether a given item conforms to this type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Expression MakeFunctionSequenceCoercer(Expression exp, Func<RoleDiagnostic> role, bool allow40)
         {
             return new SpecificFunctionType(ArgumentTypes, ResultType).MakeFunctionSequenceCoercer(exp, role, false);

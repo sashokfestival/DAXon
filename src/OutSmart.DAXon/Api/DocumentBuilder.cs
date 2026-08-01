@@ -22,8 +22,6 @@ using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Api
 {
@@ -124,6 +122,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
         }
 
@@ -246,6 +248,10 @@ namespace OutSmart.DAXon.Api
         private XdmNode BuildFromXmlReader(global::System.Xml.XmlReader reader, string systemId)
         {
             ParseOptions options = GetParseOptions();
+            // A standalone build runs outside any transformation, but the parse loop honours the
+            // thread's active deadline and a spent token from an earlier run may still sit in the
+            // slot. Claim a fresh full budget for the parse scope (same pattern as the compilers).
+            OutSmart.DAXon.Core.Controller.DeadlineToken prevDeadline = OutSmart.DAXon.Core.Controller.ArmThreadDeadline(config);
             try
             {
                 using (reader)
@@ -257,6 +263,14 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
+            finally
+            {
+                OutSmart.DAXon.Core.Controller.RestoreThreadDeadline(prevDeadline);
             }
         }
 
@@ -315,13 +329,13 @@ namespace OutSmart.DAXon.Api
             {
                 try
                 {
-                    JPConverter converter = JPConverter.Allocate(node.GetType(), null, config);
+                    JPConverter converter = JPConverter.Allocate(node.GetType(), config);
                     NodeInfo nodeInfo = (NodeInfo)converter.Convert(node, new EarlyEvaluationContext(config));
                     return XdmItem.WrapItem(nodeInfo);
                 }
                 catch (XPathException e)
                 {
-                    throw new ArgumentException(e.GetMessage());
+                    throw new ArgumentException(e.Message);
                 }
                 catch (InvalidCastException e)
                 {
@@ -342,6 +356,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual void Parse(string file, IDestination destination)
@@ -359,6 +377,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
         }
     }

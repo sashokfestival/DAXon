@@ -14,7 +14,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,7 +24,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Internal.Streams;
 using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Api
@@ -40,7 +38,7 @@ namespace OutSmart.DAXon.Api
         private HashSet<XdmNode> updatedDocuments;
         private Builder sourceTreeBuilder;
 
-        public virtual IEnumerator<XdmNode> UpdatedDocuments => updatedDocuments.IIterator();
+        public virtual IEnumerator<XdmNode> UpdatedDocuments => updatedDocuments.GetEnumerator();
 
         public virtual DynamicQueryContext UnderlyingQueryContext => context;
         public XQueryEvaluator(Processor processor, XQueryExpression expression)
@@ -52,10 +50,8 @@ namespace OutSmart.DAXon.Api
 
         public virtual void SetSchemaValidationMode(ValidationMode mode)
         {
-            if (mode != null)
-            {
-                context.SchemaValidationMode = mode.GetNumber();
-            }
+            // ValidationMode is an enum: the Java null-check was always true here.
+            context.SchemaValidationMode = mode.GetNumber();
         }
 
         public virtual ValidationMode GetSchemaValidationMode()
@@ -110,6 +106,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiUncheckedException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiUncheckedException(e.ToXPathException());
+            }
         }
 
         public virtual XdmValue GetExternalVariable(QName name)
@@ -121,24 +121,6 @@ namespace OutSmart.DAXon.Api
             }
 
             return XdmValue.Wrap(oval);
-        }
-
-        public virtual void SetURIResolver(URIResolver resolver)
-        {
-            context.ResourceResolver = new ResourceResolverWrappingURIResolver(resolver);
-        }
-
-        public virtual URIResolver GetURIResolver()
-        {
-            IResourceResolver rr = context.ResourceResolver;
-            if (rr is ResourceResolverWrappingURIResolver)
-            {
-                return ((ResourceResolverWrappingURIResolver)rr).WrappedURIResolver;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         public virtual void SetResourceResolver(IResourceResolver resolver)
@@ -159,16 +141,6 @@ namespace OutSmart.DAXon.Api
         public virtual IUnparsedTextURIResolver GetUnparsedTextURIResolver()
         {
             return context.UnparsedTextURIResolver;
-        }
-
-        public virtual void SetErrorListener(ErrorListener listener)
-        {
-            context.SetErrorListener(listener);
-        }
-
-        public virtual ErrorListener GetErrorListener()
-        {
-            return context.GetErrorListener();
         }
 
         public virtual void SetErrorReporter(IErrorReporter reporter)
@@ -235,7 +207,7 @@ namespace OutSmart.DAXon.Api
                     //                destination.close();
                 }
             }
-            catch (TransformerException e)
+            catch (XPathException e)
             {
                 throw new DAXonApiException(e);
             }
@@ -252,15 +224,24 @@ namespace OutSmart.DAXon.Api
                 throw new InvalidOperationException("Query is updating");
             }
 
+            bool closed = false;
             try
             {
                 IReceiver @out = GetDestinationReceiver(destination);
                 expression.Run(context, @out, null);
                 destination.CloseAndNotify();
+                closed = true;
             }
-            catch (TransformerException e)
+            catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            finally
+            {
+                if (!closed)
+                {
+                    DestinationHelper.ReleaseUnclosed(destination);
+                }
             }
         }
 
@@ -283,15 +264,24 @@ namespace OutSmart.DAXon.Api
                 config.Logger.Info("Processing streamed input " + systemId);
             }
 
+            bool closed = false;
             try
             {
                 IReceiver receiver = GetDestinationReceiver(destination);
                 expression.RunStreamed(context, source, receiver, null);
                 destination.CloseAndNotify();
+                closed = true;
             }
-            catch (TransformerException e)
+            catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            finally
+            {
+                if (!closed)
+                {
+                    DestinationHelper.ReleaseUnclosed(destination);
+                }
             }
         }
 
@@ -315,6 +305,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XdmItem EvaluateSingle()
@@ -333,6 +327,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public XdmSequenceIterator<XdmItem> IIterator()
@@ -349,6 +347,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiUncheckedException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiUncheckedException(e.ToXPathException());
             }
         }
 
@@ -394,6 +396,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
 
             sourceTreeBuilder = controller.MakeBuilder();
             sourceTreeBuilder.SetDurability(Durability.LASTING);
@@ -421,7 +427,7 @@ namespace OutSmart.DAXon.Api
             return sn;
         }
 
-        public override void Dispose()
+        public override void Close()
         {
         }
 
@@ -468,8 +474,21 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
-        public IEnumerator<XdmItem> GetEnumerator() => throw new NotImplementedException();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        // s9api XQueryEvaluator is Iterable<XdmItem>: foreach over the evaluator runs the query.
+        public IEnumerator<XdmItem> GetEnumerator()
+        {
+            XdmSequenceIterator<XdmItem> it = IIterator();
+            while (it.HasNext())
+            {
+                yield return it.Next();
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

@@ -13,10 +13,9 @@ using System.Text;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.XQuery
 {
-    public interface IDeclaration : SourceLocator
+    public interface IDeclaration : OutSmart.DAXon.Api.ILocation
     {
     }
 }

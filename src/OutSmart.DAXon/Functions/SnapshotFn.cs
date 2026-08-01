@@ -145,7 +145,7 @@ namespace OutSmart.DAXon.Functions
                 }
             }
 
-            bm.Dispose(); // Java Receiver.close()
+            bm.Close(); // Java Receiver.close()
         }
     }
 }

@@ -24,6 +24,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.XQuery;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Tracing;
+using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Values.Arrays
 {
@@ -32,10 +33,11 @@ namespace OutSmart.DAXon.Values.Arrays
 
         // PHASE7_INDEXER_ARRAYITEM
         public IGroundedValue this[int n] { get { return Get(n); } }
-        public virtual IFunctionItemType FunctionItemType => throw new NotImplementedException();
-        public virtual OperandRole[] OperandRoles => throw new NotImplementedException();
-        public virtual string Description => throw new NotImplementedException();
-        public virtual UnicodeString UnicodeStringValue => throw new NotImplementedException();
+        public abstract IFunctionItemType FunctionItemType { get; }
+        public virtual OperandRole[] OperandRoles => new[] { OperandRole.SINGLE_ATOMIC }; // upstream ArrayItem default
+        public virtual string Description => "array"; // upstream ArrayItem default
+        // Arrays are function items: no string value (FOTY0014), like AbstractFunction.
+        public virtual UnicodeString UnicodeStringValue => throw new UncheckedXPathException(new XPathException("The string value of an array is not defined", "FOTY0014"));
         public bool IsArray()
         {
             return true;
@@ -57,7 +59,7 @@ namespace OutSmart.DAXon.Values.Arrays
         public abstract IEnumerable<IGroundedValue> Members();
         public virtual ISequenceIterator Parcels()
         {
-            return (ISequenceIterator)(new SequenceIteratorOverJavaIterator<IGroundedValue>(Members().IIterator(), (member) => new Parcel(member)));
+            return (ISequenceIterator)(new SequenceIteratorOverJavaIterator<IGroundedValue>(Members().GetEnumerator(), (member) => new Parcel(member)));
         }
 
         public abstract ArrayItem Append(IGroundedValue newMember);
@@ -69,55 +71,72 @@ namespace OutSmart.DAXon.Values.Arrays
         public abstract SequenceType GetMemberType(TypeHierarchy th);
         public virtual string ToShortString()
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append("array{");
-            int count = 0;
-            foreach (IGroundedValue member in Members())
+            // This member walk recurses directly rather than through Err.Depict, so it carries
+            // the depth cap itself (see Err.MaxDepictDepth).
+            Err.EnterDepiction();
+            try
             {
-                if (count++ > 2)
+                if (Err.DepictionTooDeep)
                 {
-                    sb.Append(" ...");
-                    break;
+                    return "array{...}";
                 }
 
-                sb.Append(member.ToShortString());
-                sb.Append(", ");
-            }
+                StringBuilder sb = new StringBuilder();
+                sb.Append("array{");
+                int count = 0;
+                foreach (IGroundedValue member in Members())
+                {
+                    if (count++ > 2)
+                    {
+                        sb.Append(" ...");
+                        break;
+                    }
 
-            sb.Append("}");
-            return sb.ToString();
+                    sb.Append(member.ToShortString());
+                    sb.Append(", ");
+                }
+
+                sb.Append('}');
+                return sb.ToString();
+            }
+            finally
+            {
+                Err.LeaveDepiction();
+            }
         }
 
         public Genre GetGenre()
         {
             return Genre.ARRAY;
         }
-        public virtual StructuredQName GetFunctionName() => throw new NotImplementedException();
-        public virtual int GetArity() => throw new NotImplementedException();
-        public virtual AnnotationList GetAnnotations() => throw new NotImplementedException();
-        public virtual IXPathContext MakeNewContext(IXPathContext arg0, IContextOriginator arg1) => throw new NotImplementedException();
-        public virtual bool DeepEquals(IFunctionItem arg0, IXPathContext arg1, IAtomicComparer arg2, int arg3) => throw new NotImplementedException();
-        public virtual bool DeepEqual40(IFunctionItem arg0, IXPathContext arg1, DeepEqual.DeepEqualOptions arg2) => throw new NotImplementedException();
-        public virtual void Export(ExpressionPresenter arg0) => throw new NotImplementedException();
-        public virtual bool IsTrustedResultType() => throw new NotImplementedException();
-        public virtual IAtomicSequence Atomize() => throw new NotImplementedException();
-        public virtual ISequence Call(IXPathContext arg0, ISequence[] arg1) => throw new NotImplementedException();
+        public abstract StructuredQName GetFunctionName();
+        public abstract int GetArity();
+        public abstract AnnotationList GetAnnotations();
+        public abstract IXPathContext MakeNewContext(IXPathContext arg0, IContextOriginator arg1);
+        public abstract bool DeepEquals(IFunctionItem arg0, IXPathContext arg1, IAtomicComparer arg2, int arg3);
+        public abstract bool DeepEqual40(IFunctionItem arg0, IXPathContext arg1, DeepEqual.DeepEqualOptions arg2);
+        public abstract void Export(ExpressionPresenter arg0);
+        public abstract bool IsTrustedResultType();
+        public abstract IAtomicSequence Atomize();
+        public abstract ISequence Call(IXPathContext arg0, ISequence[] arg1);
         public virtual ISequenceIterator Iterate() => new SingletonIterator(this);
         // An array is a single item: as a grounded sequence it has length 1 (Head() == this), so ItemAt(0) is
         // the array itself and any other index is out of range. Was a throwing stub -> `array-expr[n]` NRE'd via
         // SubscriptExpression.GetItemAt (prod-ArrowPostfix). The array-MEMBER accessor is Get(int), not this.
         public virtual IItem ItemAt(int arg0) => arg0 == 0 ? (IItem)this : null;
         public virtual IItem Head() => this;
-        public virtual IGroundedValue Subsequence(int arg0, int arg1) => throw new NotImplementedException();
+        // Singleton-sequence subsequence rule, same as ItemAt above.
+        public virtual IGroundedValue Subsequence(int start, int length) => start <= 0 && (long)start + length > 0 ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance();
         public virtual int GetLength() => 1;
-        public virtual string GetStringValue() => throw new NotImplementedException();
+        // Mirrors UnicodeStringValue: arrays have no string value (FOTY0014).
+        public virtual string GetStringValue() => throw new UncheckedXPathException(new XPathException("The string value of an array is not defined", "FOTY0014"));
         SingletonIterator IItem.Iterate() => default;
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public virtual bool IsSequenceVariadic() => false; // upstream FunctionItem default
         public virtual IGroundedValue Reduce() => this;
         public virtual bool IsStreamed() => false; // upstream NodeInfo/Item default
-        public virtual bool EffectiveBooleanValue() => throw new NotImplementedException();
+        public abstract bool EffectiveBooleanValue();
         public virtual IGroundedValue Materialize() => this;
         public virtual IEnumerable<IItem> AsIterable() => new IItem[] { this };
         public virtual bool ContainsNode(NodeInfo sought) => OutSmart.DAXon.Expressions.SingletonIntersectExpression.ContainsNode(((OutSmart.DAXon.Model.ISequence)this).Iterate(), sought); // upstream GroundedValue default

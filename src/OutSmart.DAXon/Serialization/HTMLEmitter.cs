@@ -20,7 +20,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
 {
@@ -29,71 +28,23 @@ namespace OutSmart.DAXon.Serialization
     /// </summary>
     public abstract class HTMLEmitter : XMLEmitter
     {
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private const int REP_NATIVE = 0;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private const int REP_ENTITY = 1;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private const int REP_DECIMAL = 2;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private const int REP_HEX = 3;
 
-        /// <summary>
-        /// Table of HTML tags that have no closing tag
-        /// </summary>
         static HTMLTagHashSet emptyTags = new HTMLTagHashSet(31);
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
         private static readonly HTMLTagHashSet booleanAttributes = new HTMLTagHashSet(43);
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
         private static readonly HTMLTagHashSet booleanCombinations = new HTMLTagHashSet(57);
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private readonly int nonASCIIRepresentation = REP_NATIVE;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private readonly int excludedRepresentation = REP_ENTITY;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private int inScript;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         protected int version = 5;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private string parentElement;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private NamespaceUri uri;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private bool escapeNonAscii = false;
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private readonly Stack<INodeName> nodeNameStack = new Stack<INodeName>();
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
         static HTMLEmitter()
         {
             SetBooleanAttribute("*", "hidden"); // HTML5
@@ -153,52 +104,12 @@ namespace OutSmart.DAXon.Serialization
             SetBooleanAttribute("video", "muted"); // HTML5
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public HTMLEmitter()
         {
         }
-        /// <summary>
-        /// Preferred character representations
-        /// </summary>
         private static int RepresentationCode(string rep)
         {
-            rep = rep.ToLowerCase();
+            rep = rep.ToLowerInvariant();
             switch (rep)
             {
                 case "native":
@@ -213,241 +124,47 @@ namespace OutSmart.DAXon.Serialization
                     return REP_ENTITY;
             }
         }
-        /// <summary>
-        /// Table of HTML tags that have no closing tag
-        /// </summary>
         protected static void SetEmptyTag(string tag)
         {
             emptyTags.Add(tag);
         }
 
-        /// <summary>
-        /// Table of HTML tags that have no closing tag
-        /// </summary>
         protected static bool IsEmptyTag(string tag)
         {
             return emptyTags.Contains(tag);
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
         private static void SetBooleanAttribute(string element, string attribute)
         {
             booleanAttributes.Add(attribute);
             booleanCombinations.Add(element + '+' + attribute);
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
         private static bool IsBooleanAttribute(string element, string attribute, string value)
         {
-            return attribute.EqualsIgnoreCase(value) && booleanAttributes.Contains(attribute) && (booleanCombinations.Contains(element + '+' + attribute) || booleanCombinations.Contains("*+" + attribute));
+            return attribute.Equals(value, global::System.StringComparison.OrdinalIgnoreCase) && booleanAttributes.Contains(attribute) && (booleanCombinations.Contains(element + '+' + attribute) || booleanCombinations.Contains("*+" + attribute));
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override void SetEscapeNonAscii(bool escape)
         {
             escapeNonAscii = escape;
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected abstract bool IsHTMLElement(INodeName name);
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
         public override void Open()
         {
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
         protected override void OpenDocument()
         {
 
-            //        if (writer == null) {
-            //            makeWriter();
-            //        }
             if (started)
             {
                 return;
             }
 
             string byteOrderMark = outputProperties.GetProperty(DAXonOutputKeys.BYTE_ORDER_MARK);
-            if ("yes".Equals(byteOrderMark) && "UTF-8".EqualsIgnoreCase(outputProperties.GetProperty(OutputKeys.ENCODING)))
+            if ("yes".Equals(byteOrderMark) && "UTF-8".Equals(outputProperties.GetProperty(DAXonOutputKeys.ENCODING), global::System.StringComparison.OrdinalIgnoreCase))
             {
                 try
                 {
@@ -467,91 +184,17 @@ namespace OutSmart.DAXon.Serialization
             inScript = -1000000;
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
         protected override void WriteDocType(INodeName name, string displayName, string systemId, string publicId)
         {
             base.WriteDocType(name, displayName, systemId, publicId);
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             uri = elemName.GetNamespaceUri();
             base.StartElement(elemName, type, attributes, namespaces, location, properties);
             parentElement = elementStack.Peek();
-            if (IsHTMLElement(elemName) && (parentElement.EqualsIgnoreCase("script") || parentElement.EqualsIgnoreCase("style")))
+            if (IsHTMLElement(elemName) && (parentElement.Equals("script", global::System.StringComparison.OrdinalIgnoreCase) || parentElement.Equals("style", global::System.StringComparison.OrdinalIgnoreCase)))
             {
                 inScript = 0;
             }
@@ -560,85 +203,11 @@ namespace OutSmart.DAXon.Serialization
             nodeNameStack.Push(elemName);
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
         public virtual void StartContentOLD()
         {
             CloseStartTag(); // prevent <xxx/> syntax
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
         protected override void WriteAttribute(INodeName elCode, string attname, string value, int properties)
         {
             try
@@ -665,46 +234,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
-        /// <summary>
-        /// Escape characters. Overrides the XML behaviour
-        /// </summary>
         protected override void WriteEscape(UnicodeString chars, bool inAttribute)
         {
             int segstart = 0;
@@ -864,87 +393,7 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
-        /// <summary>
-        /// Escape characters. Overrides the XML behaviour
-        /// </summary>
         protected abstract bool RejectControlCharacters();
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
-        /// <summary>
-        /// Escape characters. Overrides the XML behaviour
-        /// </summary>
         protected override void WriteEmptyElementTagCloser(string displayName, INodeName nameCode)
         {
             if (IsHTMLElement(nameCode))
@@ -959,46 +408,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
-        /// <summary>
-        /// Escape characters. Overrides the XML behaviour
-        /// </summary>
         /// <summary>
         /// Output an element end tag.
         /// </summary>
@@ -1030,49 +439,6 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
-        /// <summary>
-        /// Escape characters. Overrides the XML behaviour
-        /// </summary>
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
         /// Character data.
         /// </summary>
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
@@ -1085,49 +451,6 @@ namespace OutSmart.DAXon.Serialization
             base.Characters(chars, locationId, properties);
         }
 
-        /// <summary>
-        /// Table of boolean attributes
-        /// </summary>
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        //HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        //HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        // HTML5
-        /// <summary>
-        /// Output start of document
-        /// </summary>
-        /// <summary>
-        /// Escape characters. Overrides the XML behaviour
-        /// </summary>
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
         /// <summary>
         /// Handle a processing instruction.
         /// </summary>

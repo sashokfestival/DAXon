@@ -21,30 +21,25 @@ namespace OutSmart.DAXon.Model
     public interface IItem : IGroundedValue
     {
         Genre GetGenre();
-        IItem Head()
-;
+        IItem Head();
 
 
 
         UnicodeString UnicodeStringValue { get; }
-        string GetStringValue()
-;
+        string GetStringValue();
 
 
 
         IAtomicSequence Atomize();
-        string ToShortString()
-;
+        string ToShortString();
 
 
 
-        IItem ItemAt(int n)
-;
+        IItem ItemAt(int n);
 
 
 
-        IGroundedValue Subsequence(int start, int length)
-;
+        IGroundedValue Subsequence(int start, int length);
 
 
 
@@ -55,23 +50,19 @@ namespace OutSmart.DAXon.Model
 
 
 
-        int GetLength()
-;
+        int GetLength();
 
 
 
-        SingletonIterator Iterate()
-;
+        SingletonIterator Iterate();
 
 
 
-        IGroundedValue Reduce()
-;
+        IGroundedValue Reduce();
 
 
 
-        bool IsStreamed()
-;
+        bool IsStreamed();
 
 
     }

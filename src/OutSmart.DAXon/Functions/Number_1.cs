@@ -35,9 +35,6 @@ namespace OutSmart.DAXon.Functions
             return DoubleValue.NaN;
         }
 
-        /// <summary>
-        /// Type-check a calling expression.
-        /// </summary>
         public override Expression TypeCheckCaller(FunctionCall caller, ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             if (caller.GetArg(0).IsCallOn(typeof(Number_1)))
@@ -50,9 +47,6 @@ namespace OutSmart.DAXon.Functions
             return caller;
         }
 
-        /// <summary>
-        /// Type-check a calling expression.
-        /// </summary>
         public static DoubleValue ToNumber(AtomicValue arg0)
         {
             if (arg0 is BooleanValue)
@@ -83,9 +77,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Type-check a calling expression.
-        /// </summary>
         public static DoubleValue Convert(AtomicValue value, Configuration config)
         {
             try
@@ -124,17 +115,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Type-check a calling expression.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new NumberFnElaborator();
         }
 
-        /// <summary>
-        /// Type-check a calling expression.
-        /// </summary>
         public class NumberFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()

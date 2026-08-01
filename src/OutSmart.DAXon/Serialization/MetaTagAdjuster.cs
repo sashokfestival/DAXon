@@ -21,7 +21,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Serialization
 {
     public class MetaTagAdjuster : ProxyReceiver
@@ -40,13 +39,13 @@ namespace OutSmart.DAXon.Serialization
 
         public virtual void SetOutputProperties(Properties details)
         {
-            encoding = details.GetProperty(OutputKeys.ENCODING);
+            encoding = details.GetProperty(DAXonOutputKeys.ENCODING);
             if (encoding == null)
             {
                 encoding = "UTF-8";
             }
 
-            mediaType = details.GetProperty(OutputKeys.MEDIA_TYPE);
+            mediaType = details.GetProperty(DAXonOutputKeys.MEDIA_TYPE);
             if (mediaType == null)
             {
                 mediaType = "text/html";
@@ -55,7 +54,7 @@ namespace OutSmart.DAXon.Serialization
             string htmlVn = details.GetProperty(DAXonOutputKeys.HTML_VERSION);
             if (htmlVn == null && !isXHTML)
             {
-                htmlVn = details.GetProperty(OutputKeys.VERSION);
+                htmlVn = details.GetProperty(DAXonOutputKeys.VERSION);
             }
 
             if (htmlVn != null && htmlVn.StartsWith("5", StringComparison.Ordinal))
@@ -80,7 +79,7 @@ namespace OutSmart.DAXon.Serialization
             }
             else
             {
-                return name1.EqualsIgnoreCase(name2);
+                return name1.Equals(name2, global::System.StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -107,7 +106,7 @@ namespace OutSmart.DAXon.Serialization
             }
             else
             {
-                return name.GetLocalPart().EqualsIgnoreCase(local);
+                return name.GetLocalPart().Equals(local, global::System.StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -129,7 +128,7 @@ namespace OutSmart.DAXon.Serialization
                         if (ComparesEqual(name, "http-equiv"))
                         {
                             string value = Whitespace.Trim(att.Value);
-                            if (value.EqualsIgnoreCase("Content-Type"))
+                            if (value.Equals("Content-Type", global::System.StringComparison.OrdinalIgnoreCase))
                             {
 
                                 // case-blind comparison even for XHTML
@@ -171,9 +170,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
         /// <summary>
         /// End of element
         /// </summary>

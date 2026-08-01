@@ -20,13 +20,11 @@ namespace OutSmart.DAXon.Model
         NodeInfo GetRootNode();
         Configuration GetConfiguration();
         long GetDocumentNumber();
-        bool IsTyped()
-;
+        bool IsTyped();
 
 
 
-        bool IsMutable()
-;
+        bool IsMutable();
 
 
 
@@ -36,8 +34,7 @@ namespace OutSmart.DAXon.Model
         ISpaceStrippingRule SpaceStrippingRule { get; set; }
         void SetUserData(string key, object value);
         object GetUserData(string key);
-        Durability GetDurability()
-;
+        Durability GetDurability();
 
 
     }

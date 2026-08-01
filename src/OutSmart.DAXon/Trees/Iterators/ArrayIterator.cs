@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Trees.Iterators
         protected int index; // position in array of current item, zero-based
         protected int start; // position of first item to be returned, zero-based
         protected int end; // position of first item that is NOT returned, zero-based
-        public virtual bool HasNext => throw new NotImplementedException();
+        public abstract bool HasNext { get; }
         public abstract ISequenceIterator MakeSliceIterator(int min, int max);
         public virtual bool IsActuallyGrounded()
         {
@@ -44,15 +44,15 @@ namespace OutSmart.DAXon.Trees.Iterators
         {
             return end - start;
         }
-        public virtual IItem Current() => throw new NotImplementedException();
-        public virtual bool SupportsGetLength() => throw new NotImplementedException();
-        public virtual IGroundedValue GetResidue() => throw new NotImplementedException();
-        public virtual ISequenceIterator GetReverseIterator() => throw new NotImplementedException();
-        public virtual IItem Next() => throw new NotImplementedException();
+        public abstract IItem Current();
+        public abstract bool SupportsGetLength();
+        public abstract IGroundedValue GetResidue();
+        public abstract ISequenceIterator GetReverseIterator();
+        public abstract IItem Next();
         public virtual void Dispose() { }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual IGroundedValue Materialize() => throw new NotImplementedException();
+        public abstract IGroundedValue Materialize();
 
         public class Of<T> : ArrayIterator where T : class, IItem
         {

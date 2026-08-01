@@ -95,7 +95,7 @@ namespace OutSmart.DAXon.Expressions
         public virtual int GetLength()
         {
             int bl = SequenceTool.GetLength(@base) - start + 1;
-            return System.Math.Max(bl, 0);
+            return Math.Max(bl, 0);
         }
 
         public virtual void Dispose()

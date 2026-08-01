@@ -18,7 +18,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Serialization
 {
@@ -45,24 +44,15 @@ namespace OutSmart.DAXon.Serialization
             SetEmptyTag("param");
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public HTML40Emitter()
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override bool IsHTMLElement(INodeName name)
         {
             return name.HasURI(NamespaceUri.NULL);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override void OpenDocument()
         {
             string versionProperty = outputProperties.GetProperty(DAXonOutputKeys.HTML_VERSION);
@@ -70,7 +60,7 @@ namespace OutSmart.DAXon.Serialization
             // Note, we recognize html-version even when running XSLT 2.0.
             if (versionProperty == null)
             {
-                versionProperty = outputProperties.GetProperty(OutputKeys.VERSION);
+                versionProperty = outputProperties.GetProperty(DAXonOutputKeys.VERSION);
             }
 
             if (versionProperty != null)
@@ -88,16 +78,13 @@ namespace OutSmart.DAXon.Serialization
             base.OpenDocument();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             if (!started)
             {
                 OpenDocument();
-                string systemId = outputProperties.GetProperty(OutputKeys.DOCTYPE_SYSTEM);
-                string publicId = outputProperties.GetProperty(OutputKeys.DOCTYPE_PUBLIC);
+                string systemId = outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_SYSTEM);
+                string publicId = outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_PUBLIC);
 
                 // Treat "" as equivalent to absent. This goes beyond what the spec strictly allows.
                 if ("".Equals(systemId))
@@ -121,9 +108,6 @@ namespace OutSmart.DAXon.Serialization
             base.StartElement(elemName, type, attributes, namespaces, location, properties);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override bool RejectControlCharacters()
         {
             return true;

@@ -33,24 +33,12 @@ namespace OutSmart.DAXon.Values
         public static readonly StringValue ZERO_LENGTH_UNTYPED = StringValue.MakeUntypedAtomic(EmptyUnicodeString.GetInstance());
         protected readonly UnicodeString content;
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override BuiltInAtomicType PrimitiveType => typeLabel == BuiltInAtomicType.UNTYPED_ATOMIC ? BuiltInAtomicType.UNTYPED_ATOMIC : BuiltInAtomicType.STRING;
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override UnicodeString PrimitiveStringValue => content;
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual UnicodeString Content => content;
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual Base64BinaryValue CodepointCollationKey
         {
             get
@@ -69,67 +57,40 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override UnicodeString UnicodeStringValue => content;
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         protected StringValue() : base(BuiltInAtomicType.STRING)
         {
             content = EmptyUnicodeString.GetInstance();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         protected StringValue(IAtomicType typeLabel) : base(typeLabel)
         {
             content = EmptyUnicodeString.GetInstance();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public StringValue(UnicodeString content) : this(content, BuiltInAtomicType.STRING)
         {
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public StringValue(UnicodeString content, IAtomicType type) : base(type)
         {
             this.content = content;
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public StringValue(string value) : this(value, BuiltInAtomicType.STRING)
         {
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public StringValue(string value, IAtomicType typeLabel) : base(typeLabel)
         {
             this.content = StringTool.FromCharSequence(value);
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public static StringValue MakeUntypedAtomic(UnicodeString value)
         {
             return new StringValue(value, BuiltInAtomicType.UNTYPED_ATOMIC);
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)
         {
             if (typeLabel == this.typeLabel)
@@ -142,9 +103,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public static StringValue Bmp(string content)
         {
 
@@ -152,9 +110,6 @@ namespace OutSmart.DAXon.Values
             return new StringValue(BMPString.Of(content));
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public static StringValue MakeStringValue(string value)
         {
             if (value == null || value.Length == 0)
@@ -167,9 +122,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual StringValue Economize()
         {
             UnicodeString c2 = content.Economize();
@@ -181,9 +133,6 @@ namespace OutSmart.DAXon.Values
             return new StringValue(c2, typeLabel);
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public static StringValue MakeUStringValue(UnicodeString value)
         {
             if (value == null || value.IsEmpty())
@@ -196,33 +145,21 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual long Length()
         {
             return content.Length();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual int Length32()
         {
             return content.Length32();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual bool IsEmpty()
         {
             return content.IsEmpty();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual IAtomicIterator IterateCharacters()
         {
             lock (this)
@@ -231,25 +168,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override IAtomicMatchKey GetXPathMatchKey(IStringCollator collator, int implicitTimezone)
         {
             return collator.GetCollationKey(this.UnicodeStringValue);
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public virtual IIntIterator CodePoints()
         {
             return content.CodePoints();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override int GetHashCode()
         {
 
@@ -269,9 +197,6 @@ namespace OutSmart.DAXon.Values
             return h;
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override bool Equals(object o)
         {
             if (o is StringValue)
@@ -284,25 +209,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override bool EffectiveBooleanValue()
         {
             return !IsEmpty();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override string ToString()
         {
             return Content.ToString();
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override string ToShortString()
         {
             string s = content.ToString();
@@ -320,17 +236,11 @@ namespace OutSmart.DAXon.Values
             return s;
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             return new AnonymousXPathComparable(this, collator);
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public override bool IsIdentical(AtomicValue v)
         {
             return v is StringValue && (this is AnyURIValue == v is AnyURIValue) && (this.IsUntypedAtomic() == v.IsUntypedAtomic()) && Equals(v);
@@ -339,7 +249,8 @@ namespace OutSmart.DAXon.Values
         private sealed class AnonymousXPathComparable : IXPathComparable
         {
 
-            private readonly StringValue parent; private readonly IStringCollator collator;
+            private readonly StringValue parent;
+            private readonly IStringCollator collator;
             public AnonymousXPathComparable(StringValue parent, IStringCollator collator)
             {
                 this.parent = parent; this.collator = collator;
@@ -357,9 +268,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public sealed class CharacterIterator : IAtomicIterator
         {
             int inpos = 0; // 0-based index of the current Java char
@@ -373,7 +281,7 @@ namespace OutSmart.DAXon.Values
             {
                 if (inpos < value.Length)
                 {
-                    int c = value.CharAt(inpos++);
+                    int c = value[inpos++];
                     int current;
                     if (c >= 55296 && c <= 56319)
                     {
@@ -381,7 +289,7 @@ namespace OutSmart.DAXon.Values
                         // we'll trust the data to be sound
                         try
                         {
-                            current = ((c - 55296) * 1024) + ((int)value.CharAt(inpos++) - 56320) + 65536;
+                            current = ((c - 55296) * 1024) + ((int)value[inpos++] - 56320) + 65536;
                         }
                         catch (IndexOutOfRangeException e)
                         {
@@ -405,9 +313,6 @@ namespace OutSmart.DAXon.Values
             public void Dispose() { }
         }
 
-        /// <summary>
-        /// Protected constructor for use by subtypes
-        /// </summary>
         public sealed class Builder : IUniStringConsumer
         {
             UnicodeBuilder buffer = new UnicodeBuilder();
@@ -423,11 +328,12 @@ namespace OutSmart.DAXon.Values
             }
 
             // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-            public void Append(IItem item, ILocation locationId, int properties) { throw new NotImplementedException(); }
-            public void Append(IItem item) { throw new NotImplementedException(); }
-            public bool HandlesAppend() => throw new NotImplementedException();
-            public void Open() { throw new NotImplementedException(); }
-            public void Dispose() { throw new NotImplementedException(); }
+            public void Append(IItem item, ILocation locationId, int properties) => throw new InvalidOperationException("This consumer only accepts character content");
+            public void Append(IItem item) => throw new InvalidOperationException("This consumer only accepts character content");
+            public bool HandlesAppend() => false;
+            public void Open() { }
+            public void Close() { }
+            public void Dispose() { }
         }
     }
 }

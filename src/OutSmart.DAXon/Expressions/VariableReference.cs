@@ -71,12 +71,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override int IntrinsicDependencies
         {
             get
@@ -109,20 +103,8 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override int ImplementationMethod => (Cardinality.AllowsMany(GetCardinality()) ? 0 : EVALUATE_METHOD) | ITERATE_METHOD | PROCESS_METHOD;
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Expression ScopingExpression
         {
             get
@@ -155,12 +137,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public virtual string DisplayName
         {
             get
@@ -176,12 +152,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public virtual string EQName
         {
             get
@@ -205,20 +175,8 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string ExpressionName => "varRef";
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string StreamerName => "VariableReference";
         public VariableReference(StructuredQName name)
         {
@@ -305,12 +263,7 @@ namespace OutSmart.DAXon.Expressions
             }
 
 
-            //        if (staticType == null) {
-            //            throw new global::System.InvalidOperationException("Variable $" + getDisplayName() + " has not been fixed up");
-            //        }
             //  following code removed because it causes error181 to blow the stack - need to check for circularities well
-            //            if (binding instanceof GlobalVariable) {
-            //            }
             if (binding != null)
             {
                 RecomputeInLoop();
@@ -445,9 +398,6 @@ namespace OutSmart.DAXon.Expressions
             return UType.ANY;
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             if (staticType == null)
@@ -479,9 +429,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
@@ -540,50 +487,26 @@ namespace OutSmart.DAXon.Expressions
             return p & ~StaticProperty.ALL_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
         public override bool SupportsLazyEvaluation()
         {
             return false;
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is VariableReference && binding == ((VariableReference)other).binding && binding != null;
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return binding == null ? 73619830 : binding.GetHashCode();
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             return pathMap.GetPathForVariable(GetBinding());
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext c)
         {
             try
@@ -598,7 +521,6 @@ namespace OutSmart.DAXon.Expressions
             catch (NullReferenceException err)
             {
 
-                //err.printStackTrace();
                 string msg = "Internal error: no value for variable $" + DisplayName + " at line " + GetLocation().GetLineNumber() + (GetLocation().GetSystemId() == null ? "" : " of " + GetLocation().GetSystemId());
                 new StandardDiagnostics().LogStackTrace(c, c.GetConfiguration().Logger, 2);
                 throw new InvalidOperationException(msg);
@@ -606,19 +528,12 @@ namespace OutSmart.DAXon.Expressions
             catch (InvalidOperationException err)
             {
 
-                //err.printStackTrace();
-                string msg = err.GetMessage() + ". Variable reference $" + DisplayName + " at line " + GetLocation().GetLineNumber() + (GetLocation().GetSystemId() == null ? "" : " of " + GetLocation().GetSystemId());
+                string msg = err.Message + ". Variable reference $" + DisplayName + " at line " + GetLocation().GetLineNumber() + (GetLocation().GetSystemId() == null ? "" : " of " + GetLocation().GetSystemId());
                 new StandardDiagnostics().LogStackTrace(c, c.GetConfiguration().Logger, 2);
                 throw new InvalidOperationException(msg);
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext c)
         {
             try
@@ -632,12 +547,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override void Process(Outputter output, IXPathContext c)
         {
             try
@@ -656,12 +565,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public virtual ISequence EvaluateVariable(IXPathContext c)
         {
             try
@@ -681,46 +584,22 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public virtual IBinding GetBinding()
         {
             return binding;
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string ToString()
         {
             string d = EQName;
             return "$" + (d == null ? "$" : d);
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string ToShortString()
         {
             return "$" + DisplayName;
         }
 
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("varRef", this);

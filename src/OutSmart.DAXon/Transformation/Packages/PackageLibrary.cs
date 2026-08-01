@@ -18,13 +18,13 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Xslt;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System.IO;
 using System.Threading;
 namespace OutSmart.DAXon.Transformation.Packages
 {
     public class PackageLibrary
     {
+        private readonly object syncLock = new object();
         private readonly Configuration config;
         private readonly CompilerInfo compilerInfo;
         private Dictionary<string, IList<PackageVersion>> packageVersions = new Dictionary<string, IList<PackageVersion>>();
@@ -34,10 +34,10 @@ namespace OutSmart.DAXon.Transformation.Packages
         {
             get
             {
-                lock (this)
+                lock (syncLock)
                 {
                     IList<StylesheetPackage> result = new List<StylesheetPackage>();
-                    foreach (PackageDetails details in packages.Values())
+                    foreach (PackageDetails details in packages.Values)
                     {
                         if (details.loadedPackage != null)
                         {
@@ -94,7 +94,7 @@ namespace OutSmart.DAXon.Transformation.Packages
 
         public virtual void AddPackage(StylesheetPackage packageIn)
         {
-            lock (this)
+            lock (syncLock)
             {
                 string name = packageIn.PackageName;
                 PackageVersion version = packageIn.GetPackageVersion();
@@ -104,7 +104,7 @@ namespace OutSmart.DAXon.Transformation.Packages
                 details.loadedPackage = packageIn;
                 if (vp.packageName != null)
                 {
-                    packages.Put(vp, details);
+                    packages[vp] = details;
                     AddPackage(details);
                 }
             }
@@ -112,21 +112,21 @@ namespace OutSmart.DAXon.Transformation.Packages
 
         public virtual void AddPackage(PackageDetails details)
         {
-            lock (this)
+            lock (syncLock)
             {
                 VersionedPackageName vp = details.nameAndVersion;
                 string name = vp.packageName;
                 PackageVersion version = vp.packageVersion;
-                IList<PackageVersion> versions = packageVersions.Get(name);
+                IList<PackageVersion> versions = packageVersions.GetOrDefault(name);
 
                 if (versions == null)
                 {
                     versions = new List<PackageVersion>();
-                    packageVersions.Put(name, versions);
+                    packageVersions[name] = versions;
                 }
 
                 versions.Add(version);
-                packages.Put(vp, details);
+                packages[vp] = details;
             }
         }
 
@@ -151,10 +151,10 @@ namespace OutSmart.DAXon.Transformation.Packages
 
         public virtual PackageDetails FindPackage(string name, PackageVersionRanges ranges)
         {
-            lock (this)
+            lock (syncLock)
             {
                 HashSet<PackageDetails> candidates = new HashSet<PackageDetails>();
-                IList<PackageVersion> available = packageVersions.Get(name);
+                IList<PackageVersion> available = packageVersions.GetOrDefault(name);
                 if (available == null)
                 {
                     return null;
@@ -163,7 +163,7 @@ namespace OutSmart.DAXon.Transformation.Packages
                 int maxPriority = int.MinValue;
                 foreach (PackageVersion pv in available)
                 {
-                    PackageDetails details = packages.Get(new VersionedPackageName(name, pv));
+                    PackageDetails details = packages.GetOrDefault(new VersionedPackageName(name, pv));
                     if (ranges.Contains(pv))
                     {
                         candidates.Add(details);
@@ -175,7 +175,7 @@ namespace OutSmart.DAXon.Transformation.Packages
                     }
                 }
 
-                if (candidates.IsEmpty())
+                if (candidates.Count == 0)
                 {
                     return null;
                 }
@@ -219,10 +219,10 @@ namespace OutSmart.DAXon.Transformation.Packages
 
         public virtual PackageDetails FindDetailsForAlias(string shortName)
         {
-            lock (this)
+            lock (syncLock)
             {
                 PackageDetails selected = null;
-                foreach (PackageDetails details in packages.Values())
+                foreach (PackageDetails details in packages.Values)
                 {
                     if (shortName.Equals(details.shortName))
                     {
@@ -250,43 +250,59 @@ namespace OutSmart.DAXon.Transformation.Packages
             else if (details.exportLocation != null)
             {
                 TestForCycles(details, disallowed);
+
+                // Cleared in finally: a load that throws must not leave the marker set, or every
+                // same-thread retry reports a false XTSE3005 cycle (and pins the Thread object
+                // in a library that lives as long as the Configuration).
                 details.beingProcessed = Thread.CurrentThread;
-                ResolvedResource input = details.exportLocation;
-                IIPackageLoader loader = config.MakePackageLoader();
-                StylesheetPackage pack = loader.LoadPackage(input);
-                CheckNameAndVersion(pack, details);
-                details.loadedPackage = pack;
-                details.beingProcessed = null;
-                return pack;
+                try
+                {
+                    ResolvedResource input = details.exportLocation;
+                    IIPackageLoader loader = config.MakePackageLoader();
+                    StylesheetPackage pack = loader.LoadPackage(input);
+                    CheckNameAndVersion(pack, details);
+                    details.loadedPackage = pack;
+                    return pack;
+                }
+                finally
+                {
+                    details.beingProcessed = null;
+                }
             }
             else if (details.sourceLocation != null)
             {
                 TestForCycles(details, disallowed);
                 details.beingProcessed = Thread.CurrentThread;
-                Compilation compilation = new Compilation(config, compilerInfo);
-                compilation.SetUsingPackages(disallowed);
-                compilation.SetExpectedNameAndVersion(details.nameAndVersion);
-                compilation.ClearParameters();
-                compilation.SetLibraryPackage(true);
-                if (details.staticParams != null)
+                try
                 {
-                    foreach (KeyValuePair<StructuredQName, IGroundedValue> entry in details.staticParams.EntrySet())
+                    Compilation compilation = new Compilation(config, compilerInfo);
+                    compilation.SetUsingPackages(disallowed);
+                    compilation.SetExpectedNameAndVersion(details.nameAndVersion);
+                    compilation.ClearParameters();
+                    compilation.SetLibraryPackage(true);
+                    if (details.staticParams != null)
                     {
-                        compilation.SetParameter(entry.Key, entry.Value);
+                        foreach (KeyValuePair<StructuredQName, IGroundedValue> entry in details.staticParams)
+                        {
+                            compilation.SetParameter(entry.Key, entry.Value);
+                        }
                     }
-                }
 
-                PrincipalStylesheetModule psm = compilation.CompilePackage(details.sourceLocation);
-                details.beingProcessed = null;
-                if (compilation.ErrorCount > 0)
+                    PrincipalStylesheetModule psm = compilation.CompilePackage(details.sourceLocation);
+                    if (compilation.ErrorCount > 0)
+                    {
+                        throw new XPathException("Errors found in package " + details.nameAndVersion.packageName);
+                    }
+
+                    StylesheetPackage styPack = psm.GetStylesheetPackage();
+                    CheckNameAndVersion(styPack, details);
+                    details.loadedPackage = styPack;
+                    return styPack;
+                }
+                finally
                 {
-                    throw new XPathException("Errors found in package " + details.nameAndVersion.packageName);
+                    details.beingProcessed = null;
                 }
-
-                StylesheetPackage styPack = psm.GetStylesheetPackage();
-                CheckNameAndVersion(styPack, details);
-                details.loadedPackage = styPack;
-                return styPack;
             }
             else
             {

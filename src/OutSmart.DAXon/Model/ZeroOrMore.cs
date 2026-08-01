@@ -33,15 +33,15 @@ namespace OutSmart.DAXon.Model
             this.value = list;
         }
 
-        public static ZeroOrMore<T> FromSequenceIterator<T>(ISequenceIterator iter)
+        public static ZeroOrMore<TItem> FromSequenceIterator<TItem>(ISequenceIterator iter)
         {
-            IList<T> list = new List<T>();
+            IList<TItem> list = new List<TItem>();
             for (IItem item; (item = iter.Next()) != null;)
             {
-                list.Add((T)item);
+                list.Add((TItem)item);
             }
 
-            return new ZeroOrMore<T>(list);
+            return new ZeroOrMore<TItem>(list);
         }
 
         public virtual string GetStringValue()
@@ -94,9 +94,6 @@ namespace OutSmart.DAXon.Model
             return Reverse.ReverseIterator(value);
         }
 
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         public virtual bool EffectiveBooleanValue()
         {
             int len = GetLength();
@@ -124,9 +121,6 @@ namespace OutSmart.DAXon.Model
             }
         }
 
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         public virtual IGroundedValue Subsequence(int start, int length)
         {
             if (start < 0)
@@ -139,12 +133,9 @@ namespace OutSmart.DAXon.Model
                 return EmptySequence.GetInstance();
             }
 
-            return new ListIterator.Of<T>(value.SubList(start, start + length)).Materialize().Reduce();
+            return new ListIterator.Of<T>(value.GetRange(start, (start + length) - (start))).Materialize().Reduce();
         }
 
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         public override string ToString()
         {
             StringBuilder fsb = new StringBuilder(64);
@@ -158,9 +149,6 @@ namespace OutSmart.DAXon.Model
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         public virtual IGroundedValue Reduce()
         {
             int len = GetLength();
@@ -178,21 +166,18 @@ namespace OutSmart.DAXon.Model
             }
         }
 
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         //@Override
         public virtual IEnumerator<T> IIterator()
         {
-            return value.IIterator();
+            return value.GetEnumerator();
         }
         ISequenceIterator IGroundedValue.Iterate() => Iterate();
         IItem IGroundedValue.ItemAt(int arg0) => (IItem)(object)ItemAt(arg0);
         IItem IGroundedValue.Head() => (IItem)(object)Head();
         IItem ISequence.Head() => (IItem)(object)Head();
         ISequenceIterator ISequence.Iterate() => Iterate();
-        public IEnumerator<T> GetEnumerator() => throw new NotImplementedException();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        public IEnumerator<T> GetEnumerator() => value.GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public virtual IGroundedValue Materialize() => this; // upstream GroundedValue default

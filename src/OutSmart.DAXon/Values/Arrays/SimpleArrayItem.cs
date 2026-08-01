@@ -28,41 +28,20 @@ namespace OutSmart.DAXon.Values.Arrays
     /// </summary>
     public class SimpleArrayItem : AbstractArrayItem
     {
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         public static readonly SimpleArrayItem EMPTY_ARRAY = new SimpleArrayItem(new List<IGroundedValue>());
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         private readonly IList<IGroundedValue> _members;
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         private bool knownToBeGrounded = false;
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         private IPingable conversionPingable;
 
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         public override OperandRole[] OperandRoles => new OperandRole[]
             {
                 OperandRole.SINGLE_ATOMIC
             };
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         public SimpleArrayItem(IList<IGroundedValue> members)
         {
             this._members = members;
         }
 
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         public static SimpleArrayItem MakeSimpleArrayItem(ISequenceIterator input)
         {
             IList<IGroundedValue> members = input is Regex.SingleCharTokenIterator tok
@@ -120,17 +99,11 @@ namespace OutSmart.DAXon.Values.Arrays
             return all;
         }
 
-        /// <summary>
-        /// Static constant value representing an empty array
-        /// </summary>
         public virtual void RequestNotification(IPingable informee)
         {
             this.conversionPingable = informee;
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public virtual void NotifyConversion()
         {
             if (conversionPingable != null)
@@ -139,9 +112,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public virtual void MakeGrounded()
         {
             if (!knownToBeGrounded)
@@ -158,25 +128,16 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override AnnotationList GetAnnotations()
         {
             return AnnotationList.EMPTY;
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override IGroundedValue Get(int index)
         {
             return _members[index];
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ArrayItem Put(int index, IGroundedValue newValue)
         {
             NotifyConversion();
@@ -184,41 +145,26 @@ namespace OutSmart.DAXon.Values.Arrays
             return a2.Put(index, newValue);
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override int ArrayLength()
         {
             return _members.Count;
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override bool IsEmpty()
         {
-            return _members.IsEmpty();
+            return _members.Count == 0;
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override IEnumerable<IGroundedValue> Members()
         {
             return _members;
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ISequenceIterator Parcels()
         {
-            return (ISequenceIterator)(new SequenceIteratorOverJavaIterator<IGroundedValue>(_members.IIterator(), (member) => new Parcel(member)));
+            return (ISequenceIterator)(new SequenceIteratorOverJavaIterator<IGroundedValue>(_members.GetEnumerator(), (member) => new Parcel(member)));
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ArrayItem RemoveSeveral(IntSet positions)
         {
             NotifyConversion();
@@ -226,9 +172,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return a2.RemoveSeveral(positions);
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ArrayItem Remove(int pos)
         {
             NotifyConversion();
@@ -236,17 +179,11 @@ namespace OutSmart.DAXon.Values.Arrays
             return a2.Remove(pos);
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ArrayItem SubArray(int start, int end)
         {
-            return new SimpleArrayItem(_members.SubList(start, end));
+            return new SimpleArrayItem(_members.GetRange(start, (end) - (start)));
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ArrayItem Insert(int position, IGroundedValue member)
         {
             NotifyConversion();
@@ -254,9 +191,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return a2.Insert(position, member);
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ArrayItem Append(IGroundedValue newMember)
         {
             NotifyConversion();
@@ -264,9 +198,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return a2.Append(newMember);
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override ArrayItem Concat(ArrayItem other)
         {
             NotifyConversion();
@@ -274,17 +205,11 @@ namespace OutSmart.DAXon.Values.Arrays
             return a2.Concat(other);
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public virtual IList<IGroundedValue> GetMembers()
         {
             return _members;
         }
 
-        /// <summary>
-        /// Notify conversion to an ImmutableArrayItem
-        /// </summary>
         public override string ToShortString()
         {
             int size = GetMembers().Count;
@@ -299,7 +224,7 @@ namespace OutSmart.DAXon.Values.Arrays
             else
             {
                 StringBuilder buff = new StringBuilder(256);
-                buff.Append("[");
+                buff.Append('[');
                 foreach (IGroundedValue entry in Members())
                 {
                     buff.Append(Err.DepictSequence(entry).ToString().Trim());
@@ -308,11 +233,11 @@ namespace OutSmart.DAXon.Values.Arrays
 
                 if (size == 1)
                 {
-                    buff.Append("]");
+                    buff.Append(']');
                 }
                 else
                 {
-                    buff.SetCharAt(buff.Length - 2, ']');
+                    buff[buff.Length - 2] = ']';
                 }
 
                 return buff.ToString().Trim();

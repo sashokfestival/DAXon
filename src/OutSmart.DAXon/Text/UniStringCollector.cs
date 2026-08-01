@@ -28,6 +28,8 @@ namespace OutSmart.DAXon.Text
     /// </summary>
     internal sealed class UniStringCollector : AbstractUniStringConsumer, IUnicodeWriter
     {
+        // IDisposable via IUnicodeWriter; in-memory collector, nothing to release.
+        public void Dispose() { }
         // 64KB chunk cap: below the LOH threshold, and each sealed chunk becomes one rope segment.
         private const int CHUNK = 1 << 16;
 

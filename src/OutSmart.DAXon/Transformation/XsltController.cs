@@ -15,7 +15,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Trees.Wrappers;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,7 +26,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Transformation
 {
     public class XsltController : Controller
@@ -104,7 +102,7 @@ namespace OutSmart.DAXon.Transformation
         {
             get
             {
-                lock (this)
+                lock (syncLock)
                 {
                     long thread = Environment.CurrentManagedThreadId;
 
@@ -127,7 +125,6 @@ namespace OutSmart.DAXon.Transformation
             base.Reset();
             Configuration config = GetConfiguration();
             validationMode = config.SchemaValidationMode;
-            accumulatorManager = new AccumulatorManager();
             traceListener = null;
             ITraceListener tracer;
             try
@@ -136,7 +133,7 @@ namespace OutSmart.DAXon.Transformation
             }
             catch (XPathException err)
             {
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
 
             if (tracer != null)
@@ -150,9 +147,29 @@ namespace OutSmart.DAXon.Transformation
             ClearPerTransformationData();
         }
 
+        protected internal override void ReleaseRunState()
+        {
+            lock (syncLock)
+            {
+                base.ReleaseRunState();
+
+                // Both of these were reset only in Reset(), i.e. only from the constructor, so they
+                // lived as long as the Xslt30Transformer rather than as long as the run. The
+                // accumulator manager is the expensive one: its two maps key on ITreeInfo with STRONG
+                // references and the class has no Remove/Clear at all, and SetApplicableAccumulators
+                // runs for EVERY source document whether or not the stylesheet declares an
+                // accumulator - so a reused transformer pinned every tree it ever saw.
+                accumulatorManager = new AccumulatorManager();
+
+                // The attribute-set frame stack is keyed by managed thread id and was never removed
+                // except when a stack happened to empty; an aborted expansion left the entry behind.
+                attributeSetEvaluationStacks.Clear();
+            }
+        }
+
         protected override void ClearPerTransformationData()
         {
-            lock (this)
+            lock (syncLock)
             {
                 base.ClearPerTransformationData();
                 principalResult = null;
@@ -234,7 +251,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual bool CheckUniqueOutputDestination(DocumentKey uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (uri == null)
                 {
@@ -252,7 +269,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual void AddUnavailableOutputDestination(DocumentKey uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (allOutputDestinations == null)
                 {
@@ -265,7 +282,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual void RemoveUnavailableOutputDestination(DocumentKey uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (allOutputDestinations != null)
                 {
@@ -276,7 +293,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual bool IsUnusedOutputDestination(DocumentKey uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 return allOutputDestinations == null || !allOutputDestinations.Contains(uri);
             }
@@ -317,7 +334,7 @@ namespace OutSmart.DAXon.Transformation
             lock (messageCounters)
             {
                 int n = messageCounters.GetOrDefault(code, 0);
-                messageCounters.Put(code, n + 1);
+                messageCounters[code] = n + 1;
             }
         }
 
@@ -401,7 +418,7 @@ namespace OutSmart.DAXon.Transformation
                 }
 
                 initialContext.WaitForChildThreads();
-                dest.Dispose();
+                dest.Close();
             }
             catch (TerminationException err)
             {
@@ -425,6 +442,7 @@ namespace OutSmart.DAXon.Transformation
             {
                 inUse = false;
                 principalResultURI = null;
+                ReleaseRunState();
             }
         }
 
@@ -579,7 +597,7 @@ namespace OutSmart.DAXon.Transformation
                 }
 
                 initialContext.WaitForChildThreads();
-                dest.Dispose();
+                dest.Close();
             }
             catch (UncheckedXPathException err)
             {
@@ -592,6 +610,7 @@ namespace OutSmart.DAXon.Transformation
             finally
             {
                 inUse = false;
+                ReleaseRunState();
             }
         }
 
@@ -664,7 +683,7 @@ namespace OutSmart.DAXon.Transformation
                 }
 
                 initialContext.WaitForChildThreads();
-                dest.Dispose();
+                dest.Close();
             }
             catch (TerminationException err)
             {
@@ -689,8 +708,10 @@ namespace OutSmart.DAXon.Transformation
                 inUse = false;
                 if (traceListener != null)
                 {
-                    traceListener.Dispose();
+                    traceListener.Close();
                 }
+
+                ReleaseRunState();
             }
         }
 
@@ -733,7 +754,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual void ReleaseAttributeSetEvaluationStack()
         {
-            lock (this)
+            lock (syncLock)
             {
                 long thread = Environment.CurrentManagedThreadId;
                 attributeSetEvaluationStacks.Remove(thread);
@@ -750,15 +771,16 @@ namespace OutSmart.DAXon.Transformation
                 this.parent = parent;
                 this.finalResult = finalResult;
             }
-            public override void Dispose()
+            public override void Close()
             {
                 if (parent.traceListener != null)
                 {
-                    parent.traceListener.Dispose();
+                    parent.traceListener.Close();
                 }
 
-                finalResult.Dispose();
+                finalResult.Close();
                 parent.inUse = false;
+                parent.ReleaseRunState();
             }
         }
     }

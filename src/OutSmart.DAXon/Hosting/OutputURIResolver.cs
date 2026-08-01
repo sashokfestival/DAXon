@@ -13,14 +13,14 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Lib
 {
     public interface IOutputURIResolver
     {
         IOutputURIResolver NewInstance();
-        Result Resolve(string href, string @base);
-        void Dispose(Result result);
+        IResultTarget Resolve(string href, string @base);
+        void Dispose(IResultTarget result);
     }
 }

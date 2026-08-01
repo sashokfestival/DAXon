@@ -59,7 +59,7 @@ namespace OutSmart.DAXon.Expressions
 
         public override string ExpressionName => "filter";
 
-        public override double Cost => System.Math.Max(GetLhsExpression().Cost + 5 * GetRhsExpression().Cost, MAX_COST);
+        public override double Cost => Math.Max(GetLhsExpression().Cost + 5 * GetRhsExpression().Cost, MAX_COST);
 
         public override int ImplementationMethod => ITERATE_METHOD;
 
@@ -752,7 +752,6 @@ namespace OutSmart.DAXon.Expressions
                             Expression subs = SystemFunction.MakeCall("subsequence", start.GetRetainedStaticContext(), start, Literal.MakeLiteral(Int64Value.MakeIntegerValue(1), start), choice);
                             let.SetAction(subs);
 
-                            //decl.fixupReferences(let);
                             return let;
                         }
 

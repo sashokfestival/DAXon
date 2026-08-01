@@ -29,17 +29,8 @@ namespace OutSmart.DAXon.Expressions
 
         public virtual string ErrorCodeLocalPart => exception.GetErrorCode().LocalName;
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD | ITERATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override string ExpressionName => "errorExpr";
         public ErrorExpression() : this("Unspecified error", "XXXX9999", false)
         {
@@ -75,25 +66,16 @@ namespace OutSmart.DAXon.Expressions
             this.original = original;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
 
@@ -107,41 +89,23 @@ namespace OutSmart.DAXon.Expressions
             throw err;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             EvaluateItem(context);
             return null; // to fool the compiler
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return AnyItemType.GetInstance();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.ALLOWS_ZERO_OR_MORE; // we return a liberal value, so that we never get a type error reported
             // statically
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ErrorExpression e2 = new ErrorExpression(exception);
@@ -150,12 +114,6 @@ namespace OutSmart.DAXon.Expressions
             return e2;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override string ToString()
         {
             if (original != null)
@@ -168,12 +126,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override string ToShortString()
         {
             if (original != null)
@@ -186,12 +138,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("error", this);
@@ -201,12 +147,6 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ErrorExpressionElaborator();
@@ -235,12 +175,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         private class ErrorExpressionElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

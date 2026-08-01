@@ -12,7 +12,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,9 +37,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
         /// <summary>
@@ -51,9 +47,6 @@ namespace OutSmart.DAXon.Expressions
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
 
@@ -92,9 +85,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             SequenceOp.Optimize(visitor, contextItemType);
@@ -177,26 +167,17 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void CheckForUpdatingSubexpressions()
         {
             Sequence.CheckForUpdatingSubexpressions();
             GetAction().CheckForUpdatingSubexpressions();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override bool IsUpdatingExpression()
         {
             return false;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             QuantifiedExpression qe = new QuantifiedExpression();
@@ -213,18 +194,12 @@ namespace OutSmart.DAXon.Expressions
             return qe;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
             return p | StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /// <summary>
         /// Evaluate the expression to return a singleton value
         /// </summary>
@@ -233,12 +208,6 @@ namespace OutSmart.DAXon.Expressions
             return BooleanValue.Get(EffectiveBooleanValue(context));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
 
@@ -263,56 +232,26 @@ namespace OutSmart.DAXon.Expressions
             return !some;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         public override ItemType GetItemType()
         {
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return UType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         public override string ToString()
         {
             return (@operator == Token.SOME ? "some" : "every") + " $" + VariableEQName + " in " + Sequence + " satisfies " + ExpressionTool.Parenthesize(GetAction());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         public override string ToShortString()
         {
             return (@operator == Token.SOME ? "some" : "every") + " $" + VariableName + " in " + Sequence.ToShortString() + " satisfies ...";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement(Token.tokens[@operator], this);
@@ -323,23 +262,11 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new QuantifiedExprElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the result as a boolean
-        /// </summary>
         /// <summary>
         /// Elaborator for a quantified expression ({@code some|every X in Y satisfies Z})
         /// </summary>

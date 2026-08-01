@@ -46,12 +46,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         public virtual int CurrentDepth => currentDepth;
 
         /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
         /// Notify the end of an element node
         /// </summary>
         public virtual TinyNodeImpl LastCompletedElement
@@ -108,7 +102,7 @@ namespace OutSmart.DAXon.Trees.Tiny
 
             if (useEventLocation)
             {
-                object copier = GetPipelineConfiguration().GetComponent(typeof(ICopyInformee).GetName());
+                object copier = GetPipelineConfiguration().GetComponent(typeof(ICopyInformee).FullName);
                 if (copier is LocationCopier)
                 {
                     SetSystemId(((LocationCopier)copier).GetSystemId());
@@ -148,12 +142,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             currentDepth++;
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         public override void EndDocument()
         {
 
@@ -180,12 +168,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             currentDepth--;
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         public override void Reset()
         {
             base.Reset();
@@ -196,13 +178,7 @@ namespace OutSmart.DAXon.Trees.Tiny
             statistics = config.GetTreeStatistics().TEMPORARY_TREE_STATISTICS;
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
 
             TinyTree tt = tree;
@@ -214,15 +190,9 @@ namespace OutSmart.DAXon.Trees.Tiny
                 tt.Condense(statistics);
             }
 
-            base.Dispose();
+            base.Close();
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
 
@@ -259,16 +229,10 @@ namespace OutSmart.DAXon.Trees.Tiny
             nodeNr++;
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         private void StartElementSetupNamespaces(NamespaceMap namespaces)
         {
             noNewNamespaces = true;
-            if (namespaceStack.IsEmpty())
+            if (namespaceStack.Count == 0)
             {
                 noNewNamespaces = false;
                 namespaceStack.Push(namespaces);
@@ -280,12 +244,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         private void StartElementSetupSiblings(TinyTree tt)
         {
             if (siblingsAtDepth[currentDepth] > PARENT_POINTER_INTERVAL)
@@ -303,12 +261,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         private void StartElementAddNode(INodeName elemName, ISchemaType type, TinyTree tt, int properties)
         {
 
@@ -334,12 +286,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         private void StartElementCalculateDepth(TinyTree tt)
         {
             if (currentDepth == 0)
@@ -372,12 +318,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             siblingsAtDepth[currentDepth] = 0;
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         private void StartElementLocalSystemId(TinyTree tt, ILocation location)
         {
             string localSystemId = location.GetSystemId();
@@ -397,23 +337,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         protected virtual string GetAttValue(AttributeInfo att)
         {
             return att.Value;
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         private void Attribute2(INodeName attName, ISimpleType type, string value, ILocation locationId, int properties)
         {
 
@@ -433,12 +361,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         /// <summary>
         /// Notify the end of an element node
         /// </summary>
@@ -475,15 +397,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element node
-        /// </summary>
         /// <summary>
         /// Notify a text node
         /// </summary>
@@ -525,15 +438,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         }
 
         /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element node
-        /// </summary>
-        /// <summary>
         /// Notify a text node
         /// </summary>
         protected virtual int MakeTextNode(UnicodeString chars)
@@ -563,7 +467,6 @@ namespace OutSmart.DAXon.Trees.Tiny
                 nodeNr = tt.AddNode(Types.Type.TEXT, currentDepth, bufferStart, len, -1);
 
                 //nodeNr = tt.addNode(global::OutSmart.DAXon.Types.Type.TEXT, currentDepth, tt.textChunksUsed, -1, -1);
-                //tt.appendChars(chars);
                 int prev = prevAtDepth[currentDepth];
                 if (prev > 0)
                 {
@@ -578,21 +481,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return nodeNr;
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element node
-        /// </summary>
-        /// <summary>
-        /// Notify a text node
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         public override void ProcessingInstruction(string piname, UnicodeString remainder, ILocation locationId, int properties)
         {
             TinyTree tt = tree;
@@ -632,24 +520,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element node
-        /// </summary>
-        /// <summary>
-        /// Notify a text node
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
             TinyTree tt = tree;
@@ -673,24 +543,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         }
 
         /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element node
-        /// </summary>
-        /// <summary>
-        /// Notify a text node
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
         /// Set an unparsed entity in the document
         /// </summary>
         public override void SetUnparsedEntity(string name, string uri, string publicId)
@@ -703,24 +555,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Open the event stream
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element node
-        /// </summary>
-        /// <summary>
-        /// Notify a text node
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
         /// <summary>
         /// Set an unparsed entity in the document
         /// </summary>

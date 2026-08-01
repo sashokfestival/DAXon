@@ -20,7 +20,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Api
 {
@@ -72,7 +71,7 @@ namespace OutSmart.DAXon.Api
             }
             set
             {
-                lock (this)
+                lock (syncLock)
                 {
                     try
                     {
@@ -91,14 +90,15 @@ namespace OutSmart.DAXon.Api
                     {
                         throw new DAXonApiUncheckedException(e);
                     }
+                    catch (RecursionDepthError e)
+                    {
+                        throw new DAXonApiUncheckedException(e.ToXPathException());
+                    }
                 }
             }
         }
 
         /*staticParameters*/
-        /// <summary>
-        /// Clear the values of all parameters that have been set
-        /// </summary>
         public virtual IDestination Destination
         {
             get => destination; set
@@ -127,7 +127,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         internal virtual void SetSource(IActiveSource source)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (source is NodeInfo)
                 {
@@ -143,7 +143,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual void SetParameter(QName name, XdmValue value)
         {
-            lock (this)
+            lock (syncLock)
             {
                 try
                 {
@@ -153,28 +153,26 @@ namespace OutSmart.DAXon.Api
                 {
                     throw new DAXonApiUncheckedException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiUncheckedException(e.ToXPathException());
+                }
             }
         }
 
         /*staticParameters*/
-        /// <summary>
-        /// Clear the values of all parameters that have been set
-        /// </summary>
         public virtual void ClearParameters()
         {
-            lock (this)
+            lock (syncLock)
             {
                 parameters = new GlobalParameterSet();
             }
         }
 
         /*staticParameters*/
-        /// <summary>
-        /// Clear the values of all parameters that have been set
-        /// </summary>
         public virtual XdmValue GetParameter(QName name)
         {
-            lock (this)
+            lock (syncLock)
             {
                 ISequence oval = parameters[name.GetStructuredQName()];
                 return oval == null ? null : XdmValue.Wrap(oval);
@@ -182,12 +180,9 @@ namespace OutSmart.DAXon.Api
         }
 
         /*staticParameters*/
-        /// <summary>
-        /// Clear the values of all parameters that have been set
-        /// </summary>
         public virtual void Transform()
         {
-            lock (this)
+            lock (syncLock)
             {
                 IActiveSource initialSelection = initialSource;
                 bool reset = false;
@@ -196,8 +191,14 @@ namespace OutSmart.DAXon.Api
                     throw new InvalidOperationException("No destination has been supplied");
                 }
 
+                bool closed = false;
                 try
                 {
+                    // Arm the Processor-wide cooperative deadline relative to the start of this run.
+                    // BEFORE the source parse below: the parse loop honours the thread's active
+                    // deadline, so it must see this run's fresh budget, not a spent token left on
+                    // the thread by an earlier run.
+                    controller.SetTimeout(processor.TransformTimeout);
                     IReceiver @out = GetDestinationReceiver(controller, destination);
                     GlobalContextRequirement gcr = controller.GetExecutable().GlobalContextRequirement;
                     if ((gcr == null || !gcr.IsAbsentFocus()) && initialSelection != null)
@@ -220,8 +221,6 @@ namespace OutSmart.DAXon.Api
                     }
 
                     controller.InitializeController(parameters);
-                    // Arm the Processor-wide cooperative deadline relative to the start of this run.
-                    controller.SetTimeout(processor.TransformTimeout);
                     controller.OpenTraceEpisode();
                     if (initialTemplateName != null)
                     {
@@ -238,6 +237,7 @@ namespace OutSmart.DAXon.Api
                     }
 
                     destination.CloseAndNotify();
+                    closed = true;
                 }
                 catch (XPathException e)
                 {
@@ -249,6 +249,10 @@ namespace OutSmart.DAXon.Api
 
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
                 finally
                 {
                     if (reset)
@@ -257,14 +261,15 @@ namespace OutSmart.DAXon.Api
                     }
 
                     controller.CloseTraceEpisode();
+                    if (!closed)
+                    {
+                        DestinationHelper.ReleaseUnclosed(destination);
+                    }
                 }
             }
         }
 
         /*staticParameters*/
-        /// <summary>
-        /// Clear the values of all parameters that have been set
-        /// </summary>
         private bool MaybeSetGlobalContextItem(IItem item)
         {
             if (controller.GlobalContextItem == null)
@@ -279,9 +284,6 @@ namespace OutSmart.DAXon.Api
         }
 
         /*staticParameters*/
-        /// <summary>
-        /// Clear the values of all parameters that have been set
-        /// </summary>
         public IReceiver GetReceiver(PipelineConfiguration pipe, SerializationProperties @params)
         {
             if (destination == null)
@@ -296,9 +298,10 @@ namespace OutSmart.DAXon.Api
         }
 
         /*staticParameters*/
-        /// <summary>
-        /// Clear the values of all parameters that have been set
-        /// </summary>
+        public void Close()
+        {
+        }
+
         public void Dispose()
         {
         }

@@ -32,9 +32,6 @@ namespace OutSmart.DAXon.Values
             SaveContext(exp, context); //Instrumentation.count("SingletonClosure.new()");
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public override ISequenceIterator Iterate()
         {
             try
@@ -59,9 +56,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public override IItem Head()
         {
             try
@@ -74,9 +68,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual IItem AsItem()
         {
             lock (this)
@@ -100,9 +91,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual IItem ItemAt(int n)
         {
             if (n != 0)
@@ -113,17 +101,11 @@ namespace OutSmart.DAXon.Values
             return AsItem();
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual int GetLength()
         {
             return AsItem() == null ? 0 : 1;
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public override IGroundedValue Materialize()
         {
             try
@@ -136,17 +118,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public override ISequence MakeRepeatable()
         {
             return this;
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual bool IsBuilt()
         {
             return built;

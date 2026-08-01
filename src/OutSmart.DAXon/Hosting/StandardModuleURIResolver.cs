@@ -16,8 +16,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Lib
 {
@@ -92,7 +90,7 @@ namespace OutSmart.DAXon.Lib
                     return config.GetResourceResolver().Resolve(rr);
                 }
             }
-            catch (TransformerException e)
+            catch (XPathException e)
             {
             }
 

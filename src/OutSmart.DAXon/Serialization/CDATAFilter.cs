@@ -12,10 +12,10 @@ using OutSmart.DAXon.Serialization.CharCodes;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System;
 using System.Collections.Generic;
 
+using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Serialization
 {
     /// <summary>
@@ -251,10 +251,10 @@ namespace OutSmart.DAXon.Serialization
         /// <param name="details">the output properties</param>
         private void GetCdataElements(Properties details)
         {
-            bool isHTML = "html".Equals(details.GetProperty(OutputKeys.METHOD));
-            bool isHTML5 = isHTML && "5.0".Equals(details.GetProperty(OutputKeys.VERSION));
+            bool isHTML = "html".Equals(details.GetProperty(DAXonOutputKeys.METHOD));
+            bool isHTML5 = isHTML && "5.0".Equals(details.GetProperty(DAXonOutputKeys.VERSION));
             bool isHTML4 = isHTML && !isHTML5;
-            string cdata = details.GetProperty(OutputKeys.CDATA_SECTION_ELEMENTS);
+            string cdata = details.GetProperty(DAXonOutputKeys.CDATA_SECTION_ELEMENTS);
             if (cdata == null)
             {
                 // this doesn't happen, but there's no harm allowing for it

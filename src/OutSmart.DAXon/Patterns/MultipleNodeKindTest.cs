@@ -40,13 +40,34 @@ namespace OutSmart.DAXon.Patterns
         public MultipleNodeKindTest(UType u)
         {
             uType = u;
-            if (UType.DOCUMENT.Overlaps(u)) { nodeKindMask |= 1 << Types.Type.DOCUMENT; }
-            if (UType.ELEMENT.Overlaps(u)) { nodeKindMask |= 1 << Types.Type.ELEMENT; }
-            if (UType.ATTRIBUTE.Overlaps(u)) { nodeKindMask |= 1 << Types.Type.ATTRIBUTE; }
-            if (UType.TEXT.Overlaps(u)) { nodeKindMask |= 1 << Types.Type.TEXT; }
-            if (UType.COMMENT.Overlaps(u)) { nodeKindMask |= 1 << Types.Type.COMMENT; }
-            if (UType.PI.Overlaps(u)) { nodeKindMask |= 1 << Types.Type.PROCESSING_INSTRUCTION; }
-            if (UType.NAMESPACE.Overlaps(u)) { nodeKindMask |= 1 << Types.Type.NAMESPACE; }
+            if (UType.DOCUMENT.Overlaps(u))
+            {
+                nodeKindMask |= 1 << Types.Type.DOCUMENT;
+            }
+            if (UType.ELEMENT.Overlaps(u))
+            {
+                nodeKindMask |= 1 << Types.Type.ELEMENT;
+            }
+            if (UType.ATTRIBUTE.Overlaps(u))
+            {
+                nodeKindMask |= 1 << Types.Type.ATTRIBUTE;
+            }
+            if (UType.TEXT.Overlaps(u))
+            {
+                nodeKindMask |= 1 << Types.Type.TEXT;
+            }
+            if (UType.COMMENT.Overlaps(u))
+            {
+                nodeKindMask |= 1 << Types.Type.COMMENT;
+            }
+            if (UType.PI.Overlaps(u))
+            {
+                nodeKindMask |= 1 << Types.Type.PROCESSING_INSTRUCTION;
+            }
+            if (UType.NAMESPACE.Overlaps(u))
+            {
+                nodeKindMask |= 1 << Types.Type.NAMESPACE;
+            }
         }
 
         public override UType GetUType() => uType;

@@ -39,23 +39,23 @@ namespace OutSmart.DAXon.Model
                 Rule rule = anyElementRule;
                 while (rule != null)
                 {
-                    treeMap.Put(-rule.Rank, rule);
+                    treeMap[-rule.Rank] = rule;
                     rule = rule.Next;
                 }
 
                 rule = unnamedElementRuleChain;
                 while (rule != null)
                 {
-                    treeMap.Put(-rule.Rank, rule);
+                    treeMap[-rule.Rank] = rule;
                     rule = rule.Next;
                 }
 
                 foreach (Rule r in namedElementRules.Values)
                 {
-                    treeMap.Put(-r.Rank, r);
+                    treeMap[-r.Rank] = r;
                 }
 
-                return treeMap.Values().IIterator();
+                return treeMap.Values.GetEnumerator();
             }
         }
         public SelectedElementsSpaceStrippingRule(bool rejectDuplicates)
@@ -105,8 +105,8 @@ namespace OutSmart.DAXon.Model
                 int fp = test.Fingerprint;
                 NamePool pool = ((NameTest)test).GetNamePool();
                 FingerprintedQName key = new FingerprintedQName(pool.GetUnprefixedQName(fp), pool);
-                Rule chain = namedElementRules.Get(key);
-                namedElementRules.Put(key, AddRuleToList(newRule, chain, true));
+                Rule chain = namedElementRules.GetOrDefault(key);
+                namedElementRules[key] = AddRuleToList(newRule, chain, true);
             }
             else
             {
@@ -165,7 +165,7 @@ namespace OutSmart.DAXon.Model
         {
 
             // search the specific list for this node type / node name
-            Rule bestRule = namedElementRules.Get(nodeName);
+            Rule bestRule = namedElementRules.GetOrDefault(nodeName);
 
             // search the list for *:local and prefix:* node tests
             if (unnamedElementRuleChain != null)
@@ -277,15 +277,8 @@ namespace OutSmart.DAXon.Model
         } //    private static void exportRuleJS(Rule rule, StringBuilder fsb) {
         //        if (test instanceof NodeKindTest) {
         //            // elements="*"
-        //            fsb.append("return " + which + ";");
-        //        } else if (test instanceof NameTest) {
         //            fsb.append("if (uri=='" + test.getMatchingNodeName().getURI() +
         //                               "' && local=='" + test.getMatchingNodeName().getLocalPart() +
         //                               "') return " + which + ";" );
-        //        } else if (test instanceof NamespaceTest) {
-        //        } else if (test instanceof LocalNameTest) {
-        //        } else {
-        //        }
-        //    }
     }
 }

@@ -173,10 +173,8 @@ namespace OutSmart.DAXon.Patterns
             {
                 throw;
             }
-            catch (XPathException.StackOverflow)
-            {
-                throw;
-            }
+            // No StackOverflow catch: RecursionDepthError (a foreign type since round BC) passes
+            // through the XPathException catch below untouched; the old subtype is never thrown here.
             catch (XPathException e)
             {
                 HandleDynamicError(e, c2);

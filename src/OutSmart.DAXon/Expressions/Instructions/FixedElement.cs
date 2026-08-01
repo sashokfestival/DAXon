@@ -13,7 +13,6 @@ using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -96,15 +95,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             //                    fixedContent.removeRedundantNamespaces(visitor, namespaceBindings);
             //                }
             //                return this;
-            //            }
-            //            if (getContentExpression() instanceof Block) {
             //                for (Operand o : getContentExpression().operands()) {
             //                    if (exp instanceof FixedElement &&
             //                        ((FixedElement) exp).removeRedundantNamespaces(visitor, namespaceBindings);
             //                    }
             //                }
-            //            }
-            //        }
             return this;
         }
 
@@ -242,7 +237,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override void GatherProperties(Action<string, object> consumer)
         {
-            consumer.Accept("name", FixedElementName);
+            consumer("name",FixedElementName);
         }
 
         private ISchemaType GetXSIType(IStaticContext env)
@@ -418,7 +413,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                 }
 
-                fsb.SetLength(fsb.Length - 1);
+                fsb.Length = fsb.Length - 1;
                 @out.EmitAttribute("namespaces", fsb.ToString());
             }
 
@@ -525,8 +520,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         // output the element end tag (which will fail if validation fails)
                         @out.EndElement();
                     }
-                    catch (XPathException e)
+                    catch (XPathException e) when (!(e is XPathException.StackOverflow))
                     {
+                        // Filtered: a literal result element nests once per level of a recursive
+                        // template, and decorating from inside a catch re-enters exception dispatch
+                        // at ~20KB of stack per level - far more than the descent itself cost.
                         throw e.MaybeWithLocation(expr.GetLocation()).MaybeWithContext(context);
                     }
 

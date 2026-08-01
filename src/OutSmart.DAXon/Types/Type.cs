@@ -13,7 +13,7 @@ using OutSmart.DAXon.Values.Maps;
 using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Values;
 
-// Phase 5: stub OutSmart.DAXon.Types.Type class Ã¢â‚¬â€ Type.cs is excluded but
+// Stub OutSmart.DAXon.Types.Type class -- Type.cs is excluded but
 // XPathParser/SequenceTool/ValueComparison call Types.GetItemType etc. as
 // static methods. Add a public static facade in the OutSmart.DAXon.Types namespace.
 namespace OutSmart.DAXon.Types
@@ -47,10 +47,8 @@ namespace OutSmart.DAXon.Types
         public const int STOPPER = 101;
         // NODE_TYPE / ITEM_TYPE are ItemType-typed statics (Saxon Java: Types.NODE_TYPE = AnyNodeTest,
         // Types.ITEM_TYPE = AnyItemType — they are NOT the same value).
-        // Runtime 2026-06-10: converted from eager static readonly fields to LAZY properties — a static-init
-        // cycle left them NULL at runtime (Instruction.GetItemType returned null -> NRE in
-        // TypeHierarchy.Relationship during Block.TypeCheck for any template containing xsl:next-match etc.).
-        // Same lazy pattern as the compat SequenceType constants (no static-init-ordering hazard).
+        // LAZY properties, not eager static readonly fields: a static-init cycle would leave them NULL at
+        // runtime (same lazy pattern as the compat SequenceType constants).
         // NODE_TYPE MUST be AnyNodeTest (node()), not AnyItemType: it is the declared arg type of the
         // node-argument builtins (fn:root/local-name/namespace-uri/nilled/generate-id/id/idref/lang/base-uri/
         // document-uri/node-name/name, key/document node args). When it was AnyItemType, TypeChecker.StaticTypeCheck
@@ -198,10 +196,8 @@ namespace OutSmart.DAXon.Types
             }
             return AnyItemType.GetInstance();
         }
-        // Runtime 2026-06-10: was hollow (=> null) -> every `instance of xs:string`/`xs:integer`/... died with
-        // XPST0051 "Unknown atomic type" in XPathParser.GetPlainType. Mirror the excluded real
-        // Types.GetBuiltInItemType (Type.cs:275): fingerprint -> the functional BuiltInType registry stub below
-        // (same path the xs:* constructor functions already use via GetBuiltInSimpleType).
+        // Mirror upstream Types.getBuiltInItemType: fingerprint -> the functional BuiltInType registry below
+        // (same path the xs:* constructor functions use via GetBuiltInSimpleType).
         public static ItemType GetBuiltInItemType(string ns, string local)
         {
             var t = BuiltInType.GetSchemaType(StandardNames.GetFingerprint(NamespaceUri.Of(ns), local));
@@ -218,7 +214,7 @@ namespace OutSmart.DAXon.Types
         }
         public static object GetBuiltInSimpleType(string ns, string local) => GetBuiltInSimpleType(StandardNames.GetFingerprint(NamespaceUri.Of(ns), local));
         public static bool IsPossiblyComparable(ItemType t1, ItemType t2, bool ordered) => true;
-        // Phase 5: int-version overload (paulirwin passes XPathVersion int).
+        // Int-version overload (paulirwin passes XPathVersion int).
         public static bool IsPossiblyComparable(ItemType t1, ItemType t2, int xpathVersion) => true;
         public static bool IsComparable(ItemType t1, ItemType t2, bool ordered) => true;
         // Faithful port of upstream Type.isSubType(AtomicType,AtomicType): walk the atomic base-type

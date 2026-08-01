@@ -18,7 +18,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,31 +33,13 @@ namespace OutSmart.DAXon.Expressions
     {
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
         /// Node kinds whose typed value is always a string
         /// </summary>
         public static readonly UType STRING_KINDS = UType.NAMESPACE.Union(UType.COMMENT).Union(UType.PI);
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
         /// Node kinds whose typed value is always untypedAtomic
         /// </summary>
         public static readonly UType UNTYPED_KINDS = UType.TEXT.Union(UType.DOCUMENT);
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         /// <summary>
         /// Node kinds whose typed value is untypedAtomic if the configuration is untyped
         /// </summary>
@@ -83,20 +64,8 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string StreamerName => "Atomizer";
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override string ExpressionName => "data";
         public Atomizer(Expression sequence, Func<RoleDiagnostic> role) : base(sequence)
         {
@@ -177,9 +146,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);
@@ -215,9 +181,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private void ComputeSingleValued(TypeHierarchy th)
         {
             ItemType operandType = OperandItemType;
@@ -252,9 +215,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private bool IsSingleValuedSchemaType(ISchemaType st)
         {
             if (st == Untyped.INSTANCE)
@@ -299,9 +259,6 @@ namespace OutSmart.DAXon.Expressions
             return false; // play safe
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private string ExpandMessage(string message)
         {
             if (roleSupplier == null)
@@ -310,13 +267,10 @@ namespace OutSmart.DAXon.Expressions
             }
             else
             {
-                return message + ". Found while atomizing the " + roleSupplier.Get().GetMessage() + " in {" + ToShortString() + "} on line " + GetLocation().GetLineNumber();
+                return message + ". Found while atomizing the " + roleSupplier().GetMessage() + " in {" + ToShortString() + "} on line " + GetLocation().GetLineNumber();
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression exp = base.Optimize(visitor, contextInfo);
@@ -392,17 +346,11 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public bool IsUntyped()
         {
             return untyped;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
@@ -414,18 +362,12 @@ namespace OutSmart.DAXon.Expressions
             return p | StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void ResetLocalStaticProperties()
         {
             base.ResetLocalStaticProperties();
             operandItemType = null;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             Atomizer copy = new Atomizer(BaseExpression.Copy(rebindings), roleSupplier);
@@ -435,12 +377,6 @@ namespace OutSmart.DAXon.Expressions
             return copy;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             try
@@ -464,29 +400,17 @@ namespace OutSmart.DAXon.Expressions
                 }
                 else
                 {
-                    string message = ExpandMessage(e.GetMessage());
+                    string message = ExpandMessage(e.Message);
                     throw new XPathException(message).WithErrorCode(e.ErrorCodeQName).WithLocation(e.GetLocator()).WithXPathContext(context).MaybeWithLocation(GetLocation());
                 }
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return (AtomicValue)MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override ItemType GetItemType()
         {
             operandItemType = BaseExpression.GetItemType();
@@ -494,23 +418,11 @@ namespace OutSmart.DAXon.Expressions
             return GetAtomizedItemType(BaseExpression, untyped, th);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return UType.ANY_ATOMIC.Intersection(GetItemType().GetUType());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public static ItemType GetAtomizedItemType(Expression operand, bool alwaysUntyped, TypeHierarchy th)
         {
             ItemType @in = operand.GetItemType();
@@ -566,15 +478,6 @@ namespace OutSmart.DAXon.Expressions
 
             return BuiltInAtomicType.ANY_ATOMIC;
         }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             ItemType @in = OperandItemType;
@@ -609,15 +512,6 @@ namespace OutSmart.DAXon.Expressions
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             PathMap.PathMapNodeSet result = BaseExpression.AddToPathMap(pathMap, pathMapNodeSet);
@@ -634,15 +528,6 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public static ISequenceIterator GetAtomizingIterator(ISequenceIterator @base, bool oneToOne)
         {
             if (SequenceTool.SupportsGetLength(@base))
@@ -675,15 +560,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public static IAtomicSequence Atomize(ISequence sequence)
         {
             if (sequence is IAtomicSequence)
@@ -701,74 +577,29 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override string ToString()
         {
             return "data(" + BaseExpression.ToString() + ")";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override string ToShortString()
         {
             return BaseExpression.ToShortString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override void EmitExtraAttributes(ExpressionPresenter @out)
         {
             if (roleSupplier != null)
             {
-                @out.EmitAttribute("diag", roleSupplier.Get().Save());
+                @out.EmitAttribute("diag", roleSupplier().Save());
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new AtomizerElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         /// <summary>
         /// Elaborator for an Atomizer
         /// </summary>
@@ -813,7 +644,7 @@ namespace OutSmart.DAXon.Expressions
                             }
                             else
                             {
-                                string message = expr.ExpandMessage(e.GetMessage());
+                                string message = expr.ExpandMessage(e.Message);
                                 throw new XPathException(message).WithErrorCode(e.ErrorCodeQName).WithLocation(e.GetLocator()).WithXPathContext(context).MaybeWithLocation(expr.GetLocation());
                             }
                         }
@@ -826,7 +657,7 @@ namespace OutSmart.DAXon.Expressions
                             }
                             else
                             {
-                                string message = expr.ExpandMessage(e.GetMessage());
+                                string message = expr.ExpandMessage(e.Message);
                                 throw new XPathException(message).WithErrorCode(e.ErrorCodeQName).WithLocation(e.GetLocator()).WithXPathContext(context).MaybeWithLocation(expr.GetLocation());
                             }
                         }
@@ -857,7 +688,7 @@ namespace OutSmart.DAXon.Expressions
                         }
                         else
                         {
-                            string message = expr.ExpandMessage(e.GetMessage());
+                            string message = expr.ExpandMessage(e.Message);
                             throw new XPathException(message).WithErrorCode(e.ErrorCodeQName).WithLocation(e.GetLocator()).WithXPathContext(context).MaybeWithLocation(expr.GetLocation());
                         }
                     }
@@ -870,7 +701,7 @@ namespace OutSmart.DAXon.Expressions
                         }
                         else
                         {
-                            string message = expr.ExpandMessage(e.GetMessage());
+                            string message = expr.ExpandMessage(e.Message);
                             throw new XPathException(message).WithErrorCode(e.ErrorCodeQName).WithLocation(e.GetLocator()).WithXPathContext(context).MaybeWithLocation(expr.GetLocation());
                         }
                     }

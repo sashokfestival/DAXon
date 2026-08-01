@@ -80,17 +80,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
         }
 
         //    }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
         }
 
         //    }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //
         public override void GatherVariableReferences(ExpressionVisitor visitor, IBinding binding, IList<VariableReference> references)
         {
@@ -98,9 +92,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
         }
 
         //    }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //
         public override void RefineVariableType(ExpressionVisitor visitor, IList<VariableReference> references, Expression returnExpr)
         {
@@ -114,9 +105,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
         }
 
         //    }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //
         public override void AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
@@ -124,9 +112,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
         }
 
         //    }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //
         public override void Explain(ExpressionPresenter @out)
         {
@@ -136,9 +121,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
         }
 
         //    }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //
         public override string ToShortString()
         {
@@ -149,9 +131,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
         }
 
         //    }
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //
         public override string ToString()
         {

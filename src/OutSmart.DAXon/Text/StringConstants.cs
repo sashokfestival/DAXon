@@ -50,7 +50,7 @@ namespace OutSmart.DAXon.Text
         public static readonly byte[] ESCAPE_NBSP = Bytes("&nbsp;");
         public static byte[] Bytes(string s)
         {
-            return s.GetBytes(StandardCharsets.US_ASCII);
+            return Encoding.ASCII.GetBytes(s);
         }
     }
 }

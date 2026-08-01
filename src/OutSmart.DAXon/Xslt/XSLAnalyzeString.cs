@@ -107,11 +107,11 @@ namespace OutSmart.DAXon.Xslt
                 {
                     if (err.HasErrorCode("FORX0001"))
                     {
-                        InvalidFlags("Error in regular expression flags: " + err.GetMessage());
+                        InvalidFlags("Error in regular expression flags: " + err.Message);
                     }
                     else
                     {
-                        InvalidRegex("Error in regular expression: " + err.GetMessage());
+                        InvalidRegex("Error in regular expression: " + err.Message);
                     }
                 }
             }
@@ -148,7 +148,6 @@ namespace OutSmart.DAXon.Xslt
         public override void Validate(ComponentDeclaration decl)
         {
 
-            //checkWithinTemplate();
             bool foundFallback = false;
             foreach (NodeInfo curr in Children())
             {

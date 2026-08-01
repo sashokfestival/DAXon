@@ -12,11 +12,9 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.XQuery
 {
     using System.IO;
-    public class InputStreamMarker
+    // .NET streams are seekable; the Java mark/reset shim reduces to identity.
+    public static class InputStreamMarker
     {
-        public InputStreamMarker() { }
-        public InputStreamMarker(Stream s) { }
         public static Stream EnsureMarkSupported(Stream s) => s;
-        public Stream Reset() => throw new NotImplementedException("STUB: InputStreamMarker.Reset not ported (excluded stub)");
     }
 }

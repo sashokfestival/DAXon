@@ -14,10 +14,10 @@ using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Lib
 {
     public abstract class Logger
@@ -91,7 +91,7 @@ namespace OutSmart.DAXon.Lib
                     if (ch == '\n')
                     {
                         logger.Println(builder.ToString(), INFO);
-                        builder.SetLength(0);
+                        builder.Length = 0;
                     }
                     else
                     {
@@ -105,7 +105,7 @@ namespace OutSmart.DAXon.Lib
                 if (builder.Length > 0)
                 {
                     logger.Println(builder.ToString(), INFO);
-                    builder.SetLength(0);
+                    builder.Length = 0;
                 }
             }
 

@@ -15,7 +15,6 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Trees.Wrappers;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Internal.Streams;
 using System;
 using System.Collections.Generic;
@@ -24,7 +23,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Api
 {
     public class XdmNode : XdmItem
@@ -44,6 +42,10 @@ namespace OutSmart.DAXon.Api
                 catch (XPathException e)
                 {
                     throw new DAXonApiException(e);
+                }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
                 }
             }
         }
@@ -298,7 +300,7 @@ namespace OutSmart.DAXon.Api
 
         public XdmStream<XdmNode> Stream()
         {
-            return new XdmStream<XdmNode>(OutSmart.DAXon.Internal.Streams.Stream.Of(this));
+            return new XdmStream<XdmNode>(this);
         }
     }
 }

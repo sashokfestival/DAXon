@@ -14,7 +14,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -65,14 +64,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_CALL_TEMPLATE;
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public int BindingSlot
         {
             get => bindingSlot; set
@@ -81,14 +74,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_XSLT_CONTEXT | StaticProperty.DEPENDS_ON_FOCUS;
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override string StreamerName => "CallTemplate";
         public CallTemplate(NamedTemplate template, StructuredQName calledTemplateName, bool useTailRecursion, bool inStreamable)
         {
@@ -143,9 +130,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return useTailRecursion;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override Expression Simplify()
         {
             WithParam.Simplify(actualParams);
@@ -153,9 +137,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             WithParam.TypeCheck(actualParams, visitor, contextInfo);
@@ -189,9 +170,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             WithParam.Optimize(visitor, actualParams, contextItemType);
@@ -199,9 +177,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         protected override int ComputeCardinality()
         {
             if (template == null)
@@ -214,9 +189,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override ItemType GetItemType()
         {
             if (template == null)
@@ -229,9 +201,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             CallTemplate ct = new CallTemplate(template, calledTemplateName, useTailRecursion, isWithinDeclaredStreamableConstruct);
@@ -241,17 +210,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return ct;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return true;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             List<Operand> list = new List<Operand>(10);
@@ -260,9 +223,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return list;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             NamedTemplate t;
@@ -294,23 +254,18 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 ITailCall tc = t.Expand(output, c2);
                 DispatchTailCall(tc);
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                throw new XPathException.StackOverflow("Too many nested template or function calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, GetLocation()).WithXPathContext(context);
+                // Filtered: one such catch per recursion level; only the innermost describes.
+                throw e.Describe("Too many nested template or function calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, GetLocation());
             }
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override StructuredQName GetObjectName()
         {
             return template == null ? null : template.TemplateName;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("callT", this);
@@ -349,9 +304,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override string ToString()
         {
 
@@ -368,22 +320,19 @@ namespace OutSmart.DAXon.Expressions.Instructions
             {
                 buff.Append(first ? "(" : ", ");
                 buff.Append(p.VariableQName.DisplayName);
-                buff.Append("=");
+                buff.Append('=');
                 buff.Append(p.GetSelectExpression().ToString());
                 first = false;
             }
 
             if (!first)
             {
-                buff.Append(")");
+                buff.Append(')');
             }
 
             return buff.ToString();
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override string ToShortString()
         {
 
@@ -391,17 +340,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return "CallTemplate#" + template.GetObjectName().DisplayName;
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CallTemplateElaborator();
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public class CallTemplatePackage : ITailCall
         {
             private readonly Component targetComponent;
@@ -433,6 +376,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 //  local variables are held. It should be possible to avoid creating a new context, and instead
                 //  to update the existing one in situ. Experimented with this June 2022 (MHK) and it looks possible
                 //  in principle, but I hit trouble getting the current component right.
+                // One tail call is one step of unbounded cost, and the trampoline driving them
+                // never grows the stack — so StackGuard.Probe in Expand is blind to an
+                // infinitely tail-recursive template and only the deadline can stop it. Checked
+                // here and not in Expand because the trampoline runs at constant depth: an
+                // XPathException raised deep inside a NON-tail recursion grows the stack at every
+                // converting rethrow while unwinding, and overflows it (see StackGuard.Margin).
+                evaluationContext.GetController().CheckTimeoutPerStep();
                 NamedTemplate template = (NamedTemplate)targetComponent.GetActor();
                 XPathContextMajor c2 = evaluationContext.NewContext();
                 c2.SetCurrentComponent(targetComponent);
@@ -449,9 +399,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Return the name of this instruction.
-        /// </summary>
         public class CallTemplateElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
@@ -535,9 +482,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
                             ITailCall tc = t.Expand(output, c2);
                             DispatchTailCall(tc);
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw new XPathException.StackOverflow("Too many nested template or function calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, expr.GetLocation()).WithXPathContext(context);
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw e.Describe("Too many nested template or function calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, expr.GetLocation());
                         }
 
                         return null;

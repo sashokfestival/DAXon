@@ -138,7 +138,7 @@ namespace OutSmart.DAXon.Xslt
                     }
 
                     Expression exp = MakeAttributeValueTemplate(val, att);
-                    serializationAttributes.Put(name, exp);
+                    serializationAttributes[name] = exp;
                 }
                 else if (name.GetLocalPart().Equals("asynchronous") && name.HasURI(NamespaceUri.SAXON))
                 {
@@ -200,7 +200,7 @@ namespace OutSmart.DAXon.Xslt
             if (useCharacterMapsAtt != null)
             {
                 string s = XSLOutput.PrepareCharacterMaps(this, useCharacterMapsAtt, new Properties());
-                serializationAttributes.Put(new StructuredQName("", NamespaceUri.NULL, "use-character-maps"), new StringLiteral(s));
+                serializationAttributes[new StructuredQName("", NamespaceUri.NULL, "use-character-maps")] = new StringLiteral(s);
             }
         }
 
@@ -213,13 +213,13 @@ namespace OutSmart.DAXon.Xslt
 
             href = TypeCheck("href", href);
             formatExpression = TypeCheck("format", formatExpression);
-            foreach (StructuredQName prop in serializationAttributes.KeySet())
+            foreach (StructuredQName prop in serializationAttributes.Keys)
             {
-                Expression exp1 = serializationAttributes.Get(prop);
+                Expression exp1 = serializationAttributes.GetOrDefault(prop);
                 Expression exp2 = TypeCheck(prop.DisplayName, exp1);
                 if (exp1 != exp2)
                 {
-                    serializationAttributes.Put(prop, exp2);
+                    serializationAttributes[prop] = exp2;
                 }
             }
 
@@ -266,7 +266,7 @@ namespace OutSmart.DAXon.Xslt
             // If no serialization method was specified, we can work it out statically if the
             // first contained instruction is a literal result element. This saves effort at run-time.
             string method = null;
-            if (formatExpression == null && globalProps.GetProperty("method") == null && serializationAttributes.Get(METHOD) == null)
+            if (formatExpression == null && globalProps.GetProperty("method") == null && serializationAttributes.GetOrDefault(METHOD) == null)
             {
                 IAxisIterator kids = IterateAxis(AxisInfo.CHILD);
                 NodeInfo first = kids.Next();
@@ -276,7 +276,7 @@ namespace OutSmart.DAXon.Xslt
                     {
                         method = "xhtml";
                     }
-                    else if (first.GetLocalPart().EqualsIgnoreCase("html") && first.GetNamespaceUri().IsEmpty())
+                    else if (first.GetLocalPart().Equals("html", global::System.StringComparison.OrdinalIgnoreCase) && first.GetNamespaceUri().IsEmpty())
                     {
                         method = "html";
                     }
@@ -292,9 +292,9 @@ namespace OutSmart.DAXon.Xslt
             Properties localProps = new Properties();
             HashSet<StructuredQName> @fixed = new HashSet<StructuredQName>(10);
             INamespaceResolver namespaceResolver = GetStaticContext().GetNamespaceResolver();
-            foreach (StructuredQName property in serializationAttributes.KeySet())
+            foreach (StructuredQName property in serializationAttributes.Keys)
             {
-                Expression exp = serializationAttributes.Get(property);
+                Expression exp = serializationAttributes.GetOrDefault(property);
                 if (exp is StringLiteral)
                 {
                     string s = ((StringLiteral)exp).Stringify();
@@ -313,7 +313,7 @@ namespace OutSmart.DAXon.Xslt
                     {
                         if (e.ErrorCodeQName.HasURI(NamespaceUri.SAXON))
                         {
-                            CompileWarning(e.GetMessage(), e.ErrorCodeQName);
+                            CompileWarning(e.Message, e.ErrorCodeQName);
                         }
                         else
                         {

@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Text
             int n = 0;
             for (int i = 0; i < s.Length; i++)
             {
-                int c = s.CharAt(i);
+                int c = s[i];
                 if (c < 55296 || c > 56319)
                 {
                     n++; // don't count high surrogates, i.e. D800 to DBFF
@@ -46,7 +46,7 @@ namespace OutSmart.DAXon.Text
         {
             for (int i = 0; i < str.Length; i++)
             {
-                if (UTF16CharacterSet.IsSurrogate(str.CharAt(i)))
+                if (UTF16CharacterSet.IsSurrogate(str[i]))
                 {
                     return true;
                 }
@@ -80,10 +80,10 @@ namespace OutSmart.DAXon.Text
                 byte[] triples = new byte[uLength * 3];
                 for (int i = 0, j = 0; i < chars.Length; i++)
                 {
-                    char c = chars.CharAt(i);
+                    char c = chars[i];
                     if (UTF16CharacterSet.IsSurrogate(c))
                     {
-                        int cp = UTF16CharacterSet.CombinePair(c, chars.CharAt(++i));
+                        int cp = UTF16CharacterSet.CombinePair(c, chars[++i]);
                         triples[j++] = (byte)((cp >> 16) & 0xff);
                         triples[j++] = (byte)((cp >> 8) & 0xff);
                         triples[j++] = (byte)(cp & 0xff);
@@ -160,6 +160,31 @@ namespace OutSmart.DAXon.Text
         {
             char[] array = new char[count];
             ArrayTools.Fill(array, ch);
+            builder.Insert(0, array);
+        }
+
+        /// <summary>
+        /// Wide-character sibling of <see cref="PrependRepeated(StringBuilder, char, int)"/>. One
+        /// array, one Insert: prepending in a loop re-shifts the whole buffer per character, which
+        /// is quadratic in the count.
+        /// </summary>
+        public static void PrependRepeated(StringBuilder builder, int ch, int count)
+        {
+            if (ch <= 0xffff)
+            {
+                PrependRepeated(builder, (char)ch, count);
+                return;
+            }
+
+            char high = UTF16CharacterSet.HighSurrogate(ch);
+            char low = UTF16CharacterSet.LowSurrogate(ch);
+            char[] array = new char[checked(count * 2)];
+            for (int i = 0; i < array.Length; i += 2)
+            {
+                array[i] = high;
+                array[i + 1] = low;
+            }
+
             builder.Insert(0, array);
         }
 
@@ -325,12 +350,12 @@ namespace OutSmart.DAXon.Text
 
             public override int Next()
             {
-                int c = value.CharAt(i++);
+                int c = value[i++];
                 if (UTF16CharacterSet.IsHighSurrogate(c))
                 {
                     try
                     {
-                        int d = HasNext() ? value.CharAt(i++) : -1;
+                        int d = HasNext() ? value[i++] : -1;
                         if (!UTF16CharacterSet.IsLowSurrogate(d))
                         {
                             throw new InvalidOperationException("Unmatched surrogate code value " + c + " at position " + i);

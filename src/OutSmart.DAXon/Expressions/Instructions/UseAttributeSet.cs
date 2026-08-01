@@ -62,9 +62,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override string ExpressionName => "useAS";
 
-        /// <summary>
-        /// Compute a hashcode
-        /// </summary>
         public override string StreamerName => "UseAttributeSet";
         public UseAttributeSet(StructuredQName name, bool streamable)
         {
@@ -110,7 +107,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
             else
             {
-                return new Block(targets.ToArray(new UseAttributeSet[0]));
+                return new Block(targets.ToArray());
             }
         }
 
@@ -207,25 +204,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return targetName.Equals(((UseAttributeSet)obj).targetName);
         }
 
-        /// <summary>
-        /// Compute a hashcode
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return 0x56423719 ^ targetName.GetHashCode();
         }
 
-        /// <summary>
-        /// Compute a hashcode
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new UseAttributeSetElaborator();
         }
 
-        /// <summary>
-        /// Compute a hashcode
-        /// </summary>
         public class UseAttributeSetElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

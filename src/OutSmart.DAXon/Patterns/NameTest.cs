@@ -34,14 +34,8 @@ namespace OutSmart.DAXon.Patterns
         /// </summary>
         public override double DefaultPriority => 0;
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
         public override int Fingerprint => fingerprint;
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
         public override StructuredQName MatchingNodeName
         {
             get
@@ -51,22 +45,10 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
         public override int PrimitiveType => nodeKind;
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
         public override IntSet RequiredNodeNames => (new IntSingletonSet(fingerprint));
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
-        /// <summary>
-        /// Determines whether two NameTests are equal
-        /// </summary>
         public string FullAlphaCode => BasicAlphaCode + " n" + MatchingNodeName.EQName;
         public NameTest(int nodeKind, NamespaceUri uri, string localName, NamePool namePool)
         {
@@ -180,27 +162,18 @@ namespace OutSmart.DAXon.Patterns
             return fp == fingerprint;
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
         public virtual NamespaceUri GetNamespaceURI()
         {
             ComputeUriAndLocal();
             return uri;
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
         public virtual string GetLocalPart()
         {
             ComputeUriAndLocal();
             return localName;
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
         public override string ToString()
         {
             switch (nodeKind)
@@ -219,9 +192,6 @@ namespace OutSmart.DAXon.Patterns
         }
 
         /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
-        /// <summary>
         /// Returns a hash code value for the object.
         /// </summary>
         public override int GetHashCode()
@@ -229,34 +199,16 @@ namespace OutSmart.DAXon.Patterns
             return nodeKind << 20 ^ fingerprint;
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
-        /// <summary>
-        /// Determines whether two NameTests are equal
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is NameTest && ((NameTest)other).namePool == namePool && ((NameTest)other).nodeKind == nodeKind && ((NameTest)other).fingerprint == fingerprint;
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
-        /// <summary>
-        /// Determines whether two NameTests are equal
-        /// </summary>
         public string ExportQNameTest()
         {
             return MatchingNodeName.EQName;
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
-        /// <summary>
-        /// Determines whether two NameTests are equal
-        /// </summary>
         public override string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             string explanation = base.ExplainMismatch(item, th);
@@ -268,12 +220,6 @@ namespace OutSmart.DAXon.Patterns
             return ("The node has the wrong name");
         }
 
-        /// <summary>
-        /// Get the fingerprint required
-        /// </summary>
-        /// <summary>
-        /// Determines whether two NameTests are equal
-        /// </summary>
         public override string ToShortString()
         {
             switch (nodeKind)

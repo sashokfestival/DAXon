@@ -23,9 +23,6 @@ namespace OutSmart.DAXon.Values
     public abstract class GDateValue : CalendarValue
     {
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         protected static byte[] daysPerMonth = new byte[]
         {
             31,
@@ -41,9 +38,6 @@ namespace OutSmart.DAXon.Values
             30,
             31
         };
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         protected static readonly short[] monthData = new short[]
         {
             306,
@@ -63,24 +57,12 @@ namespace OutSmart.DAXon.Values
         protected readonly byte month;
         protected readonly byte day;
         public readonly bool hasNoYearZero;
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public virtual int Year => year;
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public virtual byte Month => month;
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public virtual byte Day => day;
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public virtual GDateComparable SchemaComparable => new GDateComparable(this);
         public GDateValue(int year, byte month, byte day, bool hasNoYearZero, int tzMinutes, IAtomicType typeLabel) : base(typeLabel, tzMinutes)
         {
@@ -110,40 +92,6 @@ namespace OutSmart.DAXon.Values
             return m;
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
-        public override GregorianCalendar GetCalendar()
-        {
-            int tz = HasTimezone() ? TimezoneInMinutes * 60000 : 0;
-            TimeZoneInfo zone = new SimpleTimeZone(tz, "LLL");
-            GregorianCalendar calendar = new GregorianCalendar(zone);
-            calendar.SetGregorianChange(new Date(long.MinValue));
-            if (tz < calendar.GetMinimum(Calendar.ZONE_OFFSET) || tz > calendar.GetMaximum(Calendar.ZONE_OFFSET))
-            {
-                return AdjustTimezone(0).GetCalendar();
-            }
-
-            calendar.Clear();
-            calendar.SetLenient(false);
-            int yr = year;
-            if (year <= 0)
-            {
-                yr = hasNoYearZero ? 1 - year : 0 - year;
-                calendar[Calendar.ERA] = GregorianCalendar.BC;
-            }
-
-
-            calendar.Set(yr, month - 1, day);
-            calendar[Calendar.ZONE_OFFSET] = tz;
-            calendar[Calendar.DST_OFFSET] = 0;
-            calendar.GetTime();
-            return calendar;
-        }
-
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         protected static void SetLexicalValue(MutableGDateValue m, UnicodeString s, bool allowYearZero)
         {
             m.hasNoYearZero = !allowYearZero;
@@ -424,9 +372,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         private static ValidationFailure BadDate(string msg, UnicodeString value)
         {
             ValidationFailure err = new ValidationFailure("Invalid date " + Err.Wrap(value, Err.VALUE) + " (" + msg + ")");
@@ -434,9 +379,6 @@ namespace OutSmart.DAXon.Values
             return err;
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         private static ValidationFailure BadDate(string msg, UnicodeString value, string errorCode)
         {
             ValidationFailure err = new ValidationFailure("Invalid date " + Err.Wrap(value, Err.VALUE) + " (" + msg + ")");
@@ -444,25 +386,16 @@ namespace OutSmart.DAXon.Values
             return err;
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public static bool IsValidDate(int year, int month, int day)
         {
             return month > 0 && month <= 12 && day > 0 && day <= daysPerMonth[month - 1] || month == 2 && day == 29 && IsLeapYear(year);
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public static bool IsLeapYear(int year)
         {
             return (year % 4 == 0) && !(year % 100 == 0 && !(year % 400 == 0));
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public override void CheckValidInJavascript()
         {
             if (year <= 0 || year > 9999)
@@ -471,9 +404,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public override bool Equals(object o)
         {
             if (o is GDateValue)
@@ -487,17 +417,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public override int GetHashCode()
         {
             return DateTimeValue.ComputeHashCode(year, month, day, (byte)12, (byte)0, (byte)0, 0, TimezoneInMinutes);
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public override int CompareTo(CalendarValue other, int implicitTimezone)
         {
             if (PrimitiveType != other.PrimitiveType)
@@ -531,25 +455,16 @@ namespace OutSmart.DAXon.Values
             return ToDateTime().CompareTo(other.ToDateTime(), implicitTimezone);
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public override DateTimeValue ToDateTime()
         {
             return new DateTimeValue(year, month, day, (byte)0, (byte)0, (byte)0, 0, TimezoneInMinutes, hasNoYearZero);
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             return null;
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public override AtomicValue GetComponent(AccessorFn.Component component)
         {
             switch (component)
@@ -601,9 +516,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Test whether a candidate date is actually a valid date in the proleptic Gregorian calendar
-        /// </summary>
         public class GDateComparable : IComparable<GDateComparable>
         {
             private readonly GDateValue value;

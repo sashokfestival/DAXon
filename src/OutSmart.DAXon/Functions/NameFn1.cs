@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Transformation;
@@ -16,8 +15,8 @@ using OutSmart.DAXon.Transformation;
 namespace OutSmart.DAXon.Functions
 {
 
-    // Runtime 2026-06-10: fn:name#1/local-name#1 - real Name_1/LocalName_1.cs drag the StringElaborator
-    // cluster; Call-only impls (UpperLowerCaseFn pattern). Java: StringValue.makeStringValue(node.getDisplayName()/getLocalPart()).
+    // fn:name#1/local-name#1: Call-only impls — the full Name_1/LocalName_1 ports drag the StringElaborator
+    // cluster. Java: StringValue.makeStringValue(node.getDisplayName()/getLocalPart()).
     public class NameFn1 : ScalarSystemFunction
     {
         private readonly bool _local;

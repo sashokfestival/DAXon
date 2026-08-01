@@ -9,7 +9,6 @@ using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Lib;
@@ -87,13 +86,19 @@ namespace OutSmart.DAXon.Functions
 
                 SerializationParamsHandler sph = new SerializationParamsHandler(props);
                 sph.SetSerializationParams(el);
-                if (props.GetProperty("method") == null) { props.SetProperty("method", "xml"); }
+                if (props.GetProperty("method") == null)
+                {
+                    props.SetProperty("method", "xml");
+                }
                 // The port's XML indenter is not wired into the fn:serialize() receiver chain (it throws there,
                 // though it works for xsl:result-document). Until that chain is fixed, neutralise indent="yes"
                 // so serialize(., <serialization-parameters><indent value="yes"/>…) yields (unindented) output
                 // instead of a runtime error. No fn-serialize test asserts on indentation whitespace.
                 // [follow-up: XML indent in the serialize() emitter chain]
-                if ("yes".Equals(props.GetProperty("indent"))) { props.SetProperty("indent", "no"); }
+                if ("yes".Equals(props.GetProperty("indent")))
+                {
+                    props.SetProperty("indent", "no");
+                }
                 elementSprops = sph.GetSerializationProperties();
             }
             else if (param is MapItem paramMap)
@@ -111,22 +116,64 @@ namespace OutSmart.DAXon.Functions
                     // QName("","indent") returns the local name "indent", which must NOT be matched as the
                     // standard indent parameter — serialize(., map{QName("","indent"):true()}) must NOT indent
                     // (serialize-xml-120/120b). untypedAtomic is a StringValue, so string keys still pass.
-                    if (!(__opt.key is StringValue)) { continue; }
+                    if (!(__opt.key is StringValue))
+                    {
+                        continue;
+                    }
                     string __k = __opt.key.GetStringValue();
                     IItem __v = __opt.value == null ? null : __opt.value.Head();
-                    if (__v == null) { continue; }
-                    if (__k == "method") { props.SetProperty("method", __v.UnicodeStringValue.ToString()); }
-                    else if (__k == "indent") { props.SetProperty("indent", RequireBooleanParam(__opt.value, __k) ? "yes" : "no"); }
-                    else if (__k == "omit-xml-declaration") { props.SetProperty("omit-xml-declaration", RequireBooleanParam(__opt.value, __k) ? "yes" : "no"); }
-                    else if (__k == "standalone") { props.SetProperty("standalone", RequireBooleanParam(__opt.value, __k) ? "yes" : "no"); }
-                    else if (__k == "byte-order-mark") { props.SetProperty("byte-order-mark", RequireBooleanParam(__opt.value, __k) ? "yes" : "no"); }
-                    else if (__k == "allow-duplicate-names") { props.SetProperty(DAXonOutputKeys.ALLOW_DUPLICATE_NAMES, RequireBooleanParam(__opt.value, __k) ? "yes" : "no"); }
-                    else if (__k == "doctype-system") { props.SetProperty("doctype-system", __v.UnicodeStringValue.ToString()); }
-                    else if (__k == "doctype-public") { props.SetProperty("doctype-public", __v.UnicodeStringValue.ToString()); }
-                    else if (__k == "encoding") { props.SetProperty("encoding", __v.UnicodeStringValue.ToString()); }
-                    else if (__k == "version") { props.SetProperty("version", __v.UnicodeStringValue.ToString()); }
-                    else if (__k == "media-type") { props.SetProperty("media-type", __v.UnicodeStringValue.ToString()); }
-                    else if (__k == "item-separator") { props.SetProperty("item-separator", __v.UnicodeStringValue.ToString()); }
+                    if (__v == null)
+                    {
+                        continue;
+                    }
+                    if (__k == "method")
+                    {
+                        props.SetProperty("method", __v.UnicodeStringValue.ToString());
+                    }
+                    else if (__k == "indent")
+                    {
+                        props.SetProperty("indent", RequireBooleanParam(__opt.value, __k) ? "yes" : "no");
+                    }
+                    else if (__k == "omit-xml-declaration")
+                    {
+                        props.SetProperty("omit-xml-declaration", RequireBooleanParam(__opt.value, __k) ? "yes" : "no");
+                    }
+                    else if (__k == "standalone")
+                    {
+                        props.SetProperty("standalone", RequireBooleanParam(__opt.value, __k) ? "yes" : "no");
+                    }
+                    else if (__k == "byte-order-mark")
+                    {
+                        props.SetProperty("byte-order-mark", RequireBooleanParam(__opt.value, __k) ? "yes" : "no");
+                    }
+                    else if (__k == "allow-duplicate-names")
+                    {
+                        props.SetProperty(DAXonOutputKeys.ALLOW_DUPLICATE_NAMES, RequireBooleanParam(__opt.value, __k) ? "yes" : "no");
+                    }
+                    else if (__k == "doctype-system")
+                    {
+                        props.SetProperty("doctype-system", __v.UnicodeStringValue.ToString());
+                    }
+                    else if (__k == "doctype-public")
+                    {
+                        props.SetProperty("doctype-public", __v.UnicodeStringValue.ToString());
+                    }
+                    else if (__k == "encoding")
+                    {
+                        props.SetProperty("encoding", __v.UnicodeStringValue.ToString());
+                    }
+                    else if (__k == "version")
+                    {
+                        props.SetProperty("version", __v.UnicodeStringValue.ToString());
+                    }
+                    else if (__k == "media-type")
+                    {
+                        props.SetProperty("media-type", __v.UnicodeStringValue.ToString());
+                    }
+                    else if (__k == "item-separator")
+                    {
+                        props.SetProperty("item-separator", __v.UnicodeStringValue.ToString());
+                    }
                     else if (__k == "cdata-section-elements" || __k == "suppress-indentation")
                     {
                         // Map-form value is xs:QName* — serialize to the space-separated Clark-name list
@@ -139,7 +186,10 @@ namespace OutSmart.DAXon.Functions
                             {
                                 throw new XPathException("The value of the " + __k + " serialization parameter must be a sequence of xs:QName", "XPTY0004");
                             }
-                            if (__names.Length > 0) { __names.Append(' '); }
+                            if (__names.Length > 0)
+                            {
+                                __names.Append(' ');
+                            }
                             __names.Append(__qv.GetStructuredQName().ClarkName);
                         }
                         props.SetProperty(__k == "cdata-section-elements" ? "cdata-section-elements" : DAXonOutputKeys.SUPPRESS_INDENTATION, __names.ToString());
@@ -171,7 +221,10 @@ namespace OutSmart.DAXon.Functions
                             string __ckStr = __ck.GetStringValue();
                             if (__ckStr.Length >= 1)
                             {
-                                if (__charMapEntries == null) { __charMapEntries = new OutSmart.DAXon.Collections.IntHashMap<string>(); }
+                                if (__charMapEntries == null)
+                                {
+                                    __charMapEntries = new OutSmart.DAXon.Collections.IntHashMap<string>();
+                                }
                                 __charMapEntries.Put(char.ConvertToUtf32(__ckStr, 0), __cv.GetStringValue());
                             }
                         }
@@ -193,8 +246,14 @@ namespace OutSmart.DAXon.Functions
             // emits the XML declaration per the serialization spec default.
             if (elementSprops == null)
             {
-                if (props.GetProperty("method") == null) { props.SetProperty("method", "xml"); }
-                if (props.GetProperty("omit-xml-declaration") == null) { props.SetProperty("omit-xml-declaration", "yes"); }
+                if (props.GetProperty("method") == null)
+                {
+                    props.SetProperty("method", "xml");
+                }
+                if (props.GetProperty("omit-xml-declaration") == null)
+                {
+                    props.SetProperty("omit-xml-declaration", "yes");
+                }
             }
             try
             {
@@ -206,13 +265,19 @@ namespace OutSmart.DAXon.Functions
                 SerializerFactory sf = context.GetConfiguration().SerializerFactory;
                 PipelineConfiguration pipe = context.GetConfiguration().MakePipelineConfiguration();
                 SerializationProperties sprops = elementSprops ?? (__mapCharMaps != null ? new SerializationProperties(props, __mapCharMaps) : new SerializationProperties(props));
-                IReceiver outr = sf.GetReceiver(result, sprops, pipe);
                 // Inline sequence-copy (real SequenceCopier.cs uses a newer 0-arg Append() this IReceiver lacks):
-                // Open -> Append(item) per item -> Dispose (IReceiver: Receiver.cs:34/68/75).
-                outr.Open();
-                IItem it;
-                while ((it = iter.Next()) != null) { outr.Append(it); }
-                outr.Dispose();
+                // Open -> Append(item) per item -> Close.
+                using (IReceiver outr = sf.GetReceiver(result, sprops, pipe))
+                {
+                    outr.Open();
+                    IItem it;
+                    while ((it = iter.Next()) != null)
+                    {
+                        outr.Append(it);
+                    }
+                    outr.Close();
+                }
+
                 return new StringValue(builder.ToUnicodeString());
             }
             catch (XPathException e)

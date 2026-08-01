@@ -14,7 +14,6 @@ using OutSmart.DAXon.XQuery;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,12 +38,6 @@ namespace OutSmart.DAXon.Types
 
         public override AnnotationList AnnotationAssertions => annotations;
 
-        /// <summary>
-        /// Test whether this function type equals another function type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override double DefaultPriority
         {
             get
@@ -168,12 +161,6 @@ namespace OutSmart.DAXon.Types
             return false;
         }
 
-        /// <summary>
-        /// Test whether this function type equals another function type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             int h = resultType.GetHashCode() ^ argTypes.Length;
@@ -185,12 +172,6 @@ namespace OutSmart.DAXon.Types
             return h;
         }
 
-        /// <summary>
-        /// Test whether this function type equals another function type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Affinity Relationship(IFunctionItemType other, TypeHierarchy th)
         {
             if (other == AnyFunctionType.GetInstance() || other is AnyFunctionTypeWithAssertions)
@@ -291,12 +272,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Test whether this function type equals another function type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override bool Matches(IItem item, TypeHierarchy th)
         {
             if (!(item is IFunctionItem))
@@ -361,12 +336,6 @@ namespace OutSmart.DAXon.Types
             return affinity == Affinity.SAME_TYPE || affinity == Affinity.SUBSUMED_BY;
         }
 
-        /// <summary>
-        /// Test whether this function type equals another function type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             if (!(item is IFunctionItem))
@@ -479,12 +448,6 @@ namespace OutSmart.DAXon.Types
             return null;
         }
 
-        /// <summary>
-        /// Test whether this function type equals another function type
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Expression MakeFunctionSequenceCoercer(Expression exp, Func<RoleDiagnostic> role, bool allow40)
         {
             return new FunctionSequenceCoercer(exp, this, role, allow40);

@@ -13,7 +13,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -61,9 +60,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         public override int ImplementationMethod => EVALUATE_METHOD;
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ExpressionName => "partialApply";
         public PartialApply(Expression @base, Expression[] boundArguments)
         {
@@ -216,9 +212,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             int h = 0x236b92a0;
@@ -232,9 +225,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("partialApply", this);
@@ -256,18 +246,12 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             Expression[] boundArgumentsCopy = new Expression[boundArgumentsOp.Length];
@@ -289,9 +273,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ToString()
         {
             StringBuilder buff = new StringBuilder(64);
@@ -305,12 +286,12 @@ namespace OutSmart.DAXon.Functions.HigherOrder
                 buff.Append(BaseExpression.ToString());
             }
 
-            buff.Append("(");
+            buff.Append('(');
             for (int i = 0; i < boundArgumentsOp.Length; i++)
             {
                 if (boundArgumentsOp[i] == null)
                 {
-                    buff.Append("?");
+                    buff.Append('?');
                 }
                 else
                 {
@@ -323,14 +304,11 @@ namespace OutSmart.DAXon.Functions.HigherOrder
                 }
             }
 
-            buff.Append(")");
+            buff.Append(')');
             return buff.ToString();
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         // MUST be a true override of Expression.EvaluateItem (net472 has no covariant returns, so the
         // upstream `PartialApply evaluateItem` covariant signature became a SHADOW here): base-typed dispatch
         // (e.g. `declare context item := contains(?, 'e')` evaluating the initializer through
@@ -341,18 +319,12 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new PartialApplyElaborator();
         }
 
         //
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         private class PartialApplyElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()

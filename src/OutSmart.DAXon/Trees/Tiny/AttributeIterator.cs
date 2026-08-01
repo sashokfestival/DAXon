@@ -30,7 +30,10 @@ namespace OutSmart.DAXon.Trees.Tiny
             _tree = tree as TinyTree;
             _element = node;
             _test = test as NodeTest;
-            if (_tree != null) { _index = _tree.alpha[node]; }
+            if (_tree != null)
+            {
+                _index = _tree.alpha[node];
+            }
         }
         public NodeInfo Next()
         {
@@ -38,7 +41,10 @@ namespace OutSmart.DAXon.Trees.Tiny
             {
                 int cur = _index++;
                 var att = new TinyAttributeImpl(_tree, cur);
-                if (_test == null || _test.Test(att)) { return att; }
+                if (_test == null || _test.Test(att))
+                {
+                    return att;
+                }
             }
             return null;
         }

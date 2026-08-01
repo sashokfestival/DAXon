@@ -19,8 +19,7 @@ namespace OutSmart.DAXon.Model
     public interface ISequenceIterator : IDisposable
     {
         IItem Next();
-        void Dispose()
-;
+        void Dispose();
 
     }
 }

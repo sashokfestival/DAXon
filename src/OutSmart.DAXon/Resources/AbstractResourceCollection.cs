@@ -121,9 +121,6 @@ namespace OutSmart.DAXon.Resources
             return options;
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         protected virtual InputDetails GetInputDetails(string resourceURI)
         {
             InputDetails inputDetails = new InputDetails();
@@ -144,14 +141,25 @@ namespace OutSmart.DAXon.Resources
                 }
                 else
                 {
-                    URLConnection connection = ResourceLoader.UrlConnection(uri.ToURL());
-                    inputDetails.contentType = connection.ContentType;
-                    inputDetails.encoding = connection.ContentEncoding;
-                    foreach (string param in inputDetails.contentType.Replace(" ", "").Split(";"))
+                    // This connection is opened for its headers alone - the body is fetched again
+                    // below by UrlStream - so it must be released here rather than left to
+                    // finalization, which would hold a pooled socket per collection member.
+                    URLConnection connection = ResourceLoader.UrlConnection(uri.Inner);
+                    try
+                    {
+                        inputDetails.contentType = connection.ContentType;
+                        inputDetails.encoding = connection.ContentEncoding;
+                    }
+                    finally
+                    {
+                        connection.Disconnect();
+                    }
+
+                    foreach (string param in inputDetails.contentType.Replace(" ", "").SplitRegex(";"))
                     {
                         if (param.StartsWith("charset=", StringComparison.Ordinal))
                         {
-                            inputDetails.encoding = param.Split("=", 2)[1];
+                            inputDetails.encoding = param.SplitRegex("=", 2)[1];
                         }
                         else
                         {
@@ -179,8 +187,16 @@ namespace OutSmart.DAXon.Resources
                         stream = ResourceLoader.UrlStream(config, uri.ToString());
                     }
 
-                    inputDetails.contentType = GuessContentTypeFromContent(stream);
-                    stream.Dispose();
+                    // finally, not a bare Dispose after the call: a throw out of the sniffer used to
+                    // leave this file handle or response to the finalizer.
+                    try
+                    {
+                        inputDetails.contentType = GuessContentTypeFromContent(stream);
+                    }
+                    finally
+                    {
+                        stream.Dispose();
+                    }
                 }
 
                 if (@params != null && @params.OnError.HasValue)
@@ -200,9 +216,6 @@ namespace OutSmart.DAXon.Resources
             }
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         protected virtual string GuessContentTypeFromName(string resourceURI)
         {
             string contentTypeFromName = URLConnection.GuessContentTypeFromName(resourceURI);
@@ -219,9 +232,6 @@ namespace OutSmart.DAXon.Resources
             return contentTypeFromName;
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         protected virtual string GuessContentTypeFromContent(System.IO.Stream stream)
         {
             try
@@ -235,13 +245,10 @@ namespace OutSmart.DAXon.Resources
             }
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         private string GetFileExtension(string name)
         {
             int i = name.LastIndexOf('.');
-            int p = System.Math.Max(name.LastIndexOf('/'), name.LastIndexOf('\\'));
+            int p = Math.Max(name.LastIndexOf('/'), name.LastIndexOf('\\'));
             if (i > p && i + 1 < name.Length)
             {
                 return name.Substring(i + 1);
@@ -250,9 +257,6 @@ namespace OutSmart.DAXon.Resources
             return null;
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         public virtual IResource MakeResource(IXPathContext context, InputDetails details)
         {
             IResourceFactory factory = null;
@@ -270,9 +274,6 @@ namespace OutSmart.DAXon.Resources
             return factory.MakeResource(context, details);
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         public virtual IResource MakeTypedResource(IXPathContext context, IResource basicResource)
         {
             string mediaType = basicResource.ContentType;
@@ -304,24 +305,18 @@ namespace OutSmart.DAXon.Resources
             }
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         public virtual IResource MakeResource(IXPathContext context, string resourceURI)
         {
             InputDetails details = GetInputDetails(resourceURI);
             return MakeResource(context, details);
         }
 
-        /// <summary>
-        /// Options for parsing the content of an XML resource
-        /// </summary>
         public virtual bool StripWhitespace(ISpaceStrippingRule rules)
         {
             return false;
         }
-        public virtual IEnumerator<string> GetResourceURIs(IXPathContext arg0) => throw new NotImplementedException();
-        public virtual IEnumerator<IResource> GetResources(IXPathContext arg0) => throw new NotImplementedException();
+        public abstract IEnumerator<string> GetResourceURIs(IXPathContext arg0);
+        public abstract IEnumerator<IResource> GetResources(IXPathContext arg0);
 
         private class ErrorSuppressor : IErrorReporter
         {
@@ -379,9 +374,6 @@ namespace OutSmart.DAXon.Resources
             /// The encoding of the resource (if it is text, represented in binary)
             /// </summary>
             public string encoding;
-            /// <summary>
-            /// Options for parsing the content of an XML resource
-            /// </summary>
             public ParseOptions parseOptions;
             public int onError = URIQueryParameters.ON_ERROR_FAIL;
             public virtual System.IO.Stream GetInputStream(Configuration config)

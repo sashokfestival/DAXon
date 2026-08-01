@@ -50,8 +50,8 @@ namespace OutSmart.DAXon.Functions
         public virtual void NotifyListener(string label, ISequence val, IXPathContext context)
         {
             Dictionary<string, object> info = new Dictionary<string, object>();
-            info.Put("label", label);
-            info.Put("value", val);
+            info["label"] = label;
+            info["value"] = val;
             ITraceListener listener = context.GetController().GetTraceListener();
             listener.Enter(this, info, context);
             listener.Leave(this);
@@ -94,7 +94,7 @@ namespace OutSmart.DAXon.Functions
                 else if (val.GetGenre() == Genre.EXTERNAL)
                 {
                     object obj = ((ObjectValue<object>)val).GetObject();
-                    @out.Info(label + ": " + obj.GetType().GetName() + " = " + Err.Truncate30(StringView.Tidy(obj.ToString())));
+                    @out.Info(label + ": " + obj.GetType().FullName + " = " + Err.Truncate30(StringView.Tidy(obj.ToString())));
                 }
                 else
                 {
@@ -147,7 +147,7 @@ namespace OutSmart.DAXon.Functions
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void GatherProperties(Action<string, object> consumer) { throw new NotImplementedException(); }
+        public virtual void GatherProperties(Action<string, object> consumer) { } // upstream Traceable default: no properties
 
         /// <summary>
         /// Tracing IIterator class

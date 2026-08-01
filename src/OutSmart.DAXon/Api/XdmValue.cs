@@ -24,8 +24,8 @@ namespace OutSmart.DAXon.Api
         public virtual object UnderlyingValue => _value;
         public XdmValue() { }
         public XdmValue(object value) { _value = value; }
-        // Runtime 2026-06-11: type-dispatching Wrap like the real one - a NodeInfo must wrap as XdmNode
-        // (MessageInstr.MakeMessage casts (XdmNode)XdmNode.Wrap(content)). AtomicValue -> XdmAtomicValue.
+        // Type-dispatching Wrap: a NodeInfo must wrap as XdmNode (MessageInstr.MakeMessage casts
+        // (XdmNode)XdmNode.Wrap(content)); AtomicValue -> XdmAtomicValue.
         public static XdmValue Wrap(object value)
         {
             if (value is NodeInfo __n)
@@ -47,7 +47,11 @@ namespace OutSmart.DAXon.Api
         // over an XdmValue silently saw nothing, e.g. the driver's context-select narrowing).
         public IEnumerator<XdmItem> GetEnumerator()
         {
-            if (this is XdmItem selfItem) { yield return selfItem; yield break; }
+            if (this is XdmItem selfItem)
+            {
+                yield return selfItem;
+                yield break;
+            }
             if (_value is OutSmart.DAXon.Model.ISequence seq)
             {
                 var iter = seq.Iterate();
@@ -57,7 +61,7 @@ namespace OutSmart.DAXon.Api
                 }
             }
         }
-        // Phase 7.17: Select used by XdmNode.Children() etc. — returns object
+        // Select used by XdmNode.Children() etc. — returns object
         // (callers chain .AsListOfNodes(); the result type doesn't matter for
         // compile gating since XdmStream/Step are excluded).
         public virtual object Select(object step) => throw new NotImplementedException("STUB: XdmValue.Select not ported (excluded stub)");

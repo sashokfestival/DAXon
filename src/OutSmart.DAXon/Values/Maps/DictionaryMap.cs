@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Values.Maps
     {
         private readonly Dictionary<string, IGroundedValue> hashMap;
 
-        public override UType KeyUType => hashMap.IsEmpty() ? UType.VOID : UType.STRING;
+        public override UType KeyUType => hashMap.Count == 0 ? UType.VOID : UType.STRING;
         public DictionaryMap()
         {
             hashMap = new Dictionary<string, IGroundedValue>();
@@ -36,19 +36,19 @@ namespace OutSmart.DAXon.Values.Maps
 
         public virtual void InitialPut(string key, IGroundedValue value)
         {
-            hashMap.Put(key, value);
+            hashMap[key] = value;
         }
 
         public virtual void InitialAppend(string key, IGroundedValue value)
         {
-            IGroundedValue existingValue = hashMap.Get(key);
+            IGroundedValue existingValue = hashMap.GetOrDefault(key);
             if (existingValue == null)
             {
                 InitialPut(key, value);
             }
             else
             {
-                hashMap.Put(key, existingValue.Concatenate(value));
+                hashMap[key] = existingValue.Concatenate(value);
             }
         }
 
@@ -61,7 +61,7 @@ namespace OutSmart.DAXon.Values.Maps
         {
             if (key is StringValue)
             {
-                return hashMap.Get(key.GetStringValue());
+                return hashMap.GetOrDefault(key.GetStringValue());
             }
             else
             {
@@ -76,7 +76,7 @@ namespace OutSmart.DAXon.Values.Maps
 
         public override bool IsEmpty()
         {
-            return hashMap.IsEmpty();
+            return hashMap.Count == 0;
         }
 
         public override IAtomicIterator Keys()
@@ -87,7 +87,7 @@ namespace OutSmart.DAXon.Values.Maps
         public override IEnumerable<KeyValuePair> KeyValuePairs()
         {
             IList<KeyValuePair> pairs = new List<KeyValuePair>();
-            foreach (KeyValuePair<string, IGroundedValue> entry in hashMap.EntrySet())
+            foreach (KeyValuePair<string, IGroundedValue> entry in hashMap)
             {
                 pairs.Add(new KeyValuePair(new StringValue(entry.Key), entry.Value));
             }
@@ -141,7 +141,7 @@ namespace OutSmart.DAXon.Values.Maps
             // we need to test the entries individually
             IAtomicIterator keyIter = Keys();
             AtomicValue key;
-            foreach (KeyValuePair<string, IGroundedValue> entry in hashMap.EntrySet())
+            foreach (KeyValuePair<string, IGroundedValue> entry in hashMap)
             {
                 IGroundedValue val = entry.Value;
                 if (valueType == null)
@@ -175,7 +175,7 @@ namespace OutSmart.DAXon.Values.Maps
         {
 
             HashTrieMap target = new HashTrieMap();
-            foreach (KeyValuePair<string, IGroundedValue> entry in hashMap.EntrySet())
+            foreach (KeyValuePair<string, IGroundedValue> entry in hashMap)
             {
                 target.InitialPut(new StringValue(entry.Key), entry.Value);
             }
@@ -191,7 +191,7 @@ namespace OutSmart.DAXon.Values.Maps
             IEnumerator<string> keyIter;
             public KeyIterator(Dictionary<string, IGroundedValue> hashMap)
             {
-                this.keyIter = hashMap.KeySet().IIterator();
+                this.keyIter = hashMap.Keys.GetEnumerator();
             }
 
             public virtual AtomicValue Next()

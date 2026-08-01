@@ -15,7 +15,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -319,8 +318,7 @@ namespace OutSmart.DAXon.Expressions
             catch (NotSupportedException e)
             {
 
-                //e.printStackTrace();
-                if (e.GetCause() is NoDynamicContextException)
+                if (e.InnerException is NoDynamicContextException)
                 {
                     return this;
                 }
@@ -480,9 +478,6 @@ namespace OutSmart.DAXon.Expressions
             return true;
         }
 
-        /// <summary>
-        /// Get hashCode in support of equals() method
-        /// </summary>
         protected override int ComputeHashCode()
         {
             if (GetFunctionName() == null)
@@ -499,33 +494,21 @@ namespace OutSmart.DAXon.Expressions
             return h;
         }
 
-        /// <summary>
-        /// Get hashCode in support of equals() method
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Get hashCode in support of equals() method
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Get hashCode in support of equals() method
-        /// </summary>
         public virtual bool AdjustRequiredType(JavaExternalObjectType requiredType)
         {
             return false;
         }
 
-        /// <summary>
-        /// Get hashCode in support of equals() method
-        /// </summary>
         public abstract class FunctionCallElaborator : PullElaborator
         {
             protected ISequenceEvaluator[] argumentEvaluators;

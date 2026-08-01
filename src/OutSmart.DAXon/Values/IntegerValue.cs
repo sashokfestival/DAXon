@@ -40,8 +40,8 @@ namespace OutSmart.DAXon.Values
             int.MinValue,
             int.MaxValue,
             StandardNames.XS_SHORT,
-            Short.MIN_VALUE,
-            Short.MAX_VALUE,
+            short.MinValue,
+            short.MaxValue,
             StandardNames.XS_BYTE,
             sbyte.MinValue,
             sbyte.MaxValue,
@@ -106,7 +106,7 @@ namespace OutSmart.DAXon.Values
 
             if (value > long.MaxValue || value < long.MinValue)
             {
-                if (value == System.Math.Floor(value))
+                if (value == Math.Floor(value))
                 {
                     return new BigIntegerValue(FormatNumber.AdjustToDecimal(value, 2).ToBigInteger());
                 }

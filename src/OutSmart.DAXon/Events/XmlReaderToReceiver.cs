@@ -14,7 +14,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -38,6 +37,9 @@ namespace OutSmart.DAXon.Events
         // The XML declaration is ASCII-compatible in every XML-supported encoding, so peeking the first bytes
         // as Latin-1 (a lossless byte↔char map) safely finds version="1.1" regardless of the real encoding.
         private const int XmlDeclPeekBytes = 256;
+        // JAXP disable/enable-output-escaping PI targets (javax.xml.transform.Result.PI_*).
+        private const string PI_DISABLE_OUTPUT_ESCAPING = "javax.xml.transform.disable-output-escaping";
+        private const string PI_ENABLE_OUTPUT_ESCAPING = "javax.xml.transform.enable-output-escaping";
         private readonly IReceiver receiver;
         private readonly PipelineConfiguration pipe;
         private readonly XmlReader reader;
@@ -135,10 +137,24 @@ namespace OutSmart.DAXon.Events
                 settings.ValidationEventHandler += (sender, e) => { };
             }
 
+            // Ownership note: CloseInput=true above means this factory OWNS the supplied stream/reader
+            // - the returned XmlReader's Dispose closes it, on the success path and the mid-parse-error
+            // path alike. The same ownership must hold when construction itself throws, or the input
+            // (engine-opened for doc()/includes; wrapped in a deadline guard for http) leaks to the
+            // finalizer holding its file handle or pooled socket. The declaration peek is a real throw
+            // site: a guarded network stream raises SXTO0001 from Read when the run's deadline expires.
             string baseUri = systemId ?? string.Empty;
             if (charStream != null)
             {
-                return XmlReader.Create(charStream, settings, baseUri);
+                try
+                {
+                    return XmlReader.Create(charStream, settings, baseUri);
+                }
+                catch
+                {
+                    charStream.Dispose();
+                    throw;
+                }
             }
 
             if (byteStream != null)
@@ -146,8 +162,18 @@ namespace OutSmart.DAXon.Events
                 // XML 1.1: .NET's XmlReader rejects version="1.1". If the declaration announces 1.1, downgrade
                 // it to 1.0 in a pass-through wrapper and relax character checking so the C0 controls that are
                 // well-formed in 1.1 (but not 1.0) pass. A 1.0 / declaration-less document is untouched.
-                byteStream = MaybeDowngradeXml11(byteStream, settings);
-                return XmlReader.Create(byteStream, settings, baseUri);
+                try
+                {
+                    byteStream = MaybeDowngradeXml11(byteStream, settings);
+                    return XmlReader.Create(byteStream, settings, baseUri);
+                }
+                catch
+                {
+                    // byteStream is either the original or the PrefixedStream wrapping it, whose
+                    // Dispose cascades to the original - correct at every point of the sequence.
+                    byteStream.Dispose();
+                    throw;
+                }
             }
 
             if (!string.IsNullOrEmpty(systemId))
@@ -205,8 +231,13 @@ namespace OutSmart.DAXon.Events
             // needed to drop ignorable whitespace (number-4501). Without validation every inter-element
             // whitespace is Whitespace, so this stays off and such nodes are preserved.
             bool dtdWhitespaceClassification = reader.Settings != null && reader.Settings.ValidationType == ValidationType.DTD;
+            // Cooperative deadline: a doc()/document() call mid-run parses here with no other
+            // check site, so a large document must not outrun the transformation limit. Called
+            // per node event - the active token throttles clock sampling itself.
             while (reader.Read())
             {
+                OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
@@ -307,7 +338,7 @@ namespace OutSmart.DAXon.Events
         {
             Flush(true);
             receiver.EndDocument();
-            receiver.Dispose();
+            receiver.Close();
         }
 
         // Harvest ID-family attribute types from a DOCTYPE internal subset's ATTLIST declarations. .NET's
@@ -555,12 +586,12 @@ namespace OutSmart.DAXon.Events
             Flush(true);
             if (allowDisableOutputEscaping)
             {
-                if (target.Equals(ResultConsts.PI_DISABLE_OUTPUT_ESCAPING))
+                if (target.Equals(PI_DISABLE_OUTPUT_ESCAPING))
                 {
                     escapingDisabled = true;
                     return;
                 }
-                else if (target.Equals(ResultConsts.PI_ENABLE_OUTPUT_ESCAPING))
+                else if (target.Equals(PI_ENABLE_OUTPUT_ESCAPING))
                 {
                     escapingDisabled = false;
                     return;
@@ -667,7 +698,7 @@ namespace OutSmart.DAXon.Events
             {
                 if (pos < prefixLen)
                 {
-                    int take = System.Math.Min(count, prefixLen - pos);
+                    int take = Math.Min(count, prefixLen - pos);
                     System.Array.Copy(prefix, pos, buffer, offset, take);
                     pos += take;
                     return take;

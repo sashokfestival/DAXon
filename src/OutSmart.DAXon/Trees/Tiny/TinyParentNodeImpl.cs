@@ -19,25 +19,16 @@ namespace OutSmart.DAXon.Trees.Tiny
     public abstract class TinyParentNodeImpl : TinyNodeImpl
     {
 
-        /// <summary>
-        /// Determine if the node has children.
-        /// </summary>
         public override UnicodeString UnicodeStringValue => GetStringValue(tree, nodeNr);
         public TinyParentNodeImpl(TinyTree tree, int nodeNr) : base(tree, nodeNr)
         {
         }
 
-        /// <summary>
-        /// Determine if the node has children.
-        /// </summary>
         public override bool HasChildNodes()
         {
             return nodeNr + 1 < tree.numberOfNodes && tree.depth[nodeNr + 1] > tree.depth[nodeNr];
         }
 
-        /// <summary>
-        /// Determine if the node has children.
-        /// </summary>
         public static UnicodeString GetStringValue(TinyTree tree, int nodeNr)
         {
             int level = tree.depth[nodeNr];

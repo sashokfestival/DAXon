@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Xslt
     {
 
         //    protected boolean seesAvuncularVariables() {
-        //        return false;
-        //    }
         //    public SourceBinding bindVariable(StructuredQName qName) {
         //    }
         protected virtual ItemType ReturnedItemType => null;

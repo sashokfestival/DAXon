@@ -69,7 +69,7 @@ namespace OutSmart.DAXon.Xslt
                 StringBuilder buffer = new StringBuilder(256);
                 foreach (PackageVersionRange r in ranges)
                 {
-                    buffer.Append(r.ToString()).Append(",");
+                    buffer.Append(r.ToString()).Append(',');
                 }
 
                 buffer.Length = buffer.Length - 1;

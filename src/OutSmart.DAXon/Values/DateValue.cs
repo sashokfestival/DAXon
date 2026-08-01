@@ -28,14 +28,8 @@ namespace OutSmart.DAXon.Values
     public class DateValue : GDateValue, IXPathComparable
     {
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.DATE;
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override UnicodeString PrimitiveStringValue
         {
             get
@@ -65,9 +59,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override UnicodeString CanonicalLexicalRepresentation
         {
             get
@@ -89,69 +80,35 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public virtual int JulianDayNumber => GetJulianDayNumber(year, month, day);
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         private DateValue(MutableGDateValue m) : base(m)
         {
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public DateValue(int year, byte month, byte day) : this(new MutableGDateValue(year, month, day, true, NO_TIMEZONE, BuiltInAtomicType.DATE))
         {
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public DateValue(int year, byte month, byte day, bool xsd10) : this(new MutableGDateValue(year, month, day, xsd10, NO_TIMEZONE, BuiltInAtomicType.DATE))
         {
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public DateValue(int year, byte month, byte day, int tz, bool xsd10) : this(new MutableGDateValue(year, month, day, xsd10, tz, BuiltInAtomicType.DATE))
         {
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public DateValue(int year, byte month, byte day, int tz, IAtomicType type) : this(new MutableGDateValue(year, month, day, false, tz, type))
         {
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public DateValue(UnicodeString s) : this(s, ConversionRules.DEFAULT)
         {
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public DateValue(UnicodeString s, ConversionRules rules) : this(FromUnicodeString(s, rules))
         {
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
-        public DateValue(GregorianCalendar calendar, int tz) : this(FromGregorianCalendar(calendar, tz))
-        {
-        }
-
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         private static MutableGDateValue FromUnicodeString(UnicodeString s, ConversionRules rules)
         {
             MutableGDateValue m = new MutableGDateValue();
@@ -166,31 +123,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
-        private static MutableGDateValue FromGregorianCalendar(GregorianCalendar calendar, int tz)
-        {
-
-            // Note: this constructor is not used by Saxon itself, but might be used by applications
-            MutableGDateValue g = new MutableGDateValue();
-            int era = calendar[GregorianCalendar.ERA];
-            g.year = calendar[Calendar.YEAR];
-            if (era == GregorianCalendar.BC)
-            {
-                g.year = 1 - g.year;
-            }
-
-            g.month = (byte)(calendar[Calendar.MONTH] + 1);
-            g.day = (byte)calendar[Calendar.DATE];
-            g.tzMinutes = tz;
-            g.typeLabel = BuiltInAtomicType.DATE;
-            return g;
-        }
-
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static IConversionResult MakeDateValue(UnicodeString @in, ConversionRules rules)
         {
             MutableGDateValue g = new MutableGDateValue();
@@ -199,9 +131,6 @@ namespace OutSmart.DAXon.Values
             return g.error == null ? new DateValue(g) : g.error;
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static DateValue Tomorrow(int year, byte month, byte day)
         {
             if (DateValue.IsValidDate(year, month, day + 1))
@@ -218,9 +147,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static DateValue Yesterday(int year, byte month, byte day)
         {
             if (day > 1)
@@ -244,9 +170,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)
         {
             MutableGDateValue m = MakeMutableCopy();
@@ -254,26 +177,20 @@ namespace OutSmart.DAXon.Values
             return new DateValue(m);
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override CalendarValue AdjustTimezone(int timezone)
         {
             DateTimeValue dt = (DateTimeValue)ToDateTime().AdjustTimezone(timezone);
             return new DateValue(dt.Year, dt.Month, dt.Day, dt.TimezoneInMinutes, hasNoYearZero);
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override CalendarValue Add(DurationValue duration)
         {
             if (duration is DayTimeDurationValue)
             {
                 long microseconds = ((DayTimeDurationValue)duration).LengthInMicroseconds;
                 bool negative = microseconds < 0;
-                microseconds = System.Math.Abs(microseconds);
-                int days = (int)System.Math.Floor((double)microseconds / (1000000.0 * 60 * 60 * 24));
+                microseconds = Math.Abs(microseconds);
+                int days = (int)Math.Floor((double)microseconds / (1000000.0 * 60 * 60 * 24));
                 bool partDay = (microseconds % (1000000.0 * 60 * 60 * 24)) > 0;
                 int julian = JulianDayNumber;
                 MutableGDateValue d = MutableDateFromJulianDayNumber(julian + (negative ? -days : days));
@@ -316,9 +233,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override DayTimeDurationValue Subtract(CalendarValue other, IXPathContext context)
         {
             if (!(other is DateValue))
@@ -329,9 +243,6 @@ namespace OutSmart.DAXon.Values
             return base.Subtract(other, context);
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             if (HasTimezone())
@@ -348,9 +259,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public int CompareTo(IXPathComparable v2)
         {
             if (v2 is DateValue)
@@ -370,9 +278,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static int GetJulianDayNumber(int year, int month, int day)
         {
             int z = year - (month < 3 ? 1 : 0);
@@ -391,17 +296,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static DateValue DateFromJulianDayNumber(int julianDayNumber)
         {
             return new DateValue(MutableDateFromJulianDayNumber(julianDayNumber));
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         private static MutableGDateValue MutableDateFromJulianDayNumber(int julianDayNumber)
         {
             if (julianDayNumber >= 0)
@@ -428,9 +327,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static int GetDayWithinYear(int year, int month, int day)
         {
             int j = GetJulianDayNumber(year, month, day);
@@ -438,9 +334,6 @@ namespace OutSmart.DAXon.Values
             return j - k + 1;
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static int GetDayOfWeek(int year, int month, int day)
         {
             int d = GetJulianDayNumber(year, month, day);
@@ -453,17 +346,11 @@ namespace OutSmart.DAXon.Values
             return (d - 1) % 7 + 1;
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static int GetWeekNumber(int year, int month, int day)
         {
             { int doy = GetDayWithinYear(year, month, day); int dow = GetDayOfWeek(year, month, day); int week = (doy - dow + 10) / 7; if (week < 1) { return GetWeekNumber(year - 1, 12, 31); } if (week == 53 && GetDayOfWeek(year, 12, 31) < 4) { return 1; } return week; }
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
         public static int GetWeekNumberWithinMonth(int year, int month, int day)
         {
             int firstDay = GetDayOfWeek(year, month, 1);
@@ -479,8 +366,5 @@ namespace OutSmart.DAXon.Values
             return ((day + firstDay - 2) / 7) + inc;
         }
 
-        /// <summary>
-        /// Private constructor of a skeletal DateValue
-        /// </summary>
     }
 }

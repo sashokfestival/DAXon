@@ -21,8 +21,7 @@ namespace OutSmart.DAXon.Lib
         string CollationURI { get; }
         int CompareStrings(UnicodeString o1, UnicodeString o2);
         bool ComparesEqual(UnicodeString s1, UnicodeString s2);
-        bool IsEqualToEmpty(UnicodeString s1)
-;
+        bool IsEqualToEmpty(UnicodeString s1);
 
 
 

@@ -34,37 +34,29 @@ namespace OutSmart.DAXon.Expressions
         private readonly IList<CatchClause> catchClauses = new List<CatchClause>();
         private bool rollbackOutput;
 
+        /// <summary>
+        /// Errors xsl:try must never intercept, whatever its catch clauses match. A stack overflow
+        /// is one: there is no headroom left to run a handler. The host's wall-clock deadline
+        /// (SXTO0001) is the other, and the reason is not headroom but authority - it is a limit
+        /// the HOST set on the run, so a stylesheet able to catch it would turn a hard limit into a
+        /// suggestion, and a catch inside the offending loop would defeat it outright. Deliberately
+        /// wider than upstream, which has no such deadline to protect.
+        /// </summary>
+        private static bool IsUncatchable(XPathException err)
+        {
+            return err is XPathException.StackOverflow || err.HasErrorCode(DAXonErrorCode.SXTO0001);
+        }
+
         public virtual Operand TryOperand => tryOp;
 
         public virtual Expression TryExpr => tryOp.GetChildExpression();
 
         public virtual IList<CatchClause> CatchClauses => catchClauses;
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         public override string ExpressionName => "tryCatch";
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         /// <summary>
         /// An error listener that filters out reporting of any errors that are caught be the try/catch
         /// </summary>
@@ -116,9 +108,6 @@ namespace OutSmart.DAXon.Expressions
             return card;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             Types.ItemType type = TryExpr.GetItemType();
@@ -130,9 +119,6 @@ namespace OutSmart.DAXon.Expressions
             return type;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             IList<Operand> list = new List<Operand>();
@@ -145,9 +131,6 @@ namespace OutSmart.DAXon.Expressions
             return list;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             OptimizeChildren(visitor, contextInfo);
@@ -165,20 +148,11 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is TryCatch && ((TryCatch)other).tryOp.GetChildExpression().IsEqual(tryOp.GetChildExpression()) && ((TryCatch)other).catchClauses.Equals(catchClauses);
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             int h = 0x636b12a0;
@@ -190,12 +164,6 @@ namespace OutSmart.DAXon.Expressions
             return h + tryOp.GetChildExpression().GetHashCode();
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             TryCatch t2 = new TryCatch(tryOp.GetChildExpression().Copy(rebindings));
@@ -209,54 +177,21 @@ namespace OutSmart.DAXon.Expressions
             return t2;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext c)
         {
             return MakeElaborator().ElaborateForItem().Eval(c);
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext c)
         {
             return MakeElaborator().ElaborateForPull().Iterate(c);
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             DispatchTailCall(MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context));
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("try", this);
@@ -277,29 +212,11 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new TryCatchElaborator();
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         public class CatchClause
         {
             public int slotNumber = -1;
@@ -307,15 +224,6 @@ namespace OutSmart.DAXon.Expressions
             public IQNameTest nameTest;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         private class TryCatchElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
@@ -378,7 +286,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             err.SetIsGlobalError(false);
                         }
-                        else if (!(err is XPathException.StackOverflow))
+                        else if (!IsUncatchable(err))
                         {
                             StructuredQName code = err.ErrorCodeQName;
                             if (code == null)
@@ -394,7 +302,7 @@ namespace OutSmart.DAXon.Expressions
                                     {
 
                                         // rollback=no was specified, and output has been written, so we cannot recover
-                                        string message = err.GetMessage() + ". The error could not be caught, because rollback-output=no was specified, and output was already written to the result tree";
+                                        string message = err.Message + ". The error could not be caught, because rollback-output=no was specified, and output was already written to the result tree";
                                         throw new XPathException(message, "XTDE3530").WithLocation(err.GetLocator()).WithXPathContext(context);
                                     }
 
@@ -468,7 +376,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             err.SetIsGlobalError(false);
                         }
-                        else if (!(err is XPathException.StackOverflow))
+                        else if (!IsUncatchable(err))
                         {
                             StructuredQName code = err.ErrorCodeQName;
                             if (code == null)
@@ -527,7 +435,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             err.SetIsGlobalError(false);
                         }
-                        else if (!(err is XPathException.StackOverflow))
+                        else if (!IsUncatchable(err))
                         {
                             StructuredQName code = err.ErrorCodeQName;
                             if (code == null)
@@ -554,15 +462,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Iterate over the results of the function
-        /// </summary>
         /// <summary>
         /// An error listener that filters out reporting of any errors that are caught be the try/catch
         /// </summary>

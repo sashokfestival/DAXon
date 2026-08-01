@@ -72,6 +72,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
     }
 }

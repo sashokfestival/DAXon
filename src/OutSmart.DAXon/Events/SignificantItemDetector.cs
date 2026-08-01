@@ -97,18 +97,12 @@ namespace OutSmart.DAXon.Events
         }
 
         /*level==0 && */
-        /// <summary>
-        /// Notify the start of the content, that @is, the completion of all attributes and namespaces.
-        /// </summary>
         public override void StartContent()
         {
             NextOutputter.StartContent();
         }
 
         /*level==0 && */
-        /// <summary>
-        /// Notify the start of the content, that @is, the completion of all attributes and namespaces.
-        /// </summary>
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
         {
             if (!chars.IsEmpty())
@@ -120,9 +114,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /*level==0 && */
-        /// <summary>
-        /// Notify the start of the content, that @is, the completion of all attributes and namespaces.
-        /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
         {
             Start();
@@ -130,9 +121,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /*level==0 && */
-        /// <summary>
-        /// Notify the start of the content, that @is, the completion of all attributes and namespaces.
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
             Start();
@@ -140,9 +128,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /*level==0 && */
-        /// <summary>
-        /// Notify the start of the content, that @is, the completion of all attributes and namespaces.
-        /// </summary>
         public static bool IsSignificant(IItem item)
         {
             if (item is NodeInfo)
@@ -190,9 +175,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /*level==0 && */
-        /// <summary>
-        /// Notify the start of the content, that @is, the completion of all attributes and namespaces.
-        /// </summary>
         public override void Append(IItem item, ILocation locationId, int copyNamespaces)
         {
             if (IsSignificant(item))
@@ -204,9 +186,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /*level==0 && */
-        /// <summary>
-        /// Notify the start of the content, that @is, the completion of all attributes and namespaces.
-        /// </summary>
         public override void Append(IItem item)
         {
             if (IsSignificant(item))

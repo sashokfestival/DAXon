@@ -21,8 +21,6 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Api
@@ -36,17 +34,14 @@ namespace OutSmart.DAXon.Api
         private CharacterMapIndex characterMapIndex = null;
         private bool mustClose = false;
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         protected virtual Properties LocallyDefinedProperties
         {
             get
             {
                 Properties props = new Properties();
-                foreach (StructuredQName p in properties.KeySet())
+                foreach (StructuredQName p in properties.Keys)
                 {
-                    string value = properties.Get(p);
+                    string value = properties.GetOrDefault(p);
                     props.SetProperty(p.ClarkName, value);
                 }
 
@@ -58,65 +53,44 @@ namespace OutSmart.DAXon.Api
             Property[] propertyValues = (Property[])Enum.GetValues(typeof(Property));
             foreach (Property p in propertyValues)
             {
-                standardProperties.Put(p.ToString(), p);
+                standardProperties[p.ToString()] = p;
             }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public Serializer(Processor processor)
         {
             SetProcessor(processor);
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetProcessor(Processor processor)
         {
             this.processor = processor ?? throw new NullReferenceException();
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual Processor GetProcessor()
         {
             return processor;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetOutputProperties(Properties suppliedProperties)
         {
             foreach (string name in suppliedProperties.StringPropertyNames())
             {
-                properties.Put(StructuredQName.FromClarkName(name), suppliedProperties.GetProperty(name));
+                properties[StructuredQName.FromClarkName(name)] = suppliedProperties.GetProperty(name);
             }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetOutputProperties(SerializationProperties suppliedProperties)
         {
             SetOutputProperties(suppliedProperties.GetProperties());
             SetCharacterMap(suppliedProperties.GetCharacterMapIndex());
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetCloseOnCompletion(bool value)
         {
             mustClose = value;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetCharacterMap(CharacterMapIndex characterMap)
         {
             CharacterMapIndex existingIndex = this.characterMapIndex;
@@ -138,9 +112,6 @@ namespace OutSmart.DAXon.Api
             this.characterMapIndex = existingIndex;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual CharacterMapIndex GetCharacterMapIndex()
         {
             if (characterMapIndex == null)
@@ -151,9 +122,6 @@ namespace OutSmart.DAXon.Api
             return characterMapIndex;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetOutputProperty(Property property, string value)
         {
             SerializerFactory sf = processor.UnderlyingConfiguration.SerializerFactory;
@@ -166,7 +134,7 @@ namespace OutSmart.DAXon.Api
             }
             catch (XPathException e)
             {
-                throw new ArgumentException(e.GetMessage());
+                throw new ArgumentException(e.Message);
             }
 
             if (value == null)
@@ -175,21 +143,15 @@ namespace OutSmart.DAXon.Api
             }
             else
             {
-                properties.Put(property.GetQName().GetStructuredQName(), value);
+                properties[property.GetQName().GetStructuredQName()] = value;
             }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual string GetOutputProperty(Property property)
         {
-            return properties.Get(property.GetQName().GetStructuredQName());
+            return properties.GetOrDefault(property.GetQName().GetStructuredQName());
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetOutputProperty(QName property, string value)
         {
             SerializerFactory sf = processor.UnderlyingConfiguration.SerializerFactory;
@@ -202,7 +164,7 @@ namespace OutSmart.DAXon.Api
                 }
                 catch (XPathException e)
                 {
-                    throw new ArgumentException(e.GetMessage());
+                    throw new ArgumentException(e.Message);
                 }
 
                 if (uri.Equals(NamespaceUri.SAXON) && property.LocalName.Equals("next-in-chain"))
@@ -219,21 +181,15 @@ namespace OutSmart.DAXon.Api
             }
             else
             {
-                properties.Put(property.GetStructuredQName(), value);
+                properties[property.GetStructuredQName()] = value;
             }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual string GetOutputProperty(QName property)
         {
-            return properties.Get(property.GetStructuredQName());
+            return properties.GetOrDefault(property.GetStructuredQName());
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetOutputWriter(TextWriter writer)
         {
             result.SetOutputStream(null);
@@ -242,9 +198,6 @@ namespace OutSmart.DAXon.Api
             mustClose = false;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetOutputStream(System.IO.Stream stream)
         {
             result.SetWriter(null);
@@ -253,9 +206,6 @@ namespace OutSmart.DAXon.Api
             mustClose = false;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SetOutputFile(string file)
         {
             result.SetOutputStream(null);
@@ -265,9 +215,6 @@ namespace OutSmart.DAXon.Api
             mustClose = true;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SerializeNode(XdmNode node)
         {
             StreamResult res = result;
@@ -279,9 +226,6 @@ namespace OutSmart.DAXon.Api
             SerializeNodeToResult(node, res);
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void SerializeXdmValue(XdmValue value)
         {
             if (value is XdmNode)
@@ -299,14 +243,15 @@ namespace OutSmart.DAXon.Api
                 {
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
             }
 
             CloseAndNotify();
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual void Serialize(ResolvedResource source)
         {
             try
@@ -320,11 +265,12 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual string SerializeToString(ResolvedResource source)
         {
             try
@@ -340,11 +286,12 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual string SerializeNodeToString(XdmNode node)
         {
             StringWriter sw = new StringWriter();
@@ -353,10 +300,7 @@ namespace OutSmart.DAXon.Api
             return sw.ToString();
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
-        private void SerializeNodeToResult(XdmNode node, Result res)
+        private void SerializeNodeToResult(XdmNode node, IResultTarget res)
         {
             try
             {
@@ -367,12 +311,14 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
-        public virtual StreamWriterToReceiver GetXMLStreamWriter()
+        // Returns a System.Xml.XmlWriter whose events feed this serializer's output.
+        public virtual StreamWriterToReceiver GetXmlWriter()
         {
             PipelineConfiguration pipe = processor.UnderlyingConfiguration.MakePipelineConfiguration();
             IReceiver r = GetReceiver(pipe, GetSerializationProperties());
@@ -380,13 +326,7 @@ namespace OutSmart.DAXon.Api
             return new StreamWriterToReceiver(r);
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual object GetOutputDestination()
         {
             if (result.GetOutputStream() != null)
@@ -417,9 +357,6 @@ namespace OutSmart.DAXon.Api
             }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public override IReceiver GetReceiver(PipelineConfiguration pipe, SerializationProperties @params)
         {
             try
@@ -450,48 +387,44 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual Properties GetCombinedOutputProperties(Properties defaultOutputProperties)
         {
             Properties props = defaultOutputProperties == null ? new Properties() : new Properties(defaultOutputProperties);
-            foreach (StructuredQName p in properties.KeySet())
+            foreach (StructuredQName p in properties.Keys)
             {
-                string value = properties.Get(p);
+                string value = properties.GetOrDefault(p);
                 props.SetProperty(p.ClarkName, value);
             }
 
             return props;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
         public virtual SerializationProperties GetSerializationProperties()
         {
             return new SerializationProperties(LocallyDefinedProperties, characterMapIndex);
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
-        protected virtual Result GetResult()
+        protected virtual IResultTarget GetResult()
         {
             return result;
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
             if (mustClose)
             {
 
-                // This relies on the fact that the SerializerFactory sets the global::System.IO.Stream
+                // ExpandedStreamResult publishes the stream it opens from the system ID back into
+                // this result (round BG - before that the port never set it, so this branch was
+                // dead and a failed run left its output file locked until finalization). Null the
+                // slot out after closing: a reused Serializer must reopen from the system ID, not
+                // find last run's closed stream.
                 System.IO.Stream stream = result.GetOutputStream();
                 if (stream != null)
                 {
@@ -502,6 +435,10 @@ namespace OutSmart.DAXon.Api
                     catch (IOException err)
                     {
                         throw new DAXonApiException("Failed while closing output file", err);
+                    }
+                    finally
+                    {
+                        result.SetOutputStream(null);
                     }
                 }
 
@@ -520,26 +457,43 @@ namespace OutSmart.DAXon.Api
             }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
-        public static Property GetProperty(QName name)
+        // Abort-path release: free the published stream/writer silently (no listener
+        // notifications, no DAXonApiException on the unwind path) and null the slots so a
+        // preceding successful Close makes this a no-op.
+        public override void Dispose()
         {
-            string clarkName = name.ClarkName;
-            Property prop = standardProperties.Get(clarkName);
-            if (prop != null)
+            if (mustClose)
             {
-                return prop;
-            }
-            else
-            {
-                throw new ArgumentException("Unknown serialization property " + clarkName);
+                System.IO.Stream stream = result.GetOutputStream();
+                if (stream != null)
+                {
+                    try { stream.Dispose(); } catch (IOException) { }
+                    result.SetOutputStream(null);
+                }
+
+                TextWriter writer = result.GetWriter();
+                if (writer != null)
+                {
+                    try { writer.Dispose(); } catch (IOException) { }
+                    result.SetWriter(null);
+                }
             }
         }
 
-        /// <summary>
-        /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-        /// </summary>
+        public static Property GetProperty(QName name)
+        {
+            string clarkName = name.ClarkName;
+            // TryGetValue, not Get-then-null-test: Property is an enum, so the Java null-check
+            // was always true and an unknown name silently answered enum value 0 (METHOD)
+            // instead of throwing.
+            if (standardProperties.TryGetValue(clarkName, out Property prop))
+            {
+                return prop;
+            }
+
+            throw new ArgumentException("Unknown serialization property " + clarkName);
+        }
+
         public virtual bool IsMustCloseAfterUse()
         {
             return mustClose;
@@ -609,9 +563,6 @@ namespace OutSmart.DAXon.Api
             SAXON_INTERNAL_DTD_SUBSET,
             SAXON_LINE_LENGTH,
             SAXON_ATTRIBUTE_ORDER,
-            /// <summary>
-            /// Saxon extension: request canonical XML output. Value is "yes" or "no"
-            /// </summary>
             SAXON_CANONICAL,
             SAXON_NEWLINE,
             SAXON_SUPPRESS_INDENTATION,
@@ -624,7 +575,6 @@ namespace OutSmart.DAXon.Api
             SAXON_SUPPLY_SOURCE_LOCATOR
 
             // --------------------
-            // TODO enum body members
             // private final String name;
             // Property(String propertyName) {
             //     this.name = propertyName;

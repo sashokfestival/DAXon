@@ -30,10 +30,23 @@ namespace OutSmart.DAXon.Transformation
     public class KeyIndex
     {
 
-        // The entry in an index is either a NodeInfo or a List<NodeInfo>
-        private readonly Dictionary<IAtomicMatchKey, object> index;
+        // The entry in an index is either a NodeInfo or a List<NodeInfo>. Written freely while the
+        // builder still owns it; once published it is never mutated again. KeyManager keeps built
+        // indexes on the compiled package, so every thread sharing that package reads this map with
+        // no lock: mutating a Dictionary under concurrent readers corrupts its bucket chain, and
+        // FindEntry then spins forever on a map that stays poisoned for the life of the process.
+        // ReindexUntypedValues - the one writer that could still run after publication - therefore
+        // swaps in a filled copy instead of writing in place.
+        // Hardening, not a live fix: that writer is currently unreachable, because untypedKeys is
+        // only populated when KeyDefinition.IsConvertUntypedToOther() holds, and the only setter
+        // upstream calls lives in the SEF package loader, which is a bare stub here. Whoever
+        // implements PackageLoaderHE inherits a KeyIndex that is already safe to share.
+        private volatile Dictionary<IAtomicMatchKey, object> index;
+
+        // Serializes reindexing. The lookup path never takes it.
+        private readonly object reindexLock = new object();
         private UType keyTypesPresent = UType.VOID;
-        private UType keyTypesConvertedFromUntyped = UType.STRING_LIKE;
+        private volatile UType keyTypesConvertedFromUntyped = UType.STRING_LIKE;
         private HashSet<UnicodeString> untypedKeys;
         private ConversionRules rules;
         private int implicitTimezone;
@@ -161,13 +174,20 @@ namespace OutSmart.DAXon.Transformation
 
         private void AddEntry(IAtomicMatchKey val, NodeInfo curr, bool isFirst)
         {
-            object value = index.Get(val);
+            AddEntry(index, val, curr, isFirst);
+        }
+
+        // The target is always a map the caller owns exclusively: the one being built, or the
+        // private copy a reindex is filling. Nothing here may touch a published map.
+        private void AddEntry(Dictionary<IAtomicMatchKey, object> target, IAtomicMatchKey val, NodeInfo curr, bool isFirst)
+        {
+            object value = target.GetOrDefault(val);
             if (value == null)
             {
 
                 // this is the first node with this key value; we store the entry as a singleton
                 // node to avoid the overhead of creating a list
-                index.Put(val, curr);
+                target.PutAndGetPrevious(val, curr);
             }
             else
             {
@@ -178,7 +198,7 @@ namespace OutSmart.DAXon.Transformation
                     // replace the singleton key entry with a list-valued key entry
                     nodes = new List<NodeInfo>(4);
                     nodes.Add((NodeInfo)value);
-                    index.Put(val, nodes);
+                    target[val] = nodes;
                 }
                 else
                 {
@@ -223,7 +243,7 @@ namespace OutSmart.DAXon.Transformation
                             {
 
                                 // add the node at this position
-                                nodes.Add(i + 1, curr);
+                                nodes.Insert(i + 1,curr);
                             }
 
                             found = true;
@@ -235,7 +255,7 @@ namespace OutSmart.DAXon.Transformation
                     // if we're still here, add the new node at the start
                     if (!found)
                     {
-                        nodes.Add(0, curr);
+                        nodes.Insert(0,curr);
                     }
                 }
             }
@@ -244,41 +264,69 @@ namespace OutSmart.DAXon.Transformation
         public virtual void ReindexUntypedValues(BuiltInAtomicType type)
         {
             UType uType = type.GetUType();
-            if (UType.STRING_LIKE.Subsumes(uType))
+            lock (reindexLock)
             {
-                return;
-            }
-
-            if (UType.NUMERIC.Subsumes(uType))
-            {
-                type = BuiltInAtomicType.DOUBLE;
-            }
-
-            StringConverter converter = type.GetStringConverter(rules);
-            foreach (UnicodeString v in untypedKeys)
-            {
-                IAtomicMatchKey uk = GetCollationKey(new StringValue(v), collation, implicitTimezone);
-                AtomicValue convertedValue = converter.ConvertString(v).AsAtomic();
-                IAtomicMatchKey amk = GetCollationKey(convertedValue, collation, implicitTimezone);
-                object value = index.Get(uk);
-                if (value is NodeInfo)
+                if (keyTypesConvertedFromUntyped.Subsumes(uType))
                 {
-                    AddEntry(amk, ((NodeInfo)value), false);
+
+                    // already done, here or by whichever thread got here first: the conversion is
+                    // driven by the primitive type alone, so repeating it would add nothing
+                    return;
                 }
-                else
+
+                if (!UType.STRING_LIKE.Subsumes(uType))
                 {
-                    IList<NodeInfo> nodes = (IList<NodeInfo>)value;
-                    foreach (NodeInfo node in nodes)
+                    BuiltInAtomicType converted = UType.NUMERIC.Subsumes(uType) ? BuiltInAtomicType.DOUBLE : type;
+                    StringConverter converter = converted.GetStringConverter(rules);
+                    Dictionary<IAtomicMatchKey, object> updated = CopyIndex();
+                    foreach (UnicodeString v in untypedKeys)
                     {
-                        AddEntry(amk, node, false);
+                        IAtomicMatchKey uk = GetCollationKey(new StringValue(v), collation, implicitTimezone);
+                        AtomicValue convertedValue = converter.ConvertString(v).AsAtomic();
+                        IAtomicMatchKey amk = GetCollationKey(convertedValue, collation, implicitTimezone);
+                        object value = index.GetOrDefault(uk);
+                        if (value is NodeInfo)
+                        {
+                            AddEntry(updated, amk, ((NodeInfo)value), false);
+                        }
+                        else
+                        {
+                            IList<NodeInfo> nodes = (IList<NodeInfo>)value;
+                            foreach (NodeInfo node in nodes)
+                            {
+                                AddEntry(updated, amk, node, false);
+                            }
+                        }
                     }
+
+                    index = updated;
                 }
+
+
+                // published after the map, so a reader that sees this type covered is guaranteed
+                // to be looking at the map that covers it
+                keyTypesConvertedFromUntyped = keyTypesConvertedFromUntyped.Union(uType);
             }
+        }
+
+        // A private clone of the published map, lists included: the reindex appends to entries the
+        // readers of the old map may still be iterating.
+        private Dictionary<IAtomicMatchKey, object> CopyIndex()
+        {
+            Dictionary<IAtomicMatchKey, object> current = index;
+            var copy = new Dictionary<IAtomicMatchKey, object>(current.Count);
+            foreach (KeyValuePair<IAtomicMatchKey, object> entry in current)
+            {
+                IList<NodeInfo> nodes = entry.Value as IList<NodeInfo>;
+                copy.Add(entry.Key, nodes == null ? entry.Value : new List<NodeInfo>(nodes));
+            }
+
+            return copy;
         }
 
         public virtual bool IsEmpty()
         {
-            return index.IsEmpty();
+            return index.Count == 0;
         }
 
         public virtual ISequenceIterator GetNodes(AtomicValue soughtValue)
@@ -286,9 +334,11 @@ namespace OutSmart.DAXon.Transformation
             if (untypedKeys != null && !keyTypesConvertedFromUntyped.Subsumes(soughtValue.GetUType()))
             {
                 ReindexUntypedValues(soughtValue.PrimitiveType);
-                keyTypesConvertedFromUntyped = keyTypesConvertedFromUntyped.Union(soughtValue.PrimitiveType.GetUType());
             }
 
+            // One read of the published map: a concurrent reindex swaps in a different one, and
+            // every lookup below has to come from a single consistent snapshot.
+            Dictionary<IAtomicMatchKey, object> snapshot = index;
             if (soughtValue.IsUntypedAtomic())
             {
                 IList<NodeInfo> resultNodes = new List<NodeInfo>();
@@ -297,7 +347,7 @@ namespace OutSmart.DAXon.Transformation
                 {
                     IAtomicType targetType = (IAtomicType)type.ToItemType();
                     AtomicValue converted = (AtomicValue)Converter.Convert(soughtValue, targetType, rules);
-                    object value = index.Get(GetCollationKey(converted, collation, implicitTimezone));
+                    object value = snapshot.GetOrDefault(GetCollationKey(converted, collation, implicitTimezone));
                     if (value != null)
                     {
                         counter++;
@@ -307,7 +357,7 @@ namespace OutSmart.DAXon.Transformation
                         }
                         else
                         {
-                            resultNodes.AddAll((IList<NodeInfo>)value);
+                            resultNodes.AddRange((IList<NodeInfo>)value);
                         }
                     }
                 }
@@ -324,7 +374,7 @@ namespace OutSmart.DAXon.Transformation
             }
             else
             {
-                object value = index.Get(GetCollationKey(soughtValue, collation, implicitTimezone));
+                object value = snapshot.GetOrDefault(GetCollationKey(soughtValue, collation, implicitTimezone));
                 return EntryIterator(value);
             }
         }
@@ -350,7 +400,7 @@ namespace OutSmart.DAXon.Transformation
         {
             IList<IAtomicMatchKey> amks = new List<IAtomicMatchKey>(4);
             SequenceTool.Supply(soughtValue, (keyVal) => amks.Add(GetCollationKey((AtomicValue)keyVal, collation, implicitTimezone)));
-            object value = index.Get(new CompositeAtomicMatchKey(amks));
+            object value = index.GetOrDefault(new CompositeAtomicMatchKey(amks));
             return EntryIterator(value);
         }
 

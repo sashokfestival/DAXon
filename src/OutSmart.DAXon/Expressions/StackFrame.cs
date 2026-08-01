@@ -80,8 +80,12 @@ namespace OutSmart.DAXon.Expressions
         // Shallow-copy of a stack is tricky in C# because iteration reverses the order
         private Stack<ISequence> ShallowCopy(Stack<ISequence> old)
         {
+            ISequence[] items = old.ToArray();
             Stack<ISequence> s2 = NewStack();
-            s2.AddAll(old);
+            for (int i = items.Length - 1; i >= 0; i--)
+            {
+                s2.Push(items[i]);
+            }
             return s2;
         }
 
@@ -92,7 +96,7 @@ namespace OutSmart.DAXon.Expressions
 
         public virtual bool HoldsDynamicValue()
         {
-            return dynamicStack != null && !dynamicStack.Empty();
+            return dynamicStack != null && dynamicStack.Count > 0;
         }
     }
 }

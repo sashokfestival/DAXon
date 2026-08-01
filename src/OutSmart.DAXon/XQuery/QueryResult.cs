@@ -24,7 +24,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Serialization;
 using OutSmart.DAXon.Trees.Iterators;
 using Configuration = OutSmart.DAXon.Core.Configuration;
-using Result = OutSmart.DAXon.Internal.Jaxp.Transform.Result;
 using Properties = OutSmart.DAXon.Internal.Collections.Properties;
 
 namespace OutSmart.DAXon.XQuery
@@ -34,29 +33,32 @@ namespace OutSmart.DAXon.XQuery
         public const string RESULT_NS = "http://saxon.sf.net/2009/serialization/result";
         public QueryResult() { }
 
-        public static void Serialize(NodeInfo node, Result destination, Properties outputProperties)
+        public static void Serialize(NodeInfo node, IResultTarget destination, Properties outputProperties)
         {
             SerializeSequence(SingletonIterator.MakeIterator(node), node.GetConfiguration(), destination, outputProperties);
         }
 
-        public static void Serialize(NodeInfo node, Result destination, SerializationProperties properties)
+        public static void Serialize(NodeInfo node, IResultTarget destination, SerializationProperties properties)
         {
             SerializeSequence(SingletonIterator.MakeIterator(node), node.GetConfiguration(), destination, properties);
         }
 
-        public static void SerializeSequence(ISequenceIterator iterator, Configuration config, Result result, Properties outputProperties)
+        public static void SerializeSequence(ISequenceIterator iterator, Configuration config, IResultTarget result, Properties outputProperties)
         {
             SerializeSequence(iterator, config, result, new SerializationProperties(outputProperties));
         }
 
-        public static void SerializeSequence(ISequenceIterator iterator, Configuration config, Result result, SerializationProperties properties)
+        public static void SerializeSequence(ISequenceIterator iterator, Configuration config, IResultTarget result, SerializationProperties properties)
         {
             SerializerFactory sf = config.SerializerFactory;
             IReceiver tr = sf.GetReceiver(result, properties);
             tr.Open();
             IItem it;
-            while ((it = iterator.Next()) != null) { tr.Append(it); }
-            tr.Dispose();
+            while ((it = iterator.Next()) != null)
+            {
+                tr.Append(it);
+            }
+            tr.Close();
         }
 
         // Legacy no-op shapes for the DAXonDeepEqual "undocumented diagnostic option" debug path,

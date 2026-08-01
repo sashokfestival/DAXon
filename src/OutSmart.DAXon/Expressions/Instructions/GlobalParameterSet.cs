@@ -11,7 +11,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -28,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         // PHASE7_INDEXER_GPS
         public IGroundedValue this[StructuredQName key] { get { return Get(key); } set { Put(key, value); } }
 
-        public virtual ICollection<StructuredQName> Keys => @params.KeySet();
+        public virtual ICollection<StructuredQName> Keys => @params.Keys;
 
         public virtual int NumberOfKeys => @params.Count;
         /// <summary>
@@ -53,13 +52,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
             else
             {
-                @params.Put(qName, value);
+                @params.PutAndGetPrevious(qName, value);
             }
         }
 
         public virtual IGroundedValue Get(StructuredQName qName)
         {
-            return @params.Get(qName);
+            return @params.GetOrDefault(qName);
         }
 
         public virtual bool ContainsKey(StructuredQName qName)

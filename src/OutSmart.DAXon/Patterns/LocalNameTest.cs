@@ -32,27 +32,12 @@ namespace OutSmart.DAXon.Patterns
 
         public string FullAlphaCode => BasicAlphaCode + " n*:" + localName;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override double DefaultPriority => -0.25;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public string LocalName => localName;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override int PrimitiveType => nodeKind;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public NamePool NamePool => namePool;
         public LocalNameTest(NamePool pool, int nodeKind, string localName)
         {
@@ -79,7 +64,7 @@ namespace OutSmart.DAXon.Patterns
             if (nodeKind == Types.Type.ELEMENT && tree is TinyTree)
             {
                 Dictionary<string, IntSet> localNameIndex = ((TinyTree)tree).LocalNameIndex;
-                IntSet intSet = localNameIndex.Get(localName);
+                IntSet intSet = localNameIndex.GetOrDefault(localName);
                 if (intSet == null)
                 {
                     return IntPredicateLambda.Of((n) => false);
@@ -110,9 +95,6 @@ namespace OutSmart.DAXon.Patterns
             return namePool.GetLocalName(fp).Equals(localName);
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override string ToString()
         {
             switch (nodeKind)
@@ -127,9 +109,6 @@ namespace OutSmart.DAXon.Patterns
         }
 
         /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
         /// Returns a hash code value for the object.
         /// </summary>
         public override int GetHashCode()
@@ -137,34 +116,16 @@ namespace OutSmart.DAXon.Patterns
             return nodeKind << 20 ^ localName.GetHashCode();
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is LocalNameTest && ((LocalNameTest)other).nodeKind == nodeKind && ((LocalNameTest)other).localName.Equals(localName);
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public string ExportQNameTest()
         {
             return "*:" + localName;
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             string explanation = base.ExplainMismatch(item, th);

@@ -14,29 +14,22 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Text
 {
-    public interface IUnicodeWriter
+    public interface IUnicodeWriter : global::System.IDisposable
     {
         void Write(UnicodeString chars);
         void WriteAscii(byte[] content);
-        void WriteCodePoint(int codepoint)
-;
+        void WriteCodePoint(int codepoint);
 
 
 
-        void WriteRepeatedAscii(byte asciiChar, int count)
-;
+        void WriteRepeatedAscii(byte asciiChar, int count);
 
 
 
 
 
         void Write(string chars);
-        void Dispose()
-;
-
-
-        void Flush()
-;
+        void Flush();
 
     }
 }

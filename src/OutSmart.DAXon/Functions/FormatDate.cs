@@ -30,6 +30,11 @@ namespace OutSmart.DAXon.Functions
 {
     public class FormatDate : SystemFunction, ICallable
     {
+        // Widths beyond this are rejected with FOFD1340: the padded component must fit the
+        // engine's int[]-backed strings (hard ceiling ~536M codepoints), and a width of
+        // int.MaxValue overflowed the picture builder's min+1 pre-size into a negative array.
+        internal const int MAX_WIDTH = 100_000_000;
+
         static readonly string[] knownCalendars = new[]
         {
             "AD",
@@ -112,7 +117,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException e)
             {
-                throw new XPathException("Invalid calendar name. " + e.GetMessage()).WithErrorCode("FOFD1340").WithXPathContext(context);
+                throw new XPathException("Invalid calendar name. " + e.Message).WithErrorCode("FOFD1340").WithXPathContext(context);
             }
 
             if (cal.HasURI(NamespaceUri.NULL))
@@ -177,7 +182,7 @@ namespace OutSmart.DAXon.Functions
 
             if (numberer.DefaultedLocale() != null)
             {
-                sb.Append("[Language: " + numberer.DefaultedLocale().GetLanguage() + "]");
+                sb.Append("[Language: " + numberer.DefaultedLocale().TwoLetterISOLanguageName + "]");
             }
 
             int i = 0;
@@ -598,7 +603,7 @@ namespace OutSmart.DAXon.Functions
 
                 if (max < 4 || (max < int.MaxValue && value > 9999))
                 {
-                    value = value % (int)System.Math.Pow(10, max);
+                    value = value % (int)Math.Pow(10, max);
                 }
             }
 
@@ -623,14 +628,14 @@ namespace OutSmart.DAXon.Functions
             else if (!widths.IsEmpty())
             {
                 int[] range = GetWidths(widths);
-                min = System.Math.Max(min, range[0]);
+                min = Math.Max(min, range[0]);
                 if (max == int.MaxValue)
                 {
                     max = range[1];
                 }
                 else
                 {
-                    max = System.Math.Max(max, range[1]);
+                    max = Math.Max(max, range[1]);
                 }
 
                 if (defaultFormat)
@@ -639,7 +644,10 @@ namespace OutSmart.DAXon.Functions
                     // if format was defaulted, the explicit widths override the implicit format
                     if (StringTool.LastCodePoint(primary) == '1' && min != primary.Length())
                     {
-                        UnicodeBuilder sb = new UnicodeBuilder(min + 1);
+                        // Pre-size is only a hint: the builder archives its active part every 64K
+                        // codepoints anyway, so anything bigger is wasted allocation (and min + 1
+                        // used to overflow at min = int.MaxValue before GetWidths capped the width).
+                        UnicodeBuilder sb = new UnicodeBuilder(Math.Min(min + 1, 65536));
                         for (int i = 1; i < min; i++)
                         {
                             sb.Append('0');
@@ -671,7 +679,7 @@ namespace OutSmart.DAXon.Functions
             {
                 if (max < int.MaxValue)
                 {
-                    value = value % (int)System.Math.Pow(10, max);
+                    value = value % (int)Math.Pow(10, max);
                 }
             }
             else if (STR_f.Equals(component))
@@ -737,9 +745,18 @@ namespace OutSmart.DAXon.Functions
                 }
             }
 
-            while (str.Length() < min)
+            if (str.Length() < min)
             {
-                str = str.Concat(STR_0);
+
+                // One concat: Concat copies the whole accumulated string, so padding a digit at a
+                // time is quadratic in a width the picture alone decides.
+                UnicodeBuilder pad = new UnicodeBuilder((int)(min - str.Length()));
+                for (long i = str.Length(); i < min; i++)
+                {
+                    pad.Append('0');
+                }
+
+                str = str.Concat(pad.ToUnicodeString());
             }
 
             if (str.Length() > min)
@@ -790,11 +807,11 @@ namespace OutSmart.DAXon.Functions
 
             if (STR_N.Equals(primary))
             {
-                return StringView.Tidy(s.ToUpperCase());
+                return StringView.Tidy(s.ToUpperInvariant());
             }
             else if (STR_n.Equals(primary))
             {
-                return StringView.Tidy(s.ToLowerCase());
+                return StringView.Tidy(s.ToLowerInvariant());
             }
             else
             {
@@ -824,12 +841,12 @@ namespace OutSmart.DAXon.Functions
             {
                 digitZero = Alphanumeric.GetDigitFamily(adjustedPicture.CodePointAt(0));
                 StringBuilder fsb = new StringBuilder(formattedStr);
-                while (formattedLen < min)
-                {
-                    StringTool.PrependWideChar(fsb, digitZero);
-                    formattedLen = formattedLen + 1;
-                }
 
+                // In one insert. The width comes from the picture and is bounded only by int, so
+                // prepending one digit at a time was quadratic: '[Y1,10000000]' outran a 3s
+                // deadline by minutes, and this whole call is a single step no deadline check
+                // reaches into.
+                StringTool.PrependRepeated(fsb, digitZero, min - formattedLen);
                 formattedStr = fsb.ToString();
             }
 
@@ -889,6 +906,13 @@ namespace OutSmart.DAXon.Functions
                             throw new XPathException("Invalid min value in format picture " + Err.Wrap(widths, Err.VALUE), "FOFD1340");
                         }
 
+                        if (min > MAX_WIDTH)
+                        {
+                            // The padded output must fit the engine's int[]-backed strings; without the
+                            // cap a width of 2^31-1 overflowed the picture builder's min+1 pre-size.
+                            throw new XPathException("Width in format picture exceeds the implementation limit of " + MAX_WIDTH + " " + Err.Wrap(widths, Err.VALUE), "FOFD1340");
+                        }
+
                         if (max < 1 || max < min)
                         {
                             throw new XPathException("Invalid max value in format picture " + Err.Wrap(widths, Err.VALUE), "FOFD1340");
@@ -910,8 +934,10 @@ namespace OutSmart.DAXon.Functions
                 result[1] = max;
                 return result;
             }
-            catch (FormatException err)
+            catch (Exception err) when (err is FormatException || err is OverflowException)
             {
+                // Java's Integer.parseInt raises one exception for malformed AND out-of-range
+                // input; .NET splits them, and only the malformed half was being caught.
                 throw new XPathException("Invalid integer used as width in date/time picture", "FOFD1340");
             }
         }
@@ -1018,7 +1044,7 @@ namespace OutSmart.DAXon.Functions
                 }
 
                 bool negative = tz < 0;
-                tz = System.Math.Abs(tz);
+                tz = Math.Abs(tz);
                 buffer[used++] = negative ? '-' : '+';
                 int hour = tz / 60;
                 int minute = tz % 60;
@@ -1097,7 +1123,7 @@ namespace OutSmart.DAXon.Functions
 
                     if (format.CodePointAt(0) == 'n')
                     {
-                        tzname = tzname.ToLowerCase();
+                        tzname = tzname.ToLowerInvariant();
                     }
 
                     return tzname;

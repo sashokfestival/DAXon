@@ -80,7 +80,7 @@ namespace OutSmart.DAXon.Api
             return sn;
         }
 
-        public override void Dispose()
+        public override void Close()
         {
             // no action
         }

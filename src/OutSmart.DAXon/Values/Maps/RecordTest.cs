@@ -11,7 +11,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,22 +31,13 @@ namespace OutSmart.DAXon.Values.Maps
         private readonly HashSet<string> optionalFields = new HashSet<string>();
         private bool _extensible;
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
-        public IEnumerable<string> FieldNames => fieldTypes.KeySet();
+        public IEnumerable<string> FieldNames => fieldTypes.Keys;
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override SequenceType[] ArgumentTypes => new SequenceType[]
             {
                 SequenceType.SINGLE_ATOMIC
             };
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override SequenceType ResultType
         {
             get
@@ -60,7 +50,7 @@ namespace OutSmart.DAXon.Values.Maps
                 {
                     ItemType resultType = null;
                     bool allowsMany = false;
-                    foreach (KeyValuePair<string, SequenceType> field in fieldTypes.EntrySet())
+                    foreach (KeyValuePair<string, SequenceType> field in fieldTypes)
                     {
                         if (resultType == null)
                         {
@@ -79,9 +69,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override double DefaultPriority
         {
             get
@@ -89,7 +76,7 @@ namespace OutSmart.DAXon.Values.Maps
 
                 // TODO: this algorithm means that adding fields to the record type reduces its priority, which is wrong
                 double prio = 1;
-                foreach (SequenceType st in fieldTypes.Values())
+                foreach (SequenceType st in fieldTypes.Values)
                 {
                     prio *= st.PrimaryType.GetNormalizedDefaultPriority();
                 }
@@ -98,45 +85,27 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override string BasicAlphaCode => "FM";
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public RecordTest()
         {
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public RecordTest(IList<string> names, IList<SequenceType> types, IList<string> optionalFieldNames, bool extensible)
         {
             SetDetails(names, types, optionalFieldNames, extensible);
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public static RecordTest Extensible(params Field[] fields)
         {
             return MakeRecordTest(true, fields);
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public static RecordTest NonExtensible(params Field[] fields)
         {
             return MakeRecordTest(false, fields);
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         private static RecordTest MakeRecordTest(bool extensible, params Field[] fields)
         {
             IList<string> fieldNames = new List<string>(fields.Length);
@@ -155,71 +124,47 @@ namespace OutSmart.DAXon.Values.Maps
             return new RecordTest(fieldNames, fieldTypes, optionalFieldNames, extensible);
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public virtual void SetDetails(IList<string> names, IList<SequenceType> types, IList<string> optionalFieldNames, bool extensible)
         {
             for (int i = 0; i < names.Count; i++)
             {
-                fieldTypes.Put(names[i], types[i]);
+                fieldTypes[names[i]] = types[i];
             }
 
-            optionalFields.AddAll(optionalFieldNames);
+            optionalFields.AddRange(optionalFieldNames);
             this._extensible = extensible;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override Genre GetGenre()
         {
             return Genre.MAP;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override bool IsMapType()
         {
             return true;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override bool IsArrayType()
         {
             return false;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public SequenceType GetFieldType(string field)
         {
-            return fieldTypes.Get(field);
+            return fieldTypes.GetOrDefault(field);
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public bool IsOptionalField(string field)
         {
             return optionalFields.Contains(field);
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public bool IsExtensible()
         {
             return _extensible;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override bool Matches(IItem item, TypeHierarchy th)
         {
             if (!(item is MapItem))
@@ -228,7 +173,7 @@ namespace OutSmart.DAXon.Values.Maps
             }
 
             MapItem map = (MapItem)item;
-            foreach (KeyValuePair<string, SequenceType> field in fieldTypes.EntrySet())
+            foreach (KeyValuePair<string, SequenceType> field in fieldTypes)
             {
                 IGroundedValue val = map[new StringValue(field.Key)];
                 if (val == null)
@@ -260,39 +205,27 @@ namespace OutSmart.DAXon.Values.Maps
             return true;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public virtual int GetArity()
         {
             return 1;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public override string ToString()
         {
             return MakeString(st => st.ToString());
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         public string ToExportString()
         {
             return MakeString(st => st.ToExportString());
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         private string MakeString(Func<SequenceType, string> show)
         {
             StringBuilder sb = new StringBuilder(100);
             sb.Append("record(");
             bool first = true;
-            foreach (KeyValuePair<string, SequenceType> field in fieldTypes.EntrySet())
+            foreach (KeyValuePair<string, SequenceType> field in fieldTypes)
             {
                 if (first)
                 {
@@ -324,7 +257,7 @@ namespace OutSmart.DAXon.Values.Maps
                 }
                 else
                 {
-                    sb.Append(show.Apply(field.Value));
+                    sb.Append(show(field.Value));
                 }
             }
 
@@ -333,13 +266,10 @@ namespace OutSmart.DAXon.Values.Maps
                 sb.Append(", *");
             }
 
-            sb.Append(")");
+            sb.Append(')');
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
         /// <summary>
         /// Test whether this function type equals another function type
         /// </summary>
@@ -348,18 +278,12 @@ namespace OutSmart.DAXon.Values.Maps
             return this == other || other is RecordTest && _extensible == ((RecordTest)other)._extensible && fieldTypes.Equals(((RecordTest)other).fieldTypes) && optionalFields.Equals(((RecordTest)other).optionalFields);
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
 
             // Need to avoid infinite recursion for self-reference fields
             int h = 0x27ca481f;
-            foreach (KeyValuePair<string, SequenceType> entry in fieldTypes.EntrySet())
+            foreach (KeyValuePair<string, SequenceType> entry in fieldTypes)
             {
                 h ^= entry.Key.GetHashCode();
                 if (entry.Value.PrimaryType == this)
@@ -375,12 +299,6 @@ namespace OutSmart.DAXon.Values.Maps
             return h;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Affinity Relationship(IFunctionItemType other, TypeHierarchy th)
         {
             if (other == AnyFunctionType.GetInstance())
@@ -411,12 +329,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         private Affinity RecordToMapRelationship(MapType other, TypeHierarchy th)
         {
             IAtomicType recordKeyType = IsExtensible() ? BuiltInAtomicType.ANY_ATOMIC : BuiltInAtomicType.STRING;
@@ -447,7 +359,7 @@ namespace OutSmart.DAXon.Values.Maps
             {
 
                 // The type of every field in the record must be a subtype of the map value type
-                foreach (SequenceType entry in fieldTypes.Values())
+                foreach (SequenceType entry in fieldTypes.Values)
                 {
                     Affinity rel = th.SequenceTypeRelationship(entry, other.ValueType);
                     if (!(rel == Affinity.SUBSUMED_BY || rel == Affinity.SAME_TYPE))
@@ -460,16 +372,10 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         private Affinity RecordTypeRelationship(RecordTest other, TypeHierarchy th)
         {
-            HashSet<string> keys = new HashSet<string>(fieldTypes.KeySet());
-            keys.AddAll(other.fieldTypes.KeySet());
+            HashSet<string> keys = new HashSet<string>(fieldTypes.Keys);
+            keys.AddRange(other.fieldTypes.Keys);
             bool foundSubsuming = false;
             bool foundSubsumed = false;
             bool foundOverlap = false;
@@ -487,8 +393,8 @@ namespace OutSmart.DAXon.Values.Maps
 
             foreach (string key in keys)
             {
-                SequenceType t1 = fieldTypes.Get(key);
-                SequenceType t2 = other.fieldTypes.Get(key);
+                SequenceType t1 = fieldTypes.GetOrDefault(key);
+                SequenceType t2 = other.fieldTypes.GetOrDefault(key);
                 if (t1 == null)
                 {
                     if (IsExtensible())
@@ -559,17 +465,11 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             if (item is MapItem)
             {
-                foreach (KeyValuePair<string, SequenceType> entry in fieldTypes.EntrySet())
+                foreach (KeyValuePair<string, SequenceType> entry in fieldTypes)
                 {
                     string key = entry.Key;
                     SequenceType required = entry.Value;
@@ -618,12 +518,6 @@ namespace OutSmart.DAXon.Values.Maps
             return null;
         }
 
-        /// <summary>
-        /// Construct a dummy RecordTest, details to be supplied later
-        /// </summary>
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Expression MakeFunctionSequenceCoercer(Expression exp, Func<RoleDiagnostic> role, bool allow40)
         {
             return new SpecificFunctionType(ArgumentTypes, ResultType).MakeFunctionSequenceCoercer(exp, role, false);

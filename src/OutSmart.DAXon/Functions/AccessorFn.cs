@@ -73,17 +73,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override AtomicValue Evaluate(IItem item, IXPathContext context)
         {
             return ((AtomicValue)item).GetComponent(ComponentId);
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new AccessorFnElaborator();
@@ -135,193 +129,121 @@ namespace OutSmart.DAXon.Functions
             , AMPM_OF_DAY
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class YearFromDateTime : AccessorFn
         {
             public override Component ComponentId => Component.YEAR;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class MonthFromDateTime : AccessorFn
         {
             public override Component ComponentId => Component.MONTH;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class DayFromDateTime : AccessorFn
         {
             public override Component ComponentId => Component.DAY;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class HoursFromDateTime : AccessorFn
         {
             public override Component ComponentId => Component.HOURS;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class MinutesFromDateTime : AccessorFn
         {
             public override Component ComponentId => Component.MINUTES;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class SecondsFromDateTime : AccessorFn
         {
             public override Component ComponentId => Component.SECONDS;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class TimezoneFromDateTime : AccessorFn
         {
             public override Component ComponentId => Component.TIMEZONE;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class YearFromDate : AccessorFn
         {
             public override Component ComponentId => Component.YEAR;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class MonthFromDate : AccessorFn
         {
             public override Component ComponentId => Component.MONTH;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class DayFromDate : AccessorFn
         {
             public override Component ComponentId => Component.DAY;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class TimezoneFromDate : AccessorFn
         {
             public override Component ComponentId => Component.TIMEZONE;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class HoursFromTime : AccessorFn
         {
             public override Component ComponentId => Component.HOURS;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class MinutesFromTime : AccessorFn
         {
             public override Component ComponentId => Component.MINUTES;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class SecondsFromTime : AccessorFn
         {
             public override Component ComponentId => Component.SECONDS;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class TimezoneFromTime : AccessorFn
         {
             public override Component ComponentId => Component.TIMEZONE;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class YearsFromDuration : AccessorFn
         {
             public override Component ComponentId => Component.YEAR;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class MonthsFromDuration : AccessorFn
         {
             public override Component ComponentId => Component.MONTH;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class DaysFromDuration : AccessorFn
         {
             public override Component ComponentId => Component.DAY;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class HoursFromDuration : AccessorFn
         {
             public override Component ComponentId => Component.HOURS;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class MinutesFromDuration : AccessorFn
         {
             public override Component ComponentId => Component.MINUTES;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class SecondsFromDuration : AccessorFn
         {
             public override Component ComponentId => Component.SECONDS;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class LocalNameFromQName : AccessorFn
         {
             public override Component ComponentId => Component.LOCALNAME;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class PrefixFromQName : AccessorFn
         {
             public override Component ComponentId => Component.PREFIX;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class NamespaceUriFromQName : AccessorFn
         {
             public override Component ComponentId => Component.NAMESPACE;

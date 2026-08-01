@@ -63,7 +63,7 @@ namespace OutSmart.DAXon.Events
                     }
                 }
 
-                pendingUndeclarations = undeclarations.ToArray(NamespaceBinding.EMPTY_ARRAY);
+                pendingUndeclarations = undeclarations.ToArray();
             }
             else
             {
@@ -147,9 +147,6 @@ namespace OutSmart.DAXon.Events
         }
 
         //break;
-        /// <summary>
-        /// endElement: Discard the namespaces declared on this element.
-        /// </summary>
         public override void EndElement()
         {
             if (depth-- == 0)
@@ -162,9 +159,6 @@ namespace OutSmart.DAXon.Events
         }
 
         //break;
-        /// <summary>
-        /// endElement: Discard the namespaces declared on this element.
-        /// </summary>
         public NamespaceUri GetURIForPrefix(string prefix, bool useDefault)
         {
             if ((prefix.Length == 0) && !useDefault)
@@ -190,9 +184,6 @@ namespace OutSmart.DAXon.Events
         }
 
         //break;
-        /// <summary>
-        /// endElement: Discard the namespaces declared on this element.
-        /// </summary>
         public IEnumerator<string> IteratePrefixes()
         {
             IList<string> prefixes = new List<string>(namespacesSize);
@@ -206,7 +197,7 @@ namespace OutSmart.DAXon.Events
             }
 
             prefixes.Add("xml");
-            return prefixes.IIterator();
+            return prefixes.GetEnumerator();
         }
     }
 }

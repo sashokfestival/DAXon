@@ -14,7 +14,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -47,23 +46,8 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string StreamerName => "VennExpression";
         public VennExpression(Expression p1, int op, Expression p2) : base(p1, op, p2)
         {
@@ -117,9 +101,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             int c1 = GetLhsExpression().GetCardinality();
@@ -167,9 +148,6 @@ namespace OutSmart.DAXon.Expressions
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int prop0 = GetLhsExpression().GetSpecialProperties();
@@ -193,9 +171,6 @@ namespace OutSmart.DAXon.Expressions
             return props;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         private bool TestContextDocumentNodeSet(int prop0, int prop1)
         {
             switch (@operator)
@@ -211,9 +186,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public virtual void GatherComponents(int @operator, HashSet<Expression> set)
         {
             if (GetLhsExpression() is VennExpression && ((VennExpression)GetLhsExpression()).@operator == @operator)
@@ -235,9 +207,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         private bool TestSubTree(int prop0, int prop1)
         {
             switch (@operator)
@@ -253,20 +222,11 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         private bool CreatesNoNewNodes(int prop0, int prop1)
         {
             return (prop0 & StaticProperty.NO_NODES_NEWLY_CREATED) != 0 && (prop1 & StaticProperty.NO_NODES_NEWLY_CREATED) != 0;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Configuration config = visitor.GetConfiguration();
@@ -315,12 +275,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Expression e = base.Optimize(visitor, contextItemType);
@@ -553,23 +507,11 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private bool OperandsAreDisjoint(TypeHierarchy th)
         {
             return th.Relationship(GetLhsExpression().GetItemType(), GetRhsExpression().GetItemType()) == Affinity.DISJOINT;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private bool ContextItemWithCurrentGroup(Expression lhs, Expression rhs)
         {
             if (lhs is ContextItemExpression && rhs is CurrentGroupCall)
@@ -582,12 +524,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Unordered(bool retainAllNodes, bool forStreaming)
         {
             if (@operator == Token.UNION && !forStreaming && OperandsAreDisjoint(GetConfiguration().GetTypeHierarchy()))
@@ -602,12 +538,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             VennExpression exp = new VennExpression(GetLhsExpression().Copy(rebindings), @operator, GetRhsExpression().Copy(rebindings));
@@ -615,26 +545,11 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override OperandRole GetOperandRole(int arg)
         {
             return OperandRole.SAME_FOCUS_ACTION;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
 
@@ -667,29 +582,11 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return GetLhsExpression().GetHashCode() ^ GetRhsExpression().GetHashCode();
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override Patterns.Pattern ToPattern(Configuration config)
         {
             if (IsPredicatePattern(GetLhsExpression()) || IsPredicatePattern(GetRhsExpression()))
@@ -725,29 +622,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private bool IndependentOfContextItem(Expression exp)
         {
             return (exp.Dependencies & StaticProperty.DEPENDS_ON_CONTEXT_ITEM) == 0;
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private bool IsPredicatePattern(Expression exp)
         {
             if (exp is ItemChecker)
@@ -758,15 +637,6 @@ namespace OutSmart.DAXon.Expressions
             return exp is FilterExpression && (((FilterExpression)exp).GetSelectExpression() is ContextItemExpression);
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override string Tag()
         {
             if (@operator == Token.UNION)
@@ -777,15 +647,6 @@ namespace OutSmart.DAXon.Expressions
             return Token.tokens[@operator];
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext c)
         {
             switch (@operator)
@@ -818,15 +679,6 @@ namespace OutSmart.DAXon.Expressions
             throw new NotSupportedException("Unknown operator in Venn Expression");
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private void GatherUnionLeafIterators(IList<ISequenceIterator> leafIterators, IXPathContext context)
         {
             Expression e1 = GetLhsExpression();
@@ -850,15 +702,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             if (@operator == Token.UNION)
@@ -873,29 +716,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new VennElaborator();
         }
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public class VennElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

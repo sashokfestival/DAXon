@@ -16,7 +16,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,25 +40,16 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected override bool IsPermittedChild(StyleElement child)
         {
             return child is XSLSort;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected override bool MayContainSequenceConstructor()
         {
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override void PrepareAttributes()
         {
             string groupByAtt = null;
@@ -194,9 +184,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         //                case "array":
         //                    requireXslt40("array");
         //                    select = arrayToSequence(makeExpression(value, att));
@@ -262,7 +249,7 @@ namespace OutSmart.DAXon.Xslt
                 catch (XPathException err)
                 {
                     string prefix = starting != null ? "With group-starting-with attribute: " : "With group-ending-with attribute: ";
-                    CompileError(prefix + err.GetMessage(), err.ErrorCodeQName);
+                    CompileError(prefix + err.Message, err.ErrorCodeQName);
                 }
             }
 
@@ -272,9 +259,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override Expression Compile(Compilation compilation, ComponentDeclaration decl)
         {
             IStringCollator collator = null;
@@ -289,7 +273,7 @@ namespace OutSmart.DAXon.Xslt
                 }
                 catch (XPathException err)
                 {
-                    CompileError("Failed to load collation " + uri + ": " + err.GetMessage(), "XTDE1110");
+                    CompileError("Failed to load collation " + uri + ": " + err.Message, "XTDE1110");
                     collator = CodepointCollator.GetInstance(); // for recovery paths
                 }
 

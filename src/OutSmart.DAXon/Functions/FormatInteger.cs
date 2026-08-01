@@ -16,7 +16,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -157,12 +156,12 @@ namespace OutSmart.DAXon.Functions
                         return new StringValue(e.result);
                     }
 
-                    string r = memo.formatter.Apply(num);
+                    string r = memo.formatter(num);
                     memo.cache[idx] = new IntFmtEntry(v, r);
                     return new StringValue(r);
                 }
 
-                return new StringValue(memo.formatter.Apply(num));
+                return new StringValue(memo.formatter(num));
             }
             catch (UncheckedXPathException e)
             {
@@ -179,7 +178,7 @@ namespace OutSmart.DAXon.Functions
 
             bool hasExplicitRadix = false;
             int radix = 10;
-            if (allow40 && pic.Matches("^([2-9]|[12][0-9]|3[0-6])\\^.*[xX].*$"))
+            if (allow40 && pic.MatchesRegex("^([2-9]|[12][0-9]|3[0-6])\\^.*[xX].*$"))
             {
                 int hat = pic.IndexOf('^');
                 radix = int.Parse(pic.Substring(0, hat));
@@ -443,7 +442,7 @@ namespace OutSmart.DAXon.Functions
 
             if (regularCheck)
             {
-                if (separatorList.IsEmpty())
+                if (separatorList.Count == 0)
                 {
                     return new RegularGroupFormatter(0, "", adjustedPic);
                 }

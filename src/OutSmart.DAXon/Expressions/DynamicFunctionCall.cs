@@ -15,7 +15,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,7 +38,7 @@ namespace OutSmart.DAXon.Expressions
         public DynamicFunctionCall(Expression fn, IList<Expression> args)
         {
             targetFunction = new Operand(this, fn, OperandRole.INSPECT);
-            suppliedArguments = new OperandArray(this, args.ToArray(new Expression[] { }));
+            suppliedArguments = new OperandArray(this, args.ToArray());
         }
 
         public override ItemType GetItemType()
@@ -232,7 +231,7 @@ namespace OutSmart.DAXon.Expressions
                 sb.Append(op.GetChildExpression().ToShortString()).Append(',');
             }
 
-            sb.SetCharAt(sb.Length - 1, ')');
+            sb[sb.Length - 1] = ')';
             return sb.ToString();
         }
 

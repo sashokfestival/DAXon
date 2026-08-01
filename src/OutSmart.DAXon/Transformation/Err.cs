@@ -150,6 +150,30 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
+        // Depiction bounds BREADTH already (first few array members, maps over 5 entries elided)
+        // but nested arrays and maps recurse, so it has to bound DEPTH too. A cap rather than a
+        // stack probe: this runs while another error message is being built - MapItem.Atomize
+        // embeds a depiction in FOTY0013 - so failing here would replace the real diagnosis with
+        // a stack error. Well above anything a legible message shows.
+        private const int MaxDepictDepth = 20;
+
+        [ThreadStatic]
+        private static int depictDepth;
+
+        /// <summary>Enter one level of value depiction. Pair with <see cref="LeaveDepiction"/>
+        /// in a finally: an abandoned counter would elide every later message on this thread.</summary>
+        internal static void EnterDepiction()
+        {
+            depictDepth++;
+        }
+
+        internal static void LeaveDepiction()
+        {
+            depictDepth--;
+        }
+
+        internal static bool DepictionTooDeep => depictDepth > MaxDepictDepth;
+
         /// <summary>
         /// Create a string representation of an item for use in an error message
         /// </summary>
@@ -158,6 +182,24 @@ namespace OutSmart.DAXon.Transformation
             if (item == null)
             {
                 return "(*null*)";
+            }
+
+            EnterDepiction();
+            try
+            {
+                return DepictItem(item);
+            }
+            finally
+            {
+                LeaveDepiction();
+            }
+        }
+
+        private static string DepictItem(IItem item)
+        {
+            if (DepictionTooDeep)
+            {
+                return "...";
             }
 
             if (item is NodeInfo)
@@ -259,6 +301,9 @@ namespace OutSmart.DAXon.Transformation
             }
             catch (Exception e)
             {
+                // Swallows everything DELIBERATELY, RecursionDepthError included: a depiction
+                // runs while another error is being built, so degrading here beats replacing
+                // the real diagnosis - and the guard's margin lets that error finish building.
                 return "(*unreadable*)";
             }
         }
@@ -383,7 +428,7 @@ namespace OutSmart.DAXon.Transformation
 
         public static string DescribeVisibility(Visibility vis)
         {
-            return vis.ToString().ToLowerCase();
+            return vis.ToString().ToLowerInvariant();
         }
 
         public static string Show(ILocation loc)

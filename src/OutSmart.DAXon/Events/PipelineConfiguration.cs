@@ -170,7 +170,7 @@ namespace OutSmart.DAXon.Events
                 components = new Dictionary<string, object>();
             }
 
-            components.Put(name, value);
+            components[name] = value;
         }
 
         public virtual object GetComponent(string name)
@@ -181,7 +181,7 @@ namespace OutSmart.DAXon.Events
             }
             else
             {
-                return components.Get(name);
+                return components.GetOrDefault(name);
             }
         }
     }

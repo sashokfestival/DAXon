@@ -69,14 +69,8 @@ UnicodeString ConstantText => constantText;
             }
         }
 
-        /// <summary>
-        /// Evaluate as an item.
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_DOCUMENT;
 
-        /// <summary>
-        /// Evaluate as an item.
-        /// </summary>
         public override string StreamerName => "DocumentInstr";
         public DocumentInstr(bool textOnly, UnicodeString constantText)
         {
@@ -197,17 +191,11 @@ UnicodeString ConstantText => constantText;
             return NodeKindTest.DOCUMENT;
         }
 
-        /// <summary>
-        /// Evaluate as an item.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return (NodeInfo)MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Evaluate as an item.
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("doc", this);
@@ -252,17 +240,11 @@ UnicodeString ConstantText => constantText;
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Evaluate as an item.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new DocumentInstrElaborator();
         }
 
-        /// <summary>
-        /// Evaluate as an item.
-        /// </summary>
         public class DocumentInstrElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
@@ -373,7 +355,7 @@ UnicodeString ConstantText => constantText;
                             ITailCall tc = contentEval.ProcessLeavingTail(@out, context);
                             DispatchTailCall(tc);
                             @out.EndDocument();
-                            @out.Dispose();
+                            @out.Close();
                             return builder.CurrentRoot;
                         }
                         catch (XPathException e) when (!(e is XPathException.StackOverflow))

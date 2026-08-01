@@ -43,9 +43,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public UnicodeString Data => UnicodeStringValue;
         public TinyProcInstImpl(TinyTree tree, int nodeNr) : base(tree, nodeNr)
         {
@@ -69,17 +66,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             return Navigator.GetBaseURI(this);
         }
 
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public override void Copy(IReceiver @out, int copyOptions, ILocation locationId)
         {
             @out.ProcessingInstruction(DisplayName, UnicodeStringValue, locationId, ReceiverOption.NONE);
         }
 
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public string GetTarget()
         {
             return DisplayName;

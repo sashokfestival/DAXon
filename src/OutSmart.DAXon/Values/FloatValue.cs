@@ -33,21 +33,9 @@ namespace OutSmart.DAXon.Values
 
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.FLOAT;
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
         public override UnicodeString PrimitiveStringValue => FloatToString(value);
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
         public override UnicodeString CanonicalLexicalRepresentation
         {
@@ -77,25 +65,16 @@ namespace OutSmart.DAXon.Values
             return new FloatValue(value, typeLabel);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override float GetFloatValue()
         {
             return value;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override double GetDoubleValue()
         {
             return value;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override //@CSharpReplaceBody(code="return Singulink.Numerics.BigDecimal.Parse(value.ToString(System.Globalization.CultureInfo.InvariantCulture));")
         BigDecimal GetDecimalValue()
         {
@@ -109,17 +88,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override long LongValue()
         {
             return (long)value;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override int GetHashCode()
         {
             if (value > int.MinValue && value < int.MaxValue)
@@ -132,46 +105,22 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         public override bool IsNaN()
         {
             return float.IsNaN(value);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         public override bool EffectiveBooleanValue()
         {
             return (value != 0 && !float.IsNaN(value));
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
         public static UnicodeString FloatToString(float value)
         {
             return FloatingPointConverter.AppendFloat(new UnicodeBuilder(), value, false);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
         /// <summary>
         /// Negate the value
@@ -181,42 +130,24 @@ namespace OutSmart.DAXon.Values
             return new FloatValue(-value);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
         /// <summary>
         /// Implement the XPath floor() function
         /// </summary>
         public override NumericValue Floor()
         {
-            return new FloatValue((float)System.Math.Floor(value));
+            return new FloatValue((float)Math.Floor(value));
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
         /// <summary>
         /// Implement the XPath ceiling() function
         /// </summary>
         public override NumericValue Ceiling()
         {
-            return new FloatValue((float)System.Math.Ceiling(value));
+            return new FloatValue((float)Math.Ceiling(value));
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
         /// <summary>
         /// Implement the XPath round() function
@@ -253,19 +184,7 @@ namespace OutSmart.DAXon.Values
             return new FloatValue(d.GetFloatValue());
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override NumericValue Round(int scale, Round.RoundingRule roundingRule)
         {
             DoubleValue d = new DoubleValue(GetDoubleValue());
@@ -273,19 +192,7 @@ namespace OutSmart.DAXon.Values
             return new FloatValue(d.GetFloatValue());
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override int Signum()
         {
             if (float.IsNaN(value))
@@ -296,55 +203,19 @@ namespace OutSmart.DAXon.Values
             return CompareTo(0);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override bool IsNegativeZero()
         {
             return value == 0 && (FloatingPointConverter.SingleToInt32Bits(value) & FloatingPointConverter.FLOAT_SIGN_MASK) != 0;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override bool IsWholeNumber()
         {
-            return value == System.Math.Floor(value) && !float.IsInfinity(value);
+            return value == Math.Floor(value) && !float.IsInfinity(value);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override int AsSubscript()
         {
             if (IsWholeNumber() && value > 0 && value <= int.MaxValue)
@@ -357,19 +228,7 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override NumericValue Abs()
         {
             if (value > 0)
@@ -378,23 +237,11 @@ namespace OutSmart.DAXon.Values
             }
             else
             {
-                return new FloatValue(System.Math.Abs(value));
+                return new FloatValue(Math.Abs(value));
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override int CompareTo(IXPathComparable other)
         {
             if (other is NumericValue)
@@ -431,19 +278,7 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override int CompareTo(long other)
         {
             float otherFloat = (float)other;
@@ -455,19 +290,7 @@ namespace OutSmart.DAXon.Values
             return value < otherFloat ? -1 : +1;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override IAtomicMatchKey AsMapKey()
         {
             if (IsNaN())
@@ -493,37 +316,13 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override bool IsIdentical(AtomicValue v)
         {
             return v is FloatValue && DoubleSortComparer.GetInstance().ComparesEqual(this, v);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
-        /// <summary>
-        /// Test whether the value is the double/float value NaN
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-to-half-even() function
-        /// </summary>
         public override AtomicValue AsAtomic()
         {
             return this;

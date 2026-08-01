@@ -22,7 +22,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Json
@@ -117,7 +116,7 @@ namespace OutSmart.DAXon.Json
                 {
                     Configuration config = context.GetConfiguration();
 
-                    lock (config)
+                    lock (config.syncLock)
                     {
                         config.CheckLicensedFeature(Configuration.LicenseFeature.SCHEMA_VALIDATION, "validation", -1);
                         LoadSchema(config);
@@ -173,7 +172,7 @@ namespace OutSmart.DAXon.Json
        * */
         public virtual void SetType(string name, ISchemaType st)
         {
-            types.Put(name, st);
+            types[name] = st;
         }
 
         /* This may not need to be a stack as there should only be at most one pre-selected key
@@ -191,7 +190,7 @@ namespace OutSmart.DAXon.Json
         public override ISequence GetResult()
         {
             @out.EndDocument();
-            @out.Dispose();
+            @out.Close();
             return builder.CurrentRoot;
         }
 
@@ -208,7 +207,7 @@ namespace OutSmart.DAXon.Json
        * */
         private bool IsInMap()
         {
-            return !inMap.IsEmpty() && inMap.Peek();
+            return inMap.Count > 0 && inMap.Peek();
         }
 
         /* This may not need to be a stack as there should only be at most one pre-selected key
@@ -217,7 +216,7 @@ namespace OutSmart.DAXon.Json
         private void StartElement(FingerprintedQName qn, string typeName)
         {
             // types is populated only under validation; skip the dictionary lookup otherwise
-            StartElement(qn, validate ? types.Get(typeName) : null);
+            StartElement(qn, validate ? types.GetOrDefault(typeName) : null);
         }
 
         /* This may not need to be a stack as there should only be at most one pre-selected key

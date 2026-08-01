@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Expressions
         {
             return lambda(item);
         }
-        // Phase 5: ILambda interface->delegate for lambda assignability.
+        // ILambda interface->delegate for lambda assignability.
         public delegate IItem ILambda(IItem item);
     }
 }

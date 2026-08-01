@@ -32,8 +32,7 @@ namespace OutSmart.DAXon.Model
         IFunctionItemType FunctionItemType { get; }
         StructuredQName GetFunctionName();
         int GetArity();
-        bool IsSequenceVariadic()
-;
+        bool IsSequenceVariadic();
 
 
 
@@ -45,13 +44,11 @@ namespace OutSmart.DAXon.Model
         string Description { get; }
         void Export(ExpressionPresenter @out);
         bool IsTrustedResultType();
-        string ToShortString()
-;
+        string ToShortString();
 
 
 
-        Genre GetGenre()
-;
+        Genre GetGenre();
 
 
     }

@@ -117,7 +117,7 @@ namespace OutSmart.DAXon.Values.Arrays
 
             protected virtual ArrayItem MakeArray(IList<IGroundedValue> members)
             {
-                if (numberOfConversions > System.Math.Max(10, numberOfCalls * 0.5))
+                if (numberOfConversions > Math.Max(10, numberOfCalls * 0.5))
                 {
 
                     // More than half the calls result in the array being converted...
@@ -175,6 +175,8 @@ namespace OutSmart.DAXon.Values.Arrays
         {
             private void Flatten(ISequence arg, IList<IItem> @out)
             {
+                // one level of recursion per level of array nesting, so the depth is the input's
+                StackGuard.Probe();
                 SequenceTool.Supply(arg.Iterate(), (item) =>
                 {
                     if (item is ArrayItem)
@@ -548,9 +550,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Implementation of the function array:tail(array) =&gt; item()*
-        /// </summary>
         public class ArrayTail : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
@@ -565,9 +564,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Implementation of the function array:tail(array) =&gt; item()*
-        /// </summary>
         public class ArrayToSequence : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
@@ -588,9 +584,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Implementation of the function array:tail(array) =&gt; item()*
-        /// </summary>
         public class ArrayFromSequence : FoldingFunction, IPingable
         {
             private double numberOfCalls = 0;
@@ -602,7 +595,7 @@ namespace OutSmart.DAXon.Values.Arrays
 
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
-                if (numberOfConversions > System.Math.Max(10, numberOfCalls * 0.5))
+                if (numberOfConversions > Math.Max(10, numberOfCalls * 0.5))
                 {
                     return ImmutableArrayItem.From(arguments[0].Iterate());
                 }

@@ -16,6 +16,6 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    // Phase 5: IContextMappingFunction interface->delegate for lambda support.
+    // IContextMappingFunction interface->delegate for lambda support.
     public delegate ISequenceIterator IContextMappingFunction(IXPathContext context);
 }

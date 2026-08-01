@@ -13,7 +13,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -100,7 +99,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         {
             SpecificFunctionType req = requiredType;
             SequenceType[] argTypes = targetFunction.FunctionItemType.ArgumentTypes;
-            int suppliedArity = System.Math.Min(args.Length, argTypes.Length);
+            int suppliedArity = Math.Min(args.Length, argTypes.Length);
             TypeHierarchy th = context.GetConfiguration().GetTypeHierarchy();
             ISequence[] targetArgs = new ISequence[suppliedArity];
             for (int i = 0; i < suppliedArity; i++)

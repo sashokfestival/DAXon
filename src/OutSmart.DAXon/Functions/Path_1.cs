@@ -66,9 +66,9 @@ namespace OutSmart.DAXon.Functions
                     case Types.Type.DOCUMENT:
                         return new StringValue(fsb.ToString());
                     case Types.Type.ELEMENT:
-                        fsb2.Append("/Q{").Append(n.GetNamespaceUri()).Append("}");
+                        fsb2.Append("/Q{").Append(n.GetNamespaceUri()).Append('}');
                         fsb2.Append(n.GetLocalPart());
-                        fsb2.Append("[").Append(Navigator.GetNumberSimple(n, context)).Append("]");
+                        fsb2.Append('[').Append(Navigator.GetNumberSimple(n, context)).Append(']');
                         fsb2.Append(fsb);
                         fsb = fsb2;
                         break;
@@ -77,7 +77,7 @@ namespace OutSmart.DAXon.Functions
                         string attURI = n.GetNamespaceUri().ToString();
                         if (!"".Equals(attURI))
                         {
-                            fsb2.Append("Q{").Append(attURI).Append("}");
+                            fsb2.Append("Q{").Append(attURI).Append('}');
                         }
 
                         fsb2.Append(n.GetLocalPart());
@@ -89,13 +89,13 @@ namespace OutSmart.DAXon.Functions
                         fsb = fsb2;
                         break;
                     case Types.Type.COMMENT:
-                        fsb2.Append("/comment()[").Append(Navigator.GetNumberSimple(n, context)).Append("]");
+                        fsb2.Append("/comment()[").Append(Navigator.GetNumberSimple(n, context)).Append(']');
                         fsb2.Append(fsb);
                         fsb = fsb2;
                         break;
                     case Types.Type.PROCESSING_INSTRUCTION:
                         fsb2.Append("/processing-instruction(").Append(n.GetLocalPart()).Append(")[");
-                        fsb2.Append(Navigator.GetNumberSimple(n, context)).Append("]");
+                        fsb2.Append(Navigator.GetNumberSimple(n, context)).Append(']');
                         fsb2.Append(fsb);
                         fsb = fsb2;
                         break;

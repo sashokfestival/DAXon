@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Text;
 
@@ -14,8 +15,11 @@ namespace OutSmart.DAXon.Types
 {
     public class StringToAnyURI : StringConverter
     {
+        private readonly StringConverter inner;
         public StringToAnyURI() { }
-        public StringToAnyURI(object x) { }
-        public override IConversionResult ConvertString(UnicodeString input) => throw new NotImplementedException("STUB: StringToAnyURI.ConvertString not ported (excluded stub)");
+        public StringToAnyURI(object x) : base(x as ConversionRules) { inner = new StringConverter.StringToAnyURI(x as ConversionRules); }
+        // Delegates to the proven nested converter (BuiltInAtomicType binds that one; this top-level
+        // copy is what ConversionRules binds - it used to throw NIE if that registry path went live).
+        public override IConversionResult ConvertString(UnicodeString input) => inner.ConvertString(input);
     }
 }

@@ -19,51 +19,40 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Lib
 {
-    public interface ITraceListener
+    public interface ITraceListener : global::System.IDisposable
     {
-        void SetOutputDestination(Logger stream)
-;
+        void SetOutputDestination(Logger stream);
 
 
-        void Open(Controller controller)
-;
+        void Open(Controller controller);
 
 
-        void Dispose()
-;
+        void Close();
 
 
-        void Enter(ITraceable instruction, Dictionary<string, object> properties, IXPathContext context)
-;
+        void Enter(ITraceable instruction, Dictionary<string, object> properties, IXPathContext context);
 
 
-        void Leave(ITraceable instruction)
-;
+        void Leave(ITraceable instruction);
 
 
-        void StartCurrentItem(IItem currentItem)
-;
+        void StartCurrentItem(IItem currentItem);
 
 
-        void EndCurrentItem(IItem currentItem)
-;
+        void EndCurrentItem(IItem currentItem);
 
 
-        object Checkpoint()
-;
+        object Checkpoint();
 
 
 
-        void Recover(object checkpoint, XPathException err)
-;
+        void Recover(object checkpoint, XPathException err);
 
 
-        void StartRuleSearch()
-;
+        void StartRuleSearch();
 
 
-        void EndRuleSearch(object rule, Mode mode, IItem item)
-;
+        void EndRuleSearch(object rule, Mode mode, IItem item);
 
     }
 }

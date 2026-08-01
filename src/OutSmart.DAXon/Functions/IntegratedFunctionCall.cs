@@ -12,7 +12,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,9 +32,6 @@ namespace OutSmart.DAXon.Functions
         private SequenceType resultType = SequenceType.ANY_SEQUENCE;
         private int state = 0;
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override int IntrinsicDependencies
         {
             get
@@ -100,9 +96,6 @@ namespace OutSmart.DAXon.Functions
             state++;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression exp = base.TypeCheck(visitor, contextInfo);
@@ -123,17 +116,11 @@ namespace OutSmart.DAXon.Functions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression PreEvaluate(ExpressionVisitor visitor)
         {
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override ItemType GetItemType()
         {
             if (function.Definition.TrustResultType())
@@ -146,9 +133,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         protected override int ComputeCardinality()
         {
             if (function.Definition.TrustResultType())
@@ -161,18 +145,12 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             ExtensionFunctionDefinition definition = function.Definition;
             return definition.HasSideEffects() ? StaticProperty.HAS_SIDE_EFFECTS : StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             IntegratedFunctionCall copy = new IntegratedFunctionCall(GetFunctionName(), function);
@@ -189,9 +167,6 @@ namespace OutSmart.DAXon.Functions
             return copy;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("ifCall", this);
@@ -205,9 +180,6 @@ namespace OutSmart.DAXon.Functions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             ExtensionFunctionDefinition definition = function.Definition;
@@ -245,7 +217,7 @@ namespace OutSmart.DAXon.Functions
                     {
                         if (!type.Matches(item, th))
                         {
-                            string msg = role.Get().ComposeErrorMessage(type, item, th);
+                            string msg = role().ComposeErrorMessage(type, item, th);
                             throw new XPathException(msg, "XPTY0004").WithLocation(GetLocation());
                         }
 
@@ -262,9 +234,6 @@ namespace OutSmart.DAXon.Functions
             return result;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             ExtensionFunctionDefinition definition = function.Definition;
@@ -305,9 +274,6 @@ namespace OutSmart.DAXon.Functions
             return result;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             ISequence[] argValues = new ISequence[GetArity()];
@@ -326,17 +292,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             return function.Call(context, arguments);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public class ConfigurationCheckingFunction : IItemMappingFunction
         {
             private readonly Configuration config;

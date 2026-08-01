@@ -20,8 +20,6 @@ using System.Text;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Transformation
 {
@@ -191,11 +189,6 @@ namespace OutSmart.DAXon.Transformation
             return optimizerOptions.IsSet(OptimizerOptions.JIT);
         }
 
-        public virtual void SetURIResolver(URIResolver resolver)
-        {
-            resourceResolver = new ResourceResolverWrappingURIResolver(resolver);
-        }
-
         public virtual void SetParameter(StructuredQName name, IGroundedValue seq)
         {
             suppliedParameters.Put(name, seq);
@@ -244,35 +237,6 @@ namespace OutSmart.DAXon.Transformation
         public virtual OptimizerOptions GetOptimizerOptions()
         {
             return this.optimizerOptions;
-        }
-
-        public virtual URIResolver GetURIResolver()
-        {
-            if (resourceResolver is ResourceResolverWrappingURIResolver)
-            {
-                return ((ResourceResolverWrappingURIResolver)resourceResolver).WrappedURIResolver;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        public virtual void SetErrorListener(ErrorListener listener)
-        {
-            ErrorReporter = new ErrorReporterToListener(listener);
-        }
-
-        public virtual ErrorListener GetErrorListener()
-        {
-            if (errorReporter is ErrorReporterToListener)
-            {
-                return ((ErrorReporterToListener)errorReporter).GetErrorListener();
-            }
-            else
-            {
-                return null;
-            }
         }
 
         public virtual void SetDefaultCollation(string collation)

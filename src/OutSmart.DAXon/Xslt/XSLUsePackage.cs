@@ -35,14 +35,8 @@ namespace OutSmart.DAXon.Xslt
         private StylesheetPackage usedPackage;
         private IList<XSLAccept> acceptors = null;
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public override StylesheetPackage UsedPackage => usedPackage;
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         private HashSet<SymbolicName> ExplicitAcceptedComponentNames
         {
             get
@@ -62,9 +56,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public virtual IList<XSLAccept> Acceptors
         {
             get
@@ -82,9 +73,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         private HashSet<SymbolicName> NamedOverrides
         {
             get
@@ -115,9 +103,6 @@ namespace OutSmart.DAXon.Xslt
                 return overrides;
             }
         }
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public virtual void FindUsedPackage(CompilerInfo info)
         {
             if (usedPackage == null)
@@ -153,9 +138,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         private PackageVersionRanges GetPackageVersionRanges()
         {
             if (versionRanges == null)
@@ -166,9 +148,6 @@ namespace OutSmart.DAXon.Xslt
             return versionRanges;
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public override void PrepareAttributes()
         {
             IAttributeMap atts = Attributes();
@@ -201,17 +180,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public override bool IsDeclaration()
         {
             return true;
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             foreach (NodeInfo child in Children())
@@ -230,9 +203,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public override void PostValidate()
         {
             foreach (NodeInfo curr in Children())
@@ -245,7 +215,7 @@ namespace OutSmart.DAXon.Xslt
 
             HashSet<SymbolicName> accepts = ExplicitAcceptedComponentNames;
             HashSet<SymbolicName> overrides = NamedOverrides;
-            if (!accepts.IsEmpty())
+            if (accepts.Count > 0)
             {
                 foreach (SymbolicName o in overrides)
                 {
@@ -268,9 +238,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public virtual void GatherNamedOverrides(PrincipalStylesheetModule module, IList<ComponentDeclaration> topLevel, HashSet<SymbolicName> overrides)
         {
             if (usedPackage == null)
@@ -301,9 +268,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Bind to the package to which this xsl:use-package element refers.
-        /// </summary>
         public virtual void GatherRuleOverrides(PrincipalStylesheetModule module, HashSet<SymbolicName> overrides)
         {
             StylesheetPackage thisPackage = module.GetStylesheetPackage();

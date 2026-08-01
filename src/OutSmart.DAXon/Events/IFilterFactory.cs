@@ -20,6 +20,6 @@ namespace OutSmart.DAXon.Events
     /// <summary>
     /// Factory class to create a ProxyReceiver which filters events on a push pipeline
     /// </summary>
-    // Phase 5: IFilterFactory interface->delegate.
+    // IFilterFactory interface->delegate.
     public delegate IReceiver IFilterFactory(IReceiver next);
 }

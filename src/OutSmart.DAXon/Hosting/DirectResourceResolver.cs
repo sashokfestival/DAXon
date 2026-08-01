@@ -16,8 +16,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Lib
@@ -36,6 +34,14 @@ namespace OutSmart.DAXon.Lib
             {
                 return null; // bug 5266
             }
+
+            // The Processor's input-size cap applies to every resource this default resolver
+            // fetches (doc/document/collection/unparsed-text/json-doc, compile-time includes).
+            // A host-supplied resolver takes precedence over this one and is the host's own
+            // code - capping what it returns is its own responsibility.
+            long maxInput = config.GetProcessor() is OutSmart.DAXon.Api.Processor apiProcessor
+                ? apiProcessor.MaxInputBytes
+                : long.MaxValue;
 
             ProtocolRestrictor restrictor = config.GetProtocolRestrictor();
             if (!"all".Equals(restrictor.ToString()))
@@ -73,7 +79,13 @@ namespace OutSmart.DAXon.Lib
                         uri = new URI(request.baseUri).Resolve(request.uri).ToString();
                     }
 
-                    return ResourceLoader.TypedResource(config, uri);
+                    ResolvedResource typed = ResourceLoader.TypedResource(config, uri);
+                    if (typed != null)
+                    {
+                        typed.Stream = InputSizeLimit.Apply(typed.Stream, maxInput, uri, "FOUT1170");
+                    }
+
+                    return typed;
                 }
                 catch (IOException e)
                 {
@@ -100,14 +112,16 @@ namespace OutSmart.DAXon.Lib
             {
 
                 // Typically happens when using unparsed-text() with an explicit encoding
-                return new ResolvedResource { Stream = stream, SystemId = request.uri };
+                return new ResolvedResource { Stream = InputSizeLimit.Apply(stream, maxInput, request.uri, "FOUT1170"), SystemId = request.uri };
             }
 
             // Default: an XML resource. Return the raw byte stream + systemId. It is delivered through the
             // direct System.Xml.XmlReader path (StreamSource -> ActiveStreamSource -> XmlReaderToReceiver),
             // no longer via a SAXSource + SAX round-trip. We opened the stream, so it is closed after the parse.
+            // NOTE the size cap only holds when we obtained the stream: if UrlStream failed above, the XML
+            // parser opens the URI itself and the fallback is uncapped (exotic URI schemes only).
             ResolvedResource xml = new ResolvedResource();
-            xml.Stream = stream;
+            xml.Stream = InputSizeLimit.Apply(stream, maxInput, request.uri, "FODC0002");
             xml.SystemId = request.uri;
             xml.PleaseCloseAfterUse = stream != null;
             return xml;

@@ -18,7 +18,6 @@ using OutSmart.DAXon.Xslt;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,9 +36,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         private const int MAX_INLININGS = 100;
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         private static string saxonDotEqName = "Q{" + NamespaceUri.SAXON + "}dot";
         private StructuredQName functionName; // null for an anonymous function
         private bool tailCalls = false;
@@ -60,9 +56,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private int refCount = 0;
         private int minimumArity = 0;
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public string Description
         {
             get
@@ -74,7 +67,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     StringBuilder sb = new StringBuilder("function");
                     if (GetParameterDefinitions().Length != 1 || !GetParameterDefinitions()[0].GetVariableQName().EQName.Equals(saxonDotEqName))
                     {
-                        sb.Append("(");
+                        sb.Append('(');
                         foreach (UserFunctionParameter param in GetParameterDefinitions())
                         {
                             if (first)
@@ -86,13 +79,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
                                 sb.Append(", ");
                             }
 
-                            sb.Append("$").Append(param.GetVariableQName().DisplayName);
+                            sb.Append('$').Append(param.GetVariableQName().DisplayName);
                         }
 
-                        sb.Append(")");
+                        sb.Append(')');
                     }
 
-                    sb.Append("{");
+                    sb.Append('{');
                     Expression body = GetBody();
                     if (body == null)
                     {
@@ -104,7 +97,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         sb.Append(bodyText);
                     }
 
-                    sb.Append("}");
+                    sb.Append('}');
                     return sb.ToString();
                 }
                 else
@@ -113,14 +106,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 }
             }
         }
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public override string TracingTag => "xsl:function";
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public IFunctionItemType FunctionItemType
         {
             get
@@ -136,9 +123,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public OperandRole[] OperandRoles
         {
             get
@@ -182,20 +166,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual FunctionStreamability DeclaredStreamability
         {
-            get => this.declaredStreamability; set
-            {
-                this.declaredStreamability = value == null ? FunctionStreamability.UNCLASSIFIED : value;
-            }
+            // FunctionStreamability is an enum: the Java null->UNCLASSIFIED fallback could never fire.
+            get => this.declaredStreamability;
+            set => this.declaredStreamability = value;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual SequenceType ResultType
         {
             get
@@ -220,14 +197,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual SequenceType DeclaredResultType => declaredResultType;
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual ISequenceEvaluator BodyEvaluator
         {
             get
@@ -245,9 +216,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public UnicodeString UnicodeStringValue
         {
             get
@@ -256,66 +224,39 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual int ReferenceCount => refCount;
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public int NumberOfParameters => GetArity();
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public UserFunction()
         {
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual void SetFunctionName(StructuredQName name)
         {
             functionName = name;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public StructuredQName GetFunctionName()
         {
             return functionName;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public void GatherProperties(Action<string, object> consumer)
         {
-            consumer.Accept("name", GetFunctionName());
-            consumer.Accept("arity", GetArity());
+            consumer("name",GetFunctionName());
+            consumer("arity",GetArity());
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public StructuredQName GetObjectName()
         {
             return functionName;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public override SymbolicName GetSymbolicName()
         {
             return new SymbolicName.F(functionName, GetArity());
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual IFunctionItemType GetFunctionItemType(int arity)
         {
             SequenceType[] argTypes = new SequenceType[arity];
@@ -328,9 +269,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new SpecificFunctionType(argTypes, resultType, annotations);
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual bool AcceptsNodesWithoutAtomization()
         {
             for (int i = 0; i < GetArity(); i++)
@@ -345,57 +283,36 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual bool IsOverrideExtensionFunction()
         {
             return overrideExtensionFunction;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual void SetOverrideExtensionFunction(bool overrideExtensionFunction)
         {
             this.overrideExtensionFunction = overrideExtensionFunction;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual void SetAnnotations(AnnotationList list)
         {
             this.annotations = list ?? throw new NullReferenceException();
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public AnnotationList GetAnnotations()
         {
             return annotations;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual void SetDeterminism(Determinism determinism)
         {
             this.determinism = determinism;
         }
 
-        /// <summary>
-        /// Create a user-defined function (the body must be added later)
-        /// </summary>
         public virtual Determinism GetDeterminism()
         {
             return determinism;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void ComputeEvaluationMode()
         {
             if (tailRecursive || declaredStreamability != FunctionStreamability.UNCLASSIFIED)
@@ -412,9 +329,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual bool? IsInlineable()
         {
             if (inlineable != -1)
@@ -462,25 +376,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void SetInlineable(bool inlineable)
         {
             this.inlineable = inlineable ? 1 : 0;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void MarkAsInlined()
         {
             inliningCount++;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void SetParameterDefinitions(UserFunctionParameter[] @params)
         {
             parameterDefinitions = @params;
@@ -494,91 +399,58 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void SetMinimumArity(int minimumArity)
         {
             this.minimumArity = minimumArity;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void SetArityRange(int min, int max)
         {
             this.minimumArity = min;
             this.parameterDefinitions = new UserFunctionParameter[max];
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual UserFunctionParameter[] GetParameterDefinitions()
         {
             return parameterDefinitions;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual int GetMinimumArity()
         {
             return minimumArity;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void SetTailRecursive(bool tailCalls, bool recursiveTailCalls)
         {
             this.tailCalls = tailCalls;
             tailRecursive = recursiveTailCalls;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual bool ContainsTailCalls()
         {
             return tailCalls;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual bool IsTailRecursive()
         {
             return tailRecursive;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void SetUpdating(bool isUpdating)
         {
             this.updating = isUpdating;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual bool IsUpdating()
         {
             return updating;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void SetIxslUpdating(bool isUpdating)
         {
             this.ixslUpdating = isUpdating;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         private static bool ContainsUserFunctionCalls(Expression exp)
         {
             if (exp is UserFunctionCall)
@@ -597,33 +469,21 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual SequenceType GetArgumentType(int n)
         {
             return parameterDefinitions[n].GetRequiredType();
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public int GetArity()
         {
             return parameterDefinitions.Length;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual bool IsMemoFunction()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void TypeCheck(ExpressionVisitor visitor)
         {
             Expression exp = GetBody();
@@ -662,9 +522,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public XPathContextMajor MakeNewContext(IXPathContext oldContext, IContextOriginator originator)
         {
             XPathContextMajor c2 = oldContext.NewCleanContext();
@@ -676,9 +533,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return c2;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual ISequence Call(IXPathContext context, ISequence[] actualArgs)
         {
             XPathContextMajor c2 = (XPathContextMajor)context;
@@ -701,7 +555,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             ISequenceEvaluator body = bodyEvaluator;
             if (body == null)
             {
-                lock (this)
+                lock (syncLock)
                 {
                     if (bodyEvaluator == null)
                     {
@@ -719,12 +573,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             {
                 result = body.Evaluate(c2);
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                // A deeper recursion level tripped the stack guard; convert here so dynamic and
+                // A deeper recursion level tripped the stack guard; describe here so dynamic and
                 // fused call paths (no call-site catch) report SXLM0001 instead of the generic
-                // internal-error wrap below.
-                throw RecursionOverflow();
+                // internal-error wrap below. Filtered: one such catch per recursion level.
+                throw RecursionOverflow(e);
             }
             catch (XPathException err) when (!(err is XPathException.StackOverflow))
             {
@@ -736,18 +590,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             {
                 throw uxe.GetXPathException().MaybeWithLocation(GetLocation()).MaybeWithContext(c2);
             }
-            catch (Exception err2) when (!(err2 is XPathException))
+            catch (Exception err2) when (!(err2 is XPathException) && !(err2 is RecursionDepthError))
             {
+                // RecursionDepthError excluded: see the matching note in TemplateRule.
                 string message = "Internal error evaluating function " + (functionName == null ? "(unnamed)" : functionName.DisplayName) + (GetLineNumber() > 0 ? " at line " + GetLineNumber() : "") + (GetSystemId() != null ? " in module " + GetSystemId() : "");
-                throw new Exception(message, err2);
+                throw new InvalidOperationException(message, err2);
             }
 
             return result;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void Process(XPathContextMajor context, ISequence[] actualArgs, Outputter output)
         {
             StackGuard.Probe();
@@ -757,7 +609,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             IPushEvaluator push = pushEvaluator;
             if (push == null)
             {
-                lock (this)
+                lock (syncLock)
                 {
                     if (pushEvaluator == null)
                     {
@@ -773,30 +625,24 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 ITailCall tc = push.ProcessLeavingTail(output, context);
                 Expression.DispatchTailCall(tc);
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                // A deeper recursion level tripped the stack guard; convert at the nearest body
+                // A deeper recursion level tripped the stack guard; describe at the nearest body
                 // so call sites without their own catch still report SXLM0001.
-                throw RecursionOverflow();
+                throw RecursionOverflow(e);
             }
         }
 
-        private XPathException.StackOverflow RecursionOverflow()
+        private RecursionDepthError RecursionOverflow(RecursionDepthError e)
         {
-            return new XPathException.StackOverflow("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, GetLocation());
+            return e.Describe("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, GetLocation());
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual ISequence Call(ISequence[] actualArgs, Controller controller)
         {
             return Call(controller.NewXPathContext(), actualArgs);
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void CallUpdating(ISequence[] actualArgs, XPathContextMajor context, IPendingUpdateList pul)
         {
             context.SetStackFrame(GetStackFrameMap(), actualArgs);
@@ -810,9 +656,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             presenter.StartElement("function");
@@ -888,145 +731,91 @@ namespace OutSmart.DAXon.Expressions.Instructions
             presenter.EndElement();
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public override bool IsExportable()
         {
             return refCount > 0 || (DeclaredVisibility != Visibility.UNDEFINED && DeclaredVisibility != Visibility.PRIVATE) || ((StylesheetPackage)GetPackageData()).IsRetainUnusedFunctions();
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public bool IsTrustedResultType()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public bool IsMap()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public bool IsArray()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public bool DeepEquals(IFunctionItem other, IXPathContext context, IAtomicComparer comparer, int flags)
         {
             throw new XPathException("Cannot compare functions using deep-equal", "FOTY0015").AsTypeError().WithXPathContext(context);
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public bool DeepEqual40(IFunctionItem other, IXPathContext context, DeepEqual.DeepEqualOptions options)
         {
             throw new XPathException("Cannot compare functions using deep-equal", "FOTY0015").AsTypeError().WithXPathContext(context);
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public IFunctionItem ItemAt(int n)
         {
             return n == 0 ? this : null;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public IGroundedValue Subsequence(int start, int length)
         {
 
             return start <= 0 && (start + length) > 0 ? (IGroundedValue)this : (IGroundedValue)EmptySequence.GetInstance();
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public int GetLength()
         {
             return 1;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public bool EffectiveBooleanValue()
         {
             return ExpressionTool.EffectiveBooleanValue(this);
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public UserFunction Reduce()
         {
             return this;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public UserFunction Head()
         {
             return this;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public IAtomicSequence Atomize()
         {
             throw new XPathException("Functions cannot be atomized", "FOTY0013");
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void IncrementReferenceCount()
         {
             refCount++;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public virtual void PrepareForStreaming()
         {
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public StructuredQName GetParameterName(int i)
         {
             return GetParameterDefinitions()[i].GetVariableQName();
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public Expression GetDefaultValueExpression(int i)
         {
             return GetParameterDefinitions()[i].DefaultValueExpression;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public int GetPositionOfParameter(StructuredQName name)
         {
             for (int i = 0; i < parameterDefinitions.Length; i++)
@@ -1040,9 +829,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return -1;
         }
 
-        /// <summary>
-        /// Determine the preferred evaluation mode for this function
-        /// </summary>
         public static Expression[] MakeExpandedArgumentArray(Expression[] arguments, Dictionary<StructuredQName, int> keywords, IFunctionDefinition fd)
         {
 
@@ -1056,7 +842,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 expandedArgs = new Expression[maxArity];
                 int positionalArgs = arguments.Length - keywords.Count;
                 Array.Copy(arguments, 0, expandedArgs, 0, positionalArgs);
-                foreach (KeyValuePair<StructuredQName, int> entry in keywords.EntrySet())
+                foreach (KeyValuePair<StructuredQName, int> entry in keywords)
                 {
                     StructuredQName key = entry.Key;
                     int argPos = entry.Value;
@@ -1100,9 +886,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
         IItem IGroundedValue.ItemAt(int arg0) => ItemAt(arg0);
         IItem IGroundedValue.Head() => Head();
         IItem ISequence.Head() => Head();
-        public virtual Genre GetGenre() => throw new NotImplementedException();
-        public virtual ISequenceIterator Iterate() => throw new NotImplementedException();
-        public virtual string GetStringValue() => throw new NotImplementedException();
+        public virtual Genre GetGenre() => Genre.FUNCTION;
+        public virtual ISequenceIterator Iterate() => new SingletonIterator(this);
+        public virtual string GetStringValue() => throw new UncheckedXPathException(new XPathException("The string value of a function is not defined", "FOTY0014"));
         IItem IItem.Head() => Head();
         IItem IItem.ItemAt(int arg0) => ItemAt(arg0);
         SingletonIterator IItem.Iterate() => new SingletonIterator(this);

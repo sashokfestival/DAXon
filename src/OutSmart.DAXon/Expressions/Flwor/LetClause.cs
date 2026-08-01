@@ -13,7 +13,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using static OutSmart.DAXon.Expressions.Flwor.Clause.ClauseName;
 using System;
 using System.Collections.Generic;
@@ -108,9 +107,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             processor.ProcessOperand(sequenceOp);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Func<RoleDiagnostic> role = () => new RoleDiagnostic(RoleDiagnostic.VARIABLE, rangeVariable.GetVariableQName().DisplayName, 0);
@@ -125,17 +121,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void GatherVariableReferences(ExpressionVisitor visitor, IBinding binding, IList<VariableReference> references)
         {
             ExpressionTool.GatherVariableReferences(Sequence, binding, references);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void RefineVariableType(ExpressionVisitor visitor, IList<VariableReference> references, Expression returnExpr)
         {
             Expression seq = Sequence;
@@ -147,18 +137,12 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             PathMap.PathMapNodeSet varPath = Sequence.AddToPathMap(pathMap, pathMapNodeSet);
             pathMap.RegisterPathForVariable(rangeVariable, varPath);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void Explain(ExpressionPresenter @out)
         {
             @out.StartElement("let");
@@ -168,9 +152,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string ToShortString()
         {
             StringBuilder fsb = new StringBuilder(64);
@@ -181,9 +162,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string ToString()
         {
             StringBuilder fsb = new StringBuilder(64);

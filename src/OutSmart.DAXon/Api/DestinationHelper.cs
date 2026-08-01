@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Functions;
 
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,10 +38,35 @@ namespace OutSmart.DAXon.Api
 
         public virtual void CloseAndNotify()
         {
-            helpee.Dispose();
+            helpee.Close();
             foreach (IAction action in listeners)
             {
                 action.Act();
+            }
+        }
+
+        /// <summary>
+        /// Release a destination whose run did not reach CloseAndNotify. Every transform/query entry
+        /// point calls CloseAndNotify as the LAST statement of its try block, so any error before it -
+        /// including an SXTO0001 timeout - used to leave a Serializer's output file open, locked and
+        /// half-written until finalization. Dispose closes it; the OnClose listeners deliberately do
+        /// NOT fire, because they signal a completed result and this run has none. A secondary failure
+        /// while closing must not displace the error being reported, hence the swallow.
+        /// </summary>
+        internal static void ReleaseUnclosed(IDestination destination)
+        {
+            if (destination == null)
+            {
+                return;
+            }
+
+            try
+            {
+                destination.Close();
+            }
+            catch (Exception)
+            {
+                // nothing useful to do while unwinding; the original error is the one that matters
             }
         }
     }

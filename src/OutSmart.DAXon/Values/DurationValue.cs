@@ -34,59 +34,26 @@ namespace OutSmart.DAXon.Values
         protected readonly long _seconds;
         protected readonly int _nanoseconds;
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.DURATION;
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Years => _months / 12;
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Months => _months % 12;
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Days => (int)(_seconds / (24 * 60 * 60));
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Hours => (int)(_seconds % (24 * 60 * 60) / (60 * 60));
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Minutes => (int)(_seconds % (60 * 60) / 60);
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Seconds => (int)(_seconds % 60);
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Microseconds => _nanoseconds / 1000;
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Nanoseconds => _nanoseconds;
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int TotalMonths => _negative ? -_months : _months;
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual BigDecimal TotalSeconds
         {
             get
@@ -101,9 +68,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override UnicodeString PrimitiveStringValue
         {
             get
@@ -128,7 +92,7 @@ namespace OutSmart.DAXon.Values
                 int hours = Hours;
                 int minutes = Minutes;
                 int seconds = Seconds;
-                sb.Append("P");
+                sb.Append('P');
                 if (years != 0)
                 {
                     sb.Append(years + "Y");
@@ -146,7 +110,7 @@ namespace OutSmart.DAXon.Values
 
                 if (hours != 0 || minutes != 0 || seconds != 0 || _nanoseconds != 0)
                 {
-                    sb.Append("T");
+                    sb.Append('T');
                 }
 
                 if (hours != 0)
@@ -175,9 +139,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual double LengthInSeconds
         {
             get
@@ -187,9 +148,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationComparable SchemaComparable
         {
             get
@@ -295,9 +253,6 @@ namespace OutSmart.DAXon.Values
             sb.Append('S');
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         protected virtual bool IsNegativeDuration(bool nonPositive)
         {
             if (_months == 0 && _seconds == 0 && _nanoseconds == 0)
@@ -310,17 +265,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public static IConversionResult MakeDuration(UnicodeString s)
         {
             return MakeDuration(s, true, true);
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         protected static IConversionResult MakeDuration(UnicodeString s, bool allowYM, bool allowDT)
         {
             int years = 0, months = 0, days = 0, hours = 0, minutes = 0, seconds = 0, nanoseconds = 0;
@@ -491,7 +440,7 @@ namespace OutSmart.DAXon.Values
                             StringBuilder frac = new StringBuilder(part);
                             while (frac.Length < 9)
                             {
-                                frac.Append("0");
+                                frac.Append('0');
                             }
 
                             part = frac.ToString();
@@ -545,13 +494,10 @@ namespace OutSmart.DAXon.Values
             {
 
                 // catch values that exceed limits
-                return new ValidationFailure(err.GetMessage());
+                return new ValidationFailure(err.Message);
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         protected static ValidationFailure BadDuration(string msg, UnicodeString s)
         {
             ValidationFailure err = new ValidationFailure("Invalid duration value '" + s + "' (" + msg + ')');
@@ -559,9 +505,6 @@ namespace OutSmart.DAXon.Values
             return err;
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         protected static ValidationFailure BadDuration(string msg, UnicodeString s, string errorCode)
         {
             ValidationFailure err = new ValidationFailure("Invalid duration value '" + s + "' (" + msg + ')');
@@ -569,9 +512,6 @@ namespace OutSmart.DAXon.Values
             return err;
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public static int SimpleInteger(string s)
         {
             long result = 0;
@@ -601,9 +541,6 @@ namespace OutSmart.DAXon.Values
             return (int)result;
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)
         {
             if (_negative)
@@ -616,9 +553,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual int Signum()
         {
             if (_negative)
@@ -634,9 +568,6 @@ namespace OutSmart.DAXon.Values
             return +1;
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override AtomicValue GetComponent(AccessorFn.Component component)
         {
             switch (component)
@@ -668,25 +599,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override IAtomicMatchKey GetXPathMatchKey(IStringCollator collator, int implicitTimezone)
         {
             return this;
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             return null;
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override bool Equals(object other)
         {
             if (other is DurationValue)
@@ -701,33 +623,21 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public override int GetHashCode()
         {
             return (int)(double)(LengthInSeconds).GetHashCode();
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationValue Add(DurationValue other)
         {
             throw new XPathException("Only subtypes of xs:duration can be added", "XPTY0004").AsTypeError();
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationValue Subtract(DurationValue other)
         {
             throw new XPathException("Only subtypes of xs:duration can be subtracted").WithErrorCode("XPTY0004").AsTypeError();
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationValue Negate()
         {
             if (_negative)
@@ -740,49 +650,31 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationValue Multiply(long factor)
         {
             return Multiply((double)factor);
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationValue Multiply(double factor)
         {
             throw new XPathException("Only subtypes of xs:duration can be multiplied by a number", "XPTY0004").AsTypeError();
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationValue Multiply(BigDecimal factor)
         {
             throw new XPathException("Only subtypes of xs:duration can be multiplied by a number", "XPTY0004").AsTypeError();
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual DurationValue Divide(double factor)
         {
             throw new XPathException("Only subtypes of xs:duration can be divided by a number", "XPTY0004").AsTypeError();
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public virtual BigDecimalValue Divide(DurationValue other)
         {
             throw new XPathException("Only subtypes of xs:duration can be divided by another duration", "XPTY0004").AsTypeError();
         }
 
-        /// <summary>
-        /// Ensure that a zero duration is considered positive
-        /// </summary>
         public class DurationComparable : IComparable<DurationComparable>
         {
             private readonly int months;

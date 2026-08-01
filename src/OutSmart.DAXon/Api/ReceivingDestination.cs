@@ -5,7 +5,7 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-namespace OutSmart.DAXon.Api.Jaxp
+namespace OutSmart.DAXon.Api
 {
     public class ReceivingDestination { public ReceivingDestination() { } public ReceivingDestination(object r) { } }
 }

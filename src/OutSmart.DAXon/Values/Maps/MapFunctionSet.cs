@@ -584,9 +584,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Implementation of the XPath 3.1 function map:keys(IMap) =&gt; atomicValue*
-        /// </summary>
         public class MapKeys : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
@@ -614,9 +611,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Implementation of the XPath 3.1 function map:keys(IMap) =&gt; atomicValue*
-        /// </summary>
         public class MapMerge : SystemFunction
         {
             public static readonly string finalKey = "Q{" + NamespaceConstant.SAXON + "}final";
@@ -636,16 +630,16 @@ namespace OutSmart.DAXon.Values.Maps
                 {
                     MapItem options = (MapItem)((Literal)arguments[1]).GroundedValue.Head();
                     Dictionary<string, IGroundedValue> values = Details.optionDetails.ProcessSuppliedOptions(options, visitor.StaticContext.MakeEarlyEvaluationContext());
-                    string duplicates = ((StringValue)values.Get("duplicates")).GetStringValue();
-                    string duplicatesErrorCode = ((StringValue)values.Get(errorCodeKey)).GetStringValue();
+                    string duplicates = ((StringValue)values.GetOrDefault("duplicates")).GetStringValue();
+                    string duplicatesErrorCode = ((StringValue)values.GetOrDefault(errorCodeKey)).GetStringValue();
                     IFunctionItem onDuplicates = values.TryGetValue(onDuplicatesKey, out var __od1) ? (IFunctionItem)__od1 : null;
                     if (onDuplicates != null)
                     {
                         duplicates = "use-callback";
                     }
 
-                    bool isFinal = ((BooleanValue)values.Get(finalKey)).GetBooleanValue();
-                    string keyType = ((StringValue)values.Get(keyTypeKey)).GetStringValue();
+                    bool isFinal = ((BooleanValue)values.GetOrDefault(finalKey)).GetBooleanValue();
+                    string keyType = ((StringValue)values.GetOrDefault(keyTypeKey)).GetStringValue();
                     MapMerge mm2 = (MapMerge)instance31.MakeFunction("merge", 1);
                     mm2.duplicates = duplicates;
                     mm2.duplicatesErrorCode = duplicatesErrorCode;
@@ -723,10 +717,10 @@ namespace OutSmart.DAXon.Values.Maps
                     {
                         MapItem options = (MapItem)arguments[1].Head();
                         Dictionary<string, IGroundedValue> values = Details.optionDetails.ProcessSuppliedOptions(options, context);
-                        duplicates = ((StringValue)values.Get("duplicates")).GetStringValue();
-                        duplicatesErrorCode = ((StringValue)values.Get(errorCodeKey)).GetStringValue();
-                        treatAsFinal = ((BooleanValue)values.Get(finalKey)).GetBooleanValue();
-                        allStringKeys = "string".Equals(((StringValue)values.Get(keyTypeKey)).GetStringValue());
+                        duplicates = ((StringValue)values.GetOrDefault("duplicates")).GetStringValue();
+                        duplicatesErrorCode = ((StringValue)values.GetOrDefault(errorCodeKey)).GetStringValue();
+                        treatAsFinal = ((BooleanValue)values.GetOrDefault(finalKey)).GetBooleanValue();
+                        allStringKeys = "string".Equals(((StringValue)values.GetOrDefault(keyTypeKey)).GetStringValue());
                         onDuplicates = values.TryGetValue(onDuplicatesKey, out var __od2) ? (IFunctionItem)__od2 : null;
                         if (onDuplicates != null)
                         {
@@ -1103,9 +1097,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Implementation of the XPath 3.1 function map:keys(IMap) =&gt; atomicValue*
-        /// </summary>
         //
         /// <summary>
         /// Implementation of the function map:of-pairs() =&gt; IMap
@@ -1152,9 +1143,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Implementation of the XPath 3.1 function map:keys(IMap) =&gt; atomicValue*
-        /// </summary>
         //
         /// <summary>
         /// Implementation of the extension function map:put() =&gt; IMap
@@ -1175,9 +1163,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Implementation of the XPath 3.1 function map:keys(IMap) =&gt; atomicValue*
-        /// </summary>
         //
         /// <summary>
         /// Implementation of the XPath 3.1 function map:remove(IMap, key) =&gt; value
@@ -1198,9 +1183,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        /// <summary>
-        /// Implementation of the XPath 3.1 function map:keys(IMap) =&gt; atomicValue*
-        /// </summary>
         //
         /// <summary>
         /// Implementation of the extension function map:size(map) =&gt; integer

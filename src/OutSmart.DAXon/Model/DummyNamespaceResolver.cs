@@ -12,13 +12,15 @@ using System.Linq;
 
 namespace OutSmart.DAXon.Model
 {
-    // Phase 5: DummyNamespaceResolver implements INamespaceResolver (8 callers).
+    // DummyNamespaceResolver implements INamespaceResolver (8 callers).
     public class DummyNamespaceResolver : INamespaceResolver
     {
         private static readonly DummyNamespaceResolver _instance = new DummyNamespaceResolver();
         public DummyNamespaceResolver() { }
         public static DummyNamespaceResolver GetInstance() => _instance;
-        public NamespaceUri GetURIForPrefix(string prefix, bool useDefault) => throw new NotImplementedException("STUB: DummyNamespaceResolver.GetURIForPrefix not ported (excluded stub)");
+        // Upstream: the empty prefix maps to no-namespace, any other prefix is unknown (null).
+        // ValidateContent passes this resolver for QName-ish content — the stub crashed there.
+        public NamespaceUri GetURIForPrefix(string prefix, bool useDefault) => string.IsNullOrEmpty(prefix) ? NamespaceUri.NULL : null;
         public IEnumerator<string> IteratePrefixes() => Enumerable.Empty<string>().GetEnumerator();
     }
 }

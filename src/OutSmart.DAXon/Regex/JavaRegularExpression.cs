@@ -5,7 +5,6 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using System;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
@@ -16,14 +15,8 @@ using JPattern = OutSmart.DAXon.Internal.Regex.Pattern;
 
 namespace OutSmart.DAXon.Regex
 {
-    // Runtime 2026-06-10: OpUnambiguousRepeat hollow stub REMOVED (implicit=>null). Real file re-included (regex cluster).
-    // Runtime 2026-06-10: OpNothing hollow stub REMOVED (implicit=>null). Real file re-included (regex cluster).
-    //
-    // Runtime 2026-06-11: hollow JavaRegularExpression stub replaced with a faithful port of
-    // net.sf.saxon.regex.JavaRegularExpression (upstream\saxon12-9-src\net\sf\saxon\regex\JavaRegularExpression.java),
-    // backed by the compat OutSmart.DAXon.Internal.Regex.Pattern/Matcher shim (System.Text.RegularExpressions underneath,
-    // with the process-wide Compiled-upgrade cache). Reachable consumer: functions\URIQueryParameters.cs
-    // MakeRegexFilter/RegexFilter (collection-URI ?match= filters) via ctor(UnicodeString, "") + Matches().
+    // Faithful port of net.sf.saxon.regex.JavaRegularExpression, backed by Internal.Regex.Pattern/Matcher
+    // (System.Text.RegularExpressions underneath). Consumer: URIQueryParameters ?match= collection-URI filters.
     //
     // Flag mapping notes (Java letters have their java.util.regex meanings here, NOT XPath meanings):
     //   d UNIX_LINES       -> no-op: .NET ^/$/. already treat only \n as a line terminator, which IS

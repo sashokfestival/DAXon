@@ -8,7 +8,6 @@ using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,22 +38,22 @@ namespace OutSmart.DAXon.Functions
 
         public static string Normalize(string sv, string form)
         {
-            Normalizer.Form fb;
-            if (form.EqualsIgnoreCase("NFC"))
+            NormalizationForm fb;
+            if (form.Equals("NFC", global::System.StringComparison.OrdinalIgnoreCase))
             {
-                fb = Normalizer.Form.NFC;
+                fb = NormalizationForm.FormC;
             }
-            else if (form.EqualsIgnoreCase("NFD"))
+            else if (form.Equals("NFD", global::System.StringComparison.OrdinalIgnoreCase))
             {
-                fb = Normalizer.Form.NFD;
+                fb = NormalizationForm.FormD;
             }
-            else if (form.EqualsIgnoreCase("NFKC"))
+            else if (form.Equals("NFKC", global::System.StringComparison.OrdinalIgnoreCase))
             {
-                fb = Normalizer.Form.NFKC;
+                fb = NormalizationForm.FormKC;
             }
-            else if (form.EqualsIgnoreCase("NFKD"))
+            else if (form.Equals("NFKD", global::System.StringComparison.OrdinalIgnoreCase))
             {
-                fb = Normalizer.Form.NFKD;
+                fb = NormalizationForm.FormKD;
             }
             else if ((form.Length == 0))
             {
@@ -68,7 +67,7 @@ namespace OutSmart.DAXon.Functions
 
             try
             {
-                return Normalizer.Normalize(sv, fb);
+                return sv.Normalize(fb);
             }
             catch (System.ArgumentException)
             {
@@ -86,7 +85,7 @@ namespace OutSmart.DAXon.Functions
             return (cp >= 0xFDD0 && cp <= 0xFDEF) || (cp & 0xFFFE) == 0xFFFE;
         }
 
-        private static string NormalizeAroundNonChars(string sv, Normalizer.Form fb)
+        private static string NormalizeAroundNonChars(string sv, NormalizationForm fb)
         {
             StringBuilder outb = new StringBuilder(sv.Length);
             StringBuilder run = new StringBuilder();
@@ -99,7 +98,11 @@ namespace OutSmart.DAXon.Functions
                 int adv = pair ? 2 : 1;
                 if (IsNonChar(cp))
                 {
-                    if (run.Length > 0) { outb.Append(Normalizer.Normalize(run.ToString(), fb)); run.Clear(); }
+                    if (run.Length > 0)
+                    {
+                        outb.Append(run.ToString().Normalize(fb));
+                        run.Clear();
+                    }
                     outb.Append(sv, i, adv);
                 }
                 else
@@ -110,7 +113,10 @@ namespace OutSmart.DAXon.Functions
                 i += adv;
             }
 
-            if (run.Length > 0) { outb.Append(Normalizer.Normalize(run.ToString(), fb)); }
+            if (run.Length > 0)
+            {
+                outb.Append(run.ToString().Normalize(fb));
+            }
             return outb.ToString();
         }
     }

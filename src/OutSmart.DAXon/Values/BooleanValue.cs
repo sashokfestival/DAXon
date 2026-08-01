@@ -29,61 +29,34 @@ namespace OutSmart.DAXon.Values
         /// The boolean value TRUE
         /// </summary>
         public static readonly BooleanValue TRUE = new BooleanValue(true);
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public static readonly BooleanValue FALSE = new BooleanValue(false);
         private readonly bool value;
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.BOOLEAN;
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override UnicodeString PrimitiveStringValue => value ? StringConstants.TRUE : StringConstants.FALSE;
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public IXPathComparable XPathComparable => this;
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         private BooleanValue(bool value) : base(BuiltInAtomicType.BOOLEAN)
         {
             this.value = value;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public BooleanValue(bool value, IAtomicType typeLabel) : base(typeLabel)
         {
             this.value = value;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public static BooleanValue Get(bool value)
         {
             return value ? TRUE : FALSE;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)
         {
             return new BooleanValue(value, typeLabel);
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public static IConversionResult FromString(UnicodeString s)
         {
 
@@ -128,41 +101,26 @@ namespace OutSmart.DAXon.Values
             return err;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public bool GetBooleanValue()
         {
             return value;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override bool EffectiveBooleanValue()
         {
             return value;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override IAtomicMatchKey GetXPathMatchKey(IStringCollator collator, int implicitTimezone)
         {
             return this;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             return this;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public int CompareTo(IXPathComparable other)
         {
             if (other is BooleanValue)
@@ -185,25 +143,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is BooleanValue && value == ((BooleanValue)other).value;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override int GetHashCode()
         {
             return value ? 0 : 1;
         }
 
-        /// <summary>
-        /// The boolean value FALSE
-        /// </summary>
         public override string Show()
         {
             return this.UnicodeStringValue + "()";

@@ -23,14 +23,8 @@ namespace OutSmart.DAXon.Patterns
     {
         private static readonly AnyNodeTest THE_INSTANCE = new AnyNodeTest();
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override double DefaultPriority => -0.5;
 
-        /// <summary>
-        /// Private constructor
-        /// </summary>
         private AnyNodeTest()
         {
         }
@@ -39,66 +33,42 @@ namespace OutSmart.DAXon.Patterns
             return THE_INSTANCE;
         }
 
-        /// <summary>
-        /// Private constructor
-        /// </summary>
         public override UType GetUType()
         {
             return UType.ANY_NODE;
         }
 
-        /// <summary>
-        /// Private constructor
-        /// </summary>
         public override bool Matches(int nodeKind, INodeName name, ISchemaType annotation)
         {
             return nodeKind != Types.Type.PARENT_POINTER;
         }
 
-        /// <summary>
-        /// Private constructor
-        /// </summary>
         public override IIntPredicateProxy GetMatcher(INodeVectorTree tree)
         {
             byte[] nodeKindArray = tree.NodeKindArray;
             return IntPredicateLambda.Of((nodeNr) => nodeKindArray[nodeNr] != Types.Type.PARENT_POINTER);
         }
 
-        /// <summary>
-        /// Private constructor
-        /// </summary>
         public override bool Test(NodeInfo node)
         {
             return true;
         }
 
-        /// <summary>
-        /// Private constructor
-        /// </summary>
         public bool Matches(StructuredQName qname)
         {
             return true;
         }
 
-        /// <summary>
-        /// Private constructor
-        /// </summary>
         public bool MatchesFingerprint(NamePool namePool, int fp)
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override string ToString()
         {
             return "node()";
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public string ExportQNameTest()
         {
             return "*";

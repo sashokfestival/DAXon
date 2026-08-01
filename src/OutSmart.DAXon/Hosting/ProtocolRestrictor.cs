@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,7 +14,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Lib
 {
@@ -38,13 +36,13 @@ namespace OutSmart.DAXon.Lib
             else
             {
                 IList<Func<URI, bool>> permitted = (IList<Func<URI, bool>>)(new List<object>());
-                string[] tokens = value.Split(",\\s*");
+                string[] tokens = value.SplitRegex(",\\s*");
                 foreach (string token in tokens)
                 {
                     if (token.StartsWith("jar:", StringComparison.Ordinal) && token.Length > 4)
                     {
-                        string subScheme = token.Substring(4).ToLowerCase();
-                        permitted.Add((uri) => Scheme(uri).Equals("jar") && SchemeSpecificPart(uri).ToLowerCase().StartsWith(subScheme, StringComparison.Ordinal));
+                        string subScheme = token.Substring(4).ToLowerInvariant();
+                        permitted.Add((uri) => Scheme(uri).Equals("jar") && SchemeSpecificPart(uri).ToLowerInvariant().StartsWith(subScheme, StringComparison.Ordinal));
                     }
                     else
                     {
@@ -56,7 +54,7 @@ namespace OutSmart.DAXon.Lib
                 {
                     foreach (Func<URI, bool> pred in permitted)
                     {
-                        if (pred.Test(uri))
+                        if (pred(uri))
                         {
                             return true;
                         }
@@ -69,7 +67,7 @@ namespace OutSmart.DAXon.Lib
 
         public virtual bool Test(URI uri)
         {
-            return predicate.Test(uri);
+            return predicate(uri);
         }
 
         public override string ToString()

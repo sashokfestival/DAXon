@@ -39,29 +39,8 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override string ExpressionName => "intRangeTest";
         public IntegerRangeTest(Expression value, Expression min, Expression max)
         {
@@ -125,9 +104,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Get the data type of the items returned
         /// </summary>
         public override ItemType GetItemType()
@@ -135,29 +111,11 @@ namespace OutSmart.DAXon.Expressions
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             IntegerRangeTest exp = new IntegerRangeTest(Value.Copy(rebindings), GetMin().Copy(rebindings), GetMax().Copy(rebindings));
@@ -165,29 +123,11 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is IntegerRangeTest && ((IntegerRangeTest)other).Value.IsEqual(Value) && ((IntegerRangeTest)other).GetMin().IsEqual(GetMin()) && ((IntegerRangeTest)other).GetMax().IsEqual(GetMax());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         /// <summary>
         /// Hashcode supporting equals()
         /// </summary>
@@ -198,35 +138,11 @@ namespace OutSmart.DAXon.Expressions
             return h;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext c)
         {
             return BooleanValue.Get(EffectiveBooleanValue(c));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext c)
         {
             try
@@ -239,18 +155,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public static bool Eval(IItemEvaluator minEval, IItemEvaluator maxEval, IPullEvaluator valueEval, IXPathContext c)
         {
             IntegerValue minVal = null;
@@ -315,18 +219,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("intRangeTest", this);
@@ -336,52 +228,16 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override string ToString()
         {
             return ExpressionTool.Parenthesize(Value) + " = (" + ExpressionTool.Parenthesize(GetMin()) + " to " + ExpressionTool.Parenthesize(GetMax()) + ")";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new IntegerRangeTestElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public class IntegerRangeTestElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()

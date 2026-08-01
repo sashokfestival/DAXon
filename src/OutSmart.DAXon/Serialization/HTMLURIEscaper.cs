@@ -12,7 +12,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Collections;
-using OutSmart.DAXon.Internal.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,30 +25,12 @@ namespace OutSmart.DAXon.Serialization
 {
     public class HTMLURIEscaper : ProxyReceiver
     {
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         private static readonly HTMLTagHashSet urlAttributes = new HTMLTagHashSet(47);
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         private static readonly HTMLTagHashSet urlCombinations = new HTMLTagHashSet(101);
 
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         protected INodeName currentElement;
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         protected bool escapeURIAttributes = true;
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         protected NamePool pool;
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         static HTMLURIEscaper()
         {
             SetUrlAttribute("form", "action");
@@ -90,25 +71,16 @@ namespace OutSmart.DAXon.Serialization
             SetUrlAttribute("input", "usemap");
             SetUrlAttribute("object", "usemap");
         }
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         public HTMLURIEscaper(IReceiver nextReceiver) : base(nextReceiver)
         {
         }
 
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         private static void SetUrlAttribute(string element, string attribute)
         {
             urlAttributes.Add(attribute);
             urlCombinations.Add(element + '+' + attribute);
         }
 
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         public virtual bool IsUrlAttribute(INodeName element, INodeName attribute)
         {
             if (pool == null)
@@ -126,21 +98,12 @@ namespace OutSmart.DAXon.Serialization
             return urlCombinations.Contains(elementName + '+' + attributeName);
         }
 
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
         public override void StartDocument(int properties)
         {
             nextReceiver.StartDocument(properties);
             pool = GetPipelineConfiguration().GetConfiguration().GetNamePool();
         }
 
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
         public override void StartElement(INodeName nameCode, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             currentElement = nameCode;
@@ -186,12 +149,6 @@ namespace OutSmart.DAXon.Serialization
             nextReceiver.StartElement(nameCode, type, atts2, namespaces, location, properties);
         }
 
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
         public static string EscapeURL(string url, bool normalize, Configuration config)
         {
 
@@ -204,7 +161,7 @@ namespace OutSmart.DAXon.Serialization
                 {
                     if (normalize)
                     {
-                        string normalized = Normalizer.Normalize(url, Normalizer.Form.NFC);
+                        string normalized = url.Normalize(NormalizationForm.FormC);
                         return ReallyEscapeURL(normalized).ToString();
                     }
                     else
@@ -217,12 +174,6 @@ namespace OutSmart.DAXon.Serialization
             return url;
         }
 
-        /// <summary>
-        /// Table of attributes whose value is a URL
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
         private static UnicodeString ReallyEscapeURL(string url)
         {
             UnicodeBuilder ub = new UnicodeBuilder(url.Length + 20);

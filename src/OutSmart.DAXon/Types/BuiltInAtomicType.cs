@@ -91,67 +91,22 @@ namespace OutSmart.DAXon.Types
 
         public virtual string EQName => "Q{" + NamespaceUri.SCHEMA + "}" + Name;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual StructuredQName TypeName => new StructuredQName(StandardNames.GetPrefix(fingerprint), StandardNames.GetURI(fingerprint), StandardNames.GetLocalName(fingerprint));
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual string BasicAlphaCode => alphaCode;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual int RedefinitionLevel => 0;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public SchemaValidationStatus ValidationStatus => VALIDATED;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public int DerivationMethod => Derivation.DERIVATION_RESTRICTION;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual int FinalProhibitions => 0;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public int Fingerprint => fingerprint;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual string DisplayName => StandardNames.GetDisplayName(fingerprint);
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public ISchemaType BaseType
         {
             get
@@ -167,36 +122,12 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual int PrimitiveType => primitiveFingerprint;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual ISchemaType KnownBaseType => BaseType;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual string Description => DisplayName;
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual int WhitespaceAction
@@ -215,12 +146,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual ISchemaType BuiltInBaseType
@@ -237,20 +162,10 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public virtual IList<IPlainType> PlainMemberTypes => new List<IPlainType>(1) { this };
-        public virtual BuiltInAtomicType PrimitiveAtomicType => throw new NotImplementedException();
-        public virtual double DefaultPriority => throw new NotImplementedException();
+        public virtual double DefaultPriority => 0; // upstream BuiltInAtomicType.getDefaultPriority (NumericType overrides with 0.125)
         static BuiltInAtomicType()
         {
 
@@ -299,7 +214,6 @@ namespace OutSmart.DAXon.Types
             UNSIGNED_BYTE.stringConverter = new StringToIntegerSubtype(UNSIGNED_BYTE); // We were getting an IntelliJ warning here about potential class loading deadlock. See bug #2524. Have moved the
             // static initializers here, and removed the dependency on static initialization in StringConverter, which hopefully
             // solves the problem.
-            //NumericType.init();
         }
 
         private BuiltInAtomicType(int fingerprint)
@@ -309,7 +223,7 @@ namespace OutSmart.DAXon.Types
 
         public static BuiltInAtomicType FromAlphaCode(string code)
         {
-            return byAlphaCode.Get(code);
+            return byAlphaCode.GetOrDefault(code);
         }
 
         public static bool IsStringLike(ItemType type)
@@ -337,17 +251,11 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual bool IsBuiltInType()
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual SequenceType One()
         {
             if (_one == null)
@@ -358,9 +266,6 @@ namespace OutSmart.DAXon.Types
             return _one;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual SequenceType ZeroOrOne()
         {
             if (_zeroOrOne == null)
@@ -371,9 +276,6 @@ namespace OutSmart.DAXon.Types
             return _zeroOrOne;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual SequenceType OneOrMore()
         {
             if (_oneOrMore == null)
@@ -384,9 +286,6 @@ namespace OutSmart.DAXon.Types
             return _oneOrMore;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual SequenceType ZeroOrMore()
         {
             if (_zeroOrMore == null)
@@ -397,25 +296,16 @@ namespace OutSmart.DAXon.Types
             return _zeroOrMore;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual bool IsOrdered(bool optimistic)
         {
             return ordered || (optimistic && (this == DURATION || this == ANY_ATOMIC));
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual string GetSystemId()
         {
             return null;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
         public virtual bool IsPrimitiveNumeric()
         {
             switch (Fingerprint)
@@ -430,111 +320,51 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public int GetBlock()
         {
             return 0;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public bool AllowsDerivation(int derivation)
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public void SetBaseTypeFingerprint(int baseFingerprint)
         {
             this.baseFingerprint = baseFingerprint;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public StructuredQName GetStructuredQName()
         {
             return new StructuredQName("xs", NamespaceUri.SCHEMA, StandardNames.GetLocalName(fingerprint));
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public bool IsPrimitiveType()
         {
             return Types.Type.IsPrimitiveAtomicType(fingerprint);
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public bool IsComplexType()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public bool IsAnonymousType()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual bool IsPlainType()
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual bool Matches(IItem item, TypeHierarchy th)
         {
             return item is AtomicValue && Types.Type.IsSubType(((AtomicValue)item).GetItemType(), this);
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual BuiltInAtomicType GetPrimitiveItemType()
         {
             if (IsPrimitiveType())
@@ -555,34 +385,16 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual bool IsAllowedInXSD10()
         {
             return Fingerprint != StandardNames.XS_DATE_TIME_STAMP;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public override string ToString()
         {
             return DisplayName;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual IAtomicType GetAtomizedItemType()
         {
             return this;
@@ -590,34 +402,16 @@ namespace OutSmart.DAXon.Types
 
         IPlainType IItemTypeWithSequenceTypeCache.GetAtomizedItemType() => GetAtomizedItemType();
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual bool IsAtomizable(TypeHierarchy th)
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual bool IsSameType(ISchemaType other)
         {
             return other.Fingerprint == Fingerprint;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         public virtual void CheckTypeDerivationIsOK(ISchemaType type, int block)
         {
             if (type == AnySimpleType.INSTANCE)
@@ -645,12 +439,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public bool IsSimpleType()
@@ -658,12 +446,6 @@ namespace OutSmart.DAXon.Types
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual bool IsAtomicType()
@@ -671,12 +453,6 @@ namespace OutSmart.DAXon.Types
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual bool IsIdType()
@@ -684,12 +460,6 @@ namespace OutSmart.DAXon.Types
             return fingerprint == StandardNames.XS_ID;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual bool IsIdRefType()
@@ -697,12 +467,6 @@ namespace OutSmart.DAXon.Types
             return fingerprint == StandardNames.XS_IDREF;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual bool IsListType()
@@ -710,12 +474,6 @@ namespace OutSmart.DAXon.Types
             return false;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual bool IsUnionType()
@@ -723,12 +481,6 @@ namespace OutSmart.DAXon.Types
             return false;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual bool IsNamespaceSensitive()
@@ -744,12 +496,6 @@ namespace OutSmart.DAXon.Types
             return fp == StandardNames.XS_QNAME || fp == StandardNames.XS_NOTATION;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual ValidationFailure ValidateContent(UnicodeString value, INamespaceResolver nsResolver, ConversionRules rules)
@@ -797,12 +543,6 @@ namespace OutSmart.DAXon.Types
             return converter.Validate(value);
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual StringConverter GetStringConverter(ConversionRules rules)
@@ -840,12 +580,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual IAtomicSequence Atomize(NodeInfo node)
@@ -881,12 +615,6 @@ namespace OutSmart.DAXon.Types
             return converter.ConvertString(stringValue).AsAtomic();
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public virtual IAtomicSequence GetTypedValue(UnicodeString value, INamespaceResolver resolver, ConversionRules rules)
@@ -911,12 +639,6 @@ namespace OutSmart.DAXon.Types
             return converter.ConvertString(value).AsAtomic();
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
         public override bool Equals(object obj)
@@ -924,33 +646,15 @@ namespace OutSmart.DAXon.Types
             return obj is BuiltInAtomicType && Fingerprint == ((BuiltInAtomicType)obj).Fingerprint;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public override int GetHashCode()
         {
             return Fingerprint;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public virtual ValidationFailure Validate(AtomicValue primValue, UnicodeString lexicalValue, ConversionRules rules)
         {
             switch (fingerprint)
@@ -1027,33 +731,15 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public virtual void AnalyzeContentExpression(Expression expression, int kind)
         {
             AnalyzeContentExpression(this, expression, kind);
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public static void AnalyzeContentExpression(ISimpleType simpleType, Expression expression, int kind)
         {
             if (kind == Types.Type.ELEMENT)
@@ -1077,17 +763,8 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         private static BuiltInAtomicType MakeAtomicType(int fingerprint, ISimpleType baseType, string code, bool ordered)
         {
             BuiltInAtomicType t = new BuiltInAtomicType(fingerprint);
@@ -1105,70 +782,34 @@ namespace OutSmart.DAXon.Types
             t.ordered = ordered;
             t.alphaCode = code;
             BuiltInType.Register(fingerprint, t);
-            byAlphaCode.Put(code, t);
+            byAlphaCode[code] = t;
             return t;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public virtual UnicodeString Preprocess(UnicodeString input)
         {
             return input;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public virtual UnicodeString Postprocess(UnicodeString input)
         {
             return input;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public virtual bool IsNumericType()
         {
             ItemType p = GetPrimitiveItemType();
             return p == NumericType.GetInstance() || p == DECIMAL || p == DOUBLE || p == FLOAT || p == INTEGER;
         }
 
-        /// <summary>
-        /// Determine whether this is a built-in type or a user-defined type
-        /// </summary>
-        /// <summary>
-        /// Get the validation status - always valid
-        /// </summary>
         // OK
         // OK
-        /// <summary>
-        /// The fingerprint can be used as a hashcode
-        /// </summary>
         public virtual bool IsDurationType()
         {
             return this == DURATION || this == DAY_TIME_DURATION || this == YEAR_MONTH_DURATION;
@@ -1177,6 +818,6 @@ namespace OutSmart.DAXon.Types
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public virtual Genre GetGenre() => Genre.ATOMIC; // upstream AtomicType.getGenre() default; was a throwing stub (broke axis type-checks on atomic context)
-        public virtual string ExplainMismatch(IItem item, TypeHierarchy th) => throw new NotImplementedException();
+        public virtual string ExplainMismatch(IItem item, TypeHierarchy th) => null; // upstream default: no extra explanation (diagnostics must not throw)
     }
 }

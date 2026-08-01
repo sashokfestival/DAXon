@@ -25,8 +25,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Resolver;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Transformation
@@ -42,7 +40,6 @@ namespace OutSmart.DAXon.Transformation
         private string subsection = null;
         private readonly StringBuilder buffer = new StringBuilder(100);
         protected Configuration targetConfig;
-        private ClassLoader classLoader = null;
         private readonly IList<IXmlProcessingError> errors = new List<IXmlProcessingError>();
         private PackageLibrary packageLibrary;
         private PackageDetails currentPackage;
@@ -90,6 +87,10 @@ namespace OutSmart.DAXon.Transformation
         {
         }
 
+        public virtual void Close()
+        {
+        }
+
         public virtual void Dispose()
         {
         }
@@ -97,11 +98,6 @@ namespace OutSmart.DAXon.Transformation
         public virtual string GetSystemId()
         {
             return systemId;
-        }
-
-        public virtual void SetClassLoader(ClassLoader classLoader)
-        {
-            this.classLoader = classLoader;
         }
 
         public virtual void SetBaseConfiguration(Configuration @base)
@@ -138,7 +134,7 @@ namespace OutSmart.DAXon.Transformation
 
             // TODO: set an error handler
             // TODO: set location information
-            if (!errors.IsEmpty())
+            if (errors.Count > 0)
             {
                 IErrorReporter reporter;
                 IXmlProcessingError foundFatal = null;
@@ -191,7 +187,7 @@ namespace OutSmart.DAXon.Transformation
             NamespaceUri uri = elemName.GetNamespaceUri();
             string localName = elemName.GetLocalPart();
             localNameStack.Push(localName);
-            buffer.SetLength(0);
+            buffer.Length = 0;
             if (NamespaceUri.SAXON_CONFIGURATION.Equals(uri))
             {
                 if (level == 0)
@@ -213,10 +209,10 @@ namespace OutSmart.DAXon.Transformation
                             targetConfig = new Configuration();
                             break;
                         case "PE":
-                            targetConfig = Configuration.MakeLicensedConfiguration(classLoader, "com.saxonica.config.ProfessionalConfiguration");
+                            targetConfig = Configuration.MakeLicensedConfiguration("com.saxonica.config.ProfessionalConfiguration");
                             break;
                         case "EE":
-                            targetConfig = Configuration.MakeLicensedConfiguration(classLoader, "com.saxonica.config.EnterpriseConfiguration");
+                            targetConfig = Configuration.MakeLicensedConfiguration("com.saxonica.config.EnterpriseConfiguration");
                             break;
                         default:
                             Error("configuration", "edition", edition, "HE|PE|EE");
@@ -259,8 +255,6 @@ namespace OutSmart.DAXon.Transformation
                     {
                         targetConfig.Label = label;
                     }
-
-                    targetConfig.DynamicLoader.SetClassLoader(classLoader);
                 }
 
                 if (level == 1)
@@ -505,7 +499,7 @@ namespace OutSmart.DAXon.Transformation
                 }
                 catch (ArgumentException e)
                 {
-                    string message = e.GetMessage();
+                    string message = e.Message;
                     if (message.StartsWith(attributeName, StringComparison.Ordinal))
                     {
                         message = message.Replace(attributeName, "Value");
@@ -591,7 +585,7 @@ namespace OutSmart.DAXon.Transformation
             }
             catch (XPathException e)
             {
-                errors.Add(new XmlProcessingIncident(e.GetMessage()));
+                errors.Add(new XmlProcessingIncident(e.Message));
             }
 
             targetConfig.RegisterCollation(collationUri, collator);
@@ -838,7 +832,7 @@ namespace OutSmart.DAXon.Transformation
                 currentPackage.staticParams = new Dictionary<StructuredQName, IGroundedValue>();
             }
 
-            currentPackage.staticParams.Put(qName, value);
+            currentPackage.staticParams[qName] = value;
         }
 
         private void ReadXQueryElement(IAttributeMap atts)
@@ -991,7 +985,7 @@ namespace OutSmart.DAXon.Transformation
 
         protected virtual void ErrorClass(string element, string attribute, string actual, System.Type required, Exception cause)
         {
-            XmlProcessingIncident err = new XmlProcessingIncident("Invalid configuration property " + element + (attribute == null ? "" : "/@" + attribute) + ". Supplied value '" + actual + "', required value is the name of a class that implements '" + required.GetName() + "'");
+            XmlProcessingIncident err = new XmlProcessingIncident("Invalid configuration property " + element + (attribute == null ? "" : "/@" + attribute) + ". Supplied value '" + actual + "', required value is the name of a class that implements '" + required.FullName + "'");
             err.SetCause((Exception)cause);
 
             errors.Add(err);
@@ -1086,7 +1080,7 @@ namespace OutSmart.DAXon.Transformation
             }
 
             level--;
-            buffer.SetLength(0);
+            buffer.Length = 0;
         }
 
         // already done at startElement time
@@ -1110,9 +1104,9 @@ namespace OutSmart.DAXon.Transformation
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void Append(IItem item, ILocation locationId, int properties) { throw new NotImplementedException(); }
-        public virtual void Append(IItem item) { throw new NotImplementedException(); }
-        public virtual bool UsesTypeAnnotations() => throw new NotImplementedException();
-        public virtual bool HandlesAppend() => throw new NotImplementedException();
+        public virtual void Append(IItem item, ILocation locationId, int properties) => throw new InvalidOperationException("This receiver only accepts character events");
+        public virtual void Append(IItem item) => throw new InvalidOperationException("This receiver only accepts character events");
+        public virtual bool UsesTypeAnnotations() => false;
+        public virtual bool HandlesAppend() => false;
     }
 }

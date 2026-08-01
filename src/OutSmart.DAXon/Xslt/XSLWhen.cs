@@ -68,26 +68,17 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on stylesheet functions. For most instructions, this does nothing.
-        /// </summary>
         public override bool MarkTailCalls()
         {
             StyleElement last = LastChildInstruction;
             return last != null && last.MarkTailCalls();
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on stylesheet functions. For most instructions, this does nothing.
-        /// </summary>
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
             return null; // compilation is handled from the xsl:choose element
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on stylesheet functions. For most instructions, this does nothing.
-        /// </summary>
         public override Expression CompileSequenceConstructor(Compilation compilation, ComponentDeclaration decl, bool includeParams)
         {
             if (select == null)

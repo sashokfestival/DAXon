@@ -17,6 +17,7 @@ namespace OutSmart.DAXon.Model
 {
     public sealed class DocumentPool
     {
+        private readonly object syncLock = new object();
         // The document pool ensures that the document()
         // function, when called twice with the same URI, returns the same document
         // each time. For this purpose we use a hashtable from
@@ -25,9 +26,26 @@ namespace OutSmart.DAXon.Model
         // The set of documents known to be unavailable. These documents must remain
         // unavailable for the duration of a transformation or query!
         private readonly HashSet<DocumentKey> unavailableDocuments = new HashSet<DocumentKey>(10);
+
+        /// <summary>
+        /// True when this pool holds nothing at all. Lets the end-of-run release skip its work
+        /// entirely for the common shape where the host hands in an already-built node and the
+        /// stylesheet calls neither doc() nor document(), so nothing was ever pooled.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                lock (syncLock)
+                {
+                    return documentNameMap.Count == 0 && unavailableDocuments.Count == 0;
+                }
+            }
+        }
+
         public void Add(ITreeInfo doc, string uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (uri != null)
                 {
@@ -38,7 +56,7 @@ namespace OutSmart.DAXon.Model
 
         public void Add(ITreeInfo doc, DocumentKey uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (uri != null)
                 {
@@ -48,14 +66,14 @@ namespace OutSmart.DAXon.Model
                         throw new XPathException("Cannot have two different documents with the same document-uri " + uri.AbsoluteURI);
                     }
 
-                    documentNameMap.Put(uri, doc);
+                    documentNameMap[uri] = doc;
                 }
             }
         }
 
         public ITreeInfo Find(string uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 return documentNameMap.TryGetValue(new DocumentKey(uri), out var __ti1) ? __ti1 : null;
             }
@@ -63,7 +81,7 @@ namespace OutSmart.DAXon.Model
 
         public ITreeInfo Find(DocumentKey uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 return documentNameMap.TryGetValue(uri, out var __ti2) ? __ti2 : null;
             }
@@ -71,19 +89,18 @@ namespace OutSmart.DAXon.Model
 
         public string GetDocumentURI(NodeInfo doc)
         {
-            lock (this)
+            lock (syncLock)
             {
-                foreach (DocumentKey uri in documentNameMap.KeySet())
+                foreach (KeyValuePair<DocumentKey, ITreeInfo> e in documentNameMap)
                 {
-                    ITreeInfo found = Find(uri);
-                    if (found == null)
+                    if (e.Value == null)
                     {
-                        continue; // can happen when discard-document() is used concurrently
+                        continue;
                     }
 
-                    if (found.GetRootNode().Equals(doc))
+                    if (e.Value.GetRootNode().Equals(doc))
                     {
-                        return uri.ToString();
+                        return e.Key.ToString();
                     }
                 }
 
@@ -93,19 +110,19 @@ namespace OutSmart.DAXon.Model
 
         public bool Contains(ITreeInfo doc)
         {
-            lock (this)
+            lock (syncLock)
             {
 
                 // relies on "equals" for nodes comparing node identity
-                return documentNameMap.Values().Contains(doc);
+                return documentNameMap.Values.Contains(doc);
             }
         }
 
         public ITreeInfo Discard(ITreeInfo doc)
         {
-            lock (this)
+            lock (syncLock)
             {
-                foreach (KeyValuePair<DocumentKey, ITreeInfo> e in documentNameMap.EntrySet())
+                foreach (KeyValuePair<DocumentKey, ITreeInfo> e in documentNameMap)
                 {
                     DocumentKey name = e.Key;
                     ITreeInfo entry = e.Value;
@@ -120,22 +137,34 @@ namespace OutSmart.DAXon.Model
             }
         }
 
+        // Locked like every other member: today these three are only called on per-Controller
+        // pools, but the class also backs Configuration's shared globalDocumentPool, and the
+        // asymmetry (all-but-three methods locked) invites a torn HashSet the day a caller moves.
         public void DiscardIndexes(KeyManager keyManager)
         {
-            foreach (ITreeInfo doc in documentNameMap.Values())
+            lock (syncLock)
             {
-                keyManager.ClearDocumentIndexes(doc);
+                foreach (ITreeInfo doc in documentNameMap.Values)
+                {
+                    keyManager.ClearDocumentIndexes(doc);
+                }
             }
         }
 
         public void MarkUnavailable(DocumentKey uri)
         {
-            unavailableDocuments.Add(uri);
+            lock (syncLock)
+            {
+                unavailableDocuments.Add(uri);
+            }
         }
 
         public bool IsMarkedUnavailable(DocumentKey uri)
         {
-            return unavailableDocuments.Contains(uri);
+            lock (syncLock)
+            {
+                return unavailableDocuments.Contains(uri);
+            }
         }
     }
 }

@@ -106,9 +106,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return true;
         }
 
-        /// <summary>
-        /// Get the next item, in sorted order
-        /// </summary>
         public virtual IItem Next()
         {
             if (position < 0)
@@ -139,17 +136,11 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Get the next item, in sorted order
-        /// </summary>
         public virtual bool SupportsGetLength()
         {
             return true;
         }
 
-        /// <summary>
-        /// Get the next item, in sorted order
-        /// </summary>
         public virtual int GetLength()
         {
             if (count < 0)
@@ -167,9 +158,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return count;
         }
 
-        /// <summary>
-        /// Get the next item, in sorted order
-        /// </summary>
         protected virtual void BuildArray()
         {
             int allocated = SequenceTool.SupportsGetLength(@base) ? SequenceTool.GetLength(@base) : 100;
@@ -226,9 +214,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Get the next item, in sorted order
-        /// </summary>
         private void DoSort()
         {
             BuildArray();
@@ -260,7 +245,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
             catch (InvalidCastException e)
             {
-                throw new XPathException("Non-comparable types found while sorting: " + e.GetMessage()).WithErrorCode(hostLanguage == HostLanguage.XSLT ? "XTDE1030" : "XPTY0004");
+                throw new XPathException("Non-comparable types found while sorting: " + e.Message).WithErrorCode(hostLanguage == HostLanguage.XSLT ? "XTDE1030" : "XPTY0004");
             }
             catch (InvalidOperationException e)
             {
@@ -1113,9 +1098,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public virtual void Dispose() { }
 
-        /// <summary>
-        /// Get the next item, in sorted order
-        /// </summary>
         private class SortComparer : IComparer<ObjectToBeSorted>
         {
             private IAtomicComparer[] comparators;
@@ -1160,7 +1142,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
                 }
                 catch (NoDynamicContextException e)
                 {
-                    throw new InvalidOperationException("Sorting without dynamic context: " + e.GetMessage());
+                    throw new InvalidOperationException("Sorting without dynamic context: " + e.Message);
                 }
 
 

@@ -114,7 +114,7 @@ namespace OutSmart.DAXon.Xslt
                         case StandardNames.XSL_ATTRIBUTE_SET:
                             {
                                 IList<ComponentDeclaration> declarations = psm.GetAttributeSetDeclarations(qName);
-                                found = declarations != null && !declarations.IsEmpty();
+                                found = declarations != null && declarations.Count > 0;
                                 if (found)
                                 {
                                     Visibility declared = declarations[0].SourceElement.DeclaredVisibility;

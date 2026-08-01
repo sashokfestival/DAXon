@@ -24,36 +24,21 @@ namespace OutSmart.DAXon.Types
 {
     public abstract class StringConverter : Converter
     {
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
         protected StringConverter()
         {
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
         protected StringConverter(ConversionRules rules) : base(rules)
         {
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
         public abstract IConversionResult ConvertString(UnicodeString input);
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
         public virtual ValidationFailure Validate(UnicodeString input)
         {
             IConversionResult result = ConvertString(input);
             return result is ValidationFailure ? (ValidationFailure)result : null;
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
         public virtual IConversionResult Convert(AtomicValue input)
 
         {
@@ -70,9 +55,6 @@ namespace OutSmart.DAXon.Types
             return Convert((AtomicValue)value);
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
         public class StringToNonStringDerivedType : StringConverter
         {
             private readonly StringConverter phaseOne;
@@ -153,9 +135,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
         /// Converts from xs:string or xs:untypedAtomic to xs:String
         /// </summary>
         public class StringToString : StringConverter
@@ -182,12 +161,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
         /// <summary>
         /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
         /// </summary>
@@ -216,15 +189,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
         /// Converts from xs:string to xs:normalizedString
         /// </summary>
         public class StringToNormalizedString : StringConverter
@@ -247,18 +211,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
         /// Converts from xs:string to xs:token
         /// </summary>
         public class StringToToken : StringConverter
@@ -280,21 +232,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
         /// <summary>
         /// Converts from xs:string to xs:language
         /// </summary>
@@ -327,24 +264,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
         /// <summary>
         /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
         /// </summary>
@@ -391,27 +310,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
         /// Converts from xs:string to xs:NMTOKEN
         /// </summary>
         public class StringToNMTOKEN : StringConverter
@@ -443,30 +341,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
         /// <summary>
         /// Converts from xs:string to xs:Name
         /// </summary>
@@ -513,33 +387,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
         /// <summary>
         /// Converts from xs:string to a user-defined type derived directly from xs:string
         /// </summary>
@@ -593,33 +440,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
         /// Converts from xs;string to a user-defined type derived from a built-in subtype of xs:string
         /// </summary>
         public class StringToDerivedStringSubtype : StringConverter
@@ -665,33 +485,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
         /// Converts a string to xs:float
         /// </summary>
         public class StringToFloat : StringConverter
@@ -716,33 +509,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
         /// <summary>
         /// Converts a string to an xs:decimal
         /// </summary>
@@ -797,36 +563,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to an integer
         /// </summary>
         public class StringToInteger : StringConverter
@@ -849,66 +585,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a duration
         /// </summary>
         public class StringToDuration : StringConverter
@@ -920,36 +596,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts a string to a dayTimeDuration
         /// </summary>
@@ -963,36 +609,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a yearMonthDuration
         /// </summary>
         public class StringToYearMonthDuration : StringConverter
@@ -1004,36 +620,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts a string to a dateTime
         /// </summary>
@@ -1049,36 +635,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts a string to a dateTimeStamp
         /// </summary>
@@ -1108,36 +664,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a date
         /// </summary>
         public class StringToDate : StringConverter
@@ -1153,36 +679,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a gMonth
         /// </summary>
         public class StringToGMonth : StringConverter
@@ -1194,36 +690,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts a string to a gYearMonth
         /// </summary>
@@ -1240,36 +706,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a gYear
         /// </summary>
         public class StringToGYear : StringConverter
@@ -1285,36 +721,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a gMonthDay
         /// </summary>
         public class StringToGMonthDay : StringConverter
@@ -1326,36 +732,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts a string to a gDay
         /// </summary>
@@ -1369,36 +745,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a time
         /// </summary>
         public class StringToTime : StringConverter
@@ -1411,36 +757,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts a string to a boolean
         /// </summary>
         public class StringToBoolean : StringConverter
@@ -1452,36 +768,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts a string to hexBinary
         /// </summary>
@@ -1502,36 +788,6 @@ namespace OutSmart.DAXon.Types
         }
 
         /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
         /// Converts string to base64
         /// </summary>
         public class StringToBase64Binary : StringConverter
@@ -1550,36 +806,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts String to QName
         /// </summary>
@@ -1634,41 +860,11 @@ namespace OutSmart.DAXon.Types
                 }
                 catch (XPathException err)
                 {
-                    return new ValidationFailure(err.GetMessage());
+                    return new ValidationFailure(err.Message);
                 }
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
         /// <summary>
         /// Converts String to NOTATION
         /// </summary>
@@ -1726,44 +922,11 @@ namespace OutSmart.DAXon.Types
                 }
                 catch (XPathException err)
                 {
-                    return new ValidationFailure(err.GetMessage());
+                    return new ValidationFailure(err.Message);
                 }
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
-        /// Converts String to NOTATION
-        /// </summary>
         /// <summary>
         /// Converts string to anyURI
         /// </summary>
@@ -1798,42 +961,6 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Create a StringConverter
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:String
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:normalizedString
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:token
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:language
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:NMTOKEN
-        /// </summary>
-        /// <summary>
-        /// Converts from xs:string to xs:Name
-        /// </summary>
-        /// <summary>
-        /// Converts a string to an xs:decimal
-        /// </summary>
-        /// <summary>
-        /// Converts String to NOTATION
-        /// </summary>
-        /// <summary>
-        /// Converts string to anyURI
-        /// </summary>
         /// <summary>
         /// Converter from string to plain union types
         /// </summary>

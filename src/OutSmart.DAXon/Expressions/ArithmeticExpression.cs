@@ -11,7 +11,6 @@ using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -409,9 +408,6 @@ namespace OutSmart.DAXon.Expressions
 
         /*!(operand0 instanceof UntypedAtomicConverter)*/
         /*!(operand1 instanceof UntypedAtomicConverter) &&*/
-        /// <summary>
-        /// Evaluate the expression.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return (AtomicValue)MakeElaborator().ElaborateForItem().Eval(context);
@@ -419,9 +415,6 @@ namespace OutSmart.DAXon.Expressions
 
         /*!(operand0 instanceof UntypedAtomicConverter)*/
         /*!(operand1 instanceof UntypedAtomicConverter) &&*/
-        /// <summary>
-        /// Evaluate the expression.
-        /// </summary>
         protected override string Tag()
         {
             return "arith";
@@ -429,9 +422,6 @@ namespace OutSmart.DAXon.Expressions
 
         /*!(operand0 instanceof UntypedAtomicConverter)*/
         /*!(operand1 instanceof UntypedAtomicConverter) &&*/
-        /// <summary>
-        /// Evaluate the expression.
-        /// </summary>
         protected override void ExplainExtraAttributes(ExpressionPresenter @out)
         {
             if (calculator != null)
@@ -444,9 +434,6 @@ namespace OutSmart.DAXon.Expressions
 
         /*!(operand0 instanceof UntypedAtomicConverter)*/
         /*!(operand1 instanceof UntypedAtomicConverter) &&*/
-        /// <summary>
-        /// Evaluate the expression.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ArithmeticElaborator();
@@ -454,9 +441,6 @@ namespace OutSmart.DAXon.Expressions
 
         /*!(operand0 instanceof UntypedAtomicConverter)*/
         /*!(operand1 instanceof UntypedAtomicConverter) &&*/
-        /// <summary>
-        /// Evaluate the expression.
-        /// </summary>
         /// <summary>
         /// Elaborator for an ArithmeticExpression (for example P + Q)
         /// </summary>

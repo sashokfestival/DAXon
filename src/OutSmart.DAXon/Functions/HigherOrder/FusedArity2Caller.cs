@@ -117,11 +117,11 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         /// argument/result conversion rules (none for the bare shape, matching
         /// BoundUserFunction.Call). Returns a grounded (materialized) value.
         /// </summary>
-        // Same conversion the classic UserFunctionCall elaborators apply — this fused path
-        // bypasses them, so the stack-guard signal must be converted here.
-        private static XPathException.StackOverflow StackOverflowError()
+        // Same description the classic UserFunctionCall elaborators apply — this fused path
+        // bypasses them, so the stack-guard signal must be described here.
+        private static Internal.RecursionDepthError StackOverflowError(Internal.RecursionDepthError e)
         {
-            return new XPathException.StackOverflow("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, Loc.NONE);
+            return e.Describe("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, Loc.NONE);
         }
 
         public ISequence CallTwo(ISequence acc, IItem item)
@@ -141,9 +141,9 @@ namespace OutSmart.DAXon.Functions.HigherOrder
 
                     return target.Call(c2, args).Materialize();
                 }
-                catch (Internal.RecursionDepthError)
+                catch (Internal.RecursionDepthError e) when (!e.Described)
                 {
-                    throw StackOverflowError();
+                    throw StackOverflowError(e);
                 }
             }
 
@@ -172,9 +172,9 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             {
                 rawResult = (direct ? target.EvaluateBodyDirect(c2) : target.Call(c2, args)).Materialize();
             }
-            catch (Internal.RecursionDepthError)
+            catch (Internal.RecursionDepthError e) when (!e.Described)
             {
-                throw StackOverflowError();
+                throw StackOverflowError(e);
             }
 
             if (resultType.Matches(rawResult, th))

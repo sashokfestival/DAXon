@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Events
     public class RegularSequenceChecker : ProxyReceiver
     {
         private static readonly Dictionary<State, Dictionary<Transition, State>> machine = new Dictionary<State, Dictionary<Transition, State>>();
-        private readonly Stack<Short> stack = new Stack<Short>();
+        private readonly Stack<int> stack = new Stack<int>();
 
         private State state;
         private bool fullChecking = false;
@@ -56,16 +56,16 @@ namespace OutSmart.DAXon.Events
         private static void Edge(State from, Transition @event, State to)
         {
             Dictionary<Transition, State> edges = machine.ComputeIfAbsent(from, (s) => new Dictionary<Transition, State>());
-            edges.Put(@event, to);
+            edges[@event] = to;
         }
 
         // for C#
         private void TransitionFn(Transition @event)
         {
-            Dictionary<Transition, State> map = machine.Get(state);
+            Dictionary<Transition, State> map = machine.GetOrDefault(state);
             if (map.ContainsKey(@event))
             {
-                state = map.Get(@event);
+                state = map.GetOrDefault(@event);
             }
             else
             {
@@ -90,7 +90,7 @@ namespace OutSmart.DAXon.Events
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
         {
             TransitionFn(Transition.TEXT);
-            if (chars.IsEmpty() && !stack.IsEmpty())
+            if (chars.IsEmpty() && stack.Count > 0)
             {
                 throw new InvalidOperationException("Zero-length text nodes not allowed within document/element content");
             }
@@ -110,16 +110,16 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// End of sequence
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
             if (state != State.FINAL && state != State.FAILED)
             {
-                if (!stack.IsEmpty())
+                if (stack.Count > 0)
                 {
                     throw new InvalidOperationException("Unclosed element or document nodes at end of stream");
                 }
 
-                nextReceiver.Dispose();
+                nextReceiver.Close();
                 state = State.FINAL;
             }
         }
@@ -149,7 +149,7 @@ namespace OutSmart.DAXon.Events
         public override void EndDocument()
         {
             TransitionFn(Transition.END_DOCUMENT);
-            if (stack.IsEmpty() || stack.Pop() != Types.Type.DOCUMENT)
+            if (stack.Count == 0 || stack.Pop() != Types.Type.DOCUMENT)
             {
                 throw new InvalidOperationException("Unmatched endDocument() call");
             }
@@ -172,12 +172,12 @@ namespace OutSmart.DAXon.Events
         public override void EndElement()
         {
             TransitionFn(Transition.END_ELEMENT);
-            if (stack.IsEmpty() || stack.Pop() != Types.Type.ELEMENT)
+            if (stack.Count == 0 || stack.Pop() != Types.Type.ELEMENT)
             {
                 throw new InvalidOperationException("Unmatched endElement() call");
             }
 
-            if (stack.IsEmpty())
+            if (stack.Count == 0)
             {
                 state = State.OPEN;
             }
@@ -212,9 +212,6 @@ namespace OutSmart.DAXon.Events
         }
 
         // for C#
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
         {
             TransitionFn(Transition.PI);
@@ -230,9 +227,6 @@ namespace OutSmart.DAXon.Events
         }
 
         // for C#
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public override void StartDocument(int properties)
         {
             TransitionFn(Transition.START_DOCUMENT);
@@ -249,9 +243,6 @@ namespace OutSmart.DAXon.Events
         }
 
         // for C#
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             TransitionFn(Transition.START_ELEMENT);

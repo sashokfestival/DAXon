@@ -82,7 +82,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         {
             population.Dispose();
         }
-        public virtual bool SupportsGetLength() => throw new NotImplementedException();   // overridden by Starting/Ending
-        public virtual int GetLength() => throw new NotImplementedException();
+        public abstract bool SupportsGetLength();
+        public abstract int GetLength();
     }
 }

@@ -28,6 +28,8 @@ namespace OutSmart.DAXon.Events
         {
         }
 
+        public override bool UsesTypeAnnotations() => false; // events are replayed verbatim
+
         public override void StartDocument(int properties)
         {
             buffer.Add(new Event.StartDocument(properties));
@@ -68,7 +70,7 @@ namespace OutSmart.DAXon.Events
             buffer.Add(new Event.Append(item, location, properties));
         }
 
-        public override void Dispose()
+        public override void Close()
         {
         }
 

@@ -16,6 +16,6 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    // Phase 5: IStringEvaluator interface->delegate.
+    // IStringEvaluator interface->delegate.
     public delegate string IStringEvaluator(IXPathContext context);
 }

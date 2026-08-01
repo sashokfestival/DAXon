@@ -66,7 +66,6 @@ namespace OutSmart.DAXon.Expressions
             {
                 HashSet<Expression> pre = new HashSet<Expression>();
 
-                //pre.add(this.copy());
                 return pre;
             }
         }

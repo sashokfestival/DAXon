@@ -95,9 +95,6 @@ namespace OutSmart.DAXon.Expressions
             return true;
         }
 
-        /// <summary>
-        /// Get the next item if there is one
-        /// </summary>
         public virtual IItem Next()
         {
             if (nextItem == null)
@@ -120,17 +117,11 @@ namespace OutSmart.DAXon.Expressions
             return current;
         }
 
-        /// <summary>
-        /// Get the next item if there is one
-        /// </summary>
         public virtual void Dispose()
         {
             @base.Dispose();
         }
 
-        /// <summary>
-        /// Get the next item if there is one
-        /// </summary>
         public virtual bool SupportsGetLength()
         {
             return SequenceTool.SupportsGetLength(@base);
@@ -142,8 +133,8 @@ namespace OutSmart.DAXon.Expressions
         public virtual int GetLength()
         {
             int lastBase = SequenceTool.GetLength(@base);
-            int z = System.Math.Min(lastBase, max);
-            return System.Math.Max(z - min + 1, 0);
+            int z = Math.Min(lastBase, max);
+            return Math.Max(z - min + 1, 0);
         }
     }
 }

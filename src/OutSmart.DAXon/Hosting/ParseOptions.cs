@@ -19,14 +19,13 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Lib
 {
     public class ParseOptions
     {
+        private readonly object syncLock = new object();
 
         private readonly IImmutableMap<Key, object> properties;
         private IList<Key> cacheKeys;
@@ -113,7 +112,7 @@ namespace OutSmart.DAXon.Lib
 
         private ParseOptions SearchCache(Key key, object value)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (cacheKeys == null)
                 {
@@ -137,7 +136,7 @@ namespace OutSmart.DAXon.Lib
         /// </summary>
         private void AddToCache(Key key, object value, ParseOptions result)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (cacheKeys == null)
                 {
@@ -265,7 +264,7 @@ namespace OutSmart.DAXon.Lib
 
             if (other.ParserFeatures != null)
             {
-                foreach (KeyValuePair<string, bool> entry in other.ParserFeatures.EntrySet())
+                foreach (KeyValuePair<string, bool> entry in other.ParserFeatures)
                 {
                     result = result.WithParserFeature(entry.Key, entry.Value);
                 }
@@ -273,7 +272,7 @@ namespace OutSmart.DAXon.Lib
 
             if (other.ParserProperties != null)
             {
-                foreach (KeyValuePair<string, object> entry in other.ParserProperties.EntrySet())
+                foreach (KeyValuePair<string, object> entry in other.ParserProperties)
                 {
                     result = result.WithParserProperty(entry.Key, entry.Value);
                 }
@@ -298,7 +297,7 @@ namespace OutSmart.DAXon.Lib
                 result = result.WithUseXsiSchemaLocation(true);
             }
 
-            result = result.WithValidationErrorLimit(System.Math.Min(this.ValidationErrorLimit, other.ValidationErrorLimit));
+            result = result.WithValidationErrorLimit(Math.Min(this.ValidationErrorLimit, other.ValidationErrorLimit));
             result = result.WithPropertyIfNotNull(Key.ERROR_REPORTER, other.GetErrorReporter());
             return result;
         }
@@ -388,13 +387,19 @@ namespace OutSmart.DAXon.Lib
                 parserFeatures2 = new Dictionary<string, bool>(parserFeatures);
             }
 
-            bool old = parserFeatures2.Put(uri, value);
-            return old != null && old == value ? this : WithProperty(Key.PARSER_FEATURES, parserFeatures2);
+            // Presence must be tracked explicitly: Put returns default(bool) for an absent key,
+            // so the Java "old != null && old == value" no-change test silently dropped the
+            // update when an absent feature was being set to false.
+            bool had = parserFeatures2.TryGetValue(uri, out bool prev);
+            parserFeatures2[uri] = value;
+            return had && prev == value ? this : WithProperty(Key.PARSER_FEATURES, parserFeatures2);
         }
 
         public virtual ParseOptions WithParserProperty(string uri, object value)
         {
-            Dictionary<string, object> parserProperties = (Dictionary<string, object>)GetProperty(Key.PARSER_FEATURES);
+            // PARSER_PROPERTIES, not PARSER_FEATURES: the copy-paste key made this cast throw
+            // whenever features were set, and discarded any existing properties otherwise.
+            Dictionary<string, object> parserProperties = (Dictionary<string, object>)GetProperty(Key.PARSER_PROPERTIES);
             Dictionary<string, object> parserProperties2;
             if (parserProperties == null)
             {
@@ -408,7 +413,7 @@ namespace OutSmart.DAXon.Lib
             object old;
             if (value != null)
             {
-                old = parserProperties2.Put(uri, value);
+                old = parserProperties2.PutAndGetPrevious(uri, value);
             }
             else
             {
@@ -426,8 +431,7 @@ namespace OutSmart.DAXon.Lib
                 return false;
             }
 
-            bool value = parserFeatures.Get(uri);
-            return value != null && value;
+            return parserFeatures.TryGetValue(uri, out bool value) && value;
         }
 
         public virtual bool IsParserFeatureSet(string uri)
@@ -438,8 +442,9 @@ namespace OutSmart.DAXon.Lib
                 return false;
             }
 
-            bool value = parserFeatures.Get(uri);
-            return value != null;
+            // ContainsKey, not Get-then-null-test: default(bool) is never null, so this
+            // method used to answer true for EVERY uri once any feature map existed.
+            return parserFeatures.ContainsKey(uri);
         }
 
         public virtual object GetParserProperty(string name)
@@ -451,7 +456,7 @@ namespace OutSmart.DAXon.Lib
             }
             else
             {
-                return parserProperties.Get(name);
+                return parserProperties.GetOrDefault(name);
             }
         }
 

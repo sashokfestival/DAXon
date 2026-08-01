@@ -35,7 +35,7 @@ namespace OutSmart.DAXon.Serialization
                     return;
                 }
 
-                if (strings[hash].EqualsIgnoreCase(s))
+                if (strings[hash].Equals(s, global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     return;
                 }
@@ -54,7 +54,7 @@ namespace OutSmart.DAXon.Serialization
                     return false;
                 }
 
-                if (strings[hash].EqualsIgnoreCase(s))
+                if (strings[hash].Equals(s, global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }

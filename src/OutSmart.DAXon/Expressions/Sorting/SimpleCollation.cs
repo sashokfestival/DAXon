@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Text;
-using OutSmart.DAXon.Internal.Text;
 using OutSmart.DAXon.Internal.Collections;
 using System;
 using System.Collections.Generic;

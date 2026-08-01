@@ -32,19 +32,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private FunctionStreamability functionStreamability = FunctionStreamability.UNCLASSIFIED;
         private Expression defaultValue; // In 4.0, function parameters can have a default value
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual int LocalSlotNumber => slotNumber;
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual IntegerValue[] IntegerBoundsForVariable => null;
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual Expression DefaultValueExpression
         {
             get => defaultValue; set
@@ -53,14 +44,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual int ReferenceCount => referenceCount;
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual FunctionStreamability FunctionStreamability
         {
             get => functionStreamability; set
@@ -68,119 +53,74 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 this.functionStreamability = value;
             }
         }
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public UserFunctionParameter()
         {
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public bool IsGlobal()
         {
             return false;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public bool IsAssignable()
         {
             return false;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual void SetRequired(bool required)
         {
             isRequiredParam = required;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public bool IsRequired()
         {
             return isRequiredParam;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual void SetSlotNumber(int slot)
         {
             slotNumber = slot;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual void SetRequiredType(SequenceType type)
         {
             requiredType = type;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual SequenceType GetRequiredType()
         {
             return requiredType;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual void SetVariableQName(StructuredQName name)
         {
             variableQName = name;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual StructuredQName GetVariableQName()
         {
             return variableQName;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual void AddReference(VariableReference @ref, bool isLoopingReference)
         {
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual void SetIndexedVariable(bool indexed)
         {
             isIndexed = indexed;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual void SetIndexedVariable()
         {
             SetIndexedVariable(true);
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual bool IsIndexedVariable()
         {
             return isIndexed;
         }
 
-        /// <summary>
-        /// Create a UserFunctionParameter
-        /// </summary>
         public virtual ISequence EvaluateVariable(IXPathContext context)
         {
             return context.EvaluateLocalVariable(slotNumber);

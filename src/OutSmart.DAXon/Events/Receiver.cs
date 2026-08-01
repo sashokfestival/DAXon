@@ -18,12 +18,13 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 
 namespace OutSmart.DAXon.Events
 {
-    public interface IReceiver : Result
+    // Close() = successful end-of-stream (flush, notify, release). Dispose() = abort-path release only:
+    // idempotent, emits no events -- safe under `using`; a completed Close makes it a no-op.
+    public interface IReceiver : OutSmart.DAXon.Serialization.IResultTarget, global::System.IDisposable
     {
         void SetPipelineConfiguration(PipelineConfiguration pipe);
         PipelineConfiguration GetPipelineConfiguration();
@@ -36,24 +37,20 @@ namespace OutSmart.DAXon.Events
         void Characters(UnicodeString chars, ILocation location, int properties);
         void ProcessingInstruction(string name, UnicodeString data, ILocation location, int properties);
         void Comment(UnicodeString content, ILocation location, int properties);
-        void Append(IItem item, ILocation locationId, int properties)
-;
+        void Append(IItem item, ILocation locationId, int properties);
 
 
 
-        void Append(IItem item)
-;
+        void Append(IItem item);
 
 
 
-        void Dispose();
-        bool UsesTypeAnnotations()
-;
+        void Close();
+        bool UsesTypeAnnotations();
 
 
 
-        bool HandlesAppend()
-;
+        bool HandlesAppend();
 
 
     }

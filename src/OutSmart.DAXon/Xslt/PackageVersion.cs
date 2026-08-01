@@ -192,7 +192,7 @@ namespace OutSmart.DAXon.Xslt
             StringBuilder result = new StringBuilder();
             foreach (int i in parts)
             {
-                result.Append(".").Append(i);
+                result.Append('.').Append(i);
             }
 
             if (parts.Count != 0)
@@ -202,7 +202,7 @@ namespace OutSmart.DAXon.Xslt
 
             if (suffix != null)
             {
-                result.Append("-").Append(suffix);
+                result.Append('-').Append(suffix);
             }
 
             return result.ToString();

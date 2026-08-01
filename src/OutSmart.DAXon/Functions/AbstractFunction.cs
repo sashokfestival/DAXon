@@ -46,8 +46,8 @@ namespace OutSmart.DAXon.Functions
                 throw new UncheckedXPathException(new XPathException("The string value of a function is not defined", "FOTY0014"));
             }
         }
-        public virtual IFunctionItemType FunctionItemType => throw new NotImplementedException();
-        public virtual string Description => throw new NotImplementedException();
+        public abstract IFunctionItemType FunctionItemType { get; }
+        public abstract string Description { get; }
 
         public virtual IAtomicSequence Atomize()
         {
@@ -102,47 +102,46 @@ namespace OutSmart.DAXon.Functions
             throw new XPathException("Argument to deep-equal() contains a function item", "FOTY0015");
         }
 
-        /// <summary>
-        /// Output information about this function item to the diagnostic explain() output
-        /// </summary>
         public virtual void Export(ExpressionPresenter @out)
         {
             throw new NotSupportedException("export() not implemented for " + this.GetType());
         }
 
-        /// <summary>
-        /// Output information about this function item to the diagnostic explain() output
-        /// </summary>
         public virtual bool IsTrustedResultType()
         {
             return false;
         }
 
-        /// <summary>
-        /// Output information about this function item to the diagnostic explain() output
-        /// </summary>
         public virtual string ToShortString()
         {
 
             // Need to disambiguate multiple inheritance candidates here
             return Description;
         }
-        public virtual StructuredQName GetFunctionName() => throw new NotImplementedException();
-        public virtual int GetArity() => throw new NotImplementedException();
+        public abstract StructuredQName GetFunctionName();
+        public abstract int GetArity();
         // Every function item's genre is FUNCTION (upstream Function.getGenre default); ArrayItem/MapItem
         // override to ARRAY/MAP. Was a throwing stub -> a plain function reached through a lookup expression
         // (LookupExpression querying the base item's genre) NRE'd (prod-Lookup / prod-UnaryLookup).
         public virtual Genre GetGenre() => Genre.FUNCTION;
-        public virtual ISequence Call(IXPathContext arg0, ISequence[] arg1) => throw new NotImplementedException();
+        public abstract ISequence Call(IXPathContext arg0, ISequence[] arg1);
         // A function item is a single item; iterating it yields a singleton over itself. The prior stub
         // threw (and IItem.Iterate below returned null), so a function reached as a sequence - e.g. a
         // dynamic call on a looked-up function, $map('k')(args) - failed.
         public virtual ISequenceIterator Iterate() => SingletonIterator.MakeIterator(this);
         public virtual IItem ItemAt(int arg0) => arg0 == 0 ? this : null;
         public virtual IItem Head() => this;
-        public virtual IGroundedValue Subsequence(int arg0, int arg1) => throw new NotImplementedException();
+        // A function item is a singleton sequence: the standard single-item subsequence rule.
+        public virtual IGroundedValue Subsequence(int start, int length)
+        {
+            return start <= 0 && (long)start + length > 0 ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance();
+        }
         public virtual int GetLength() => 1;
-        public virtual string GetStringValue() => throw new NotImplementedException();
+        // Mirrors UnicodeStringValue above: functions have no string value (FOTY0014).
+        public virtual string GetStringValue()
+        {
+            throw new UncheckedXPathException(new XPathException("The string value of a function is not defined", "FOTY0014"));
+        }
         SingletonIterator IItem.Iterate() => (SingletonIterator)SingletonIterator.MakeIterator(this);
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===

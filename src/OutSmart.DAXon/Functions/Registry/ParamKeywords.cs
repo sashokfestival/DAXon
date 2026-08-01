@@ -11,13 +11,13 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Functions.Registry
 {
-    // Phase 5: ParamKeywords -- function parameter naming maps (used by BuiltInFunctionSet.GetParamMap).
+    // ParamKeywords -- function parameter naming maps (used by BuiltInFunctionSet.GetParamMap).
     public static class ParamKeywords
     {
         public static readonly Dictionary<string, string> fnParamNames = new Dictionary<string, string>();
         public static readonly Dictionary<string, string> mapParamNames = new Dictionary<string, string>();
         public static readonly Dictionary<string, string> arrayParamNames = new Dictionary<string, string>();
-        // Phase 7.8: BuiltInFunctionSet references mathParamNames.
+        // BuiltInFunctionSet references mathParamNames.
         public static readonly Dictionary<string, string> mathParamNames = new Dictionary<string, string>();
     }
 }

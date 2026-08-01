@@ -64,7 +64,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException err)
             {
-                throw new XPathException("Invalid system property name. " + err.GetMessage(), "XTDE1390", context);
+                throw new XPathException("Invalid system property name. " + err.Message, "XTDE1390", context);
             }
         }
 

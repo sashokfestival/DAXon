@@ -36,13 +36,10 @@ namespace OutSmart.DAXon.Api
         NAMESPACE
 
         // --------------------
-        // TODO enum body members
         // private final int number;
         // XdmNodeKind(int number) {
         //     this.number = number;
         // }
         // protected int getNumber() {
-        //     return number;
-        // }
     }
 }

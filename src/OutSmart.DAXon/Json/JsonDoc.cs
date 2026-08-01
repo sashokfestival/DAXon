@@ -63,7 +63,7 @@ namespace OutSmart.DAXon.Json
                 // (JSONTestSuite i_string_* accept FOUT1200, not FOUT1190).
                 if (err.HasErrorCode("FOUT1190"))
                 {
-                    throw new XPathException(err.GetMessage(), "FOUT1200");
+                    throw new XPathException(err.Message, "FOUT1200");
                 }
 
                 err.MaybeSetErrorCode("FOUT1170");

@@ -15,7 +15,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -64,9 +63,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual IList<LocalParamInfo> LocalParamDetails
         {
             get => localParamDetails; set
@@ -100,7 +96,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public void GatherProperties(Action<string, object> consumer)
         {
-            consumer.Accept("name", TemplateName);
+            consumer("name",TemplateName);
         }
 
         public override void SetBody(Expression body)
@@ -172,7 +168,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 }
             }
 
-            lock (this)
+            lock (syncLock)
             {
                 if (bodyEvaluator == null)
                 {
@@ -184,18 +180,15 @@ namespace OutSmart.DAXon.Expressions.Instructions
             {
                 return bodyEvaluator.ProcessLeavingTail(output, context);
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                // A deeper recursion level tripped the stack guard; convert at the nearest body
+                // A deeper recursion level tripped the stack guard; describe at the nearest body
                 // so every invocation path reports SXLM0001 (call sites without their own catch
-                // included).
-                throw new XPathException.StackOverflow("Too many nested template or function calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, GetLocation());
+                // included). Filtered: one such catch per recursion level.
+                throw e.Describe("Too many nested template or function calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, GetLocation());
             }
         }
 
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             presenter.StartElement("template");
@@ -211,9 +204,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             presenter.EndElement();
         }
 
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual void ExplainProperties(ExpressionPresenter presenter)
         {
             if (GetRequiredContextItemType() != AnyItemType.GetInstance())
@@ -243,9 +233,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             presenter.EmitAttribute("module", GetSystemId());
         }
 
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public class LocalParamInfo
         {
             public StructuredQName name;

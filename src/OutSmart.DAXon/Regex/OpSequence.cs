@@ -68,7 +68,7 @@ namespace OutSmart.DAXon.Regex
                 int max = 0;
                 foreach (Operation o in operations)
                 {
-                    max = System.Math.Max(max, o.MaxLoopingDepth);
+                    max = Math.Max(max, o.MaxLoopingDepth);
                 }
 
                 return max;
@@ -158,17 +158,18 @@ namespace OutSmart.DAXon.Regex
 
         public override ICharacterClass GetInitialCharacterClass(bool caseBlind)
         {
-            ICharacterClass result = EmptyCharacterClass.GetInstance();
+            // combined n-ary: pairwise MakeUnion nested a class per operation (round BD-F4)
+            IList<ICharacterClass> parts = new List<ICharacterClass>();
             foreach (Operation o in operations)
             {
-                result = RECompiler.MakeUnion(result, o.GetInitialCharacterClass(caseBlind));
+                parts.Add(o.GetInitialCharacterClass(caseBlind));
                 if (o.MatchesEmptyString() == MATCHES_ZLS_NEVER)
                 {
-                    return result;
+                    break;
                 }
             }
 
-            return result;
+            return RECompiler.MakeUnion(parts);
         }
 
         public override string Display()
@@ -229,8 +230,7 @@ namespace OutSmart.DAXon.Regex
             // A stack of iterators, one for each piece in the sequence
             Stack<IIntIterator> iterators = new Stack<IIntIterator>();
             REMatcher.State savedState = ContainsCapturingExpressions() ? matcher.CaptureState() : null;
-            int backtrackingLimit = matcher.Program.BacktrackingLimit;
-            return new AnonymousIntIterator(this, iterators, matcher, position, savedState, backtrackingLimit);
+            return new AnonymousIntIterator(this, iterators, matcher, position, savedState);
         }
 
         private sealed class AnonymousIntIterator : AbstractIntIterator
@@ -241,23 +241,20 @@ namespace OutSmart.DAXon.Regex
             private readonly REMatcher matcher;
             private readonly int position;
             private readonly REMatcher.State savedState;
-            private readonly int backtrackingLimit;
             private bool primed = false;
             private int nextPos;
             // Phase5: closure-captured locals from IterateMatches
-            public AnonymousIntIterator(OpSequence parent, Stack<IIntIterator> iterators, REMatcher matcher, int position, REMatcher.State savedState, int backtrackingLimit)
+            public AnonymousIntIterator(OpSequence parent, Stack<IIntIterator> iterators, REMatcher matcher, int position, REMatcher.State savedState)
             {
                 this.parent = parent;
                 this.iterators = iterators;
                 this.matcher = matcher;
                 this.position = position;
                 this.savedState = savedState;
-                this.backtrackingLimit = backtrackingLimit;
             }
             private int Advance()
             {
-                int counter = 0;
-                while (!iterators.IsEmpty())
+                while (iterators.Count > 0)
                 {
                     IIntIterator top = iterators.Peek();
                     while (top.MoveNext())
@@ -275,10 +272,9 @@ namespace OutSmart.DAXon.Regex
                     }
 
                     iterators.Pop();
-                    if (backtrackingLimit >= 0 && counter++ > backtrackingLimit)
-                    {
-                        throw new UncheckedXPathException(new XPathException("Regex backtracking limit exceeded processing " + matcher.operation.Display() + ". Simplify the regular expression, " + "or set Feature<int>.REGEX_BACKTRACKING_LIMIT to -1 to remove this limit."));
-                    }
+                    // Shared per-attempt budget + deadline (round BE): one accounting authority
+                    // for all backtracking, whether it happens here or inside a nested repeat.
+                    matcher.CountBacktrackStep();
                 }
 
                 if (savedState != null)
@@ -287,7 +283,6 @@ namespace OutSmart.DAXon.Regex
                 }
 
 
-                //matcher.clearCapturedGroupsBeyond(position);
                 return -1;
             }
 

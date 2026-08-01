@@ -28,6 +28,7 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     public class AnalyzeStringFn : RegexFunction
     {
+        private readonly object syncLock = new object();
 
         private ResultNamesAndTypes vocab = new ResultNamesAndTypes();
 
@@ -39,7 +40,7 @@ namespace OutSmart.DAXon.Functions
 
         private void Init(Configuration config, bool schemaAware)
         {
-            lock (this)
+            lock (syncLock)
             {
                 vocab.resultName = new FingerprintedQName("", NamespaceUri.FN, "analyze-string-result");
                 vocab.nonMatchName = new FingerprintedQName("", NamespaceUri.FN, "non-match");
@@ -92,7 +93,7 @@ namespace OutSmart.DAXon.Functions
             }
 
             @out.EndElement();
-            @out.Dispose();
+            @out.Close();
             return builder.CurrentRoot;
         }
         private class ResultNamesAndTypes

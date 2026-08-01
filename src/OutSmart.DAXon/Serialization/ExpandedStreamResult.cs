@@ -19,8 +19,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
@@ -30,6 +28,12 @@ namespace OutSmart.DAXon.Serialization
         private readonly Configuration config;
         private Properties outputProperties;
         private readonly string systemId;
+        // The StreamResult this was expanded from. Kept so that a stream opened HERE (from the
+        // system ID) can be published back to it - Serializer.Dispose closes result.GetOutputStream()
+        // and says so in as many words ("relies on the fact that the SerializerFactory sets the
+        // Stream"), but the port never set it, so a run that failed before the normal pipeline close
+        // left its output file open and locked until finalization. Round BG's probe caught it.
+        private readonly StreamResult originatingResult;
         private TextWriter writer;
         private System.IO.Stream outputStream;
         private ICharacterSet characterSet;
@@ -48,7 +52,7 @@ namespace OutSmart.DAXon.Serialization
                 if (value is StreamWriter && outputProperties != null)
                 {
                     string enc = ((StreamWriter)value).Encoding.WebName;
-                    outputProperties.SetProperty(OutputKeys.ENCODING, enc);
+                    outputProperties.SetProperty(DAXonOutputKeys.ENCODING, enc);
                     characterSet = config.GetCharacterSetFactory().GetCharacterSet(outputProperties);
                 }
             }
@@ -58,20 +62,21 @@ namespace OutSmart.DAXon.Serialization
         public ExpandedStreamResult(Configuration config, StreamResult result, Properties outputProperties)
         {
             this.config = config;
+            this.originatingResult = result;
             this.systemId = result.GetSystemId();
             this.writer = result.GetWriter();
             this.outputStream = result.GetOutputStream();
             this.outputProperties = outputProperties;
-            this.encoding = outputProperties.GetProperty(OutputKeys.ENCODING);
+            this.encoding = outputProperties.GetProperty(DAXonOutputKeys.ENCODING);
             if (encoding == null)
             {
                 encoding = "UTF8";
             }
-            else if (encoding.EqualsIgnoreCase("UTF-8"))
+            else if (encoding.Equals("UTF-8", global::System.StringComparison.OrdinalIgnoreCase))
             {
                 encoding = "UTF8";
             }
-            else if (encoding.EqualsIgnoreCase("UTF-16"))
+            else if (encoding.Equals("UTF-16", global::System.StringComparison.OrdinalIgnoreCase))
             {
                 encoding = "UTF16";
             }
@@ -127,6 +132,12 @@ namespace OutSmart.DAXon.Serialization
                 string file = MakeWritableOutputFile(uriString);
                 mustCloseAfterUse = true;
                 outputStream = new FileStream(file, FileMode.Create, FileAccess.Write);
+
+                // Publish the opened stream back to the StreamResult this was expanded from, so a
+                // failure-path Dispose can actually reach it. The normal close (pipeline completes)
+                // closes the same stream first; FileStream.Dispose is idempotent, so both paths are
+                // safe in either order.
+                originatingResult.SetOutputStream(outputStream);
             }
             catch (FileNotFoundException fnf)
             {
@@ -210,30 +221,23 @@ namespace OutSmart.DAXon.Serialization
             // the character encoding is correct.
             try
             {
-                Charset javaEncoding;
-                if (encoding.EqualsIgnoreCase("iso-646") || encoding.EqualsIgnoreCase("iso646"))
-                {
-                    javaEncoding = StandardCharsets.US_ASCII;
-                }
-                else
-                {
-                    javaEncoding = Charset.ForName(encoding);
-                }
-
-                if (encoding.EqualsIgnoreCase("UTF8"))
+                if (encoding.Equals("UTF8", global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     writer = new UTF8Writer(outputStream);
                 }
                 else
                 {
-                    writer = new StreamWriter(outputStream, Encoding.GetEncoding(javaEncoding.ToString()));
+                    Encoding dotnetEncoding = encoding.Equals("iso-646", global::System.StringComparison.OrdinalIgnoreCase) || encoding.Equals("iso646", global::System.StringComparison.OrdinalIgnoreCase)
+                        ? Encoding.ASCII
+                        : Encoding.GetEncoding(encoding);
+                    writer = new StreamWriter(outputStream, dotnetEncoding);
                 }
 
                 return writer;
             }
             catch (Exception err)
             {
-                if (encoding.EqualsIgnoreCase("UTF8"))
+                if (encoding.Equals("UTF8", global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     throw new XPathException("Failed to create a UTF8 output writer");
                 }
@@ -247,7 +251,7 @@ namespace OutSmart.DAXon.Serialization
             outputStream = stream;
             try
             {
-                if (encoding.EqualsIgnoreCase("UTF8"))
+                if (encoding.Equals("UTF8", global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     return new UTF8Writer(outputStream);
                 }
@@ -259,7 +263,7 @@ namespace OutSmart.DAXon.Serialization
             }
             catch (Exception err)
             {
-                if (encoding.EqualsIgnoreCase("UTF8"))
+                if (encoding.Equals("UTF8", global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     throw new XPathException("Failed to create a UTF8 output writer");
                 }

@@ -17,7 +17,6 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -50,18 +49,9 @@ namespace OutSmart.DAXon.Transformation
         public virtual StructuredQName ModeName => modeName;
 
         public abstract SimpleMode ActivePart { get; }
-        /// <summary>
-        /// Get the maximum precedence of the rules in this mode
-        /// </summary>
         public abstract int MaxPrecedence { get; }
-        /// <summary>
-        /// Get the maximum precedence of the rules in this mode
-        /// </summary>
         public abstract int MaxRank { get; }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual HashSet<Accumulator> Accumulators
         {
             get
@@ -81,9 +71,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual RecoveryPolicy RecoveryPolicy
         {
             get => recoveryPolicy; set
@@ -92,9 +79,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual Values.SequenceType DefaultResultType
         {
             get => defaultResultType; set
@@ -117,13 +101,7 @@ namespace OutSmart.DAXon.Transformation
         {
             return modeName.Equals(UNNAMED_MODE_NAME);
         }
-        /// <summary>
-        /// Get the maximum precedence of the rules in this mode
-        /// </summary>
         public abstract void ComputeRankings(int start);
-        /// <summary>
-        /// Get the maximum precedence of the rules in this mode
-        /// </summary>
         public virtual string GetModeTitle(bool initialCaps)
         {
             if (initialCaps)
@@ -136,98 +114,59 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual void SetModeTracing(bool tracing)
         {
             this.modeTracing = tracing;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual bool IsModeTracing()
         {
             return modeTracing;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public override SymbolicName GetSymbolicName()
         {
             return new SymbolicName(StandardNames.XSL_MODE, ModeName);
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual StructuredQName GetObjectName()
         {
             return ModeName;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public abstract bool IsEmpty();
 
         // True only when NO real template rule is registered (a declared-but-ruleless mode);
         // gates the bulk shallow-copy fast path in ApplyTemplates. Conservative default.
         public virtual bool HasNoTemplateRules => false;
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual void SetEnclosingMode(bool enclosing)
         {
             this.enclosingMode = enclosing;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual bool IsEnclosingMode()
         {
             return enclosingMode;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual void SetHasRules(bool hasRules)
         {
             this.hasRules = hasRules;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual void SetStreamable(bool streamable)
         {
             this.streamable = streamable;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual bool IsDeclaredStreamable()
         {
             return streamable;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public abstract HashSet<NamespaceUri> GetExplicitNamespaces(NamePool pool);
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public abstract void ProcessRules(IRuleAction action);
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual IXPathContext MakeNewContext(IXPathContext context)
         {
             XPathContextMajor c2 = context.NewContext();
@@ -241,18 +180,9 @@ namespace OutSmart.DAXon.Transformation
             return c2;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         // WHY?
         public abstract Rule GetRule(IItem item, IXPathContext context);
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public abstract Rule GetRule(IItem item, IXPathContext context, Func<Rule, bool> filter);
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual Rule GetRule(IItem item, int min, int max, IXPathContext context)
         {
             return GetRule(item, context, (r) =>
@@ -262,9 +192,6 @@ namespace OutSmart.DAXon.Transformation
             });
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual Rule GetNextMatchRule(IItem item, Rule currentRule, IXPathContext context)
         {
             return GetRule(item, context, (r) =>
@@ -297,22 +224,13 @@ namespace OutSmart.DAXon.Transformation
             });
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public abstract void ExportTemplateRules(ExpressionPresenter @out);
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public abstract void ExplainTemplateRules(ExpressionPresenter @out);
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual ITailCall ApplyTemplates(ParameterSet parameters, ParameterSet tunnelParameters, NodeInfo separator, Outputter output, XPathContextMajor context, ILocation locationId)
         {
             // Every apply-templates dispatch (user rules AND built-in-rule descent over deep
             // input trees) funnels through here — one probe bounds the recursion depth
-            // (RecursionDepthError -> SXLM0001 at the nearest converting catch).
+            // (RecursionDepthError, described as SXLM0001 by the nearest recursion site).
             StackGuard.Probe();
             Controller controller = context.GetController();
             ISequenceIterator iterator = context.GetCurrentIterator();
@@ -330,6 +248,7 @@ namespace OutSmart.DAXon.Transformation
                 IItem it;
                 while ((it = iterator.Next()) != null)
                 {
+                    controller.CheckTimeoutPerStep();
                     if (it is NodeInfo node)
                     {
                         // Leaf kinds are emitted exactly as ShallowCopyRuleSet does (Copy cannot
@@ -385,6 +304,8 @@ namespace OutSmart.DAXon.Transformation
             bool first = true;
             while (true)
             {
+                // Per STEP, not per item: one matched node's template body can cost anything.
+                controller.CheckTimeoutPerStep();
 
                 // process any tail calls returned from previous nodes. We need to do this before changing
                 // the context. If we have a ILookaheadIterator, we can tell whether we're positioned at the
@@ -474,9 +395,6 @@ namespace OutSmart.DAXon.Transformation
             return tc;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         // WHY?
         private void CheckMustBeTyped(IItem item)
         {
@@ -494,9 +412,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         private void CheckMustByUntyped(IItem item)
         {
             if (item is NodeInfo)
@@ -513,9 +428,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         // Returns the tail call directly and updates previousTemplate via ref (was: new object[2]
         // {tc, previousTemplate} per node — a ~4.7M-alloc/transform transpile artifact on the hottest
         // apply-templates loop). Pure refactor: identical control flow, no boxing.
@@ -561,9 +473,6 @@ namespace OutSmart.DAXon.Transformation
             return tc;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         // WHY?
         private TemplateRuleTraceListener HandleRuleTraceListener(TemplateRuleTraceListener ruleTraceListener, Controller controller, ILocation locationId, IItem item, Rule rule)
         {
@@ -578,9 +487,6 @@ namespace OutSmart.DAXon.Transformation
             return ruleTraceListener;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         private void HandleTraceListener(Rule rule, IItem item, ITraceListener traceListener)
         {
             if (rule == null)
@@ -593,13 +499,7 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public abstract int GetStackFrameSlotsNeeded();
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual string GetCodeForBuiltInRuleSet(IBuiltInRuleSet builtInRuleSet)
         {
             if (builtInRuleSet is ShallowCopyAllRuleSet)
@@ -640,9 +540,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual IBuiltInRuleSet GetBuiltInRuleSetForCode(string code)
         {
             IBuiltInRuleSet @base;
@@ -687,9 +584,6 @@ namespace OutSmart.DAXon.Transformation
             return @base;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             int s = presenter.StartElement("mode");
@@ -749,24 +643,15 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         protected virtual void ExportUseAccumulators(ExpressionPresenter presenter)
         {
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual bool IsMustBeTyped()
         {
             return mustBeTyped;
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         public virtual void Explain(ExpressionPresenter presenter)
         {
             int s = presenter.StartElement("mode");
@@ -820,21 +705,12 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         // WHY?
-        /// <summary>
-        /// Interface for helper classes used to filter a chain of rules
-        /// </summary>
-        /// <summary>
-        /// Switch tracing on or off
-        /// </summary>
         // WHY?
         /// <summary>
         /// Interface for helper classes used to process all the rules in the Mode
         /// </summary>
-        // Phase 5: IRuleAction interface->delegate for lambda assignability.
+        // IRuleAction interface->delegate for lambda assignability.
         public delegate void IRuleAction(Rule r);
     }
 }

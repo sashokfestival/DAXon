@@ -13,7 +13,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,19 +36,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override string ExpressionName => "sequence";
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         public override int ImplementationMethod => ITERATE_METHOD | PROCESS_METHOD;
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Iterate over the results of all the child expressions
-        /// </summary>
         public override string StreamerName => "Block";
         public Block(Expression[] children)
         {
@@ -145,7 +135,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 }
 
                 Expression[] exps = new Expression[list.Count];
-                exps = list.ToArray(exps);
+                exps = list.ToArray();
                 return new Block(exps);
             }
             else
@@ -161,7 +151,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public static Expression MakeBlock(IList<Expression> list)
         {
-            if (list.IsEmpty())
+            if (list.Count == 0)
             {
                 return Literal.MakeEmptySequence();
             }
@@ -172,7 +162,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             else
             {
                 Expression[] exps = new Expression[list.Count];
-                exps = list.ToArray(exps);
+                exps = list.ToArray();
                 return new Block(exps);
             }
         }
@@ -286,7 +276,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             {
                 if ((reqCard & suppliedCard) == 0)
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     throw new XPathException("The required cardinality of the " + role.GetMessage() + " is " + Cardinality.Describe(reqCard) + ", but the supplied cardinality is " + Cardinality.Describe(suppliedCard), role.ErrorCode, GetLocation()).AsTypeError().WithFailingExpression(this);
                 }
                 else
@@ -438,9 +428,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             if (Size() == 0)
@@ -461,17 +448,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return c1;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return SomeOperandCreatesNewNodes();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override void CheckForUpdatingSubexpressions()
         {
             if (Size() < 2)
@@ -506,9 +487,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override bool IsVacuousExpression()
         {
 
@@ -525,9 +503,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return true;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override Expression Simplify()
         {
             bool allAtomic = true;
@@ -595,9 +570,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         private void Flatten(IList<Expression> targetList)
         {
             IList<IItem> currentLiteralList = null;
@@ -637,9 +609,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             FlushCurrentLiteralList(currentLiteralList, targetList);
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         private void FlushCurrentLiteralList(IList<IItem> currentLiteralList, IList<Expression> list)
         {
@@ -651,9 +620,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         public virtual bool IsCandidateForSharedAppend()
         {
@@ -669,9 +635,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
@@ -685,9 +648,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
@@ -744,9 +704,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
@@ -757,9 +714,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         public override void Export(ExpressionPresenter @out)
         {
@@ -773,22 +727,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
         public override string ToShortString()
         {
             return "(" + Child(0).ToShortString() + ", ...)";
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Iterate over the results of all the child expressions
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             if (Size() == 0)
@@ -805,37 +750,19 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Iterate over the results of all the child expressions
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new BlockElaborator();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Iterate over the results of all the child expressions
-        /// </summary>
         public interface IChainAction
         {
             ZenoSequence Perform(ZenoSequence @in, IXPathContext context);
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Iterate over the results of all the child expressions
-        /// </summary>
         public class BlockElaborator : PullElaborator
         {
             public override ISequenceEvaluator Lazily(bool repeatable, bool lazyEvaluationRequired)

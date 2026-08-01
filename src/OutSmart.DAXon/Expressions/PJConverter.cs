@@ -11,7 +11,6 @@ using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Wrappers;
-using OutSmart.DAXon.Internal.Reflect;
 using OutSmart.DAXon.Internal.Numerics;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Collections;
@@ -26,7 +25,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Events;
-using OutSmart.DAXon.Internal.Jaxp.Namespace;
 using System.Numerics;
 namespace OutSmart.DAXon.Expressions
 {
@@ -35,56 +33,56 @@ namespace OutSmart.DAXon.Expressions
         private static readonly Dictionary<System.Type, SequenceType> jpmap = new Dictionary<System.Type, SequenceType>();
         static PJConverter()
         {
-            jpmap.Put(typeof(bool), SequenceType.SINGLE_BOOLEAN);
-            jpmap.Put(typeof(bool), SequenceType.OPTIONAL_BOOLEAN);
-            jpmap.Put(typeof(string), SequenceType.OPTIONAL_STRING);
-            jpmap.Put(typeof(string), SequenceType.OPTIONAL_STRING);
+            jpmap[typeof(bool)] = SequenceType.SINGLE_BOOLEAN;
+            jpmap[typeof(bool)] = SequenceType.OPTIONAL_BOOLEAN;
+            jpmap[typeof(string)] = SequenceType.OPTIONAL_STRING;
+            jpmap[typeof(string)] = SequenceType.OPTIONAL_STRING;
 
             // Mappings for long and int are chosen to avoid static type errors when
             // a Java method expecting long or int is called with an integer literal
-            jpmap.Put(typeof(long), SequenceType.SINGLE_INTEGER);
-            jpmap.Put(typeof(long), SequenceType.OPTIONAL_INTEGER);
-            jpmap.Put(typeof(int), SequenceType.SINGLE_INTEGER);
-            jpmap.Put(typeof(int), SequenceType.OPTIONAL_INTEGER);
-            jpmap.Put(typeof(short), SequenceType.SINGLE_SHORT);
-            jpmap.Put(typeof(Short), SequenceType.OPTIONAL_SHORT);
-            jpmap.Put(typeof(byte), SequenceType.SINGLE_BYTE);
-            jpmap.Put(typeof(byte), SequenceType.OPTIONAL_BYTE);
-            jpmap.Put(typeof(float), SequenceType.SINGLE_FLOAT);
-            jpmap.Put(typeof(float), SequenceType.OPTIONAL_FLOAT);
-            jpmap.Put(typeof(double), SequenceType.SINGLE_DOUBLE);
-            jpmap.Put(typeof(double), SequenceType.OPTIONAL_DOUBLE);
-            jpmap.Put(typeof(URI), SequenceType.OPTIONAL_ANY_URI);
-            jpmap.Put(typeof(URL), SequenceType.OPTIONAL_ANY_URI);
-            jpmap.Put(typeof(BigInteger), SequenceType.OPTIONAL_INTEGER);
-            jpmap.Put(typeof(BigDecimal), SequenceType.OPTIONAL_DECIMAL);
-            jpmap.Put(typeof(UnicodeString), SequenceType.OPTIONAL_STRING);
-            jpmap.Put(typeof(StringValue), SequenceType.OPTIONAL_STRING);
-            jpmap.Put(typeof(BooleanValue), SequenceType.OPTIONAL_BOOLEAN);
-            jpmap.Put(typeof(DoubleValue), SequenceType.OPTIONAL_DOUBLE);
-            jpmap.Put(typeof(FloatValue), SequenceType.OPTIONAL_FLOAT);
-            jpmap.Put(typeof(DecimalValue), SequenceType.OPTIONAL_DECIMAL);
-            jpmap.Put(typeof(IntegerValue), SequenceType.OPTIONAL_INTEGER);
-            jpmap.Put(typeof(AnyURIValue), SequenceType.OPTIONAL_ANY_URI);
-            jpmap.Put(typeof(QNameValue), SequenceType.OPTIONAL_QNAME);
-            jpmap.Put(typeof(NotationValue), SequenceType.OPTIONAL_NOTATION);
-            jpmap.Put(typeof(DateValue), SequenceType.OPTIONAL_DATE);
-            jpmap.Put(typeof(DateTimeValue), SequenceType.OPTIONAL_DATE_TIME);
-            jpmap.Put(typeof(TimeValue), SequenceType.OPTIONAL_TIME);
-            jpmap.Put(typeof(DurationValue), SequenceType.OPTIONAL_DURATION);
-            jpmap.Put(typeof(DayTimeDurationValue), SequenceType.OPTIONAL_DAY_TIME_DURATION);
-            jpmap.Put(typeof(YearMonthDurationValue), SequenceType.OPTIONAL_YEAR_MONTH_DURATION);
-            jpmap.Put(typeof(GYearValue), SequenceType.OPTIONAL_G_YEAR);
-            jpmap.Put(typeof(GYearMonthValue), SequenceType.OPTIONAL_G_YEAR_MONTH);
-            jpmap.Put(typeof(GMonthValue), SequenceType.OPTIONAL_G_MONTH);
-            jpmap.Put(typeof(GMonthDayValue), SequenceType.OPTIONAL_G_MONTH_DAY);
-            jpmap.Put(typeof(GDayValue), SequenceType.OPTIONAL_G_DAY);
-            jpmap.Put(typeof(Base64BinaryValue), SequenceType.OPTIONAL_BASE64_BINARY);
-            jpmap.Put(typeof(HexBinaryValue), SequenceType.OPTIONAL_HEX_BINARY);
-            jpmap.Put(typeof(IFunctionItem), SequenceType.OPTIONAL_FUNCTION_ITEM);
-            jpmap.Put(typeof(MapItem), MapType.OPTIONAL_MAP_ITEM);
-            jpmap.Put(typeof(NodeInfo), SequenceType.OPTIONAL_NODE);
-            jpmap.Put(typeof(ITreeInfo), SequenceType.OPTIONAL_DOCUMENT_NODE);
+            jpmap.PutAndGetPrevious(typeof(long), SequenceType.SINGLE_INTEGER);
+            jpmap[typeof(long)] = SequenceType.OPTIONAL_INTEGER;
+            jpmap[typeof(int)] = SequenceType.SINGLE_INTEGER;
+            jpmap[typeof(int)] = SequenceType.OPTIONAL_INTEGER;
+            jpmap[typeof(short)] = SequenceType.SINGLE_SHORT;
+            jpmap[typeof(short?)] = SequenceType.OPTIONAL_SHORT;
+            jpmap[typeof(byte)] = SequenceType.SINGLE_BYTE;
+            jpmap[typeof(byte)] = SequenceType.OPTIONAL_BYTE;
+            jpmap[typeof(float)] = SequenceType.SINGLE_FLOAT;
+            jpmap[typeof(float)] = SequenceType.OPTIONAL_FLOAT;
+            jpmap[typeof(double)] = SequenceType.SINGLE_DOUBLE;
+            jpmap[typeof(double)] = SequenceType.OPTIONAL_DOUBLE;
+            jpmap[typeof(URI)] = SequenceType.OPTIONAL_ANY_URI;
+            jpmap[typeof(global::System.Uri)] = SequenceType.OPTIONAL_ANY_URI;
+            jpmap[typeof(BigInteger)] = SequenceType.OPTIONAL_INTEGER;
+            jpmap[typeof(BigDecimal)] = SequenceType.OPTIONAL_DECIMAL;
+            jpmap[typeof(UnicodeString)] = SequenceType.OPTIONAL_STRING;
+            jpmap[typeof(StringValue)] = SequenceType.OPTIONAL_STRING;
+            jpmap[typeof(BooleanValue)] = SequenceType.OPTIONAL_BOOLEAN;
+            jpmap[typeof(DoubleValue)] = SequenceType.OPTIONAL_DOUBLE;
+            jpmap[typeof(FloatValue)] = SequenceType.OPTIONAL_FLOAT;
+            jpmap[typeof(DecimalValue)] = SequenceType.OPTIONAL_DECIMAL;
+            jpmap[typeof(IntegerValue)] = SequenceType.OPTIONAL_INTEGER;
+            jpmap[typeof(AnyURIValue)] = SequenceType.OPTIONAL_ANY_URI;
+            jpmap[typeof(QNameValue)] = SequenceType.OPTIONAL_QNAME;
+            jpmap[typeof(NotationValue)] = SequenceType.OPTIONAL_NOTATION;
+            jpmap[typeof(DateValue)] = SequenceType.OPTIONAL_DATE;
+            jpmap[typeof(DateTimeValue)] = SequenceType.OPTIONAL_DATE_TIME;
+            jpmap[typeof(TimeValue)] = SequenceType.OPTIONAL_TIME;
+            jpmap[typeof(DurationValue)] = SequenceType.OPTIONAL_DURATION;
+            jpmap[typeof(DayTimeDurationValue)] = SequenceType.OPTIONAL_DAY_TIME_DURATION;
+            jpmap[typeof(YearMonthDurationValue)] = SequenceType.OPTIONAL_YEAR_MONTH_DURATION;
+            jpmap[typeof(GYearValue)] = SequenceType.OPTIONAL_G_YEAR;
+            jpmap[typeof(GYearMonthValue)] = SequenceType.OPTIONAL_G_YEAR_MONTH;
+            jpmap[typeof(GMonthValue)] = SequenceType.OPTIONAL_G_MONTH;
+            jpmap[typeof(GMonthDayValue)] = SequenceType.OPTIONAL_G_MONTH_DAY;
+            jpmap[typeof(GDayValue)] = SequenceType.OPTIONAL_G_DAY;
+            jpmap[typeof(Base64BinaryValue)] = SequenceType.OPTIONAL_BASE64_BINARY;
+            jpmap[typeof(HexBinaryValue)] = SequenceType.OPTIONAL_HEX_BINARY;
+            jpmap[typeof(IFunctionItem)] = SequenceType.OPTIONAL_FUNCTION_ITEM;
+            jpmap[typeof(MapItem)] = MapType.OPTIONAL_MAP_ITEM;
+            jpmap[typeof(NodeInfo)] = SequenceType.OPTIONAL_NODE;
+            jpmap[typeof(ITreeInfo)] = SequenceType.OPTIONAL_DOCUMENT_NODE;
         }
 
         public static SequenceType GetEquivalentSequenceType(System.Type javaClass)
@@ -108,46 +106,7 @@ namespace OutSmart.DAXon.Expressions
                 }
             }
 
-            return jpmap.Get(javaClass);
-        }
-
-        public static SequenceType GetParameterizedSequenceType(OutSmart.DAXon.Internal.Reflect.Type javaType)
-        {
-            if (javaType is ParameterizedType)
-            {
-                ParameterizedType aType = (ParameterizedType)javaType;
-                OutSmart.DAXon.Internal.Reflect.Type[] parameterArgTypes = (OutSmart.DAXon.Internal.Reflect.Type[])aType.ActualTypeArguments;
-                if (parameterArgTypes.Length == 1 && parameterArgTypes[0] is System.Type && typeof(IItem).IsAssignableFrom((System.Type)parameterArgTypes[0]))
-                {
-                    SequenceType memberType = GetEquivalentSequenceType((System.Type)((System.Type)parameterArgTypes[0]));
-                    ItemType itemType = memberType == null ? null : memberType.PrimaryType;
-                    OutSmart.DAXon.Internal.Reflect.Type collectionType = (OutSmart.DAXon.Internal.Reflect.Type)aType.RawType;
-                    int cardinality = -1;
-                    if (collectionType.Equals(typeof(ZeroOrOne<>)))
-                    {
-                        cardinality = StaticProperty.ALLOWS_ZERO_OR_ONE;
-                    }
-                    else if (collectionType.Equals(typeof(One<>)))
-                    {
-                        cardinality = StaticProperty.ALLOWS_ONE;
-                    }
-                    else if (collectionType.Equals(typeof(OneOrMore<>)))
-                    {
-                        cardinality = StaticProperty.ALLOWS_ONE_OR_MORE;
-                    }
-                    else if (collectionType.Equals(typeof(ZeroOrMore<>)))
-                    {
-                        cardinality = StaticProperty.ALLOWS_ZERO_OR_MORE;
-                    }
-
-                    if (itemType != null && cardinality != -1)
-                    {
-                        return SequenceType.MakeSequenceType(itemType, cardinality);
-                    }
-                }
-            }
-
-            return null;
+            return jpmap.GetOrDefault(javaClass);
         }
 
         public abstract object Convert(ISequence value, System.Type targetClass, IXPathContext context);
@@ -310,7 +269,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             return IntegerValueToInt.INSTANCE;
                         }
-                        else if (targetClass == typeof(short) || targetClass == typeof(Short))
+                        else if (targetClass == typeof(short) || targetClass == typeof(short?))
                         {
                             return IntegerValueToShort.INSTANCE;
                         }
@@ -406,9 +365,9 @@ namespace OutSmart.DAXon.Expressions
                         {
                             return AnyURIValueToURI.INSTANCE;
                         }
-                        else if (typeof(URL).IsAssignableFrom(targetClass))
+                        else if (typeof(global::System.Uri).IsAssignableFrom(targetClass))
                         {
-                            return AnyURIValueToURL.INSTANCE;
+                            return AnyURIValueToSystemUri.INSTANCE;
                         }
                         else if (targetClass == typeof(string) || targetClass == typeof(string))
                         {
@@ -425,7 +384,7 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else if (th.IsSubType(itemType, BuiltInAtomicType.QNAME))
                     {
-                        if (targetClass == typeof(object) || targetClass == typeof(QName))
+                        if (targetClass == typeof(object) || targetClass == typeof(System.Xml.XmlQualifiedName))
                         {
                             return QualifiedNameValueToQName.INSTANCE;
                         }
@@ -440,7 +399,7 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else if (th.IsSubType(itemType, BuiltInAtomicType.NOTATION))
                     {
-                        if (targetClass == typeof(object) || targetClass == typeof(QName))
+                        if (targetClass == typeof(object) || targetClass == typeof(System.Xml.XmlQualifiedName))
                         {
                             return QualifiedNameValueToQName.INSTANCE;
                         }
@@ -470,13 +429,13 @@ namespace OutSmart.DAXon.Expressions
                         {
                             return Identity.INSTANCE;
                         }
-                        else if (targetClass == typeof(Date))
+                        else if (targetClass == typeof(global::System.DateTime))
                         {
-                            return CalendarValueToDate.INSTANCE;
+                            return CalendarValueToDateTime.INSTANCE;
                         }
-                        else if (targetClass == typeof(Calendar))
+                        else if (targetClass == typeof(global::System.DateTimeOffset))
                         {
-                            return CalendarValueToCalendar.INSTANCE;
+                            return CalendarValueToDateTimeOffset.INSTANCE;
                         }
                         else
                         {
@@ -489,13 +448,13 @@ namespace OutSmart.DAXon.Expressions
                         {
                             return Identity.INSTANCE;
                         }
-                        else if (targetClass == typeof(Date))
+                        else if (targetClass == typeof(global::System.DateTime))
                         {
-                            return CalendarValueToDate.INSTANCE;
+                            return CalendarValueToDateTime.INSTANCE;
                         }
-                        else if (targetClass == typeof(Calendar))
+                        else if (targetClass == typeof(global::System.DateTimeOffset))
                         {
-                            return CalendarValueToCalendar.INSTANCE;
+                            return CalendarValueToDateTimeOffset.INSTANCE;
                         }
                         else
                         {
@@ -508,13 +467,13 @@ namespace OutSmart.DAXon.Expressions
                         {
                             return Identity.INSTANCE;
                         }
-                        else if (targetClass == typeof(Date))
+                        else if (targetClass == typeof(global::System.DateTime))
                         {
-                            return CalendarValueToDate.INSTANCE;
+                            return CalendarValueToDateTime.INSTANCE;
                         }
-                        else if (targetClass == typeof(Calendar))
+                        else if (targetClass == typeof(global::System.DateTimeOffset))
                         {
-                            return CalendarValueToCalendar.INSTANCE;
+                            return CalendarValueToDateTimeOffset.INSTANCE;
                         }
                         else
                         {
@@ -639,7 +598,7 @@ namespace OutSmart.DAXon.Expressions
 
         private static XPathException CannotConvert(ItemType source, System.Type target, Configuration config)
         {
-            return new XPathException("Cannot convert from " + source + " to " + target.GetName());
+            return new XPathException("Cannot convert from " + source + " to " + target.FullName);
         }
 
         public static PJConverter AllocateNodeListCreator(Configuration config, object node)
@@ -683,7 +642,7 @@ namespace OutSmart.DAXon.Expressions
                 {
                     // ConstructorInfo.Invoke wraps a constructor-thrown exception in TargetInvocationException
                     // (the BCL equivalent of java.lang.reflect.InvocationTargetException).
-                    throw new XPathException("Cannot convert untypedAtomic to " + targetClass.GetName() + ": " + (e.InnerException ?? e).Message, "FORG0001");
+                    throw new XPathException("Cannot convert untypedAtomic to " + targetClass.FullName + ": " + (e.InnerException ?? e).Message, "FORG0001");
                 }
             }
         }
@@ -729,7 +688,7 @@ namespace OutSmart.DAXon.Expressions
                 {
                     try
                     {
-                        list = (Collection<object>)targetClass.NewInstance();
+                        list = (Collection<object>)global::System.Activator.CreateInstance(targetClass);
                     }
                     catch (MissingMethodException e)
                     {
@@ -893,7 +852,7 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else
                     {
-                        throw new XPathException("Cannot convert value " + value.GetType() + " of type " + SequenceTool.GetItemType(value, context.GetConfiguration().GetTypeHierarchy()) + " to class " + targetClass.GetName());
+                        throw new XPathException("Cannot convert value " + value.GetType() + " of type " + SequenceTool.GetItemType(value, context.GetConfiguration().GetTypeHierarchy()) + " to class " + targetClass.FullName);
                     }
                 }
             }
@@ -918,14 +877,14 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else
                     {
-                        throw new XPathException("Expected external object of class " + targetClass.GetName() + ", got " + head.GetType());
+                        throw new XPathException("Expected external object of class " + targetClass.FullName + ", got " + head.GetType());
                     }
                 }
 
                 object obj = ((IAnyExternalObject)head).WrappedObject;
                 if (!targetClass.IsAssignableFrom(obj.GetType()))
                 {
-                    throw new XPathException("External object has wrong class (is " + obj.GetType().GetName() + ", expected " + targetClass.GetName() + ")");
+                    throw new XPathException("External object has wrong class (is " + obj.GetType().FullName + ", expected " + targetClass.FullName + ")");
                 }
 
                 return obj;
@@ -947,7 +906,7 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else
                     {
-                        throw new XPathException("Supplied value is empty: expected + " + targetClass.GetName());
+                        throw new XPathException("Supplied value is empty: expected + " + targetClass.FullName);
                     }
                 }
 
@@ -956,12 +915,12 @@ namespace OutSmart.DAXon.Expressions
                     object obj = ((IAnyExternalObject)head).WrappedObject;
                     if (!targetClass.IsAssignableFrom(obj.GetType()))
                     {
-                        throw new XPathException("External object has wrong class (is " + obj.GetType().GetName() + ", expected " + targetClass.GetName() + ")");
+                        throw new XPathException("External object has wrong class (is " + obj.GetType().FullName + ", expected " + targetClass.FullName + ")");
                     }
 
                     if (iter.Next() != null)
                     {
-                        throw new XPathException("Supplied sequence has more than one item: expected a single instance of " + targetClass.GetName());
+                        throw new XPathException("Supplied sequence has more than one item: expected a single instance of " + targetClass.FullName);
                     }
 
                     return obj;
@@ -1133,19 +1092,19 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class AnyURIValueToURL : PJConverter
+        public class AnyURIValueToSystemUri : PJConverter
         {
-            public static readonly AnyURIValueToURL INSTANCE = new AnyURIValueToURL();
+            public static readonly AnyURIValueToSystemUri INSTANCE = new AnyURIValueToSystemUri();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
             {
                 AnyURIValue av = (AnyURIValue)value.Head();
                 try
                 {
-                    return av == null ? null : new URL(((AnyURIValue)value).GetStringValue());
+                    return av == null ? null : new global::System.Uri(((AnyURIValue)value).GetStringValue());
                 }
-                catch (MalformedURLException err)
+                catch (UriFormatException err)
                 {
-                    throw new XPathException("The anyURI value '" + value + "' is not an acceptable Java URL");
+                    throw new XPathException("The anyURI value '" + value + "' is not an acceptable absolute URI");
                 }
             }
         }
@@ -1156,27 +1115,27 @@ namespace OutSmart.DAXon.Expressions
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
             {
                 QualifiedNameValue qv = (QualifiedNameValue)value.Head();
-                return qv == null ? null : qv.ToJaxpQName();
+                return qv == null ? null : qv.ToXmlQualifiedName();
             }
         }
 
-        public class CalendarValueToDate : PJConverter
+        public class CalendarValueToDateTime : PJConverter
         {
-            public static readonly CalendarValueToDate INSTANCE = new CalendarValueToDate();
+            public static readonly CalendarValueToDateTime INSTANCE = new CalendarValueToDateTime();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
             {
                 CalendarValue cv = (CalendarValue)value.Head();
-                return cv == null ? null : cv.GetCalendar().GetTime();
+                return cv == null ? (object)null : cv.ToSystemDateTimeUtc();
             }
         }
 
-        public class CalendarValueToCalendar : PJConverter
+        public class CalendarValueToDateTimeOffset : PJConverter
         {
-            public static readonly CalendarValueToCalendar INSTANCE = new CalendarValueToCalendar();
+            public static readonly CalendarValueToDateTimeOffset INSTANCE = new CalendarValueToDateTimeOffset();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
             {
                 CalendarValue cv = (CalendarValue)value.Head();
-                return cv == null ? null : cv.GetCalendar();
+                return cv == null ? (object)null : cv.ToSystemDateTimeOffset();
             }
         }
 
@@ -1187,9 +1146,6 @@ namespace OutSmart.DAXon.Expressions
         //        public Object convert(ISequence value, Class targetClass, IXPathContext context) throws XPathException {
         //            List<AtomicValue> val = new List<AtomicValue>();
         //            ISequenceIterator @base = value.iterate();
-        //            PJConverter converter = allocate(
-        //            return converter.convert(item, targetClass, context);
-        //            while (true) {
         //                IItem item = atomized.next();
         //                if (item == null) {
         //                    break;
@@ -1199,8 +1155,6 @@ namespace OutSmart.DAXon.Expressions
         //            } else {
         //                return
         //
-        //        }
-        //    }
         //
         public class Atomic : PJConverter
         {

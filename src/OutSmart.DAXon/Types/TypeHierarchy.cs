@@ -13,9 +13,9 @@ using OutSmart.DAXon.XQuery;
 using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using static OutSmart.DAXon.Types.Affinity;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -31,14 +31,20 @@ namespace OutSmart.DAXon.Types
 {
     public class TypeHierarchy
     {
-        private readonly Dictionary<ItemTypePair, Affinity> map;
+        // Concurrent (java.util.concurrent.ConcurrentHashMap upstream, and it has to be): there is
+        // ONE TypeHierarchy per Configuration, i.e. per Processor, and Relationship() writes to it
+        // from every compile. Compiles do run concurrently on a shared Processor - the documented
+        // host wrapper's Sheets.GetOrAdd can call the factory on two threads at once, and
+        // xsl:evaluate / fn:transform compile mid-transform - so a plain Dictionary was open to a
+        // torn resize, whose net472 symptom is not a crash but an endless loop inside FindEntry.
+        private readonly ConcurrentDictionary<ItemTypePair, Affinity> map;
         protected Configuration config;
 
         public virtual ItemType GenericFunctionItemType => AnyFunctionType.GetInstance();
         public TypeHierarchy(Configuration config)
         {
             this.config = config;
-            map = new Dictionary<ItemTypePair, Affinity>();
+            map = new ConcurrentDictionary<ItemTypePair, Affinity>();
         }
 
         public static ISchemaType GetNearestNamedType(ISchemaType type)
@@ -76,8 +82,8 @@ namespace OutSmart.DAXon.Types
                         }
                         catch (XPathException e)
                         {
-                            RoleDiagnostic role = roleSupplier.Get();
-                            ValidationFailure vf = new ValidationFailure("Failed to atomize the " + role.GetMessage() + ": " + e.GetMessage());
+                            RoleDiagnostic role = roleSupplier();
+                            ValidationFailure vf = new ValidationFailure("Failed to atomize the " + role.GetMessage() + ": " + e.Message);
                             vf.SetErrorCode("XPTY0117");
                             throw vf.MakeException();
                         }
@@ -97,7 +103,7 @@ namespace OutSmart.DAXon.Types
                             {
                                 if (item is AtomicValue && ((AtomicValue)item).IsUntypedAtomic())
                                 {
-                                    RoleDiagnostic role = roleSupplier.Get();
+                                    RoleDiagnostic role = roleSupplier();
                                     ValidationFailure vf = new ValidationFailure("Failed to convert the " + role.GetMessage() + ": " + "Implicit conversion of untypedAtomic value to " + requiredItemType + " is not allowed");
                                     vf.SetErrorCode("XPTY0117");
                                     throw vf.MakeException();
@@ -160,7 +166,7 @@ namespace OutSmart.DAXon.Types
                             }
                             else
                             {
-                                throw new XPathException("Failed to convert the " + roleSupplier.Get().GetMessage() + ": " + "Cannot promote non-numeric value to xs:double", "XPTY0004");
+                                throw new XPathException("Failed to convert the " + roleSupplier().GetMessage() + ": " + "Cannot promote non-numeric value to xs:double", "XPTY0004");
                             }
                         });
                         iterator = new ItemMappingIterator(iterator, promoter, true);
@@ -171,7 +177,7 @@ namespace OutSmart.DAXon.Types
                         {
                             if (item is DoubleValue)
                             {
-                                RoleDiagnostic role = roleSupplier.Get();
+                                RoleDiagnostic role = roleSupplier();
                                 throw new XPathException("Failed to convert the " + role.GetMessage() + ": " + "Cannot promote xs:double value to xs:float", "XPTY0004");
                             }
                             else if (item is NumericValue)
@@ -180,7 +186,7 @@ namespace OutSmart.DAXon.Types
                             }
                             else
                             {
-                                RoleDiagnostic role = roleSupplier.Get();
+                                RoleDiagnostic role = roleSupplier();
                                 throw new XPathException("Failed to convert the " + role.GetMessage() + ": " + "Cannot promote non-numeric value to xs:float", "XPTY0004");
                             }
                         });
@@ -316,13 +322,15 @@ namespace OutSmart.DAXon.Types
             }
 
             ItemTypePair pair = new ItemTypePair(t1, t2);
-            if (map.ContainsKey(pair))
+            if (map.TryGetValue(pair, out Affinity cached))
             {
-                return map.Get(pair);
+                return cached;
             }
 
+            // Two threads may compute the same pair at once; ComputeRelationship is a pure function
+            // of the pair, so either result is the same and last-write-wins is correct.
             Affinity affinity = ComputeRelationship(t1, t2);
-            map.Put(pair, affinity);
+            map[pair] = affinity;
             return affinity;
         }
 

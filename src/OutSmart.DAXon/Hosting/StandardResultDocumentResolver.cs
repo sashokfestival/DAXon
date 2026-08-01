@@ -16,8 +16,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Streams;
 using OutSmart.DAXon.Core;
@@ -85,7 +83,7 @@ namespace OutSmart.DAXon.Lib
             {
                 throw new XPathException("Invalid " + which + " URI syntax", err2);
             }
-            catch (MalformedURLException err3)
+            catch (UriFormatException err3)
             {
                 throw new XPathException("Resolved URL is malformed", err3);
             }
@@ -138,12 +136,12 @@ namespace OutSmart.DAXon.Lib
                 }
                 catch (ArgumentException err)
                 {
-                    throw new XPathException("Cannot write to URI " + absoluteURI + " (" + err.GetMessage() + ")");
+                    throw new XPathException("Cannot write to URI " + absoluteURI + " (" + err.Message + ")");
                 }
             }
         }
 
-        public virtual void Dispose(Result result)
+        public virtual void Dispose(IResultTarget result)
         {
             if (result is StreamResult)
             {

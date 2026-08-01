@@ -10,7 +10,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -79,7 +78,7 @@ namespace OutSmart.DAXon.Expressions
             }
             else
             {
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 string message = role.ComposeErrorMessage(requiredItemType, item, th);
                 string errorCode = role.ErrorCode;
                 if ("XPDY0050".Equals(errorCode))

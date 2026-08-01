@@ -181,7 +181,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException e)
             {
-                XPathException err = new XPathException("Invalid element name passed to element-available(): " + e.GetMessage());
+                XPathException err = new XPathException("Invalid element name passed to element-available(): " + e.Message);
                 err.SetErrorCode("XTDE1440");
                 throw err;
             }

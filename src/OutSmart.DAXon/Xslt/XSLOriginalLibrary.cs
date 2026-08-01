@@ -51,7 +51,7 @@ namespace OutSmart.DAXon.Xslt
             }
             catch (XPathException e)
             {
-                reasons.Add(e.GetMessage());
+                reasons.Add(e.Message);
                 return null;
             }
         }
@@ -103,6 +103,5 @@ namespace OutSmart.DAXon.Xslt
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
     }
 }

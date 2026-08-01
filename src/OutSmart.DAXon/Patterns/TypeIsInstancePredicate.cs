@@ -8,11 +8,10 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 
 namespace OutSmart.DAXon.Patterns
 {
-    // Phase 5: TypeIsInstancePredicate — wraps a System.Type as INodePredicate for Children() callers.
+    // TypeIsInstancePredicate — wraps a System.Type as INodePredicate for Children() callers.
     public class TypeIsInstancePredicate : INodePredicate
     {
         private readonly System.Type _t;

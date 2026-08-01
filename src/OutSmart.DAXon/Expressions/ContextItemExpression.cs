@@ -32,81 +32,21 @@ namespace OutSmart.DAXon.Expressions
         private string errorCodeForAbsentContext = "XPDY0002";
         private bool absentContextIsTypeError = false; // absurdly, but that's what the spec says
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
         public override string ExpressionName => "dot";
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
         public virtual string ErrorCodeForUndefinedContext => errorCodeForAbsentContext;
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override int NetCost => 0;
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string StreamerName => "ContextItemExpr";
-        /// <summary>
-        /// Create the expression
-        /// </summary>
         public ContextItemExpression()
         {
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ContextItemExpression cie2 = new ContextItemExpression();
@@ -116,26 +56,17 @@ namespace OutSmart.DAXon.Expressions
             return cie2;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
         public virtual void SetErrorCodeForUndefinedContext(string errorCode, bool isTypeError)
         {
             errorCodeForAbsentContext = errorCode;
             absentContextIsTypeError = isTypeError;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
         public virtual void SetStaticInfo(ContextItemStaticInfo info)
         {
             staticInfo = info;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
         /// <summary>
         /// Type-check the expression.
         /// </summary>
@@ -158,9 +89,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
         /// Type-check the expression.
         /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
@@ -176,92 +104,32 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
         public override ItemType GetItemType()
         {
             return staticInfo.GetItemType();
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return contextItemType;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
         public virtual bool IsContextPossiblyUndefined()
         {
             return staticInfo.IsPossiblyAbsent();
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Get the static cardinality
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
             return p | StaticProperty.NO_NODES_NEWLY_CREATED | StaticProperty.CONTEXT_DOCUMENT_NODESET;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
         /// <summary>
         /// Is this expression the same as another expression?
         /// </summary>
@@ -270,35 +138,11 @@ namespace OutSmart.DAXon.Expressions
             return other is ContextItemExpression;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return "ContextItemExpression".GetHashCode();
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             if (pathMapNodeSet == null)
@@ -309,49 +153,16 @@ namespace OutSmart.DAXon.Expressions
             return pathMapNodeSet;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override bool IsSubtreeExpression()
         {
             return true;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Patterns.Pattern ToPattern(Configuration config)
         {
             return AnchorPattern.GetInstance();
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
         /// <summary>
         /// Iterate over the value of the expression
         /// </summary>
@@ -366,21 +177,6 @@ namespace OutSmart.DAXon.Expressions
             return SingletonIterator.MakeIterator(item);
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Iterate over the value of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             IItem item = context.GetContextItem();
@@ -392,21 +188,6 @@ namespace OutSmart.DAXon.Expressions
             return item;
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Iterate over the value of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public virtual void ReportAbsentContext(IXPathContext context)
         {
             if (absentContextIsTypeError)
@@ -419,41 +200,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Iterate over the value of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override string ToString()
         {
             return ".";
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Iterate over the value of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("dot", this);
@@ -472,58 +223,16 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Iterate over the value of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override string ToShortString()
         {
             return ".";
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Iterate over the value of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ContextItemElaborator();
         }
 
-        /// <summary>
-        /// Create the expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Determine the item type
-        /// </summary>
-        /// <summary>
-        /// Iterate over the value of the expression
-        /// </summary>
         /// <summary>
         /// Elaborator for the context item expression, "dot".
         /// </summary>

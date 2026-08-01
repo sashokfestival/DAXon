@@ -24,7 +24,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Xslt
 {
     /// <summary>
@@ -508,7 +507,7 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual void DeclareStaticVariable(StructuredQName name, IGroundedValue value, NestedIntegerValue precedence, bool isParam)
         {
-            ValueAndPrecedence vp = staticVariables.Get(name);
+            ValueAndPrecedence vp = staticVariables.GetOrDefault(name);
             if (vp != null)
             {
                 if (vp.precedence.CompareTo(precedence) < 0)
@@ -531,7 +530,7 @@ namespace OutSmart.DAXon.Xslt
                 }
             }
 
-            staticVariables.Put(name, new ValueAndPrecedence(value, precedence, isParam));
+            staticVariables[name] = new ValueAndPrecedence(value, precedence, isParam);
         }
 
         private bool ValuesAreCompatible(IGroundedValue val0, IGroundedValue val1)
@@ -574,13 +573,13 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual IGroundedValue GetStaticVariable(StructuredQName name)
         {
-            ValueAndPrecedence vp = staticVariables.Get(name);
+            ValueAndPrecedence vp = staticVariables.GetOrDefault(name);
             return vp == null ? null : vp.value;
         }
 
         public virtual NestedIntegerValue GetStaticVariablePrecedence(StructuredQName name)
         {
-            ValueAndPrecedence vp = staticVariables.Get(name);
+            ValueAndPrecedence vp = staticVariables.GetOrDefault(name);
             return vp == null ? null : vp.precedence;
         }
 

@@ -110,11 +110,6 @@ namespace OutSmart.DAXon.Expressions
             //                    + toShortString() + " is absent", "XPDY0002", getLocation());
             //            } else {
             //                throw e;
-            //            }
-            //        }
-            //        if (origin == null) {
-            //        }
-            //        return ((AxisExpression) getStep()).iterate(origin);
         }
 
         public override Elaborator GetElaborator()

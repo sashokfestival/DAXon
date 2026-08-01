@@ -75,21 +75,12 @@ namespace OutSmart.DAXon.Functions
             return contextPossiblyUndefined;
         }
 
-        /// <summary>
-        /// Evaluate in a general context
-        /// </summary>
         public abstract Int64Value EvaluateItem(IXPathContext c);
-        /// <summary>
-        /// Evaluate in a general context
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             return EvaluateItem(context);
         }
 
-        /// <summary>
-        /// Evaluate in a general context
-        /// </summary>
         public class Position : PositionAndLast
         {
             public override Int64Value EvaluateItem(IXPathContext c)
@@ -135,9 +126,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Evaluate in a general context
-        /// </summary>
         public class Last : PositionAndLast
         {
 

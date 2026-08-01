@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         private int targetSize;
         private int retentionThreshold = 1;
         private Dictionary<K, LFUCacheEntryWithCounter<V>> map;
-        // Phase 7.8d: indexer for `cache[key]` syntax (Java's cache.get(key))
+        // Indexer for `cache[key]` syntax (Java's cache.get(key))
         public V this[K key]
         {
             get
@@ -56,7 +56,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public virtual V Get(K key)
         {
-            LFUCacheEntryWithCounter<V> entry = map.Get(key);
+            LFUCacheEntryWithCounter<V> entry = map.GetOrDefault(key);
             if (entry == null)
             {
                 return default(V);
@@ -70,7 +70,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public virtual bool ContainsKey(K key)
         {
-            LFUCacheEntryWithCounter<V> entry = map.Get(key);
+            LFUCacheEntryWithCounter<V> entry = map.GetOrDefault(key);
             if (entry == null)
             {
                 return false;
@@ -84,7 +84,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public virtual void Put(K key, V value)
         {
-            map.Put(key, new LFUCacheEntryWithCounter<V>(value));
+            map[key] = new LFUCacheEntryWithCounter<V>(value);
 
             // Consider purging rarely-used entries
             if (map.Count > 3 * targetSize)
@@ -97,11 +97,11 @@ namespace OutSmart.DAXon.Expressions.Sorting
         {
             Dictionary<K, LFUCacheEntryWithCounter<V>> m2 = new Dictionary<K, LFUCacheEntryWithCounter<V>>(targetSize);
             int retained = 0;
-            foreach (KeyValuePair<K, LFUCacheEntryWithCounter<V>> entry in map.EntrySet())
+            foreach (KeyValuePair<K, LFUCacheEntryWithCounter<V>> entry in map)
             {
                 if (entry.Value.counter > retentionThreshold)
                 {
-                    m2.Put(entry.Key, new LFUCacheEntryWithCounter<V>(entry.Value.value));
+                    m2[entry.Key] = new LFUCacheEntryWithCounter<V>(entry.Value.value);
                     retained++;
                 }
             }

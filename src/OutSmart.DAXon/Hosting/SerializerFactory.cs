@@ -22,8 +22,6 @@ using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Serialization;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Lib
 {
@@ -49,22 +47,22 @@ namespace OutSmart.DAXon.Lib
             return config;
         }
 
-        public virtual IReceiver GetReceiver(Result result, PipelineConfiguration pipe, Properties props)
+        public virtual IReceiver GetReceiver(IResultTarget result, PipelineConfiguration pipe, Properties props)
         {
             return GetReceiver(result, new SerializationProperties(props), pipe);
         }
 
-        public virtual IReceiver GetReceiver(Result result)
+        public virtual IReceiver GetReceiver(IResultTarget result)
         {
             return GetReceiver(result, new SerializationProperties(), config.MakePipelineConfiguration());
         }
 
-        public virtual IReceiver GetReceiver(Result result, SerializationProperties @params)
+        public virtual IReceiver GetReceiver(IResultTarget result, SerializationProperties @params)
         {
             return GetReceiver(result, @params, config.MakePipelineConfiguration());
         }
 
-        public virtual IReceiver GetReceiver(Result result, SerializationProperties @params, PipelineConfiguration pipe)
+        public virtual IReceiver GetReceiver(IResultTarget result, SerializationProperties @params, PipelineConfiguration pipe)
         {
             if (result == null)
                 throw new NullReferenceException();
@@ -162,7 +160,7 @@ namespace OutSmart.DAXon.Lib
                 // last thing in the output pipeline, the IReceiver that actually generates
                 // characters or bytes that are written to the StreamResult.
                 SequenceReceiver target;
-                string method = props.GetProperty(OutputKeys.METHOD);
+                string method = props.GetProperty(DAXonOutputKeys.METHOD);
                 if (method == null)
                 {
                     return NewUncommittedSerializer(result, new Sink(pipe), @params);
@@ -233,7 +231,7 @@ namespace OutSmart.DAXon.Lib
 
                     case "json":
                         {
-                            props.SetProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+                            props.SetProperty(DAXonOutputKeys.OMIT_XML_DECLARATION, "yes");
                             if (uWriter == null)
                             {
                                 uWriter = expandedResult.ObtainUnicodeWriter();
@@ -360,7 +358,7 @@ namespace OutSmart.DAXon.Lib
             return null;
         }
 
-        private IReceiver GetReceiverForNonSerializedResult(Result result, Properties props, PipelineConfiguration pipe)
+        private IReceiver GetReceiverForNonSerializedResult(IResultTarget result, Properties props, PipelineConfiguration pipe)
         {
             if (result is Emitter)
             {
@@ -408,7 +406,7 @@ namespace OutSmart.DAXon.Lib
                 if (pipe != null)
                 {
 
-                    // try to find an external object model that knows this kind of Result
+                    // try to find an external object model that knows this kind of IResultTarget
                     IList<IExternalObjectModel> externalObjectModels = pipe.GetConfiguration().ExternalObjectModels;
                     foreach (IExternalObjectModel model in externalObjectModels)
                     {
@@ -428,7 +426,7 @@ namespace OutSmart.DAXon.Lib
 
         public virtual SequenceReceiver MakeSequenceNormalizer(IReceiver receiver, Properties properties)
         {
-            string method = properties.GetProperty(OutputKeys.METHOD);
+            string method = properties.GetProperty(DAXonOutputKeys.METHOD);
             if ("json".Equals(method) || "adaptive".Equals(method))
             {
                 return receiver is SequenceReceiver ? (SequenceReceiver)receiver : new TreeReceiver(receiver);
@@ -457,7 +455,7 @@ namespace OutSmart.DAXon.Lib
             IReceiver target;
             target = emitter;
             Properties props = @params.GetProperties();
-            if (!"no".Equals(props.GetProperty(OutputKeys.INDENT)))
+            if (!"no".Equals(props.GetProperty(DAXonOutputKeys.INDENT)))
             {
                 target = NewHTMLIndenter(target, props);
             }
@@ -465,7 +463,7 @@ namespace OutSmart.DAXon.Lib
             target = new NamespaceDifferencer(target, props);
             target = InjectUnicodeNormalizer(@params, target);
             target = InjectCharacterMapExpander(@params, target, true);
-            string cdataElements = props.GetProperty(OutputKeys.CDATA_SECTION_ELEMENTS);
+            string cdataElements = props.GetProperty(DAXonOutputKeys.CDATA_SECTION_ELEMENTS);
             if (cdataElements != null && !(cdataElements.Length == 0))
             {
                 target = NewCDATAFilter(target, props);
@@ -551,7 +549,7 @@ namespace OutSmart.DAXon.Lib
         {
             IReceiver target = emitter;
             Properties props = @params.GetProperties();
-            if (!"no".Equals(props.GetProperty(OutputKeys.INDENT)))
+            if (!"no".Equals(props.GetProperty(DAXonOutputKeys.INDENT)))
             {
                 target = NewXHTMLIndenter(target, props);
             }
@@ -559,7 +557,7 @@ namespace OutSmart.DAXon.Lib
             target = new NamespaceDifferencer(target, props);
             target = InjectUnicodeNormalizer(@params, target);
             target = InjectCharacterMapExpander(@params, target, true);
-            string cdataElements = props.GetProperty(OutputKeys.CDATA_SECTION_ELEMENTS);
+            string cdataElements = props.GetProperty(DAXonOutputKeys.CDATA_SECTION_ELEMENTS);
             if (cdataElements != null && !(cdataElements.Length == 0))
             {
                 target = NewCDATAFilter(target, props);
@@ -606,7 +604,7 @@ namespace OutSmart.DAXon.Lib
             IReceiver target;
             Properties props = @params.GetProperties();
             bool canonical = "yes".Equals(props.GetProperty(DAXonOutputKeys.CANONICAL));
-            if ("yes".Equals(props.GetProperty(OutputKeys.INDENT)) || canonical)
+            if ("yes".Equals(props.GetProperty(DAXonOutputKeys.INDENT)) || canonical)
             {
                 target = NewXMLIndenter(emitter, props);
             }
@@ -616,7 +614,7 @@ namespace OutSmart.DAXon.Lib
             }
 
             target = new NamespaceDifferencer(target, props);
-            if ("1.0".Equals(props.GetProperty(OutputKeys.VERSION)) && config.XMLVersion == Configuration.XML11)
+            if ("1.0".Equals(props.GetProperty(DAXonOutputKeys.VERSION)) && config.XMLVersion == Configuration.XML11)
             {
 
                 // Check result meets XML 1.0 constraints if configuration allows XML 1.1 input but
@@ -630,7 +628,7 @@ namespace OutSmart.DAXon.Lib
                 target = InjectCharacterMapExpander(@params, target, true);
             }
 
-            string cdataElements = props.GetProperty(OutputKeys.CDATA_SECTION_ELEMENTS);
+            string cdataElements = props.GetProperty(DAXonOutputKeys.CDATA_SECTION_ELEMENTS);
             if (cdataElements != null && !(cdataElements.Length == 0) && !canonical)
             {
                 target = NewCDATAFilter(target, props);
@@ -658,7 +656,7 @@ namespace OutSmart.DAXon.Lib
             return MakeSequenceNormalizer(target, props);
         }
 
-        protected virtual SequenceReceiver CreateSaxonSerializationMethod(string method, SerializationProperties @params, PipelineConfiguration pipe, CharacterMapExpander characterMapExpander, ProxyReceiver normalizer, ExpandedStreamResult expandedResult, Result result)
+        protected virtual SequenceReceiver CreateSaxonSerializationMethod(string method, SerializationProperties @params, PipelineConfiguration pipe, CharacterMapExpander characterMapExpander, ProxyReceiver normalizer, ExpandedStreamResult expandedResult, IResultTarget result)
         {
             throw new XPathException("Saxon serialization methods require Saxon-PE to be enabled");
         }
@@ -702,7 +700,7 @@ namespace OutSmart.DAXon.Lib
             return @out;
         }
 
-        protected virtual UncommittedSerializer NewUncommittedSerializer(Result result, IReceiver next, SerializationProperties @params)
+        protected virtual UncommittedSerializer NewUncommittedSerializer(IResultTarget result, IReceiver next, SerializationProperties @params)
         {
             return new UncommittedSerializer(result, next, @params);
         }
@@ -839,7 +837,7 @@ namespace OutSmart.DAXon.Lib
             return new CharacterMapExpander(next);
         }
 
-        public virtual SequenceReceiver PrepareNextStylesheet(PipelineConfiguration pipe, string href, string baseURI, Result result)
+        public virtual SequenceReceiver PrepareNextStylesheet(PipelineConfiguration pipe, string href, string baseURI, IResultTarget result)
         {
             pipe.GetConfiguration().CheckLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION, "saxon:next-in-chain", -1);
             return null;
@@ -859,8 +857,8 @@ namespace OutSmart.DAXon.Lib
                     case DAXonOutputKeys.ALLOW_DUPLICATE_NAMES:
                     case DAXonOutputKeys.ESCAPE_URI_ATTRIBUTES:
                     case DAXonOutputKeys.INCLUDE_CONTENT_TYPE:
-                    case OutputKeys.INDENT:
-                    case OutputKeys.OMIT_XML_DECLARATION:
+                    case DAXonOutputKeys.INDENT:
+                    case DAXonOutputKeys.OMIT_XML_DECLARATION:
                     case DAXonOutputKeys.UNDECLARE_PREFIXES:
                         if (value != null)
                         {
@@ -882,7 +880,7 @@ namespace OutSmart.DAXon.Lib
                         }
 
                         break;
-                    case OutputKeys.CDATA_SECTION_ELEMENTS:
+                    case DAXonOutputKeys.CDATA_SECTION_ELEMENTS:
                     case DAXonOutputKeys.SUPPRESS_INDENTATION:
                     case DAXonOutputKeys.USE_CHARACTER_MAPS:
                         if (value != null)
@@ -891,21 +889,21 @@ namespace OutSmart.DAXon.Lib
                         }
 
                         break;
-                    case OutputKeys.DOCTYPE_PUBLIC:
+                    case DAXonOutputKeys.DOCTYPE_PUBLIC:
                         if (value != null)
                         {
                             CheckPublicIdentifier(value);
                         }
 
                         break;
-                    case OutputKeys.DOCTYPE_SYSTEM:
+                    case DAXonOutputKeys.DOCTYPE_SYSTEM:
                         if (value != null)
                         {
                             CheckSystemIdentifier(value);
                         }
 
                         break;
-                    case OutputKeys.ENCODING:
+                    case DAXonOutputKeys.ENCODING:
 
                         // no constraints
                         break;
@@ -927,7 +925,7 @@ namespace OutSmart.DAXon.Lib
 
                         // no checking needed
                         break;
-                    case OutputKeys.METHOD:
+                    case DAXonOutputKeys.METHOD:
                     case DAXonOutputKeys.JSON_NODE_OUTPUT_METHOD:
                         if (value != null)
                         {
@@ -935,7 +933,7 @@ namespace OutSmart.DAXon.Lib
                         }
 
                         break;
-                    case OutputKeys.MEDIA_TYPE:
+                    case DAXonOutputKeys.MEDIA_TYPE:
 
                         // no constraints
                         break;
@@ -950,7 +948,7 @@ namespace OutSmart.DAXon.Lib
 
                         // no checking
                         break;
-                    case OutputKeys.STANDALONE:
+                    case DAXonOutputKeys.STANDALONE:
                         if (value != null && !value.Equals("omit"))
                         {
                             try
@@ -964,7 +962,7 @@ namespace OutSmart.DAXon.Lib
                         }
 
                         break;
-                    case OutputKeys.VERSION:
+                    case DAXonOutputKeys.VERSION:
 
                         // no constraints
                         break;
@@ -1130,7 +1128,7 @@ namespace OutSmart.DAXon.Lib
                 {
                     if (s.StartsWith("{", StringComparison.Ordinal))
                     {
-                        builder.Append("Q").Append(s);
+                        builder.Append('Q').Append(s);
                     }
                     else
                     {
@@ -1142,7 +1140,7 @@ namespace OutSmart.DAXon.Lib
                     throw new XPathException("Value of " + Err.Wrap(key) + " must be a list of QNames in 'Q{uri}local' notation", "SEPM0016");
                 }
 
-                builder.Append(" ");
+                builder.Append(' ');
             }
 
             return builder.ToString();
@@ -1164,7 +1162,7 @@ namespace OutSmart.DAXon.Lib
                 {
                     if (s.StartsWith("{", StringComparison.Ordinal))
                     {
-                        builder.Append("Q").Append(s);
+                        builder.Append('Q').Append(s);
                     }
                     else
                     {
@@ -1176,7 +1174,7 @@ namespace OutSmart.DAXon.Lib
                     throw new XPathException("Value of " + Err.Wrap(key) + " must be a list of QNames in 'Q{uri}local' notation", "SEPM0016");
                 }
 
-                builder.Append(" ");
+                builder.Append(' ');
             }
 
             return builder.ToString().Trim();
@@ -1207,11 +1205,5 @@ namespace OutSmart.DAXon.Lib
             throw new XPathException("Serialization property saxon:property-order is not available in Saxon-HE");
         }
 
-        public virtual StreamWriterToReceiver GetXMLStreamWriter(StreamResult result, Properties properties)
-        {
-            IReceiver r = GetReceiver(result, new SerializationProperties(properties));
-            r = new NamespaceReducer(r);
-            return new StreamWriterToReceiver(r);
-        }
     }
 }

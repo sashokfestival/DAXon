@@ -45,15 +45,9 @@ namespace OutSmart.DAXon.Patterns
 
         public virtual Pattern BasePattern => (Pattern)basePatternOp.GetChildExpression();
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override int Fingerprint => BasePattern.Fingerprint;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override int Dependencies => Predicate.Dependencies;
         public BasePatternWithPredicate(Pattern basePattern, Expression predicate)
@@ -71,9 +65,6 @@ namespace OutSmart.DAXon.Patterns
             AdoptChildExpression(Predicate);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override void BindCurrent(ILocalBinding binding)
         {
             Expression predicate = Predicate;
@@ -89,34 +80,22 @@ namespace OutSmart.DAXon.Patterns
             BasePattern.BindCurrent(binding);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool MatchesCurrentGroup()
         {
             return BasePattern.MatchesCurrentGroup();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             return OperandList(basePatternOp, predicateOp);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override int AllocateSlots(SlotManager slotManager, int nextFree)
         {
             int n = ExpressionTool.AllocateSlots(Predicate, nextFree, slotManager);
             return BasePattern.AllocateSlots(slotManager, n);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool Matches(IItem item, IXPathContext context)
         {
 
@@ -128,9 +107,6 @@ namespace OutSmart.DAXon.Patterns
             return MatchesPredicate(item, context);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         // Reusable single-item focus for predicate probing. Pattern objects are SHARED across
         // concurrent transforms, so this scratch is [ThreadStatic] (per-thread, never shared) and
         // guarded by a busy flag: a predicate whose own evaluation re-enters pattern matching gets a
@@ -396,41 +372,35 @@ namespace OutSmart.DAXon.Patterns
             {
                 if (useScratch)
                 {
+                    // Release the context item: the scratch iterator is [ThreadStatic] and nothing
+                    // resets it between runs, so a parked item kept its whole tree reachable from
+                    // every pool thread that ever matched a predicate pattern - one input document
+                    // retained per thread, for as long as the thread lives (round AX: 78.6 MB held
+                    // across 8 threads after the host had dropped everything).
+                    si.SetContextItem(null);
                     _scratchBusy = false;
                 }
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override bool MatchesBeneathAnchor(NodeInfo node, NodeInfo anchor, IXPathContext context)
         {
             return BasePattern.MatchesBeneathAnchor(node, anchor, context) && MatchesPredicate(node, context);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override UType GetUType()
         {
             return BasePattern.GetUType();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override ItemType GetItemType()
         {
             return BasePattern.GetItemType();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
@@ -440,9 +410,6 @@ namespace OutSmart.DAXon.Patterns
             return this;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
@@ -453,9 +420,6 @@ namespace OutSmart.DAXon.Patterns
             return this;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
         public override Pattern ConvertToTypedPattern(string val)
         {
@@ -470,37 +434,19 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override string Reconstruct()
         {
             return BasePattern + "[" + Predicate + "]";
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override string ToShortString()
         {
             return BasePattern.ToShortString() + "[" + Predicate.ToShortString() + "]";
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             BasePatternWithPredicate n = new BasePatternWithPredicate((Pattern)BasePattern.Copy(rebindings), Predicate.Copy(rebindings));
@@ -510,37 +456,19 @@ namespace OutSmart.DAXon.Patterns
             return n;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override bool Equals(object obj)
         {
             return obj is BasePatternWithPredicate && ((BasePatternWithPredicate)obj).BasePattern.IsEqual(BasePattern) && ((BasePatternWithPredicate)obj).Predicate.IsEqual(Predicate);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return BasePattern.GetHashCode() ^ Predicate.GetHashCode();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         //try {
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             presenter.StartElement("p.withPredicate");

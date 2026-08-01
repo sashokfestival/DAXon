@@ -31,30 +31,12 @@ namespace OutSmart.DAXon.Expressions
 
         public bool Condition => condition;
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_POSITION | StaticProperty.DEPENDS_ON_LAST;
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ExpressionName => "isLast";
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string StreamerName => "IsLastExpr";
         public IsLastExpression(bool condition)
         {
@@ -100,9 +82,6 @@ namespace OutSmart.DAXon.Expressions
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             IsLastExpression exp = new IsLastExpression(condition);
@@ -110,31 +89,16 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is IsLastExpression && ((IsLastExpression)other).condition == condition;
         }
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return condition ? 0x236b91a0 : 0x396b92a0;
         }
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("isLast", this);
@@ -142,12 +106,6 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ToString()
         {
             if (condition)
@@ -160,20 +118,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new IsLastElaborator();
         }
 
-        /// <summary>
-        /// Get the dependencies of this expression on the context
-        /// </summary>
         /// <summary>
         /// Elaborator for an "isLast" expression, equivalent to {@code position() = last()} or {@code position() != last()}
         /// </summary>

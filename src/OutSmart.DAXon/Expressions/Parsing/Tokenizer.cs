@@ -194,8 +194,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
         //diagnostic version of next(): change real version to realnext()
         //
         //public void next() throws XPathException {
-        //    realnext();
-        //}
         public void Next()
         {
             precedingToken = currentToken;
@@ -633,7 +631,16 @@ namespace OutSmart.DAXon.Expressions.Parsing
                                 throw new XPathException("Unclosed XPath comment");
                             }
 
-                            LookAhead();
+                            // Restart the scan instead of recursing: the tail LookAhead() cost one
+                            // stack frame per adjacent comment, so a long run of `(: :)` overflowed
+                            // the stack with an uncatchable SOE at compile time. These four
+                            // assignments reproduce the preamble the recursive call re-ran; continue
+                            // re-enters the for(;;) scan.
+                            precedingToken = nextToken;
+                            precedingTokenValue = nextTokenValue;
+                            nextTokenValue = null;
+                            nextTokenStartOffset = inputOffset;
+                            continue;
                         }
                         else
                         {

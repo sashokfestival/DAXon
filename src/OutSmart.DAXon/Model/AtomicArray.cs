@@ -66,7 +66,7 @@ namespace OutSmart.DAXon.Model
 
         public virtual AtomicValue Head()
         {
-            return content.IsEmpty() ? null : content[0];
+            return content.Count == 0 ? null : content[0];
         }
 
         public virtual IAtomicIterator Iterate()
@@ -104,7 +104,7 @@ namespace OutSmart.DAXon.Model
                 length = content.Count - start;
             }
 
-            return new AtomicArray(content.SubList(start, start + length));
+            return new AtomicArray(content.GetRange(start, (start + length) - (start)));
         }
 
         public virtual string GetStringValue()
@@ -152,7 +152,7 @@ namespace OutSmart.DAXon.Model
 
         public virtual IEnumerator<AtomicValue> IIterator()
         {
-            return content.IIterator();
+            return content.GetEnumerator();
         }
         ISequenceIterator IGroundedValue.Iterate() => Iterate();
         IItem IGroundedValue.ItemAt(int arg0) => ItemAt(arg0);

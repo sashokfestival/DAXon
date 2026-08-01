@@ -372,9 +372,6 @@ namespace OutSmart.DAXon.Expressions
             return base.ToPattern(config);
         }
 
-        //    }
-        //    }
-        //    }
         public override void Process(Outputter output, IXPathContext context)
         {
             MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context);
@@ -387,7 +384,9 @@ namespace OutSmart.DAXon.Expressions
 
         public override bool IsUpdatingExpression()
         {
-            return TargetFunction is Put;
+            // XQuery Update (fn:put) is not supported: the old check compared against an empty
+            // stub type that no code ever created, so this was already constant false.
+            return false;
         }
 
         public override void Export(ExpressionPresenter @out)
@@ -447,9 +446,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        //    }
-        //    }
-        //    }
         public override Elaborator GetElaborator()
         {
             SystemFunction fn = TargetFunction;
@@ -465,9 +461,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        //    }
-        //    }
-        //    }
         public abstract class Optimized : SystemFunctionCall
         {
             public Optimized(SystemFunction target, Expression[] arguments) : base(target, arguments)
@@ -480,9 +473,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        //    }
-        //    }
-        //    }
         /// <summary>
         /// Elaborator for a system function call, used in cases where the specific function call has no custom support
         /// </summary>

@@ -20,6 +20,6 @@ namespace OutSmart.DAXon.Expressions.Elaboration
     /// <summary>
     /// Interface implemented by classes that evaluate an expression to deliver a single item
     /// </summary>
-    // Phase 7: IItemEvaluator interface -> delegate for lambda assignability.
+    // IItemEvaluator interface -> delegate for lambda assignability.
     public delegate IItem IItemEvaluator(IXPathContext context);
 }

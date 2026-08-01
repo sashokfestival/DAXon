@@ -40,8 +40,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
         public const int OPTION = 15;
         public const int CHARACTER_MAP_EXPANSION = 16;
         public const int FOR_MEMBER = 17;
-        //public static final int DOCUMENT_ORDER = 17;  // 9.8 and earlier
-        //public static final int MAP_CONSTRUCTOR = 18;  // 9.8 and earlier
         public const int MATCH_PATTERN = 19;
         public const int MISC = 20;
         public const int DYNAMIC_FUNCTION = 21;
@@ -235,7 +233,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             fsb.Append(kind + "|");
             fsb.Append(operand + "|");
             fsb.Append(errorCode.Equals("XPTY0004") ? "" : errorCode);
-            fsb.Append("|");
+            fsb.Append('|');
             fsb.Append(operation);
             return fsb.ToString();
         }

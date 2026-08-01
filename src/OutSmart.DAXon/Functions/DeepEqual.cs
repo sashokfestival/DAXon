@@ -16,7 +16,6 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Trees.Utilities;
 using OutSmart.DAXon.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -97,6 +96,9 @@ namespace OutSmart.DAXon.Functions
 
         public static bool DeepEqualFn(ISequenceIterator op1, ISequenceIterator op2, IXPathContext context, DeepEqualOptions options)
         {
+            // Nested arrays and maps recurse back through here (AbstractArrayItem/MapItem call it
+            // per member); the node-vs-node overload carries the matching probe for trees.
+            StackGuard.Probe();
             bool result = true;
             string reason = null;
             IErrorReporter reporter = context.GetErrorReporter();
@@ -246,7 +248,6 @@ namespace OutSmart.DAXon.Functions
 
                 // this will happen if the sequences contain non-comparable values
                 // comparison errors are masked
-                //err.printStackTrace();
                 result = false;
                 reason = "sequences contain non-comparable values";
             }
@@ -266,6 +267,10 @@ namespace OutSmart.DAXon.Functions
      */
         public static string DeepEqualFn(NodeInfo n1, NodeInfo n2, IXPathContext context, DeepEqualOptions options)
         {
+            // Descends child-by-child, so the recursion depth is the INPUT TREE's depth: unlike a
+            // looping stylesheet this is driven by data the host did not write. Converted to
+            // SXLM0001 once, at the fn:deep-equal entry.
+            StackGuard.Probe();
 
             // shortcut: a node is always deep-equal to itself
             if (n1.Equals(n2))
@@ -414,7 +419,6 @@ namespace OutSmart.DAXon.Functions
                 case Types.Type.COMMENT:
                     bool vr = CompareStrings(n1.GetStringValue(), n2.GetStringValue(), options, context);
 
-                    //options.comparer.comparesEqual((AtomicValue) n1.atomize(), (AtomicValue) n2.atomize());
                     if (!vr)
                     {
                         if (options.debug)
@@ -433,14 +437,14 @@ namespace OutSmart.DAXon.Functions
                             }
                             else
                             {
-                                int min = System.Math.Min(v1.Length, v2.Length);
+                                int min = Math.Min(v1.Length, v2.Length);
                                 if (v1.Substring(0, min).Equals(v2.Substring(0, min)))
                                 {
                                     message += " different at char " + min + "(\"" + StringTool.DiagnosticDisplay((v1.Length > v2.Length ? v1 : v2).Substring(min)) + "\")";
                                 }
                                 else if (v1[0] != v2[0])
                                 {
-                                    message += " different at start " + "(\"" + v1.Substring(0, System.Math.Min(v1.Length, 10)) + "\", \"" + v2.Substring(0, System.Math.Min(v2.Length, 10)) + "\")";
+                                    message += " different at start " + "(\"" + v1.Substring(0, Math.Min(v1.Length, 10)) + "\", \"" + v2.Substring(0, Math.Min(v2.Length, 10)) + "\")";
                                 }
                                 else
                                 {
@@ -448,7 +452,7 @@ namespace OutSmart.DAXon.Functions
                                     {
                                         if (!v1.Substring(0, i).Equals(v2.Substring(0, i)))
                                         {
-                                            message += " different at char " + (i - 1) + "(\"" + v1.Substring(i - 1, System.Math.Min(v1.Length, i + 10) - i + 1) /*Java substring(begin,END) -> C# (start,LENGTH)*/ + "\", \"" + v2.Substring(i - 1, System.Math.Min(v2.Length, i + 10) - i + 1) /*Java substring(begin,END) -> C# (start,LENGTH)*/ + "\")";
+                                            message += " different at char " + (i - 1) + "(\"" + v1.Substring(i - 1, Math.Min(v1.Length, i + 10) - i + 1) /*Java substring(begin,END) -> C# (start,LENGTH)*/ + "\", \"" + v2.Substring(i - 1, Math.Min(v2.Length, i + 10) - i + 1) /*Java substring(begin,END) -> C# (start,LENGTH)*/ + "\")";
                                             break;
                                         }
                                     }
@@ -684,7 +688,7 @@ namespace OutSmart.DAXon.Functions
 
                 if (found >= 0)
                 {
-                    children1.Remove(found);
+                    children1.RemoveAt(found);
                     hashcodes1.Remove(found);
                 }
                 else
@@ -716,7 +720,7 @@ namespace OutSmart.DAXon.Functions
             long h = 0;
             foreach (IItem it in value.AsIterable())
             {
-                h ^= hash.Apply(it);
+                h ^= hash(it);
             }
 
             return h;
@@ -851,12 +855,12 @@ namespace OutSmart.DAXon.Functions
             foreach (NamespaceBinding binding in bindings)
             {
                 sb.Append(binding.GetPrefix());
-                sb.Append("=");
+                sb.Append('=');
                 sb.Append(binding.GetNamespaceUri());
-                sb.Append(" ");
+                sb.Append(' ');
             }
 
-            sb.SetLength(sb.Length - 1);
+            sb.Length = sb.Length - 1;
             return sb.ToString();
         }
 
@@ -930,7 +934,18 @@ namespace OutSmart.DAXon.Functions
 
             //GenericAtomicComparer comparer = new GenericAtomicComparer(getStringCollator(), context);
             DeepEqualOptions eqOptions = new DeepEqualOptions(options, collationName, context);
-            bool b = DeepEqualFn(arguments[0].Iterate(), arguments[1].Iterate(), context, eqOptions);
+            bool b;
+            try
+            {
+                b = DeepEqualFn(arguments[0].Iterate(), arguments[1].Iterate(), context, eqOptions);
+            }
+            catch (RecursionDepthError e) when (!e.Described)
+            {
+                throw e.Describe(
+                    "Too many nested levels in deep-equal. The compared input is too deeply nested.",
+                    DAXonErrorCode.SXLM0001, null);
+            }
+
             return BooleanValue.Get(b);
         }
 
@@ -1037,7 +1052,7 @@ namespace OutSmart.DAXon.Functions
 
             private void SetBooleanOption(Dictionary<string, IGroundedValue> map, string optionName)
             {
-                ISequence value = map.Get(optionName);
+                ISequence value = map.GetOrDefault(optionName);
                 if (value != null)
                 {
                     bool booleanValue = ExpressionTool.EffectiveBooleanValue(value.Iterate());

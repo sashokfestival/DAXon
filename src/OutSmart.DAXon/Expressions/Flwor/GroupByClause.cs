@@ -103,12 +103,12 @@ namespace OutSmart.DAXon.Expressions.Flwor
             {
                 if (list[i].NominalReferenceCount == 0)
                 {
-                    list.Remove(i);
-                    retainingExpr.Remove(i - groupingSize);
+                    list.RemoveAt(i);
+                    retainingExpr.RemoveAt(i - groupingSize);
                 }
             }
 
-            bindings = list.ToArray(new LocalVariableBinding[0]);
+            bindings = list.ToArray();
             RetainedTupleExpression.SetVariables(retainingExpr);
         }
 

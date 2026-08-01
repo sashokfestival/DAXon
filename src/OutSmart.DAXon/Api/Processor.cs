@@ -13,7 +13,6 @@ using OutSmart.DAXon.Api.Push;
 using OutSmart.DAXon.Serialization;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Text;
 using OutSmart.DAXon.Internal.Collections;
 using System;
 using System.Collections.Generic;
@@ -24,7 +23,6 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Api
@@ -166,6 +164,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
 
             config.SetProcessor(this);
@@ -340,31 +342,49 @@ namespace OutSmart.DAXon.Api
                 throw new NullReferenceException();
             if (destination == null)
                 throw new NullReferenceException();
+            bool closed = false;
             try
             {
                 if (destination is Serializer)
                 {
                     ((Serializer)destination).SerializeXdmValue(value);
+                    closed = true;
                 }
                 else
                 {
                     IReceiver @out = destination.GetReceiver(config.MakePipelineConfiguration(), config.ObtainDefaultSerializationProperties());
-                    ComplexContentOutputter tree = new ComplexContentOutputter(@out);
-                    tree.Open();
-                    tree.StartDocument(ReceiverOption.NONE);
-                    foreach (XdmItem item in value)
+                    // using = abort-path release (a failed write frees the destination's file); Close inside = success path.
+                    using (ComplexContentOutputter tree = new ComplexContentOutputter(@out))
                     {
-                        tree.Append(item.UnderlyingValue, Loc.NONE, ReceiverOption.ALL_NAMESPACES);
+                        tree.Open();
+                        tree.StartDocument(ReceiverOption.NONE);
+                        foreach (XdmItem item in value)
+                        {
+                            tree.Append(item.UnderlyingValue, Loc.NONE, ReceiverOption.ALL_NAMESPACES);
+                        }
+
+                        tree.EndDocument();
+                        tree.Close();
                     }
 
-                    tree.EndDocument();
-                    tree.Dispose();
                     destination.CloseAndNotify();
+                    closed = true;
                 }
             }
             catch (XPathException err)
             {
                 throw new DAXonApiException(err);
+            }
+            catch (RecursionDepthError err)
+            {
+                throw new DAXonApiException(err.ToXPathException());
+            }
+            finally
+            {
+                if (!closed)
+                {
+                    DestinationHelper.ReleaseUnclosed(destination);
+                }
             }
         }
 

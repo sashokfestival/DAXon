@@ -92,39 +92,27 @@ namespace OutSmart.DAXon.Model
             return StructuredQName.ComputeHashCode(NamespaceUri.NULL, localName);
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object obj)
         {
             return obj is INodeName && ((INodeName)obj).GetLocalPart().Equals(localName) && ((INodeName)obj).HasURI(NamespaceUri.NULL);
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override string ToString()
         {
             return localName;
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public bool IsIdentical(IIdentityComparable other)
         {
             return other is INodeName && this.Equals(other) && (((INodeName)other).GetPrefix().Length == 0);
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public int IdentityHashCode()
         {
             return GetHashCode() ^ GetPrefix().GetHashCode();
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public string GetURI() => throw new NotImplementedException();
+        public string GetURI() => ""; // no-namespace name
     }
 }

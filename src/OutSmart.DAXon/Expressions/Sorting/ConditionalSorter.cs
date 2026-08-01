@@ -169,7 +169,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         {
             return new ConditionalSorterElaborator();
         }
-        // Phase 5: IRewriteAction interface->delegate.
+        // IRewriteAction interface->delegate.
         private delegate Expression IRewriteAction(Expression e);
 
         public class ConditionalSorterElaborator : PullElaborator

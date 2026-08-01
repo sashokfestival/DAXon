@@ -15,7 +15,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -95,7 +94,7 @@ namespace OutSmart.DAXon.Xslt
                 }
                 catch (XPathException err)
                 {
-                    CompileError("Failed to load collation " + collationString + ": " + err.GetMessage(), "XTDE1035");
+                    CompileError("Failed to load collation " + collationString + ": " + err.Message, "XTDE1035");
                     stringCollator = CodepointCollator.GetInstance(); // for recovery paths
                 }
 

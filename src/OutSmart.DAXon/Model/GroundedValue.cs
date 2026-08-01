@@ -26,40 +26,33 @@ namespace OutSmart.DAXon.Model
         IItem Head();
         IGroundedValue Subsequence(int start, int length);
         int GetLength();
-        bool EffectiveBooleanValue()
-;
+        bool EffectiveBooleanValue();
 
 
 
         UnicodeString UnicodeStringValue { get; }
         string GetStringValue();
-        IGroundedValue Reduce()
-;
+        IGroundedValue Reduce();
 
 
 
-        IGroundedValue Materialize()
-;
+        IGroundedValue Materialize();
 
 
 
-        string ToShortString()
-;
+        string ToShortString();
 
 
 
-        IEnumerable<IItem> AsIterable()
-;
+        IEnumerable<IItem> AsIterable();
 
 
 
-        bool ContainsNode(NodeInfo sought)
-;
+        bool ContainsNode(NodeInfo sought);
 
 
 
-        IGroundedValue Concatenate(params IGroundedValue[] others)
-;
+        IGroundedValue Concatenate(params IGroundedValue[] others);
 
 
 

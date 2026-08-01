@@ -42,28 +42,10 @@ namespace OutSmart.DAXon.Events
         private int depth = 0;
         private string target = "unknown";
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public virtual int Checksum => checksum;
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public virtual string Digest => digest.Digest;
         public CheckSumFilter(IReceiver nextReceiver) : base(nextReceiver)
         {
@@ -184,16 +166,16 @@ namespace OutSmart.DAXon.Events
             foreach (AttributeInfo att in attributes)
             {
                 string key = att.GetNodeName().GetLocalPart() + att.GetNodeName().GetNamespaceUri();
-                attrmap.Put(key, att.Value);
-                namemap.Put(key, att.GetNodeName());
+                attrmap[key] = att.Value;
+                namemap[key] = att.GetNodeName();
                 names[index++] = key;
             }
 
             Array.Sort(names);
             foreach (string key in names)
             {
-                INodeName name = namemap.Get(key);
-                string value = attrmap.Get(key);
+                INodeName name = namemap.GetOrDefault(key);
+                string value = attrmap.GetOrDefault(key);
                 checksum ^= Hash(name, sequence);
                 Trace("After attribute name " + name.DisplayName + ": " + checksum);
                 checksum ^= Hash(value, sequence);
@@ -203,12 +185,6 @@ namespace OutSmart.DAXon.Events
             base.StartElement(elemName, type, attributes, namespaces, location, properties);
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void EndElement()
         {
             depth--;
@@ -235,16 +211,7 @@ namespace OutSmart.DAXon.Events
             base.EndElement();
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
         {
             if (target.Equals(SIGMA))
@@ -286,46 +253,19 @@ namespace OutSmart.DAXon.Events
             base.ProcessingInstruction(target, data, locationId, properties);
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public virtual bool IsChecksumFound()
         {
             return checksumFound;
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public virtual bool IsDigestFound()
         {
             return digestFound;
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         public virtual bool IsChecksumCorrect()
         {
             if (requireDigest && !digestCorrect)
@@ -336,16 +276,7 @@ namespace OutSmart.DAXon.Events
             return checksumCorrect || "skip".Equals(Environment.GetEnvironmentVariable("saxon-checksum"));
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         private int Hash(string s, int sequence)
         {
 
@@ -360,16 +291,7 @@ namespace OutSmart.DAXon.Events
             return h;
         }
 
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         //
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
         private int Hash(INodeName n, int sequence)
         {
             return Hash(n.GetLocalPart(), sequence) ^ Hash(n.GetNamespaceUri().ToString(), sequence);

@@ -48,7 +48,7 @@ namespace OutSmart.DAXon.Regex.CharClass
             return IntEmptySet.GetInstance();
         }
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual IIntPredicateProxy Union(IIntPredicateProxy other) => throw new NotImplementedException();
+        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
+        public virtual IIntPredicateProxy Union(IIntPredicateProxy other) => OutSmart.DAXon.Collections.IntUnionPredicate.MakeUnion(this, other); // upstream IntPredicateProxy default
     }
 }

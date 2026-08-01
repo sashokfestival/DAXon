@@ -11,7 +11,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -116,7 +115,7 @@ namespace OutSmart.DAXon.Values.Arrays
             }
             else
             {
-                return "array(" + show.Apply(memberType) + ")";
+                return "array(" + show(memberType) + ")";
             }
         }
 
@@ -144,17 +143,11 @@ namespace OutSmart.DAXon.Values.Arrays
             return false;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             return memberType.GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Affinity Relationship(IFunctionItemType other, TypeHierarchy th)
         {
             if (other == AnyFunctionType.GetInstance())
@@ -194,17 +187,11 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override Expression MakeFunctionSequenceCoercer(Expression exp, Func<RoleDiagnostic> role, bool allow40)
         {
             return new SpecificFunctionType(ArgumentTypes, ResultType).MakeFunctionSequenceCoercer(exp, role, false);
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             if (item is ArrayItem)

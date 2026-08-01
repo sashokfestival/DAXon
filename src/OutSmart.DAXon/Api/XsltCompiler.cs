@@ -22,8 +22,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Xslt;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Api
 {
@@ -68,11 +66,6 @@ namespace OutSmart.DAXon.Api
             return processor;
         }
 
-        public virtual void SetURIResolver(URIResolver resolver)
-        {
-            compilerInfo.ResourceResolver = new ResourceResolverWrappingURIResolver(resolver);
-        }
-
         public virtual void SetResourceResolver(IResourceResolver resolver)
         {
             compilerInfo.ResourceResolver = resolver;
@@ -88,6 +81,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiUncheckedException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiUncheckedException(e.ToXPathException());
+            }
         }
 
         public virtual void ClearParameters()
@@ -95,32 +92,9 @@ namespace OutSmart.DAXon.Api
             compilerInfo.ClearParameters();
         }
 
-        public virtual URIResolver GetURIResolver()
-        {
-            IResourceResolver rr = compilerInfo.ResourceResolver;
-            if (rr is ResourceResolverWrappingURIResolver)
-            {
-                return ((ResourceResolverWrappingURIResolver)rr).WrappedURIResolver;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         public virtual IResourceResolver GetResourceResolver()
         {
             return compilerInfo.ResourceResolver;
-        }
-
-        public virtual void SetErrorListener(ErrorListener listener)
-        {
-            compilerInfo.SetErrorListener(listener);
-        }
-
-        public virtual ErrorListener GetErrorListener()
-        {
-            return compilerInfo.GetErrorListener();
         }
 
         public virtual void SetErrorList(IList<IXmlProcessingError> errorList)
@@ -276,12 +250,16 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XsltPackage CompilePackage(ResolvedResource source)
         {
             // Compile under the Processor's deadline (see Compile(ResolvedResource)).
-            Controller prevDeadline = Controller.ArmThreadDeadline(config);
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(config);
             try
             {
                 Compilation compilation = null;
@@ -317,6 +295,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
             catch (XmlProcessingAbort e)
             {
@@ -359,6 +341,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
         }
 
@@ -410,6 +396,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XsltPackage ObtainPackage(string packageName, string versionRange)
@@ -438,6 +428,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XsltPackage ObtainPackageWithAlias(string alias)
@@ -458,6 +452,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         // Public in the Java original (compile(Source)); needed by callers that obtain a
@@ -468,7 +466,7 @@ namespace OutSmart.DAXon.Api
                 throw new NullReferenceException();
             // Compile under the Processor's deadline: constant folding of hostile stylesheet text is
             // otherwise unbounded work before any run-time deadline exists (see ArmThreadDeadline).
-            Controller prevDeadline = Controller.ArmThreadDeadline(config);
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(config);
             try
             {
                 CompilerInfo ci2 = new CompilerInfo(compilerInfo);
@@ -482,6 +480,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
             catch (XmlProcessingAbort e)
             {
@@ -521,7 +523,7 @@ namespace OutSmart.DAXon.Api
         {
             System.Xml.XmlResolver resolver = new ResourceResolverXmlResolver(config.GetResourceResolver());
             // Compile under the Processor's deadline (see Compile(ResolvedResource)).
-            Controller prevDeadline = Controller.ArmThreadDeadline(config);
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(config);
             try
             {
                 CompilerInfo ci2 = new CompilerInfo(compilerInfo);
@@ -538,6 +540,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
             catch (XmlProcessingAbort e)
             {

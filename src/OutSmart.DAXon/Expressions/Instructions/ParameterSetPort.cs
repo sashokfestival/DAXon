@@ -5,11 +5,8 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Runtime 2026-06-10: HAND-PORTED from upstream/saxon12-9-src/net/sf/saxon/expr/instruct/ParameterSet.java
-// (192 lines). Like WithParam.java, the JavaToCSharp converter CRASHES on this file, so the class previously
-// existed only as a HOLLOW compat stub (Put no-op, GetIndex=>-1, GetValue=>null) — every xsl:with-param value
-// for call-template/apply-templates was dropped at the RECEIVING end (xsl:param fell back to its default).
-// Note the stub also drifted NOT_SUPPLIED to -1; the real Java constant is 0.
+// Hand-ported 1:1 from upstream ParameterSet.java (the JavaToCSharp converter crashes on it).
+// NOT_SUPPLIED is 0, matching the real Java constant.
 
 using System;
 using OutSmart.DAXon.Model;

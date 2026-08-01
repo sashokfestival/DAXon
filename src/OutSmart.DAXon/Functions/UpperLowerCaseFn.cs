@@ -19,15 +19,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Values;
 
 namespace OutSmart.DAXon.Functions
 {
 
-    // Runtime 2026-06-10: fn:upper-case/lower-case - real UpperCase/LowerCase.cs drag the StringElaborator
-    // cluster; Call-only impl (String_1 pattern).
+    // fn:upper-case/lower-case: Call-only impl (String_1 pattern) — the full UpperCase/LowerCase ports drag
+    // the StringElaborator cluster.
     public class UpperLowerCaseFn : ScalarSystemFunction
     {
 

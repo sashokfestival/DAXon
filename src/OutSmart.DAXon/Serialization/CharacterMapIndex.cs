@@ -27,22 +27,22 @@ namespace OutSmart.DAXon.Serialization
 
         public virtual CharacterMap GetCharacterMap(StructuredQName name)
         {
-            return index.Get(name);
+            return index.GetOrDefault(name);
         }
 
         public virtual void PutCharacterMap(StructuredQName name, CharacterMap charMap)
         {
-            index.Put(name, charMap);
+            index[name] = charMap;
         }
 
         public virtual IEnumerator<CharacterMap> IIterator()
         {
-            return index.Values.IIterator();
+            return index.Values.GetEnumerator();
         }
 
         public virtual bool IsEmpty()
         {
-            return index.IsEmpty();
+            return index.Count == 0;
         }
 
         public virtual CharacterMapIndex Copy()
@@ -68,7 +68,7 @@ namespace OutSmart.DAXon.Serialization
                 characterMaps.Add(map);
             }
 
-            if (!characterMaps.IsEmpty())
+            if (characterMaps.Count > 0)
             {
                 characterMapExpander = sf.NewCharacterMapExpander(next);
                 if (characterMaps.Count == 1)

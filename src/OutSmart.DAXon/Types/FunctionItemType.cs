@@ -11,7 +11,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.XQuery;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,8 +26,7 @@ namespace OutSmart.DAXon.Types
     /// </summary>
     public interface IFunctionItemType : ItemType
     {
-        Genre GetGenre()
-;
+        Genre GetGenre();
 
 
 

@@ -192,7 +192,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException err)
             {
-                throw new XPathException("Invalid key name: " + err.GetMessage(), "XTDE1260");
+                throw new XPathException("Invalid key name: " + err.Message, "XTDE1260");
             }
 
             selectedKeySet = keyManager.GetKeyDefinitionSet(qName);
@@ -264,7 +264,7 @@ namespace OutSmart.DAXon.Functions
                     allKeyIterators.Add(someResults);
                 }
 
-                if (allKeyIterators.IsEmpty())
+                if (allKeyIterators.Count == 0)
                 {
                     return EmptySequence.GetInstance();
                 }

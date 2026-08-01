@@ -18,11 +18,10 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Transformation
 {
-    public class XPathException : TransformerException
+    public class XPathException : global::System.Exception
     {
         private bool _isTypeError = false;
         private bool _isSyntaxError = false;
@@ -66,7 +65,7 @@ namespace OutSmart.DAXon.Transformation
             BreakPoint();
         }
 
-        public XPathException(Exception err) : base(err)
+        public XPathException(Exception err) : base("", err)
         {
             BreakPoint();
         }
@@ -105,16 +104,9 @@ namespace OutSmart.DAXon.Transformation
             {
                 return (XPathException)err;
             }
-            else if (err.GetCause() is XPathException)
+            else if (err.InnerException is XPathException)
             {
-                return (XPathException)err.GetCause();
-            }
-            else if (err is TransformerException)
-            {
-                XPathException xe = new XPathException(err.GetMessage(), (Exception)err);
-                // The base JAXP TransformerException.GetLocator() is a no-op stub (always null), so there is
-                // no locus to copy here; a genuine XPathException cause is unwrapped by the branch above.
-                return xe;
+                return (XPathException)err.InnerException;
             }
             else
             {

@@ -273,7 +273,6 @@ namespace OutSmart.DAXon.Xslt
             }
 
 
-            //pack.registerGlobalVariable(gvar);
             if (exp2 != select)
             {
                 var.SetBody(exp2);

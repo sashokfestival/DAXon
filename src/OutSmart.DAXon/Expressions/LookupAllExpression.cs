@@ -32,14 +32,8 @@ namespace OutSmart.DAXon.Expressions
     public class LookupAllExpression : UnaryExpression
     {
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override double Cost => BaseExpression.Cost + 1;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
         public LookupAllExpression(Expression lhs) : base(lhs)
         {
@@ -72,9 +66,6 @@ namespace OutSmart.DAXon.Expressions
             return GetItemType().GetUType();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Configuration config = visitor.GetConfiguration();
@@ -115,9 +106,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             GetOperand().Optimize(visitor, contextItemType);
@@ -144,7 +132,7 @@ namespace OutSmart.DAXon.Expressions
                     children.Add(o.GetChildExpression().Copy(new RebindingMap()));
                 }
 
-                Expression[] childExpressions = children.ToArray(new Expression[0]);
+                Expression[] childExpressions = children.ToArray();
                 Block block = new Block(childExpressions);
                 ExpressionTool.CopyLocationInfo(this, block);
                 return block;
@@ -153,17 +141,11 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             return new LookupAllExpression(BaseExpression.Copy(rebindings));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
@@ -172,9 +154,6 @@ namespace OutSmart.DAXon.Expressions
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /// <summary>
         /// Is this expression the same as another expression?
         /// </summary>
@@ -189,34 +168,16 @@ namespace OutSmart.DAXon.Expressions
             return BaseExpression.IsEqual(p.BaseExpression);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return "LookupAll".GetHashCode() ^ BaseExpression.GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return new LookupAllIterator(this, BaseExpression.Iterate(context));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("lookupAll", this);
@@ -224,45 +185,21 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string ToString()
         {
             return ExpressionTool.Parenthesize(BaseExpression) + "?*";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string ToShortString()
         {
             return BaseExpression.ToShortString() + "?*";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new LookupAllElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public class LookupAllElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
@@ -273,12 +210,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         private class LookupAllIterator : ISequenceIterator
         {
             readonly LookupAllExpression expr;
@@ -308,12 +239,12 @@ namespace OutSmart.DAXon.Expressions
                         }
                         else if (lhs is ArrayItem)
                         {
-                            level1forArrays = ((ArrayItem)lhs).Members().IIterator();
+                            level1forArrays = ((ArrayItem)lhs).Members().GetEnumerator();
                             return Next();
                         }
                         else if (lhs is MapItem)
                         {
-                            level1forMaps = ((MapItem)lhs).KeyValuePairs().IIterator();
+                            level1forMaps = ((MapItem)lhs).KeyValuePairs().GetEnumerator();
                             return Next();
                         }
                         else

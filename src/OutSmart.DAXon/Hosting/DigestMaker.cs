@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Functions;
 
 using OutSmart.DAXon.Internal.Charsets;
-using OutSmart.DAXon.Internal.Security;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -21,22 +20,23 @@ namespace OutSmart.DAXon.Lib
     public class DigestMaker
     {
         private string hexDigest = null;
-        private readonly MessageDigest digest;
+        private readonly System.Security.Cryptography.SHA256 digest = System.Security.Cryptography.SHA256.Create();
 
         public virtual string Digest
         {
             get
             {
 
-                // You can only call .digest() once
+                // The hash can only be finalized once
                 if (hexDigest == null)
                 {
+                    digest.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
 
                     // Java's String.format("%064x", new BigInteger(1, bytes)) == the 32 digest bytes as
                     // lowercase hex, zero-padded to 64. (C# String.Format has no %-conversions -- the
                     // literal translation returned the string "%064x" for every checksum.)
                     StringBuilder sb = new StringBuilder(64);
-                    foreach (byte b in digest.Digest())
+                    foreach (byte b in digest.Hash)
                     {
                         sb.Append(b.ToString("x2"));
                     }
@@ -46,19 +46,17 @@ namespace OutSmart.DAXon.Lib
                 return hexDigest;
             }
         }
-        public DigestMaker()
-        {
-            digest = MessageDigest.GetInstance("SHA-256");
-        }
 
         public virtual void Update(int value)
         {
-            digest.Update(Convert.ToString(value).GetBytes(StandardCharsets.UTF_8));
+            byte[] bytes = Encoding.UTF8.GetBytes(Convert.ToString(value));
+            digest.TransformBlock(bytes, 0, bytes.Length, null, 0);
         }
 
         public virtual void Update(string value)
         {
-            digest.Update(value.GetBytes(StandardCharsets.UTF_8));
+            byte[] bytes = Encoding.UTF8.GetBytes(value);
+            digest.TransformBlock(bytes, 0, bytes.Length, null, 0);
         }
     }
 }

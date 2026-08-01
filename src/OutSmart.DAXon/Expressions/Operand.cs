@@ -139,18 +139,10 @@ namespace OutSmart.DAXon.Expressions
             {
                 SetChildExpression(GetChildExpression().TypeCheck(visitor, contextInfo));
             }
-            catch (XPathException e)
+            catch (XPathException e) when (DecorateThenSwallow(e))
             {
-                e.MaybeSetLocation(GetChildExpression().GetLocation());
-                if (!e.IsReportableStatically())
-                {
-                    visitor.StaticContext.IssueWarning("Evaluation will always throw a dynamic error: " + e.GetMessage(), DAXonErrorCode.SXWN9027, GetChildExpression().GetLocation());
-                    SetChildExpression(new ErrorExpression(new XmlProcessingException(e)));
-                }
-                else
-                {
-                    throw e;
-                }
+                visitor.StaticContext.IssueWarning("Evaluation will always throw a dynamic error: " + e.Message, DAXonErrorCode.SXWN9027, GetChildExpression().GetLocation());
+                SetChildExpression(new ErrorExpression(new XmlProcessingException(e)));
             }
             finally
             {
@@ -167,23 +159,33 @@ namespace OutSmart.DAXon.Expressions
             {
                 SetChildExpression(GetChildExpression().Optimize(visitor, contextInfo));
             }
-            catch (XPathException e)
+            catch (XPathException e) when (DecorateThenSwallow(e))
             {
-                e.MaybeSetLocation(GetChildExpression().GetLocation());
-                if (!e.IsReportableStatically())
-                {
-                    visitor.StaticContext.IssueWarning("Evaluation will always throw a dynamic error: " + e.GetMessage(), DAXonErrorCode.SXWN9027, GetChildExpression().GetLocation());
-                    SetChildExpression(new ErrorExpression(new XmlProcessingException(e)));
-                }
-                else
-                {
-                    throw e;
-                }
+                visitor.StaticContext.IssueWarning("Evaluation will always throw a dynamic error: " + e.Message, DAXonErrorCode.SXWN9027, GetChildExpression().GetLocation());
+                SetChildExpression(new ErrorExpression(new XmlProcessingException(e)));
             }
             finally
             {
                 visitor.LeaveStaticDescent();
             }
+        }
+
+        /// <summary>
+        /// Runs in the exception FILTER of TypeCheck/Optimize, not in the handler. Decorates the
+        /// error with this operand's location and reports whether this level should swallow it.
+        /// </summary>
+        /// <remarks>
+        /// The decoration has to happen at every level (an outer expression can supply the line
+        /// number an inner one lacks), but a statically reportable error must reach the top without
+        /// any handler running: a `throw` inside a catch funclet re-enters exception dispatch from
+        /// the not-yet-unwound stack, so the cost is per recursion level and no stack size is enough
+        /// - 200 nested predicates killed the process on a 1MB thread. A filter is invoked in
+        /// dispatch pass 1 as a transient funclet, so the same work costs nothing that accumulates.
+        /// </remarks>
+        private bool DecorateThenSwallow(XPathException e)
+        {
+            e.MaybeSetLocation(GetChildExpression().GetLocation());
+            return !e.IsReportableStatically();
         }
 
         public static OperandUsage TypeDeterminedUsage(ItemType type)

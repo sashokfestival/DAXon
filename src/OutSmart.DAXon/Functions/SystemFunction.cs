@@ -81,19 +81,10 @@ namespace OutSmart.DAXon.Functions
 
         public virtual IntegerValue[] IntegerBounds => null;
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual string ErrorCodeForTypeErrors => "XPTY0004";
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual ItemType ResultItemType => details.itemType;
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public override IFunctionItemType FunctionItemType
         {
             get
@@ -109,14 +100,8 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual string StaticBaseUriString => GetRetainedStaticContext().StaticBaseUriString;
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual string StreamerName => null;
         public static Expression MakeCall(string name, RetainedStaticContext rsc, params Expression[] arguments)
         {
@@ -246,17 +231,11 @@ namespace OutSmart.DAXon.Functions
         {
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public override bool Equals(object o)
         {
             return (o is SystemFunction) && base.Equals(o);
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public override int GetHashCode()
         {
 
@@ -264,9 +243,6 @@ namespace OutSmart.DAXon.Functions
             return base.GetHashCode();
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual SequenceType GetRequiredType(int arg)
         {
             if (details == null)
@@ -277,9 +253,6 @@ namespace OutSmart.DAXon.Functions
             return details.paramTypes[arg]; // this is overridden for concat()
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual ItemType GetResultItemType(Expression[] args)
         {
             if ((details.properties & BuiltInFunctionSet.AS_ARG0) != 0)
@@ -297,9 +270,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual int GetCardinality(Expression[] args)
         {
             int c = details.cardinality;
@@ -313,9 +283,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual int GetSpecialProperties(Expression[] arguments)
         {
             if ((details.properties & BuiltInFunctionSet.NEW) != 0)
@@ -332,9 +299,6 @@ namespace OutSmart.DAXon.Functions
             return p;
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         protected virtual NodeInfo GetContextNode(IXPathContext context)
         {
             IItem item = context.GetContextItem();
@@ -356,17 +320,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public static ISequence DynamicCall(IFunctionItem f, IXPathContext context, params ISequence[] args)
         {
             return f.Call(context, args);
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("fnRef");
@@ -382,71 +340,44 @@ namespace OutSmart.DAXon.Functions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual Expression TypeCheckCaller(FunctionCall caller, ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             return caller;
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public override bool IsTrustedResultType()
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual void ExportAttributes(ExpressionPresenter @out)
         {
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual void ExportAdditionalArguments(SystemFunctionCall call, ExpressionPresenter @out)
         {
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual void ImportAttributes(Properties attributes)
         {
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public override string ToShortString()
         {
             return GetFunctionName().DisplayName + '#' + GetArity();
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public override string ToString()
         {
             return GetFunctionName().DisplayName + '#' + GetArity();
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         protected virtual UnicodeString GetUniStringArg(ISequence supplied)
         {
             StringValue item = (StringValue)supplied.Head();
             return item == null ? EmptyUnicodeString.GetInstance() : item.UnicodeStringValue;
         }
 
-        /// <summary>
-        /// Determine whether two functions are equivalent
-        /// </summary>
         public virtual Elaborator GetElaborator()
         {
             return null;

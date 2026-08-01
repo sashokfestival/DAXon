@@ -171,11 +171,11 @@ namespace OutSmart.DAXon.Xslt
             {
                 if (err.ErrorCodeQName == null)
                 {
-                    CompileError(err.GetMessage(), "XTSE0220");
+                    CompileError(err.Message, "XTSE0220");
                 }
                 else
                 {
-                    CompileError(err.GetMessage(), err.ErrorCodeQName);
+                    CompileError(err.Message, err.ErrorCodeQName);
                 }
             }
         }

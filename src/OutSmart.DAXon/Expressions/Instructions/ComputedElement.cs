@@ -12,7 +12,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,9 +34,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private ItemType itemType;
 
         /*defaultNamespace,*/
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_ELEMENT;
         public ComputedElement(Expression elementName, Expression @namespace, ISchemaType schemaType, int validation, bool inheritNamespaces, bool allowQName)
         {
@@ -266,7 +262,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                     catch (ArgumentException e)
                     {
-                        throw new XPathException("Invalid EQName in computed element constructor: " + e.GetMessage(), "XQDY0074");
+                        throw new XPathException("Invalid EQName in computed element constructor: " + e.Message, "XQDY0074");
                     }
 
                     if (!NameChecker.IsValidNCName(localName))
@@ -407,9 +403,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         }
 
         /*defaultNamespace,*/
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("compElem", this);
@@ -439,9 +432,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         }
 
         /*defaultNamespace,*/
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ComputedElementElaborator();
@@ -521,7 +511,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                             }
                             catch (ArgumentException e)
                             {
-                                throw new XPathException("Invalid EQName in computed element constructor: " + e.GetMessage(), "XQDY0074");
+                                throw new XPathException("Invalid EQName in computed element constructor: " + e.Message, "XQDY0074");
                             }
 
                             if (!NameChecker.IsValidNCName(localName))
@@ -683,8 +673,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         // output the element end tag (which will fail if validation fails)
                         @out.EndElement();
                     }
-                    catch (XPathException e)
+                    catch (XPathException e) when (!(e is XPathException.StackOverflow))
                     {
+                        // Filtered: see FixedElement - xsl:element nests per recursion level too.
                         throw e.MaybeWithLocation(expr.GetLocation()).MaybeWithContext(context);
                     }
 

@@ -44,9 +44,6 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Process the attributes of this element and all its children
-        /// </summary>
         public override void ProcessAllAttributes()
         {
             if (reportingCircumstances == OnFailure.IGNORED_INSTRUCTION)
@@ -127,7 +124,7 @@ namespace OutSmart.DAXon.Xslt
                         }
                     }
 
-                    insn.SetActualParameters(@params.ToArray(new WithParam[] { }), new WithParam[] { });
+                    insn.SetActualParameters(@params.ToArray(), new WithParam[] { });
                     this.instruction = insn;
                 }
             }
@@ -141,16 +138,10 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Process the attributes of this element and all its children
-        /// </summary>
         public override void PrepareAttributes()
         {
         }
 
-        /// <summary>
-        /// Process the attributes of this element and all its children
-        /// </summary>
         public override bool MarkTailCalls()
         {
             useTailRecursion = true;
@@ -162,12 +153,6 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Process the attributes of this element and all its children
-        /// </summary>
-        /// <summary>
-        /// Recursive walk through the stylesheet to validate all nodes
-        /// </summary>
         public override void ValidateSubtree(ComponentDeclaration decl, bool excludeStylesheet)
         {
             if (reportingCircumstances == OnFailure.IGNORED_INSTRUCTION || (IsTopLevel() && ForwardsCompatibleModeIsEnabled()))
@@ -179,22 +164,10 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Process the attributes of this element and all its children
-        /// </summary>
-        /// <summary>
-        /// Recursive walk through the stylesheet to validate all nodes
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
         }
 
-        /// <summary>
-        /// Process the attributes of this element and all its children
-        /// </summary>
-        /// <summary>
-        /// Recursive walk through the stylesheet to validate all nodes
-        /// </summary>
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
             if (instruction != null)

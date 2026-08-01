@@ -17,7 +17,6 @@ using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Trees.Wrappers;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -60,24 +59,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_COPY_OF;
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD | PROCESS_METHOD | WATCH_METHOD;
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override int Dependencies => Select.Dependencies;
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         public override string StreamerName => "CopyOf";
         public CopyOf(Expression select, bool copyNamespaces, int validation, ISchemaType schemaType, bool rejectDuplicateAttributes)
@@ -125,65 +112,41 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return !Select.GetItemType().IsPlainType();
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public virtual void SetRequireDocumentOrElement(bool requireDocumentOrElement)
         {
             this.requireDocumentOrElement = requireDocumentOrElement;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public virtual bool IsDocumentOrElementRequired()
         {
             return requireDocumentOrElement;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public virtual void SetCopyForUpdate(bool forUpdate)
         {
             copyForUpdate = forUpdate;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public virtual bool IsCopyForUpdate()
         {
             return copyForUpdate;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public virtual bool IsCopyNamespaces()
         {
             return copyNamespaces;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public virtual void SetCopyAccumulators(bool copy)
         {
             copyAccumulators = copy;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public virtual bool IsCopyAccumulators()
         {
             return copyAccumulators;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             CopyOf c = new CopyOf(Select.Copy(rebindings), copyNamespaces, validation, schemaType, rejectDuplicateAttributes);
@@ -195,9 +158,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return c;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             Types.ItemType @in = Select.GetItemType();
@@ -349,25 +309,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return Select.GetItemType();
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return Select.GetStaticUType(contextItemType);
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override int GetCardinality()
         {
             return Select.GetCardinality();
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeCheckChildren(visitor, contextInfo);
@@ -409,9 +360,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             selectOp.Optimize(visitor, contextItemType);
@@ -451,9 +399,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         public override void Export(ExpressionPresenter @out)
         {
@@ -518,9 +463,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
@@ -536,9 +478,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new PathMap.PathMapNodeSet(pathMap.MakeNewRoot(this));
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         //
         //
@@ -578,7 +517,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                                     }
                                     catch (XPathException e)
                                     {
-                                        throw new XPathException("Invalid QName in xsi:type attribute of element being validated: " + xsitype + ". " + e.GetMessage(), "XTTE1510");
+                                        throw new XPathException("Invalid QName in xsi:type attribute of element being validated: " + xsitype + ". " + e.Message, "XTTE1510");
                                     }
 
                                     type = config.GetSchemaType(typeName);
@@ -609,7 +548,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
                         item.Copy(eval, copyOptions, GetLocation());
 
-                        //Navigator.copy(item, eval, copyOptions, getLocation());
                         if (copyLineNumbers)
                         {
                             pipe.CopyInformee = null;
@@ -631,7 +569,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                     catch (NoOpenStartTagException err)
                     {
-                        XPathException e = new XPathException(err.GetMessage()).WithLocation(GetLocation()).WithXPathContext(context).WithErrorCode(err.ErrorCodeQName);
+                        XPathException e = new XPathException(err.Message).WithLocation(GetLocation()).WithXPathContext(context).WithErrorCode(err.ErrorCodeQName);
                         throw DynamicError(GetLocation(), e, context);
                     }
 
@@ -657,7 +595,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                     catch (NoOpenStartTagException err)
                     {
-                        XPathException e = new XPathException(err.GetMessage()).WithXPathContext(context).WithErrorCode(err.ErrorCodeQName);
+                        XPathException e = new XPathException(err.Message).WithXPathContext(context).WithErrorCode(err.ErrorCodeQName);
                         throw DynamicError(GetLocation(), e, context);
                     }
 
@@ -699,9 +637,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         //
         //
@@ -748,9 +683,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return newBaseUri;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         //
         //
@@ -776,9 +708,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         public static ISimpleType ValidateAttribute(NodeInfo source, ISimpleType schemaType, int validation, IXPathContext context)
         {
@@ -832,18 +761,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return annotation;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         private bool MustPush()
         {
             return schemaType != null || validation == Validation.LAX || validation == Validation.STRICT || copyForUpdate;
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         /*!copyNamespaces ||*/
         public override ISequenceIterator Iterate(IXPathContext context)
@@ -851,27 +774,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             IPullEvaluator pull = MakeElaborator().ElaborateForPull();
             return pull.Iterate(context); //        final Controller controller = context.getController();
             //        assert controller != null;
-            //        if (schemaType == null && !copyForUpdate) {
-            //            ISequenceIterator result = makeVirtualCopy(getSelect().iterate(context), controller, isXSLT);
-            //            if (result != null) {
             //                return result;
-            //            }
-            //        }
             //        SequenceCollector @out = new SequenceCollector(pipe);
-            //        if (copyForUpdate) {
-            //        }
             //        try {
-            //            process(new ComplexContentOutputter(@out), context);
-            //        } catch (XPathException err) {
-            //            err.maybeSetLocation(getLocation());
-            //            err.maybeSetContext(context);
-            //            throw err;
-            //        }
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         /*!copyNamespaces ||*/
         private ItemMappingIterator MakeVirtualCopy(ISequenceIterator input, Controller controller, bool isXSLT)
@@ -959,9 +866,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         /*!copyNamespaces ||*/
         public override Elaborator GetElaborator()
@@ -969,9 +873,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new CopyOfElaborator();
         }
 
-        /// <summary>
-        /// Get the name of this instruction, for diagnostics and tracing
-        /// </summary>
         /* && visitor.isOptimizeForStreaming() */
         /*!copyNamespaces ||*/
         private class CopyOfElaborator : PushElaborator
@@ -1037,7 +938,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         seq.SetTreeModel(TreeModel.LINKED_TREE);
                         ITailCall tc = pushEval.ProcessLeavingTail(new ComplexContentOutputter(seq), context);
                         Expression.DispatchTailCall(tc);
-                        seq.Dispose();
+                        seq.Close();
                         return seq.FirstItem;
                     };
                 }
@@ -1070,7 +971,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                                     ComplexContentOutputter cco = new ComplexContentOutputter(builder);
                                     cco.Open();
                                     expr.CopyOneNode(context, cco, (NodeInfo)item, CopyOptions.ALL_NAMESPACES);
-                                    cco.Dispose();
+                                    cco.Close();
                                     TinyNodeImpl copy = (TinyNodeImpl)builder.CurrentRoot;
                                     copy.Tree.CopiedFrom = (NodeInfo)item;
                                     output.Append(copy);

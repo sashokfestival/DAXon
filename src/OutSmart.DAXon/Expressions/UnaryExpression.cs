@@ -119,56 +119,26 @@ namespace OutSmart.DAXon.Expressions
             return BaseExpression.GetItemType();
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Default implementation returns the cardinality of the operand
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             return other != null && this.GetType().Equals(other.GetType()) && this.BaseExpression.IsEqual(((UnaryExpression)other).BaseExpression);
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Default implementation returns the cardinality of the operand
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return ("UnaryExpression " + GetType()).GetHashCode() ^ BaseExpression.GetHashCode();
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Default implementation returns the cardinality of the operand
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToString()
         {
             return ExpressionName + "(" + BaseExpression + ")";
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Default implementation returns the cardinality of the operand
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToShortString()
         {
             return ExpressionName + "(" + BaseExpression.ToShortString() + ")";
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Default implementation returns the cardinality of the operand
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             string name = ExpressionName;
@@ -191,22 +161,10 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Default implementation returns the cardinality of the operand
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected virtual void EmitExtraAttributes(ExpressionPresenter @out)
         {
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Default implementation returns the cardinality of the operand
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         // default: no action
         protected virtual string DisplayOperator(Configuration config)
         {

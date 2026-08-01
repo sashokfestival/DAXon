@@ -19,14 +19,14 @@ namespace OutSmart.DAXon.Lib
     {
         private static readonly Dictionary<string, FeatureData> byName = new Dictionary<string, FeatureData>();
         private static readonly IntHashMap<FeatureData> byCode = new IntHashMap<FeatureData>();
-        public static IEnumerable<string> Names => new SortedSet<string>(byName.KeySet());
+        public static IEnumerable<string> Names => new SortedSet<string>(byName.Keys);
 
         static FeatureIndex()
         {
             FeatureData.Init();
             foreach (FeatureData data in FeatureData.featureList)
             {
-                byName.Put(data.uri, data);
+                byName[data.uri] = data;
                 byCode.Put(data.code, data);
             }
         }
@@ -38,7 +38,7 @@ namespace OutSmart.DAXon.Lib
 
         public static FeatureData GetData(string featureName)
         {
-            return byName.Get(featureName);
+            return byName.GetOrDefault(featureName);
         }
 
         public static FeatureData GetData(int code)

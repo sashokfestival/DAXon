@@ -17,12 +17,12 @@ namespace OutSmart.DAXon.Resources
 
     public class BinaryResource
     {
-        // Phase 5: FACTORY typed as IResourceFactory for RegisterMediaType callers.
+        // FACTORY typed as IResourceFactory for RegisterMediaType callers.
         public static readonly IResourceFactory FACTORY = new GenericResourceFactory();
         public byte[] Data => throw new NotImplementedException("STUB: BinaryResource.GetData not ported (excluded stub)");
         public BinaryResource() { }
         public BinaryResource(object src, byte[] data) { }
-        // Phase 7.8: AbstractResourceCollection invokes BinaryResource.Encode/Decode.
+        // AbstractResourceCollection invokes BinaryResource.Encode/Decode.
         public static string Encode(byte[] data) => Convert.ToBase64String(data ?? new byte[0]);
         public static byte[] Decode(string s) => string.IsNullOrEmpty(s) ? new byte[0] : Convert.FromBase64String(s);
         public static byte[] Encode(string s, string encoding) { try { return Encoding.GetEncoding(encoding).GetBytes(s ?? ""); } catch { return Encoding.UTF8.GetBytes(s ?? ""); } }

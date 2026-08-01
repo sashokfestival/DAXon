@@ -8,12 +8,11 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using System.Collections;
 
 namespace OutSmart.DAXon.Model
 {
-    // Phase 5: EmptyAttributeMap implements IAttributeMap (20 callers assign to IAttributeMap).
+    // EmptyAttributeMap implements IAttributeMap (20 callers assign to IAttributeMap).
     public sealed class EmptyAttributeMap : IAttributeMap
     {
         private static readonly EmptyAttributeMap _instance = new EmptyAttributeMap();
@@ -23,7 +22,7 @@ namespace OutSmart.DAXon.Model
         public bool IsEmpty() => true;
         public AttributeInfo Get(INodeName name) => null;
         public AttributeInfo Get(NamespaceUri uri, string local) => null;
-        public AttributeInfo GetByFingerprint(int fingerprint, NamePool namePool) => throw new NotImplementedException("STUB: EmptyAttributeMap.GetByFingerprint not ported (excluded stub)");
+        public AttributeInfo GetByFingerprint(int fingerprint, NamePool namePool) => null; // no attributes: absent, like the sibling maps' miss result
         public string GetValue(NamespaceUri uri, string local) => null;
         public string GetValue(string local) => null;
         // 2026-06-17: was `=> this` (dropped the attribute!) -> any synthesized attribute map built from

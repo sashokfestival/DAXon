@@ -5,6 +5,7 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -16,21 +17,27 @@ namespace OutSmart.DAXon.Model
 {
     public sealed class NamePool
     {
+        private readonly object syncLock = new object();
         public const int FP_MASK = 0xfffff;
         // Since fingerprints in the range 0-1023 belong to predefined names, user-defined names
         // will always have a fingerprint above this range, which can be tested by a mask.
         public const int USER_DEFINED_MASK = 0xffc00;
         // Limit: maximum number of fingerprints
         private static readonly int MAX_FINGERPRINT = FP_MASK;
+        // Writes happen under the AllocateFingerprint lock, but GetFingerprint and
+        // GetUnprefixedQName read lock-free from transform threads, so both maps must be
+        // concurrent (upstream: ConcurrentHashMap): a plain-Dictionary read that straddles
+        // the writer's resize walks a mixed-modulus chain and misses a present key.
         // A map from QNames to fingerprints
-        private readonly Dictionary<StructuredQName, int> qNameToInteger = new Dictionary<StructuredQName, int>(1000);
+        private readonly ConcurrentDictionary<StructuredQName, int> qNameToInteger = new ConcurrentDictionary<StructuredQName, int>(1, 1000);
         // A map from fingerprints to QNames
-        private readonly Dictionary<int, StructuredQName> integerToQName = new Dictionary<int, StructuredQName>(1000);
+        private readonly ConcurrentDictionary<int, StructuredQName> integerToQName = new ConcurrentDictionary<int, StructuredQName>(1, 1000);
         // Next fingerprint available to be allocated. Starts at 1024 as low-end fingerprints are statically allocated to system-defined
         // names
         private readonly AtomicCounter unique = new AtomicCounter(1024);
-        // A map containing suggested prefixes for particular URIs
-        private readonly Dictionary<NamespaceUri, string> suggestedPrefixes = new Dictionary<NamespaceUri, string>();
+        // A map containing suggested prefixes for particular URIs. Concurrent because
+        // SuggestPrefix is public and takes no lock at all.
+        private readonly ConcurrentDictionary<NamespaceUri, string> suggestedPrefixes = new ConcurrentDictionary<NamespaceUri, string>();
         /// <summary>
         /// Create a NamePool
         /// </summary>
@@ -40,7 +47,7 @@ namespace OutSmart.DAXon.Model
 
         public void SuggestPrefix(string prefix, NamespaceUri uri)
         {
-            suggestedPrefixes.Put(uri, prefix);
+            suggestedPrefixes[uri] = prefix;
         }
 
         public StructuredQName GetUnprefixedQName(int nameCode)
@@ -51,7 +58,7 @@ namespace OutSmart.DAXon.Model
                 return StandardNames.GetUnprefixedQName(fp);
             }
 
-            return integerToQName.Get(fp);
+            return integerToQName.GetOrDefault(fp);
         }
 
         public StructuredQName GetStructuredQName(int fingerprint)
@@ -71,12 +78,12 @@ namespace OutSmart.DAXon.Model
                 return "xml";
             }
 
-            return suggestedPrefixes.Get(uri);
+            return suggestedPrefixes.GetOrDefault(uri);
         }
 
         public int AllocateFingerprint(NamespaceUri uri, string local)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (NamespaceUri.IsReserved(uri) || NamespaceUri.SAXON.Equals(uri))
                 {
@@ -104,7 +111,7 @@ namespace OutSmart.DAXon.Model
                 int existing2 = qNameToInteger.PutIfAbsent(qName, next);
                 if (KeyWasAbsent(existing2))
                 {
-                    integerToQName.Put(next, qName);
+                    integerToQName[next] = qName;
                     return next;
                 }
                 else

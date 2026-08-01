@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using System.Collections.Generic;
 using System.Text;
-using Charset = OutSmart.DAXon.Internal.Charsets.Charset;
 
 namespace OutSmart.DAXon.Serialization.CharCodes
 {
@@ -26,13 +25,13 @@ namespace OutSmart.DAXon.Serialization.CharCodes
 
         public string CanonicalName => encoder.WebName;
 
-        private JavaCharacterSet(Charset charset)
+        private JavaCharacterSet(Encoding encoding)
         {
-            encoder = (Encoding)charset.Inner.Clone();
+            encoder = (Encoding)encoding.Clone();
             encoder.EncoderFallback = EncoderFallback.ExceptionFallback;
         }
 
-        public static JavaCharacterSet MakeCharSet(Charset charset)
+        public static JavaCharacterSet MakeCharSet(Encoding encoding)
         {
             lock (typeof(JavaCharacterSet))
             {
@@ -42,10 +41,10 @@ namespace OutSmart.DAXon.Serialization.CharCodes
                 }
 
                 JavaCharacterSet c;
-                if (!map.TryGetValue(charset.Name(), out c))
+                if (!map.TryGetValue(encoding.WebName, out c))
                 {
-                    c = new JavaCharacterSet(charset);
-                    map[charset.Name()] = c;
+                    c = new JavaCharacterSet(encoding);
+                    map[encoding.WebName] = c;
                 }
 
                 return c;

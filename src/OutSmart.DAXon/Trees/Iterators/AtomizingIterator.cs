@@ -76,7 +76,7 @@ namespace OutSmart.DAXon.Trees.Iterators
                         }
                         else
                         {
-                            string message = e.GetMessage() + ". Failed while atomizing the " + roleDiagnostic.GetMessage();
+                            string message = e.Message + ". Failed while atomizing the " + roleDiagnostic.GetMessage();
                             throw new UncheckedXPathException(e.WithMessage(message));
                         }
                     }

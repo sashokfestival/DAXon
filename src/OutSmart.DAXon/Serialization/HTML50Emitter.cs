@@ -18,9 +18,9 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 using System.IO;
+using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Serialization
 {
     /// <summary>
@@ -29,13 +29,7 @@ namespace OutSmart.DAXon.Serialization
     public class HTML50Emitter : HTMLEmitter
     {
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         private static readonly byte[] DOCTYPE = StringConstants.Bytes("<!DOCTYPE HTML>");
-        /// <summary>
-        /// Constructor
-        /// </summary>
         private static readonly byte[] NEWLINE = StringConstants.Bytes("\n");
         static HTML50Emitter()
         {
@@ -62,42 +56,30 @@ namespace OutSmart.DAXon.Serialization
             SetEmptyTag("wbr");
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public HTML50Emitter()
         {
             version = 5;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override bool IsHTMLElement(INodeName name)
         {
             NamespaceUri uri = name.GetNamespaceUri();
             return uri.IsEmpty() || uri.Equals(NamespaceUri.XHTML);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override void OpenDocument()
         {
             version = 5;
             base.OpenDocument();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override void WriteDocType(INodeName name, string displayName, string systemId, string publicId)
         {
             try
             {
                 if (systemId == null && publicId == null)
                 {
-                    if (name.GetLocalPart().EqualsIgnoreCase("html"))
+                    if (name.GetLocalPart().Equals("html", global::System.StringComparison.OrdinalIgnoreCase))
                     {
                         writer.WriteAscii(DOCTYPE);
                         if ("yes".Equals(outputProperties.GetProperty("indent", "yes")))
@@ -116,9 +98,6 @@ namespace OutSmart.DAXon.Serialization
                 throw new XPathException(err?.Message);
             }
         }
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override bool WriteDocTypeWithNullSystemId()
         {
             return true;
@@ -132,8 +111,8 @@ namespace OutSmart.DAXon.Serialization
             if (!started)
             {
                 OpenDocument();
-                string systemId = outputProperties.GetProperty(OutputKeys.DOCTYPE_SYSTEM);
-                string publicId = outputProperties.GetProperty(OutputKeys.DOCTYPE_PUBLIC);
+                string systemId = outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_SYSTEM);
+                string publicId = outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_PUBLIC);
 
                 // Treat "" as equivalent to absent. This goes beyond what the spec strictly allows.
                 if ("".Equals(systemId))

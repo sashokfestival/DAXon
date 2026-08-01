@@ -14,7 +14,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
-
+
 using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Events
 {
@@ -29,9 +29,9 @@ namespace OutSmart.DAXon.Events
             this.actionList = actionList;
         }
 
-        public override void Dispose()
+        public override void Close()
         {
-            base.Dispose();
+            base.Close();
             try
             {
                 if (actionList != null)

@@ -28,33 +28,28 @@ namespace OutSmart.DAXon.Model
     public interface NodeInfo : IItem, ILocation, IActiveSource
     {
         ITreeInfo GetTreeInfo();
-        Configuration GetConfiguration()
-;
+        Configuration GetConfiguration();
 
 
 
         int GetNodeKind();
-        bool IsSameNodeInfo(NodeInfo other)
-;
+        bool IsSameNodeInfo(NodeInfo other);
 
 
 
         bool Equals(object other);
         int GetHashCode();
         string GetSystemId();
-        string GetPublicId()
-;
+        string GetPublicId();
 
 
 
         string GetBaseURI();
-        int GetLineNumber()
-;
+        int GetLineNumber();
 
 
 
-        int GetColumnNumber()
-;
+        int GetColumnNumber();
 
 
 
@@ -63,15 +58,13 @@ namespace OutSmart.DAXon.Model
         int Fingerprint { get; }
         string GetLocalPart();
         NamespaceUri GetNamespaceUri();
-        string GetURI()
-;
+        string GetURI();
 
 
 
         string DisplayName { get; }
         string GetPrefix();
-        ISchemaType GetSchemaType()
-;
+        ISchemaType GetSchemaType();
 
 
 
@@ -87,8 +80,7 @@ namespace OutSmart.DAXon.Model
 
         IAtomicSequence Atomize();
         NodeInfo GetParent();
-        IAxisIterator IterateAxis(int axisNumber)
-;
+        IAxisIterator IterateAxis(int axisNumber);
 
 
 
@@ -100,18 +92,15 @@ namespace OutSmart.DAXon.Model
 
         NodeInfo Root { get; }
         bool HasChildNodes();
-        IEnumerable<NodeInfo> Children()
-;
+        IEnumerable<NodeInfo> Children();
 
 
 
-        IEnumerable<NodeInfo> Children(INodePredicate filter)
-;
+        IEnumerable<NodeInfo> Children(INodePredicate filter);
 
 
 
-        IAttributeMap Attributes()
-;
+        IAttributeMap Attributes();
 
 
 
@@ -127,46 +116,38 @@ namespace OutSmart.DAXon.Model
 
 
         void GenerateId(StringBuilder buffer);
-        void Copy(IReceiver @out, int copyOptions, ILocation locationId)
-;
+        void Copy(IReceiver @out, int copyOptions, ILocation locationId);
 
 
 
-        void Deliver(IReceiver receiver, ParseOptions options)
-;
+        void Deliver(IReceiver receiver, ParseOptions options);
 
 
 
-        IActiveSource AsActiveSource()
-;
+        IActiveSource AsActiveSource();
 
 
 
         void SetSystemId(string systemId);
         NamespaceBinding[] GetDeclaredNamespaces(NamespaceBinding[] buffer);
         NamespaceMap AllNamespaces { get; }
-        bool IsId()
-;
+        bool IsId();
 
 
 
-        bool IsIdref()
-;
+        bool IsIdref();
 
 
 
-        bool IsNilled()
-;
+        bool IsNilled();
 
 
 
-        bool IsStreamed()
-;
+        bool IsStreamed();
 
 
 
-        string ToShortString()
-;
+        string ToShortString();
 
 
 
@@ -190,8 +171,7 @@ namespace OutSmart.DAXon.Model
 
 
 
-        Genre GetGenre()
-;
+        Genre GetGenre();
 
 
     }

@@ -74,7 +74,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException err)
             {
-                throw new XPathException("Invalid accumulator name: " + err.GetMessage(), "XTDE3340");
+                throw new XPathException("Invalid accumulator name: " + err.Message, "XTDE3340");
             }
 
             Accumulator accumulator = registry == null ? null : registry.GetAccumulator(qName);

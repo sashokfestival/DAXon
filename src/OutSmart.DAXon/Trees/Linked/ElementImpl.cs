@@ -4,7 +4,6 @@
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Core;
@@ -37,9 +36,6 @@ namespace OutSmart.DAXon.Trees.Linked
         private NamespaceMap namespaceMap = NamespaceMap.EmptyMap();
 
         /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
         /// Get the root node
         /// </summary>
         public override NodeInfo Root
@@ -58,46 +54,22 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override NamespaceMap AllNamespaces => namespaceMap;
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
         public ElementImpl()
         {
             this.attributeMap = EmptyAttributeMap.GetInstance();
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
         public override void SetAttributes(IAttributeMap atts)
         {
             this.attributeMap = atts;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
         public virtual void SetNodeName(INodeName name)
         {
             this.nodeName = name;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
         public virtual void Initialise(INodeName elemName, ISchemaType elementType, IAttributeMap atts, NodeInfo parent, int sequenceNumber)
         {
             this.nodeName = elemName;
@@ -107,17 +79,11 @@ namespace OutSmart.DAXon.Trees.Linked
             attributeMap = atts;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
         public override INodeName GetNodeName()
         {
             return nodeName;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
         public virtual void SetLocation(string systemId, int line, int column)
         {
             DocumentImpl root = GetRawParent().PhysicalRoot;
@@ -125,65 +91,32 @@ namespace OutSmart.DAXon.Trees.Linked
             root.SetSystemId(GetRawSequenceNumber(), systemId);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
         public override void SetSystemId(string uri)
         {
             PhysicalRoot.SetSystemId(GetRawSequenceNumber(), uri);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
         public override string GetSystemId()
         {
             DocumentImpl root = PhysicalRoot;
             return root == null ? null : root.GetSystemId(GetRawSequenceNumber());
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
         public override string GetBaseURI()
         {
             return Navigator.GetBaseURI(this, (n) => PhysicalRoot.IsTopWithinEntity((ElementImpl)n));
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
         public override bool IsNilled()
         {
             return PhysicalRoot.IsNilledElement(this);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
         public override void SetTypeAnnotation(ISchemaType type)
         {
             this.type = type;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
         /// <summary>
         /// Say that the element has the nilled property
         /// </summary>
@@ -193,12 +126,6 @@ namespace OutSmart.DAXon.Trees.Linked
         }
 
         /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
         /// Say that the element has the nilled property
         /// </summary>
         public override ISchemaType GetSchemaType()
@@ -206,15 +133,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return type;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public override int GetLineNumber()
         {
             DocumentImpl root = PhysicalRoot;
@@ -228,15 +146,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public override int GetColumnNumber()
         {
             DocumentImpl root = PhysicalRoot;
@@ -250,69 +159,33 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public override void GenerateId(StringBuilder buffer)
         {
             int sequence = GetRawSequenceNumber();
             if (sequence >= 0)
             {
                 PhysicalRoot.GenerateId(buffer);
-                buffer.Append("e");
+                buffer.Append('e');
                 buffer.Append(sequence);
             }
             else
             {
                 GetRawParent().GenerateId(buffer);
-                buffer.Append("f");
+                buffer.Append('f');
                 buffer.Append(GetSiblingPosition());
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public override int GetNodeKind()
         {
             return Types.Type.ELEMENT;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public override IAttributeMap Attributes()
         {
             return attributeMap;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual IAxisIterator IterateAttributes(NodeTest test)
         {
             if (attributeMap is AttributeMapWithIdentity)
@@ -327,24 +200,18 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public override void Copy(IReceiver @out, int copyOptions, ILocation location)
         {
+            // Recurses over the children, so the depth is the input document's. The tiny tree
+            // copies flat and needs no probe; this model is the one a host opts into.
+            StackGuard.Probe();
             bool copyTypes = CopyOptions.Includes(copyOptions, CopyOptions.TYPE_ANNOTATIONS);
             bool copyForUpdate = CopyOptions.Includes(copyOptions, CopyOptions.FOR_UPDATE);
             ISchemaType typeCode = copyTypes ? GetSchemaType() : Untyped.INSTANCE;
             Func<NodeInfo, Object> informee = @out.GetPipelineConfiguration().CopyInformee;
             if (informee != null)
             {
-                object o = informee.Apply(this);
+                object o = informee(this);
                 if (o is ILocation)
                 {
                     location = (ILocation)o;
@@ -422,15 +289,6 @@ namespace OutSmart.DAXon.Trees.Linked
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         protected virtual void CheckNotNamespaceSensitiveElement(ISchemaType type)
         {
             if (type is ISimpleType && ((ISimpleType)type).IsNamespaceSensitive())
@@ -455,15 +313,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         private void CheckNotNamespaceSensitiveAttribute(ISimpleType type, AttributeInfo att)
         {
             if (type.IsNamespaceSensitive())
@@ -488,18 +337,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void Delete()
         {
             DocumentImpl root = PhysicalRoot;
@@ -528,18 +365,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void Rename(INodeName newName, bool inherit)
         {
             string prefix = newName.GetPrefix();
@@ -566,18 +391,6 @@ namespace OutSmart.DAXon.Trees.Linked
             nodeName = newName;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void AddNamespace(NamespaceBinding binding, bool inherit)
         {
             if (binding.GetNamespaceUri().IsEmpty())
@@ -607,18 +420,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         private void InheritParentNamespaces(NamespaceBinding binding, NamespaceMap oldParentMap, NamespaceMap newParentMap)
         {
             NamespaceMap oldMap = namespaceMap;
@@ -640,18 +441,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void ReplaceStringValue(UnicodeString stringValue)
         {
             if (stringValue.IsEmpty())
@@ -666,18 +455,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void SetAttributeInfo(int index, AttributeInfo attInfo)
         {
             AttributeMapWithIdentity attMap = PrepareAttributesForUpdate();
@@ -685,18 +462,6 @@ namespace OutSmart.DAXon.Trees.Linked
             SetAttributes(attMap);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         private AttributeMapWithIdentity PrepareAttributesForUpdate()
         {
             if (Attributes() is AttributeMapWithIdentity)
@@ -711,18 +476,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void AddAttribute(INodeName nodeName, ISimpleType attType, string value, int properties, bool inheritNamespaces)
         {
             AttributeMapWithIdentity atts = PrepareAttributesForUpdate();
@@ -757,18 +510,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void RemoveAttribute(NodeInfo attribute)
         {
             if (!(attribute is AttributeImpl))
@@ -790,18 +531,6 @@ namespace OutSmart.DAXon.Trees.Linked
             ((AttributeImpl)attribute).SetRawParent(null);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void RemoveNamespace(string prefix)
         {
             if (prefix == null)
@@ -822,18 +551,6 @@ namespace OutSmart.DAXon.Trees.Linked
             namespaceMap = namespaceMap.Remove(prefix);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void AddNamespace(string prefix, NamespaceUri uri)
         {
             NamespaceUri existingURI = namespaceMap.GetNamespaceUri(prefix);
@@ -847,18 +564,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void RemoveTypeAnnotation()
         {
             if (GetSchemaType() != Untyped.INSTANCE)
@@ -868,35 +573,11 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void SetNamespaceMap(NamespaceMap map)
         {
             namespaceMap = map;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public NamespaceUri GetURIForPrefix(string prefix, bool useDefault)
         {
             if ((prefix.Length == 0))
@@ -916,35 +597,11 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public IEnumerator<string> IteratePrefixes()
         {
             return namespaceMap.IteratePrefixes();
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual bool IsInScopeNamespace(NamespaceUri uri)
         {
             foreach (NamespaceBinding b in namespaceMap)
@@ -958,18 +615,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return false;
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override NamespaceBinding[] GetDeclaredNamespaces(NamespaceBinding[] buffer)
         {
             IList<NamespaceBinding> bindings = new List<NamespaceBinding>();
@@ -978,21 +623,9 @@ namespace OutSmart.DAXon.Trees.Linked
                 bindings.Add(nb);
             }
 
-            return bindings.ToArray(NamespaceBinding.EMPTY_ARRAY);
+            return bindings.ToArray();
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void FixupInsertedNamespaces(bool inherit)
         {
             if (GetRawParent().GetNodeKind() == Types.Type.DOCUMENT)
@@ -1010,18 +643,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         private void DeepAddNamespaces(NamespaceMap inheritedNamespaces)
         {
             NamespaceMap childNamespaces = namespaceMap;
@@ -1044,35 +665,11 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override string GetAttributeValue(NamespaceUri uri, string localName)
         {
             return attributeMap == null ? null : attributeMap.GetValue(uri, localName);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override bool IsId()
         {
 
@@ -1089,35 +686,11 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override bool IsIdref()
         {
             return IsIdRefNode(this);
         }
 
-        /// <summary>
-        /// Construct an empty ElementImpl
-        /// </summary>
-        /// <summary>
-        /// Get the system ID of the entity containing this element node.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public static bool IsIdRefNode(NodeImpl node)
         {
             ISchemaType type = node.GetSchemaType();

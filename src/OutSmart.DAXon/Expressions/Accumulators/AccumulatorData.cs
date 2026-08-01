@@ -121,9 +121,12 @@ namespace OutSmart.DAXon.Expressions.Accumulators
 
                 return value;
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                throw new XPathException.StackOverflow("Too many nested accumulator evaluations. The accumulator definition may have cyclic dependencies", "XTDE3400", accumulator).WithXPathContext(context);
+                // Filtered: accumulator evaluation recurses through this frame, so one such catch
+                // exists per level. XTDE3400 stays uncatchable by xsl:try exactly as before - it
+                // used to be an XPathException.StackOverflow, which TryCatch already refused.
+                throw e.Describe("Too many nested accumulator evaluations. The accumulator definition may have cyclic dependencies", "XTDE3400", accumulator);
             }
         }
 
@@ -170,8 +173,6 @@ namespace OutSmart.DAXon.Expressions.Accumulators
         /*
      * Diagnostic output of the entire data structure
      */
-        //    }
-        //    }
         public virtual ISequence GetValue(NodeInfo node, bool postDescent)
         {
             Visit visit = new Visit(node, postDescent);
@@ -181,8 +182,6 @@ namespace OutSmart.DAXon.Expressions.Accumulators
         /*
      * Diagnostic output of the entire data structure
      */
-        //    }
-        //    }
         private ISequence Search(int start, int end, Visit sought)
         {
 
@@ -210,19 +209,11 @@ namespace OutSmart.DAXon.Expressions.Accumulators
             {
                 return Search(mid + 1, end, sought);
             } // 9.6:
-            //        int mid = (start + end) / 2;
-            //        if (sought.compareTo(values.get(mid).visit) <= 0) {
-            //            return search(start, mid, sought);
-            //        } else {
-            //            return search(mid + 1, end, sought);
-            //        }
         }
 
         /*
      * Diagnostic output of the entire data structure
      */
-        //    }
-        //    }
         /*|| (rel == 0 && sought.isPostDescent)*/
         // 9.6:
         /// <summary>

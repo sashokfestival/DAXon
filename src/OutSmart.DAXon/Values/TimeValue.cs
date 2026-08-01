@@ -93,9 +93,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public TimeComparable SchemaComparable => new TimeComparable(this);
         public TimeValue(byte hour, byte minute, byte second, int microsecond, int tzMinutes) : base(BuiltInAtomicType.TIME, tzMinutes)
         {
@@ -111,14 +108,6 @@ namespace OutSmart.DAXon.Values
             this.minute = minute;
             this.second = second;
             this.nanosecond = nanosecond;
-        }
-
-        public TimeValue(GregorianCalendar calendar, int tz) : base(BuiltInAtomicType.TIME, tz)
-        {
-            hour = (byte)calendar[Calendar.HOUR_OF_DAY];
-            minute = (byte)calendar[Calendar.MINUTE];
-            second = (byte)calendar[Calendar.SECOND];
-            nanosecond = calendar[Calendar.MILLISECOND] * 1000000;
         }
 
         public TimeValue MakeTimeValue(byte hour, byte minute, byte second, int nanosecond, int tz)
@@ -277,7 +266,7 @@ namespace OutSmart.DAXon.Values
                     }
 
                     part = tok.NextToken();
-                    if (part.Length > 9 && part.Matches("^[0-9]+$"))
+                    if (part.Length > 9 && part.MatchesRegex("^[0-9]+$"))
                     {
                         part = part.Substring(0, 9);
                     }
@@ -401,52 +390,17 @@ namespace OutSmart.DAXon.Values
             return new DateTimeValue(1972, (byte)12, (byte)31, hour, minute, second, nanosecond, TimezoneInMinutes);
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
-        public override GregorianCalendar GetCalendar()
-        {
-
-            // create a calendar using the specified timezone
-            int tz = HasTimezone() ? TimezoneInMinutes * 60000 : 0;
-            TimeZoneInfo zone = new SimpleTimeZone(tz, "LLL");
-            GregorianCalendar calendar = new GregorianCalendar(zone);
-            calendar.SetLenient(false);
-            if (tz < calendar.GetMinimum(Calendar.ZONE_OFFSET) || tz > calendar.GetMaximum(Calendar.ZONE_OFFSET))
-            {
-                return AdjustTimezone(0).GetCalendar();
-            }
-
-
-            // use a reference date of 1972-12-31
-            calendar.Set(1972, Calendar.DECEMBER, 31, hour, minute, second);
-            calendar[Calendar.MILLISECOND] = nanosecond / 1000000;
-            calendar[Calendar.ZONE_OFFSET] = tz;
-            calendar[Calendar.DST_OFFSET] = 0;
-            calendar.GetTime();
-            return calendar;
-        }
-
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)
         {
             return new TimeValue(hour, minute, second, nanosecond, TimezoneInMinutes, typeLabel);
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override CalendarValue AdjustTimezone(int timezone)
         {
             DateTimeValue dt = (DateTimeValue)ToDateTime().AdjustTimezone(timezone);
             return new TimeValue(dt.Hour, dt.Minute, dt.Second, dt.Nanosecond, dt.TimezoneInMinutes, BuiltInAtomicType.TIME);
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override AtomicValue GetComponent(AccessorFn.Component component)
         {
             switch (component)
@@ -481,9 +435,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             if (HasTimezone())
@@ -500,9 +451,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public int CompareTo(IXPathComparable other)
         {
             if (other is TimeValue)
@@ -542,9 +490,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override int CompareTo(CalendarValue other, int implicitTimezone)
         {
             if (!(other is TimeValue))
@@ -565,25 +510,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is TimeValue && CompareTo((TimeValue)other) == 0;
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override int GetHashCode()
         {
             return DateTimeValue.ComputeHashCode(1951, (byte)10, (byte)11, hour, minute, second, nanosecond, TimezoneInMinutes);
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override CalendarValue Add(DurationValue duration)
         {
             if (duration is DayTimeDurationValue)
@@ -597,9 +533,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public override DayTimeDurationValue Subtract(CalendarValue other, IXPathContext context)
         {
             if (!(other is TimeValue))
@@ -612,9 +545,6 @@ namespace OutSmart.DAXon.Values
             return base.Subtract(other, context);
         }
 
-        /// <summary>
-        /// Get a Java Calendar object corresponding to this time, on a reference date
-        /// </summary>
         public class TimeComparable : IComparable<TimeComparable>
         {
             private readonly TimeValue value;

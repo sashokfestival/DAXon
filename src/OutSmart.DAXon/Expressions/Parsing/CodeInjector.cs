@@ -20,17 +20,14 @@ namespace OutSmart.DAXon.Expressions.Parsing
 {
     public interface ICodeInjector
     {
-        Expression Inject(Expression exp)
-;
+        Expression Inject(Expression exp);
 
 
 
-        void Process(ITraceableComponent component)
-;
+        void Process(ITraceableComponent component);
 
 
-        Clause InjectClause(FLWORExpression expression, Clause clause)
-;
+        Clause InjectClause(FLWORExpression expression, Clause clause);
 
 
     }

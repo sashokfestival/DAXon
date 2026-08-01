@@ -28,26 +28,14 @@ namespace OutSmart.DAXon.Collections
         /// </summary>
         private int _hashCode = -1;
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public virtual int[] Values => contents;
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public virtual int First => contents[0];
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public IntArraySet()
         {
             contents = EMPTY_INT_ARRAY;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public IntArraySet(IntHashSet input)
         {
 
@@ -57,26 +45,17 @@ namespace OutSmart.DAXon.Collections
             Array.Sort(contents);
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public IntArraySet(IntArraySet input)
         {
             contents = new int[input.contents.Length];
             Array.Copy(input.contents, 0, contents, 0, contents.Length);
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         private IntArraySet(int[] content)
         {
             contents = content;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override IntSet Copy()
         {
             IntArraySet i2 = new IntArraySet();
@@ -87,50 +66,32 @@ namespace OutSmart.DAXon.Collections
             return i2;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override IntSet MutableCopy()
         {
             return Copy();
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override void Clear()
         {
             contents = EMPTY_INT_ARRAY;
             _hashCode = -1;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override int Size()
         {
             return contents.Length;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool IsEmpty()
         {
             return contents.Length == 0;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool Contains(int value)
         {
             return Array.BinarySearch(contents, value) >= 0;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool Remove(int value)
         {
             _hashCode = -1;
@@ -159,9 +120,6 @@ namespace OutSmart.DAXon.Collections
             return true;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool Add(int value)
         {
             _hashCode = -1;
@@ -201,17 +159,11 @@ namespace OutSmart.DAXon.Collections
             return true;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override IIntIterator IIterator()
         {
             return new IntArrayIterator(contents, contents.Length);
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override IntSet Union(IntSet other)
         {
 
@@ -283,9 +235,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public static IntArraySet Make(int[] @in, int size)
         {
             int[] @out;
@@ -302,9 +251,6 @@ namespace OutSmart.DAXon.Collections
             return new IntArraySet(@out);
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(contents.Length * 4);
@@ -338,12 +284,6 @@ namespace OutSmart.DAXon.Collections
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Test if this set has overlapping membership with another set
-        /// </summary>
         //    }
         /// <summary>
         /// Test whether this set has exactly the same members as another set
@@ -359,12 +299,6 @@ namespace OutSmart.DAXon.Collections
                 return other is IntSet && contents.Length == ((IntSet)other).Count && ContainsAll((IntSet)other);
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Test if this set has overlapping membership with another set
-        /// </summary>
         //    }
         /// <summary>
         /// Construct a hash key that supports the equals() test
@@ -388,16 +322,7 @@ namespace OutSmart.DAXon.Collections
             return _hashCode;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Test if this set has overlapping membership with another set
-        /// </summary>
         //    }
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         /// <summary>
         /// IIterator class: iterate over an array of integers
         /// </summary>

@@ -5,7 +5,6 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Expressions.Elaboration;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Lib;
@@ -29,9 +28,6 @@ namespace OutSmart.DAXon.Expressions
     public sealed class UntypedSequenceConverter : AtomicSequenceConverter
     {
 
-        /// <summary>
-        /// get HashCode for comparing two expressions.
-        /// </summary>
         public override string ExpressionName => "convertUntyped";
         public UntypedSequenceConverter(Expression sequence, IPlainType requiredItemType) : base(sequence, requiredItemType)
         {
@@ -150,49 +146,34 @@ namespace OutSmart.DAXon.Expressions
             return other is UntypedSequenceConverter && BaseExpression.IsEqual(((UntypedSequenceConverter)other).BaseExpression);
         }
 
-        /// <summary>
-        /// get HashCode for comparing two expressions.
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return base.ComputeHashCode();
         }
 
-        /// <summary>
-        /// get HashCode for comparing two expressions.
-        /// </summary>
         protected override string DisplayOperator(Configuration config)
         {
             return "convertUntyped";
         }
 
-        /// <summary>
-        /// get HashCode for comparing two expressions.
-        /// </summary>
         public override string ToShortString()
         {
             return BaseExpression.ToShortString();
         }
 
-        /// <summary>
-        /// get HashCode for comparing two expressions.
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("cvUntyped", this);
             destination.EmitAttribute("to", AlphaCode.FromItemType(RequiredItemType));
             if (RoleSupplier != null)
             {
-                destination.EmitAttribute("diag", RoleSupplier.Get().Save());
+                destination.EmitAttribute("diag", RoleSupplier().Save());
             }
 
             BaseExpression.Export(destination);
             destination.EndElement();
         }
 
-        /// <summary>
-        /// get HashCode for comparing two expressions.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new UntypedSequenceConverterElaborator();
@@ -260,7 +241,7 @@ namespace OutSmart.DAXon.Expressions
                 mapper.SetConverter(converter);
                 if (expr.RoleSupplier != null)
                 {
-                    string errorCode = expr.RoleSupplier.Get().ErrorCode;
+                    string errorCode = expr.RoleSupplier().ErrorCode;
                     mapper.SetErrorCode("XPTY0004".Equals(errorCode) ? "FORG0001" : errorCode);
                 }
 
@@ -291,7 +272,7 @@ namespace OutSmart.DAXon.Expressions
                     {
                         if (expr.RoleSupplier != null)
                         {
-                            string errorCode = expr.RoleSupplier.Get().ErrorCode;
+                            string errorCode = expr.RoleSupplier().ErrorCode;
                             throw new XPathException(((ValidationFailure)result).GetMessage(), errorCode);
                         }
                         else

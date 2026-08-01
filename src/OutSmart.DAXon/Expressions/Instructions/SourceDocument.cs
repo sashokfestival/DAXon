@@ -20,7 +20,6 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -185,14 +184,14 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
 
             @out.EmitAttribute("flags", flags);
-            if (accumulators != null && !accumulators.IsEmpty())
+            if (accumulators != null && accumulators.Count > 0)
             {
                 StringBuilder fsb = new StringBuilder(256);
                 foreach (Accumulator acc in accumulators)
                 {
                     if (fsb.Length != 0)
                     {
-                        fsb.Append(" ");
+                        fsb.Append(' ');
                     }
 
                     fsb.Append(acc.AccumulatorName.EQName);

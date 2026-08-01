@@ -12,19 +12,9 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    // Phase 7.29: COLLATION_KEY_NaN typed as IAtomicMatchKey (was const string, but
-    // callers assign return of GetMapKey()/AsMapKey() which return IAtomicMatchKey).
-    // Runtime 2026-06-11: AtomicSortComparer hollow stub REMOVED (no IAtomicComparer surface; default
-    // xsl:sort comparer fell through to nothing). Real expr/sort/AtomicSortComparer.cs re-included (batch3).
-    // Phase B: real LocalOrderComparer.cs (excluded) is a Comparator<NodeInfo> whose
-    // Compare(NodeInfo,NodeInfo) => a.CompareOrder(b); the stub lacked it so KeyIndex's
-    // comparer.Compare(curr, nodes[i]) mis-resolved to a 4-arg extension (CS7036). Add the real method.
-    // I5 B4a (2026-06-12): implements System.Collections.Generic.IComparer<NodeInfo> (was the now-retired
-    // OutSmart.DAXon.Internal.Collections.Comparator<NodeInfo>) so DocumentSorter's stage-0-renamed
-    // `(IComparer<NodeInfo>)LocalOrderComparer.GetInstance()` cast (DocumentSorter.cs:38, building the
-    // document-order sort for an xsl:for-each select) no longer throws InvalidCastException. Compare already
-    // delegates to NodeInfo.CompareOrder (faithful to the excluded real LocalOrderComparer.cs, which is
-    // `: Comparator<NodeInfo>` with the same single Compare member).
+    // COLLATION_KEY_NaN is IAtomicMatchKey: callers assign it from GetMapKey()/AsMapKey().
+    // Implements IComparer<NodeInfo> for DocumentSorter's `(IComparer<NodeInfo>)GetInstance()` cast;
+    // Compare delegates to NodeInfo.CompareOrder (faithful to upstream LocalOrderComparer).
     public class LocalOrderComparer : IComparer<NodeInfo>
     {
         private static readonly LocalOrderComparer _instance = new LocalOrderComparer();

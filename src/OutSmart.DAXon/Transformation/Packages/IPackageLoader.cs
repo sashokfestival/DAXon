@@ -15,7 +15,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Transformation.Packages

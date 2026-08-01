@@ -189,9 +189,6 @@ namespace OutSmart.DAXon.Model
         /*
      * Compare two names for equality
      */
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             return qName.GetHashCode();
@@ -200,9 +197,6 @@ namespace OutSmart.DAXon.Model
         /*
      * Compare two names for equality
      */
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual bool IsIdentical(IIdentityComparable other)
         {
             return other is INodeName && this.Equals(other) && this.GetPrefix().Equals(((INodeName)other).GetPrefix());
@@ -211,15 +205,11 @@ namespace OutSmart.DAXon.Model
         /*
      * Compare two names for equality
      */
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override string ToString()
         {
             return qName.DisplayName;
         }
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual string GetURI() => throw new NotImplementedException();
+        public virtual string GetURI() => GetNamespaceUri().ToString(); // NodeImpl/Orphan.GetURI() route through this
     }
 }

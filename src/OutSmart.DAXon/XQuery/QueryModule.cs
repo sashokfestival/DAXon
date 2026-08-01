@@ -73,10 +73,6 @@ namespace OutSmart.DAXon.XQuery
         private UnprefixedElementMatchingPolicy unprefixedElementMatchingPolicy = UnprefixedElementMatchingPolicy.DEFAULT_NAMESPACE;
         private HashSet<QueryModule> importedModules = new HashSet<QueryModule>();
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual int ConstructionMode
         {
             get => constructionMode; set
@@ -85,34 +81,14 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual XQueryFunctionLibrary GlobalFunctionLibrary => globalFunctionLibrary;
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual HashSet<QueryModule> ImportedModules => importedModules;
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual QueryModule TopLevelModule => topModule;
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual StaticQueryContext UserQueryContext => userQueryContext;
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual NamespaceUri ModuleNamespace
         {
             get => moduleNamespace; set
@@ -121,10 +97,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual URI LocationURI
         {
             get => locationURI; set
@@ -134,28 +106,12 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual string StaticBaseURI => baseURI;
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual SlotManager GlobalStackFrameMap => GetPackageData().GlobalSlotManager;
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual IEnumerable<GlobalVariable> ImportedGlobalVariables => libraryVariables.Values;
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual IEnumerable<GlobalVariable> AllGlobalVariables
         {
             get
@@ -163,7 +119,7 @@ namespace OutSmart.DAXon.XQuery
                 if (IsMainModule())
                 {
                     IList<GlobalVariable> allVars = new List<GlobalVariable>(libraryVariables.Values);
-                    allVars.AddAll(variables.Values);
+                    allVars.AddRange(variables.Values);
                     return allVars;
                 }
                 else
@@ -173,30 +129,12 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        public virtual IEnumerator<GlobalVariable> ModuleVariables => variables.Values.IIterator();
+        public virtual IEnumerator<GlobalVariable> ModuleVariables => variables.Values.GetEnumerator();
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual XQueryFunctionLibrary LocalFunctionLibrary => (XQueryFunctionLibrary)functionLibraryList[localFunctionLibraryNr];
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual INamespaceResolver LiveNamespaceResolver => new AnonymousINamespaceResolver(this);
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual int RevalidationMode
         {
             get => revalidationMode; set
@@ -212,11 +150,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual NamespaceMap ActiveNamespaceBindings
         {
             get
@@ -245,11 +178,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual ICodeInjector CodeInjector => codeInjector;
         public QueryModule(StaticQueryContext sqc)
         {
@@ -324,7 +252,6 @@ namespace OutSmart.DAXon.XQuery
         private void Init(StaticQueryContext sqc)
         {
 
-            //reset();
             userQueryContext = sqc;
             variables = new Dictionary<StructuredQName, GlobalVariable>(10);
             undeclaredVariables = new Dictionary<StructuredQName, UndeclaredVariable>(5);
@@ -335,7 +262,6 @@ namespace OutSmart.DAXon.XQuery
 
             importedSchemata = new HashSet<NamespaceUri>(5);
 
-            //importedSchemata.add(NamespaceConstant.JSON);
             importedModuleNamespaces = new HashSet<NamespaceUri>(5);
             moduleNamespace = null;
             activeNamespaces = new IndexedStack<NamespaceBinding>();
@@ -365,7 +291,6 @@ namespace OutSmart.DAXon.XQuery
             } //initializeFunctionLibraries();
         }
 
-        //reset();
         public static QueryModule MakeQueryModule(string baseURI, Executable executable, QueryModule importer, string query, NamespaceUri namespaceURI)
         {
             if (baseURI == null)
@@ -413,10 +338,6 @@ namespace OutSmart.DAXon.XQuery
             return module;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void InitializeFunctionLibraries()
         {
             StaticQueryContext sqc = userQueryContext;
@@ -442,10 +363,6 @@ namespace OutSmart.DAXon.XQuery
             unboundFunctionLibraryNr = functionLibraryList.AddFunctionLibrary(new UnboundFunctionLibrary());
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual BuiltInFunctionSet GetBuiltInFunctionSet()
         {
             if (IsUpdating())
@@ -458,64 +375,36 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual Configuration GetConfiguration()
         {
             return config;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual PackageData GetPackageData()
         {
             return packageData;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetPackageData(PackageData packageData)
         {
             this.packageData = packageData;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool IsTopLevelModule()
         {
             return this == topModule;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetIsMainModule(bool main)
         {
             moduleIsMainModule = main;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool IsMainModule()
         {
             return moduleIsMainModule;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool MayImportModule(string @namespace)
         {
             if (@namespace.Equals(moduleNamespace))
@@ -539,28 +428,16 @@ namespace OutSmart.DAXon.XQuery
             return true;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool IsSchemaAware()
         {
             return executable.IsSchemaAware();
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual OptimizerOptions GetOptimizerOptions()
         {
             return optimizerOptions;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual RetainedStaticContext MakeRetainedStaticContext()
         {
 
@@ -582,91 +459,51 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetInheritNamespaces(bool inherit)
         {
             inheritNamespaces = inherit;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool IsInheritNamespaces()
         {
             return inheritNamespaces;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetPreserveNamespaces(bool inherit)
         {
             preserveNamespaces = inherit;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool IsPreserveNamespaces()
         {
             return preserveNamespaces;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetPreserveBoundarySpace(bool preserve)
         {
             preserveSpace = preserve;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool IsPreserveBoundarySpace()
         {
             return preserveSpace;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetEmptyLeast(bool least)
         {
             defaultEmptyLeast = least;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool IsEmptyLeast()
         {
             return defaultEmptyLeast;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual ImportedFunctionLibrary GetImportedFunctionLibrary()
         {
             return (ImportedFunctionLibrary)functionLibraryList[importedFunctionLibraryNr];
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void AddImportedNamespace(NamespaceUri uri)
         {
             if (importedModuleNamespaces == null)
@@ -678,37 +515,21 @@ namespace OutSmart.DAXon.XQuery
             GetImportedFunctionLibrary().AddImportedNamespace(uri);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void AddImportedModule(QueryModule module)
         {
             importedModules.Add(module);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual bool ImportsNamespace(NamespaceUri uri)
         {
             return importedModuleNamespaces != null && importedModuleNamespaces.Contains(uri);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual Executable GetExecutable()
         {
             return executable;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetExecutable(Executable executable)
         {
             this.executable = executable; //        if (!executable.isSchemaAware()) {
@@ -716,43 +537,27 @@ namespace OutSmart.DAXon.XQuery
             //        }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual ILocation GetContainingLocation()
         {
             return moduleLocation;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual string GetSystemId()
         {
             return locationURI == null ? null : locationURI.ToString();
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void SetBaseURI(string uri)
         {
             baseURI = uri;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void DeclareVariable(GlobalVariable var)
         {
             StructuredQName key = var.GetVariableQName();
-            if (variables.Get(key) != null)
+            if (variables.GetOrDefault(key) != null)
             {
-                GlobalVariable oldVar = variables.Get(key);
+                GlobalVariable oldVar = variables.GetOrDefault(key);
                 if (oldVar == var || oldVar.UltimateOriginalVariable == var.UltimateOriginalVariable)
                 {
                 }
@@ -770,10 +575,10 @@ namespace OutSmart.DAXon.XQuery
                 }
             }
 
-            variables.Put(key, var);
+            variables[key] = var;
             GetPackageData().AddGlobalVariable(var);
             Dictionary<StructuredQName, GlobalVariable> libVars = TopLevelModule.libraryVariables;
-            GlobalVariable old = libVars.Get(key);
+            GlobalVariable old = libVars.GetOrDefault(key);
             if (old == null || old == var || old.UltimateOriginalVariable == var.UltimateOriginalVariable)
             {
             }
@@ -784,14 +589,10 @@ namespace OutSmart.DAXon.XQuery
 
             if (!IsMainModule())
             {
-                libVars.Put(key, var);
+                libVars[key] = var;
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual IList<GlobalVariable> FixupGlobalVariables(SlotManager globalVariableMap)
         {
             IList<GlobalVariable> varDefinitions = new List<GlobalVariable>(20);
@@ -814,10 +615,6 @@ namespace OutSmart.DAXon.XQuery
             return varDefinitions;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void CheckForCircularities(IList<GlobalVariable> compiledVars, XQueryFunctionLibrary globalFunctionLibrary)
         {
             IndexedStack<object> stack = null;
@@ -835,10 +632,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void TypeCheckGlobalVariables(IList<GlobalVariable> compiledVars)
         {
             ExpressionVisitor visitor = ExpressionVisitor.Make(this);
@@ -858,20 +651,16 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual Expression BindVariable(StructuredQName qName)
         {
-            GlobalVariable var = variables.Get(qName);
+            GlobalVariable var = variables.GetOrDefault(qName);
             if (var == null)
             {
                 NamespaceUri uri = qName.GetNamespaceUri();
                 if ((uri.Equals(NamespaceUri.NULL) && IsMainModule()) || uri.Equals(moduleNamespace) || ImportsNamespace(uri))
                 {
                     QueryModule main = TopLevelModule;
-                    var = main.libraryVariables.Get(qName);
+                    var = main.libraryVariables.GetOrDefault(qName);
                     if (var == null)
                     {
 
@@ -879,7 +668,7 @@ namespace OutSmart.DAXon.XQuery
                         // the variable declaration hasn't yet been read, because of the limited provision
                         // for cyclic imports. In XQuery 3.0 forwards references are more generally allowed.
                         //if (getLanguageVersion() >= 30) {
-                        UndeclaredVariable uvar = undeclaredVariables.Get(qName);
+                        UndeclaredVariable uvar = undeclaredVariables.GetOrDefault(qName);
                         if (uvar != null)
                         {
 
@@ -897,7 +686,7 @@ namespace OutSmart.DAXon.XQuery
                             uvar.SetVariableQName(qName);
                             GlobalVariableReference @ref = new GlobalVariableReference(qName);
                             uvar.RegisterReference(@ref);
-                            undeclaredVariables.Put(qName, uvar);
+                            undeclaredVariables[qName] = uvar;
                             return @ref;
                         } //                    } else {
                         //                        throw err;
@@ -937,19 +726,11 @@ namespace OutSmart.DAXon.XQuery
             return vref;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual IFunctionLibrary GetFunctionLibrary()
         {
             return functionLibraryList;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
         public virtual void DeclareFunction(XQueryFunction function)
         {
             Configuration config = GetConfiguration();
@@ -972,85 +753,50 @@ namespace OutSmart.DAXon.XQuery
             main.globalFunctionLibrary.DeclareFunction(function); //}
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         private static void IStaticError(string message, string errorCode)
         {
             throw new XPathException(message, errorCode).AsStaticError();
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void BindUnboundFunctionCalls()
         {
             UnboundFunctionLibrary lib = (UnboundFunctionLibrary)functionLibraryList[unboundFunctionLibraryNr];
             lib.BindUnboundFunctionReferences(functionLibraryList, GetConfiguration());
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void FixupGlobalFunctions()
         {
             globalFunctionLibrary.FixupGlobalFunctions(this);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void OptimizeGlobalFunctions()
         {
             globalFunctionLibrary.OptimizeGlobalFunctions(this);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void ExplainGlobalFunctions(ExpressionPresenter @out)
         {
             globalFunctionLibrary.ExplainGlobalFunctions(@out);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual UserFunction GetUserDefinedFunction(NamespaceUri uri, string localName, int arity)
         {
             return globalFunctionLibrary.GetUserDefinedFunction(uri, localName, arity);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void BindUnboundVariables()
         {
             foreach (UndeclaredVariable uv in undeclaredVariables.Values)
             {
                 StructuredQName qName = uv.GetVariableQName();
-                GlobalVariable var = variables.Get(qName);
+                GlobalVariable var = variables.GetOrDefault(qName);
                 if (var == null)
                 {
                     NamespaceUri uri = qName.GetNamespaceUri();
                     if (ImportsNamespace(uri))
                     {
                         QueryModule main = TopLevelModule;
-                        var = main.libraryVariables.Get(qName);
+                        var = main.libraryVariables.GetOrDefault(qName);
                     }
                 }
 
@@ -1069,11 +815,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void AddImportedSchema(NamespaceUri targetNamespace, string baseURI, IList<string> locationURIs)
         {
             if (importedSchemata == null)
@@ -1089,11 +830,11 @@ namespace OutSmart.DAXon.XQuery
                 TopLevelModule.loadedSchemata = loadedSchemata;
             }
 
-            HashSet<string> entries = loadedSchemata.Get(targetNamespace);
+            HashSet<string> entries = loadedSchemata.GetOrDefault(targetNamespace);
             if (entries == null)
             {
                 entries = new HashSet<string>(locationURIs.Count);
-                loadedSchemata.Put(targetNamespace, entries);
+                loadedSchemata[targetNamespace] = entries;
             }
 
             foreach (string relative in locationURIs)
@@ -1109,21 +850,11 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual bool IsImportedSchema(NamespaceUri @namespace)
         {
             return importedSchemata != null && importedSchemata.Contains(@namespace);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual HashSet<NamespaceUri> GetImportedSchemaNamespaces()
         {
             if (importedSchemata == null)
@@ -1136,11 +867,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void ReportStaticError(XPathException err)
         {
             if (!err.HasBeenReported())
@@ -1150,11 +876,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void ReportStaticError(IXmlProcessingError err)
         {
             userQueryContext.ErrorReporter.Report(err);
@@ -1164,21 +885,11 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual IXPathContext MakeEarlyEvaluationContext()
         {
             return new EarlyEvaluationContext(GetConfiguration());
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual string GetDefaultCollationName()
         {
             if (defaultCollationName == null)
@@ -1189,21 +900,11 @@ namespace OutSmart.DAXon.XQuery
             return defaultCollationName;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void SetDefaultCollationName(string collation)
         {
             defaultCollationName = collation;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void DeclarePrologNamespace(string prefix, NamespaceUri uri)
         {
             if (prefix == null)
@@ -1221,21 +922,16 @@ namespace OutSmart.DAXon.XQuery
                 IStaticError("Invalid declaration of the XML namespace", "XQST0070");
             }
 
-            if (explicitPrologNamespaces.Get(prefix) != null)
+            if (explicitPrologNamespaces.GetOrDefault(prefix) != null)
             {
                 IStaticError("Duplicate declaration of namespace prefix \"" + prefix + '"', "XQST0033");
             }
             else
             {
-                explicitPrologNamespaces.Put(prefix, uri);
+                explicitPrologNamespaces[prefix] = uri;
             }
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void DeclareActiveNamespace(string prefix, NamespaceUri uri)
         {
             if (prefix == null)
@@ -1252,41 +948,21 @@ namespace OutSmart.DAXon.XQuery
             activeNamespaces.IPush(entry);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void UndeclareNamespace()
         {
             activeNamespaces.Pop();
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual UnprefixedElementMatchingPolicy GetUnprefixedElementMatchingPolicy()
         {
             return unprefixedElementMatchingPolicy;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void SetUnprefixedElementMatchingPolicy(UnprefixedElementMatchingPolicy unprefixedElementMatchingPolicy)
         {
             this.unprefixedElementMatchingPolicy = unprefixedElementMatchingPolicy;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual NamespaceUri CheckURIForPrefix(string prefix)
         {
 
@@ -1315,7 +991,7 @@ namespace OutSmart.DAXon.XQuery
                 return defaultElementNamespace;
             }
 
-            NamespaceUri uri = explicitPrologNamespaces.Get(prefix);
+            NamespaceUri uri = explicitPrologNamespaces.GetOrDefault(prefix);
             if (uri != null)
             {
 
@@ -1335,62 +1011,37 @@ namespace OutSmart.DAXon.XQuery
             return null;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual NamespaceUri GetDefaultElementNamespace()
         {
             return CheckURIForPrefix("");
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void SetDefaultElementNamespace(NamespaceUri uri, bool isFixedDefault)
         {
             defaultElementNamespace = uri;
             fixedDefaultElementNamespace = isFixedDefault;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual NamespaceUri GetDefaultFunctionNamespace()
         {
             return defaultFunctionNamespace;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void SetDefaultFunctionNamespace(NamespaceUri uri)
         {
             defaultFunctionNamespace = uri;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual INamespaceResolver GetNamespaceResolver()
         {
             NamespaceMap result = NamespaceMap.EmptyMap();
             Dictionary<string, NamespaceUri> userDeclaredNamespaces = userQueryContext.UserDeclaredNamespaces;
-            foreach (KeyValuePair<string, NamespaceUri> e in userDeclaredNamespaces.EntrySet())
+            foreach (KeyValuePair<string, NamespaceUri> e in userDeclaredNamespaces)
             {
                 result = result.Put(e.Key, e.Value);
             }
 
-            foreach (KeyValuePair<string, NamespaceUri> e in explicitPrologNamespaces.EntrySet())
+            foreach (KeyValuePair<string, NamespaceUri> e in explicitPrologNamespaces)
             {
                 result = result.Put(e.Key, e.Value);
             }
@@ -1426,21 +1077,11 @@ namespace OutSmart.DAXon.XQuery
             return result;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual Types.ItemType GetRequiredContextItemType()
         {
             return requiredContextItemType;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual DecimalFormatManager GetDecimalFormatManager()
         {
             if (decimalFormatManager == null)
@@ -1451,11 +1092,6 @@ namespace OutSmart.DAXon.XQuery
             return decimalFormatManager;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void IssueWarning(string s, string errorCode, ILocation locator)
         {
             XmlProcessingIncident err = new XmlProcessingIncident(s, errorCode).AsWarning();
@@ -1464,77 +1100,42 @@ namespace OutSmart.DAXon.XQuery
             userQueryContext.ErrorReporter.Report(err);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual bool IsInBackwardsCompatibleMode()
         {
             return false;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual bool IsUpdating()
         {
             return updating;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual void SetXPathVersion(int languageLevel)
         {
             this.languageLevel = languageLevel;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual int GetXPathVersion()
         {
             return languageLevel;
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual KeyManager GetKeyManager()
         {
             return packageData.GetKeyManager();
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         public virtual Types.ItemType ResolveTypeAlias(StructuredQName typeName)
         {
             return GetPackageData().ObtainTypeAliasManager().GetItemType(typeName);
         }
 
-        //reset();
-        /// <summary>
-        /// Reset function libraries
-        /// </summary>
-        //}
         /// <summary>
         /// Get the number of references to a not-yet-declared global variable
         /// </summary>
         public virtual int GetForwardReferenceCount(StructuredQName variableName)
         {
-            UndeclaredVariable var = undeclaredVariables.Get(variableName);
+            UndeclaredVariable var = undeclaredVariables.GetOrDefault(variableName);
             if (var == null)
             {
                 return 0;

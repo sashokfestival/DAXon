@@ -36,9 +36,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         /// </summary>
         public override TinyTree Tree => tree;
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override NodeInfo Root => this;
         public TinyDocumentImpl(TinyTree tree) : base(tree, 0)
         {
@@ -84,9 +81,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             baseURI = uri;
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override string GetBaseURI()
         {
             if (baseURI != null)
@@ -97,58 +91,37 @@ namespace OutSmart.DAXon.Trees.Tiny
             return GetSystemId();
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override int GetLineNumber()
         {
             return 0;
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public bool IsTyped()
         {
             return tree.TypeArray != null;
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override int GetNodeKind()
         {
             return Types.Type.DOCUMENT;
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override TinyNodeImpl GetParent()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override void GenerateId(StringBuilder buffer)
         {
             buffer.Append('d');
             AppendIdDigits(buffer, GetTreeInfo().GetDocumentNumber());
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override IAtomicSequence Atomize()
         {
             return StringValue.MakeUntypedAtomic(UnicodeStringValue);
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public IAxisIterator GetAllElements(int fingerprint)
         {
             if (elementList == null)
@@ -166,9 +139,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return new NodeListIterator(list);
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         IList<NodeInfo> MakeElementList(int fingerprint)
         {
             int size = tree.NumberOfNodes / 20;
@@ -209,9 +179,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return list;
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
         public override ISchemaType GetSchemaType()
         {
             IAxisIterator children = IterateAxis(AxisInfo.CHILD, NodeKindTest.ELEMENT);
@@ -226,12 +193,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public override void Copy(IReceiver @out, int copyOptions, ILocation locationId)
         {
             @out.StartDocument(CopyOptions.GetStartDocumentProperties(copyOptions));
@@ -239,7 +200,7 @@ namespace OutSmart.DAXon.Trees.Tiny
             // copy any unparsed entities
             if (tree.entityTable != null)
             {
-                foreach (KeyValuePair<string, string[]> entry in tree.entityTable.EntrySet())
+                foreach (KeyValuePair<string, string[]> entry in tree.entityTable)
                 {
                     string name = entry.Key;
                     string[] details = entry.Value;
@@ -259,23 +220,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             @out.EndDocument();
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public void ShowSize(Logger logger)
         {
             tree.ShowSize(logger);
         }
 
-        /// <summary>
-        /// Get the base URI of this root node.
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public override int GetHashCode()
         {
 

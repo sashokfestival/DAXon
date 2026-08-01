@@ -62,22 +62,10 @@ namespace OutSmart.DAXon.Values
             return cache;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         private static readonly byte[] DIGITS = StringConstants.Bytes("0123456789");
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         private static readonly byte[] DIGIT_TENS = StringConstants.Bytes("0000000000" + "1111111111" + "2222222222" + "3333333333" + "4444444444" + "5555555555" + "6666666666" + "7777777777" + "8888888888" + "9999999999");
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         private static readonly byte[] DIGIT_ONES = StringConstants.Bytes("0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789" + "0123456789");
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         private static readonly long[] powersOfTen = new long[]
         {
             10,
@@ -104,9 +92,6 @@ namespace OutSmart.DAXon.Values
         /// </summary>
         private readonly long value;
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override UnicodeString PrimitiveStringValue
         {
             get
@@ -124,25 +109,16 @@ namespace OutSmart.DAXon.Values
                 return new Twine8(buf); //return BMPString.of(Long.toString(value));
             }
         }
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public Int64Value(long value) : base(BuiltInAtomicType.INTEGER)
         {
             this.value = value;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public Int64Value(long value, IAtomicType typeLabel) : base(typeLabel)
         {
             this.value = value;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public Int64Value(long val, BuiltInAtomicType typeLabel, bool check) : base(typeLabel)
         {
             value = val;
@@ -152,9 +128,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public static Int64Value MakeIntegerValue(long value)
         {
             if (value >= 0 && value < SMALL_INTEGERS.Length)
@@ -167,17 +140,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public static Int64Value MakeDerived(long val, IAtomicType type)
         {
             return new Int64Value(val, type);
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public static Int64Value Signum(long val)
         {
             if (val == 0)
@@ -190,9 +157,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override int AsSubscript()
         {
             if (value > 0 && value <= int.MaxValue)
@@ -205,9 +169,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)
         {
             if (typeLabel.PrimitiveType == StandardNames.XS_INTEGER)
@@ -220,9 +181,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override ValidationFailure ValidateAgainstSubType(BuiltInAtomicType type)
         {
             if (CheckRange(value, type))
@@ -237,9 +195,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override int GetHashCode()
         {
             if (value > int.MinValue && value < int.MaxValue)
@@ -252,25 +207,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override long LongValue()
         {
             return value;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override bool EffectiveBooleanValue()
         {
             return value != 0;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override int CompareTo(IXPathComparable other)
         {
             if (other is NumericValue)
@@ -298,17 +244,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override int CompareTo(long other)
         {
             return value.CompareTo(other);
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         private static void GetDigits(long i, int index, byte[] buf)
         {
 
@@ -367,9 +307,6 @@ namespace OutSmart.DAXon.Values
                 buf[--charPos] = sign;
             }
         }
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         private static int StringSize(long x)
         {
             for (int w = 0; w < 18; w++)
@@ -382,33 +319,21 @@ namespace OutSmart.DAXon.Values
 
             return 19;
         }
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override double GetDoubleValue()
         {
             return (double)value;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override float GetFloatValue()
         {
             return (float)value;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override BigDecimal GetDecimalValue()
         {
             return BigDecimal.ValueOf(value);
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override NumericValue Negate()
         {
             if (value == long.MinValue)
@@ -421,25 +346,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override NumericValue Floor()
         {
             return this;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override NumericValue Ceiling()
         {
             return this;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override NumericValue Round(int scale)
         {
             if (scale >= 0 || value == 0)
@@ -453,7 +369,7 @@ namespace OutSmart.DAXon.Values
                     return new BigIntegerValue(value).Round(scale);
                 }
 
-                long absolute = System.Math.Abs(value);
+                long absolute = Math.Abs(value);
                 long factor = 1;
                 for (long i = 1; i <= -scale; i++)
                 {
@@ -484,9 +400,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override NumericValue Round(int scale, Round.RoundingRule roundingRule)
         {
             if (scale >= 0 || value == 0)
@@ -546,9 +459,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override int Signum()
         {
             if (value > 0)
@@ -558,9 +468,6 @@ namespace OutSmart.DAXon.Values
             return -1;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         public override NumericValue Abs()
         {
             if (value > 0)
@@ -577,9 +484,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
         /// <summary>
         /// Add another integer
         /// </summary>
@@ -610,12 +514,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Array of small integer values
-        /// </summary>
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
         /// Subtract another integer
         /// </summary>
         public override IntegerValue Minus(IntegerValue other)
@@ -645,15 +543,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Array of small integer values
-        /// </summary>
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
         /// Multiply by another integer
         /// </summary>
         public override IntegerValue Times(IntegerValue other)
@@ -677,18 +566,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
         /// <summary>
         /// Divide by another integer
         /// </summary>
@@ -728,21 +605,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Array of small integer values
-        /// </summary>
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
-        /// <summary>
-        /// Divide by another integer
-        /// </summary>
-        /// <summary>
         /// Take modulo another integer
         /// </summary>
         public override IntegerValue Mod(IntegerValue other)
@@ -773,24 +635,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Array of small integer values
-        /// </summary>
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
-        /// <summary>
-        /// Divide by another integer
-        /// </summary>
-        /// <summary>
-        /// Take modulo another integer
-        /// </summary>
-        /// <summary>
         /// Integer divide by another integer
         /// </summary>
         public override IntegerValue Idiv(IntegerValue other)
@@ -818,24 +662,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Array of small integer values
-        /// </summary>
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
-        /// <summary>
-        /// Divide by another integer
-        /// </summary>
-        /// <summary>
-        /// Take modulo another integer
-        /// </summary>
-        /// <summary>
         /// Integer divide by another integer
         /// </summary>
         private bool IsLong()
@@ -844,27 +670,6 @@ namespace OutSmart.DAXon.Values
             return top != 0;
         }
 
-        /// <summary>
-        /// Array of small integer values
-        /// </summary>
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
-        /// <summary>
-        /// Divide by another integer
-        /// </summary>
-        /// <summary>
-        /// Take modulo another integer
-        /// </summary>
-        /// <summary>
-        /// Integer divide by another integer
-        /// </summary>
         /// <summary>
         /// Get the value as a global::System.Numerics.BigInteger
         /// </summary>

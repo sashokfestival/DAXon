@@ -13,7 +13,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 
-// Phase 7.8 round 3: another CS0246 batch.
 
 namespace OutSmart.DAXon.Patterns
 {
@@ -88,7 +87,10 @@ namespace OutSmart.DAXon.Patterns
                 try { ok = MatchesUpperPattern(node, anchor, context); }
                 catch (XPathException e)
                 {
-                    if (basePattern.Matches(node, context)) { throw e; }
+                    if (basePattern.Matches(node, context))
+                    {
+                        throw e;
+                    }
                     return false;
                 }
                 return ok && basePattern.Matches(node, context);
@@ -100,7 +102,10 @@ namespace OutSmart.DAXon.Patterns
                 catch (XPathException e)
                 {
                     testUpperPatternFirst = true;
-                    if (upperPattern.Matches(node, context)) { throw e; }
+                    if (upperPattern.Matches(node, context))
+                    {
+                        throw e;
+                    }
                     return false;
                 }
                 return ok && MatchesUpperPattern(node, anchor, context);
@@ -131,8 +136,14 @@ namespace OutSmart.DAXon.Patterns
         {
             while (anc != null)
             {
-                if (upperPattern.MatchesBeneathAnchor(anc, anchor, context)) { return true; }
-                if (anc.Equals(anchor)) { return false; }
+                if (upperPattern.MatchesBeneathAnchor(anc, anchor, context))
+                {
+                    return true;
+                }
+                if (anc.Equals(anchor))
+                {
+                    return false;
+                }
                 anc = anc.GetParent();
             }
             return false;

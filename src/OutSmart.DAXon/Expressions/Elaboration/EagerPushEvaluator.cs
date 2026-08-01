@@ -41,7 +41,7 @@ namespace OutSmart.DAXon.Expressions.Elaboration
                 @out.Open();
                 ITailCall tail = pusher.ProcessLeavingTail(@out, context);
                 Expression.DispatchTailCall(tail);
-                @out.Dispose();
+                @out.Close();
                 return seq.Sequence;
             }
             catch (UncheckedXPathException e)

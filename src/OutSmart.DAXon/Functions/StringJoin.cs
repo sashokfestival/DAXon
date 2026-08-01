@@ -55,25 +55,16 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine whether two expressions are equivalent
-        /// </summary>
         public override bool Equals(object o)
         {
             return (o is StringJoin) && base.Equals(o) && returnEmptyIfEmpty == ((StringJoin)o).returnEmptyIfEmpty;
         }
 
-        /// <summary>
-        /// Determine whether two expressions are equivalent
-        /// </summary>
         public override int GetHashCode()
         {
             return base.GetHashCode() | (returnEmptyIfEmpty ? 0x05000000 : 0);
         }
 
-        /// <summary>
-        /// Determine whether two expressions are equivalent
-        /// </summary>
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
             Expression e2 = base.MakeOptimizedFunctionCall(visitor, contextInfo, arguments);
@@ -105,9 +96,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        /// <summary>
-        /// Determine whether two expressions are equivalent
-        /// </summary>
         public override IFold GetFold(IXPathContext context, params ISequence[] additionalArguments)
         {
             UnicodeString separator = EmptyUnicodeString.GetInstance();
@@ -119,9 +107,6 @@ namespace OutSmart.DAXon.Functions
             return new StringJoinFold(separator, returnEmptyIfEmpty);
         }
 
-        /// <summary>
-        /// Determine whether two expressions are equivalent
-        /// </summary>
         public void Process(Outputter destination, IXPathContext context, ISequence[] arguments)
         {
             UnicodeString separator = arguments.Length > 1 ? ((IGroundedValue)arguments[1].Head()).UnicodeStringValue : EmptyUnicodeString.GetInstance();
@@ -151,12 +136,9 @@ namespace OutSmart.DAXon.Functions
                 throw e.GetXPathException();
             }
 
-            output.Dispose();
+            output.Close();
         }
 
-        /// <summary>
-        /// Determine whether two expressions are equivalent
-        /// </summary>
         private class StringJoinFold : IFold
         {
             private int position = 0;

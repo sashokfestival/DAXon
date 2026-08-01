@@ -153,35 +153,11 @@ namespace OutSmart.DAXon.Serialization
         private HashSet<string> suppressed = null;
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         /*!afterFormatted &&*/
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         protected virtual int LineLength => 80;
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         /*!afterFormatted &&*/
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         protected virtual int Indentation => 3;
         /*"link" -- excluded, see bug 3877,*/
         static HTMLIndenter()
@@ -203,7 +179,7 @@ namespace OutSmart.DAXon.Serialization
                 suppressed = new HashSet<string>(8);
                 foreach (string eqName in s.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
-                    suppressed.Add(FingerprintedQName.FromEQName(eqName).GetLocalPart().ToLowerCase());
+                    suppressed.Add(FingerprintedQName.FromEQName(eqName).GetLocalPart().ToLowerInvariant());
                 }
             }
         }
@@ -212,17 +188,17 @@ namespace OutSmart.DAXon.Serialization
         public virtual int ClassifyTag(INodeName name)
         {
             int r = 0;
-            if (inlineTable.Contains(name.GetLocalPart().ToLowerCase()))
+            if (inlineTable.Contains(name.GetLocalPart().ToLowerInvariant()))
             {
                 r |= IS_INLINE;
             }
 
-            if (formattedTable.Contains(name.GetLocalPart().ToLowerCase()))
+            if (formattedTable.Contains(name.GetLocalPart().ToLowerInvariant()))
             {
                 r |= IS_FORMATTED;
             }
 
-            if (suppressed != null && suppressed.Contains(name.GetLocalPart().ToLowerCase()))
+            if (suppressed != null && suppressed.Contains(name.GetLocalPart().ToLowerInvariant()))
             {
                 r |= IS_SUPPRESSED;
             }
@@ -231,9 +207,6 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             int withinSuppressed = level == 0 ? 0 : (propertyStack[level - 1] & IS_SUPPRESSED);
@@ -261,9 +234,6 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         /*!afterFormatted &&*/
         /// <summary>
         /// Output element end tag
@@ -291,13 +261,7 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         /*!afterFormatted &&*/
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
         /// <summary>
         /// Output character data
         /// </summary>
@@ -348,16 +312,7 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         /*!afterFormatted &&*/
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
         /// <summary>
         /// Output a processing instruction
         /// </summary>
@@ -373,19 +328,7 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         /*!afterFormatted &&*/
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
             if (afterEndElement && level != 0 && (propertyStack[level - 1] & IS_INLINE) == 0)
@@ -398,31 +341,12 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /*"link" -- excluded, see bug 3877,*/
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
         /*!afterFormatted &&*/
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private void Indent()
         {
             int spaces = level * Indentation;
 
-            //        if (spaces + 1 >= indentChars.length) {
-            //            int increment = 5 * getIndentation();
-            //            if (spaces + 1 > indentChars.length + increment) {
             //                increment += spaces + 1;
-            //            }
-            //            char[] c2 = new char[indentChars.length + increment];
-            //            System.arraycopy(indentChars, 0, c2, 0, indentChars.length);
-            //            Arrays.fill(c2, indentChars.length, c2.length, ' ');
             //            indentChars = c2;
             //        }
             //        nextReceiver.characters(new Twine16(indentChars, 0, spaces + 1),

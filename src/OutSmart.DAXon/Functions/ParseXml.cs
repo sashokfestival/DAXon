@@ -21,8 +21,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Functions
@@ -195,11 +193,11 @@ namespace OutSmart.DAXon.Functions
         private string MakeParsingErrorMessage(XPathException err)
         {
             string msg = "First argument to parse-xml() is not a well-formed and namespace-well-formed XML document. ";
-            msg += err.GetMessage();
-            var cause = err.GetCause();
+            msg += err.Message;
+            var cause = err.InnerException;
             if (cause != null)
             {
-                msg += cause is Exception __ct ? __ct.GetMessage() : cause.Message;
+                msg += cause is Exception __ct ? __ct.Message : cause.Message;
             }
 
             return msg;

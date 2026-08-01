@@ -10,7 +10,7 @@ using System;
 
 namespace OutSmart.DAXon.Trees.Linked
 {
-    // Phase 7.8c: implement IAxisIterator interface so assignment to IAxisIterator works.
+    // Implement IAxisIterator interface so assignment to IAxisIterator works.
     public class AttributeAxisIterator : IAxisIterator
     {
         public AttributeAxisIterator() { }

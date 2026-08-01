@@ -29,14 +29,8 @@ namespace OutSmart.DAXon.Functions
 
         public virtual MergeInstr ControllingInstruction => controllingInstruction;
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override ItemType ResultItemType => AnyItemType.GetInstance();
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override string StreamerName => "CurrentMergeGroup";
         public virtual void SetControllingInstruction(MergeInstr instruction, bool isInLoop)
         {
@@ -57,17 +51,11 @@ namespace OutSmart.DAXon.Functions
             return inLoop;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override int GetSpecialProperties(Expression[] arguments)
         {
             return 0;
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override Expression MakeFunctionCall(params Expression[] arguments)
         {
             // Java: new SystemFunctionCall(this, arguments) { getScopingExpression() {...} } — the port's
@@ -76,9 +64,6 @@ namespace OutSmart.DAXon.Functions
             return new AnonymousSystemFunctionCall(this, arguments);
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             string source = null;
@@ -90,9 +75,6 @@ namespace OutSmart.DAXon.Functions
             return SequenceTool.ToLazySequence(CurrentGroup(source, context));
         }
 
-        /// <summary>
-        /// Determine the item type of the value returned by the function
-        /// </summary>
         private ISequenceIterator CurrentGroup(string source, IXPathContext c)
         {
             IGroupIterator gi = c.GetCurrentMergeGroupIterator();

@@ -49,7 +49,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                 else
                 {
                     Dictionary<string, object> info = new Dictionary<string, object>(1);
-                    info.Put("var", "$" + vars[0].GetVariableQName().DisplayName);
+                    info["var"] = "$" + vars[0].GetVariableQName().DisplayName;
                     return info;
                 }
             }

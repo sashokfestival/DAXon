@@ -89,17 +89,11 @@ namespace OutSmart.DAXon.Types
             return "item()";
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             return "AnyItemType".GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual SequenceType One()
         {
             if (_one == null)
@@ -110,9 +104,6 @@ namespace OutSmart.DAXon.Types
             return _one;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual SequenceType ZeroOrOne()
         {
             if (_zeroOrOne == null)
@@ -123,9 +114,6 @@ namespace OutSmart.DAXon.Types
             return _zeroOrOne;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual SequenceType OneOrMore()
         {
             if (_oneOrMore == null)
@@ -136,9 +124,6 @@ namespace OutSmart.DAXon.Types
             return _oneOrMore;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual SequenceType ZeroOrMore()
         {
             if (_zeroOrMore == null)

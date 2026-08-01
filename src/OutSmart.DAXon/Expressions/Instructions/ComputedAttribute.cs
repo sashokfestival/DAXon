@@ -15,7 +15,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Utilities;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,14 +35,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private Operand namespaceOp;
         private readonly bool allowNameAsQName;
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_ATTRIBUTE;
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public Expression NameExp
         {
             get => nameOp.GetChildExpression(); set
@@ -70,17 +63,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             SetOptions(GetOptions() | ReceiverOption.REJECT_DUPLICATES);
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public Expression GetNamespaceExp()
         {
             return namespaceOp == null ? null : namespaceOp.GetChildExpression();
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public void SetNamespace(Expression @namespace)
         {
             if (@namespace != null)
@@ -96,57 +83,36 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             return OperandSparseList(selectOp, nameOp, namespaceOp);
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public INamespaceResolver GetNamespaceResolver()
         {
             return GetRetainedStaticContext();
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return NodeKindTest.ATTRIBUTE;
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.ALLOWS_ZERO_OR_ONE;
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public bool IsAllowNameAsQName()
         {
             return allowNameAsQName;
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             return base.ComputeSpecialProperties() | StaticProperty.SINGLE_DOCUMENT_NODESET;
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override void LocalTypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             nameOp.TypeCheck(visitor, contextItemType);
@@ -221,9 +187,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Expression exp = base.Optimize(visitor, contextItemType);
@@ -246,9 +209,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ComputedAttribute exp = new ComputedAttribute(NameExp == null ? null : NameExp.Copy(rebindings), GetNamespaceExp() == null ? null : GetNamespaceExp().Copy(rebindings), GetValidationAction(), GetSchemaType(), allowNameAsQName);
@@ -258,9 +218,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return exp;
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             if (parentType is ISimpleType)
@@ -279,18 +236,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override INodeName EvaluateNodeName(IXPathContext context)
         {
             IItem nameValue = NameExp.EvaluateItem(context);
             return ValidateNodeName(nameValue, context);
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         private INodeName ValidateNodeName(IItem nameValue, IXPathContext context)
         {
             NamePool pool = context.GetNamePool();
@@ -316,7 +267,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                     catch (ArgumentException e)
                     {
-                        throw new XPathException("Invalid EQName in computed attribute constructor: " + e.GetMessage(), "XQDY0074");
+                        throw new XPathException("Invalid EQName in computed attribute constructor: " + e.Message, "XQDY0074");
                     }
 
                     if (!NameChecker.IsValidNCName(localName))
@@ -496,9 +447,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new FingerprintedQName(prefix, uri, localName);
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         // we force the attribute to go in the null @namespace
         public override IItem EvaluateItem(IXPathContext context)
         {
@@ -507,9 +455,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return node;
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("compAtt", this);
@@ -548,17 +493,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ComputedAttributeElaborator();
         }
 
-        /// <summary>
-        /// Get the name of this instruction
-        /// </summary>
         private class ComputedAttributeElaborator : SimpleNodePushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

@@ -58,7 +58,7 @@ namespace OutSmart.DAXon.Internal.Numerics
         // therefore all results — are byte-identical to the BigInteger path.
         private readonly long _compact;
         private object _big;
-        public int Sign => _compact != INFLATED ? global::System.Math.Sign(_compact) : ((SysBigInt)_big).Sign;
+        public int Sign => _compact != INFLATED ? Math.Sign(_compact) : ((SysBigInt)_big).Sign;
 
         private SysBigInt Unscaled
         {
@@ -104,7 +104,10 @@ namespace OutSmart.DAXon.Internal.Numerics
         {
             var p = new SysBigInt[64];
             p[0] = SysBigInt.One;
-            for (int i = 1; i < p.Length; i++) p[i] = p[i - 1] * 10;
+            for (int i = 1; i < p.Length; i++)
+            {
+                p[i] = p[i - 1] * 10;
+            }
             return p;
         }
 
@@ -139,8 +142,14 @@ namespace OutSmart.DAXon.Internal.Numerics
                 return true;
             }
             r = unchecked(a * b);
-            if (a == 0) return true;
-            if (a == -1 && b == INFLATED) return false;   // -1 * long.MinValue overflows
+            if (a == 0)
+            {
+                return true;
+            }
+            if (a == -1 && b == INFLATED)   // -1 * long.MinValue overflows
+            {
+                return false;
+            }
             return r / a == b;
         }
 
@@ -158,21 +167,37 @@ namespace OutSmart.DAXon.Internal.Numerics
             ru = 0;
             long a, b;
             int diff = xs - ys;
-            if (diff == 0) { a = xu; b = yu; rscale = xs; }
+            if (diff == 0)
+            {
+                a = xu;
+                b = yu;
+                rscale = xs;
+            }
             else if (diff > 0)
             {
-                if (diff > 18 || !TryMulLong(yu, LONG_POW10[diff], out b)) { rscale = 0; return false; }
+                if (diff > 18 || !TryMulLong(yu, LONG_POW10[diff], out b))
+                {
+                    rscale = 0;
+                    return false;
+                }
                 a = xu; rscale = xs;
             }
             else
             {
                 int d = -diff;
-                if (d > 18 || !TryMulLong(xu, LONG_POW10[d], out a)) { rscale = 0; return false; }
+                if (d > 18 || !TryMulLong(xu, LONG_POW10[d], out a))
+                {
+                    rscale = 0;
+                    return false;
+                }
                 b = yu; rscale = ys;
             }
             if (subtract)
             {
-                if (b == INFLATED) return false;   // -(long.MinValue) overflows
+                if (b == INFLATED)   // -(long.MinValue) overflows
+                {
+                    return false;
+                }
                 b = -b;
             }
             return TryAddLong(a, b, out ru);
@@ -187,8 +212,17 @@ namespace OutSmart.DAXon.Internal.Numerics
         public BigDecimal(SysBigInt value) : this(value, 0) { }
         public BigDecimal(long value)
         {
-            if (value != INFLATED) { _compact = value; _scale = 0; }
-            else { _compact = INFLATED; _big = new SysBigInt(value); _scale = 0; }
+            if (value != INFLATED)
+            {
+                _compact = value;
+                _scale = 0;
+            }
+            else
+            {
+                _compact = INFLATED;
+                _big = new SysBigInt(value);
+                _scale = 0;
+            }
         }
 
         // Compact-path result constructor: the mantissa is a known long, so no BigInteger is
@@ -196,8 +230,17 @@ namespace OutSmart.DAXon.Internal.Numerics
         // INFLATED sentinel and takes the big form — value-identical.
         private BigDecimal(long compact, int scale, bool marker)
         {
-            if (compact != INFLATED) { _compact = compact; _scale = scale; }
-            else { _compact = INFLATED; _big = new SysBigInt(compact); _scale = scale; }
+            if (compact != INFLATED)
+            {
+                _compact = compact;
+                _scale = scale;
+            }
+            else
+            {
+                _compact = INFLATED;
+                _big = new SysBigInt(compact);
+                _scale = scale;
+            }
         }
         internal static BigDecimal FromCompact(long v, int scale) => new BigDecimal(v, scale, true);
         public BigDecimal(decimal value)
@@ -228,16 +271,40 @@ namespace OutSmart.DAXon.Internal.Numerics
             bool negative = bits < 0;
             int exp = (int)((bits >> 52) & 0x7FFL);
             long mantissa = bits & 0xFFFFFFFFFFFFFL;
-            if (exp == 0) exp = -1074;                    // subnormal: no implicit bit
-            else { mantissa |= 1L << 52; exp -= 1075; }
-            if (mantissa == 0) { _compact = 0; _scale = 0; return; }
-            while ((mantissa & 1) == 0 && exp < 0) { mantissa >>= 1; exp++; } // Java's normalize step
+            if (exp == 0)                    // subnormal: no implicit bit
+            {
+                exp = -1074;
+            }
+            else
+            {
+                mantissa |= 1L << 52;
+                exp -= 1075;
+            }
+            if (mantissa == 0)
+            {
+                _compact = 0;
+                _scale = 0;
+                return;
+            }
+            while ((mantissa & 1) == 0 && exp < 0) // Java's normalize step
+            {
+                mantissa >>= 1;
+                exp++;
+            }
             var m = new SysBigInt(mantissa);
             if (negative)
                 m = -m;
             SysBigInt u;
-            if (exp >= 0) { u = m * SysBigInt.Pow(2, exp); _scale = 0; }
-            else { u = m * SysBigInt.Pow(5, -exp); _scale = -exp; }
+            if (exp >= 0)
+            {
+                u = m * SysBigInt.Pow(2, exp);
+                _scale = 0;
+            }
+            else
+            {
+                u = m * SysBigInt.Pow(5, -exp);
+                _scale = -exp;
+            }
             _compact = ComputeCompact(u);
             _big = u;
         }
@@ -358,7 +425,7 @@ namespace OutSmart.DAXon.Internal.Numerics
             {
                 if (_scale == 0)
                     return _compact.ToString(CultureInfo.InvariantCulture);
-                var cs = global::System.Math.Abs(_compact).ToString(CultureInfo.InvariantCulture);
+                var cs = Math.Abs(_compact).ToString(CultureInfo.InvariantCulture);
                 var csign = _compact < 0 ? "-" : "";
                 if (_scale < 0)
                     return csign + cs + new string('0', -_scale);
@@ -399,10 +466,7 @@ namespace OutSmart.DAXon.Internal.Numerics
         public float FloatValue() => (float)DoubleValue();
 
         // ==================== Division — pure BigInteger math ====================
-        // Runtime 2026-06-11: the whole divide family previously round-tripped through
-        // double (silently losing everything beyond ~15 significant digits, and returning
-        // ZERO on divide-by-zero). Rewritten from the javadoc spec; etalon-pinned against
-        // JDK 21 in acceptance\javacompat-tests\BigDecimalDivideTests.cs.
+        // Written from the javadoc spec; etalon-pinned against JDK 21 in acceptance\javacompat-tests\BigDecimalDivideTests.cs.
 
         /// <summary>
         /// Java divide(divisor): exact quotient. Result scale is the preferred scale
@@ -417,18 +481,30 @@ namespace OutSmart.DAXon.Internal.Numerics
                 throw new global::System.ArithmeticException("Division by zero");
             int preferredScale = _scale - divisor._scale;
             if (Sign == 0)
-                return new BigDecimal(SysBigInt.Zero, global::System.Math.Max(0, preferredScale));
+                return new BigDecimal(SysBigInt.Zero, Math.Max(0, preferredScale));
 
             var n = Unscaled;
             var d = divisor.Unscaled;
-            if (d.Sign < 0) { n = -n; d = -d; }
+            if (d.Sign < 0)
+            {
+                n = -n;
+                d = -d;
+            }
             var g = SysBigInt.GreatestCommonDivisor(n, d);
-            if (!g.IsOne) { n /= g; d /= g; }
+            if (!g.IsOne)
+            {
+                n /= g;
+                d /= g;
+            }
 
             // Terminating-expansion test: after full reduction the denominator may only
             // contain factors 2 and 5.
             int twos = 0, fives = 0;
-            while (d.IsEven) { d /= 2; twos++; }
+            while (d.IsEven)
+            {
+                d /= 2;
+                twos++;
+            }
             while (true)
             {
                 var q5 = SysBigInt.DivRem(d, 5, out var r5);
@@ -439,7 +515,7 @@ namespace OutSmart.DAXon.Internal.Numerics
             if (!d.IsOne)
                 throw new global::System.ArithmeticException("Non-terminating decimal expansion; no exact representable decimal result.");
 
-            int extra = global::System.Math.Max(twos, fives);
+            int extra = Math.Max(twos, fives);
             if (extra > twos)
                 n *= SysBigInt.Pow(2, extra - twos);
             if (extra > fives)
@@ -481,9 +557,12 @@ namespace OutSmart.DAXon.Internal.Numerics
                 && TryGetCompact(out long ca) && divisor.TryGetCompact(out long cb)
                 && ca != long.MinValue && cb != long.MinValue)
             {
-                long ab = global::System.Math.Abs(ca), bb = global::System.Math.Abs(cb);
+                long ab = Math.Abs(ca), bb = Math.Abs(cb);
                 int bd = 1;
-                while (bd < 19 && bb >= LONG_POW10[bd]) bd++;
+                while (bd < 19 && bb >= LONG_POW10[bd])
+                {
+                    bd++;
+                }
                 int chunk = 18 - bd;
                 if (bb <= long.MaxValue / 4 && chunk >= 1)
                 {
@@ -548,7 +627,7 @@ namespace OutSmart.DAXon.Internal.Numerics
         // references. Approximated as a generous-scale HALF_EVEN division (DECIMAL128 is
         // 34 significant digits HALF_EVEN) instead of the old double round-trip.
         public BigDecimal Divide(BigDecimal divisor, object mathContext) =>
-            Divide(divisor, global::System.Math.Max(_scale - divisor._scale, 0) + 36, ROUND_HALF_EVEN);
+            Divide(divisor, Math.Max(_scale - divisor._scale, 0) + 36, ROUND_HALF_EVEN);
 
         /// <summary>
         /// Java divideToIntegralValue(divisor): integer part of the exact quotient,
@@ -634,9 +713,7 @@ namespace OutSmart.DAXon.Internal.Numerics
             return sign < 0 ? -q : q;
         }
 
-        // Runtime 2026-06-10: SetScale was HOLLOW (kept the unscaled value, ignored rounding) -> ceiling(1.2)
-        // returned 12 (the unscaled mantissa), floor(1.8) -> 18, round(2.5) -> 25. Real Java semantics:
-        // re-scale the mantissa and round the dropped digits per the requested mode.
+        // Java semantics: re-scale the mantissa and round the dropped digits per the requested mode.
         public BigDecimal SetScale(int newScale) => SetScale(newScale, (int)RoundingMode.UNNECESSARY); // Java: setScale(int) throws on precision loss
         public BigDecimal SetScale(int newScale, RoundingMode roundingMode) => SetScale(newScale, (int)roundingMode);
         public BigDecimal SetScale(int newScale, int roundingMode)
@@ -661,37 +738,58 @@ namespace OutSmart.DAXon.Internal.Numerics
                 case ROUND_HALF_UP: increment = twiceRem >= divisor; break;
                 case ROUND_HALF_DOWN: increment = twiceRem > divisor; break;
                 case ROUND_HALF_EVEN: increment = twiceRem > divisor || (twiceRem == divisor && !(q % 2).IsZero); break;
-                // Runtime 2026-06-11: was OutSmart.DAXon.Internal.ArithmeticException, which the transpiled
-                // tree's `catch (System.ArithmeticException)` blocks (the converter's mapping
-                // of java.lang.ArithmeticException) would NOT catch.
+                // Must be System.ArithmeticException: transpiled callers catch that type
+                // (the converter's mapping of java.lang.ArithmeticException).
                 case ROUND_UNNECESSARY: throw new global::System.ArithmeticException("Rounding necessary");
                 default: increment = false; break;
             }
             return new BigDecimal(increment ? q + sign : q, newScale);
         }
 
-        // Runtime 2026-06-11: was a hollow stub returning `this`. BigDecimalValue's
-        // constructors canonicalize through StripTrailingZeros, so the stub leaked
-        // non-canonical scales into every xs:decimal. Java semantics, except a result
-        // that would need a negative scale (integers with trailing zeros, e.g. 1600 ->
-        // 1.6E+3) stops at scale 0 — value-identical, per the shim invariant.
+        // Java semantics, except a result that would need a negative scale (integers with trailing
+        // zeros, e.g. 1600 -> 1.6E+3) stops at scale 0 — value-identical.
         public BigDecimal StripTrailingZeros()
         {
             // Scale 0 has nothing strippable (this class never goes below scale 0); returning
             // early also keeps compact integers off the big path below, which would otherwise
             // box a BigInteger via Unscaled just to conclude no-op.
-            if (_scale == 0) return this;
-            if (Sign == 0) return new BigDecimal(SysBigInt.Zero, 0); // Java 8+: 0.000 strips to 0
+            if (_scale == 0)
+            {
+                return this;
+            }
+            if (Sign == 0) // Java 8+: 0.000 strips to 0
+            {
+                return new BigDecimal(SysBigInt.Zero, 0);
+            }
             if (_scale > 0 && TryGetCompact(out long lu))
             {
-                if (lu % 10L != 0) return this;   // dominant case (fresh arithmetic results): one modulo, nothing to strip
+                if (lu % 10L != 0)   // dominant case (fresh arithmetic results): one modulo, nothing to strip
+                {
+                    return this;
+                }
                 // Chunked trailing-zero strip (8/4/2/1): same result as the by-1 loop in ~log steps.
                 // Hot case: canonicalizing long-decimal tree values ("4497.1000000000" = 9 zeros).
                 int ls = _scale;
-                while (ls >= 8 && lu % 100000000L == 0) { lu /= 100000000L; ls -= 8; }
-                if (ls >= 4 && lu % 10000L == 0) { lu /= 10000L; ls -= 4; }
-                if (ls >= 2 && lu % 100L == 0) { lu /= 100L; ls -= 2; }
-                if (ls >= 1 && lu % 10L == 0) { lu /= 10L; ls -= 1; }
+                while (ls >= 8 && lu % 100000000L == 0)
+                {
+                    lu /= 100000000L;
+                    ls -= 8;
+                }
+                if (ls >= 4 && lu % 10000L == 0)
+                {
+                    lu /= 10000L;
+                    ls -= 4;
+                }
+                if (ls >= 2 && lu % 100L == 0)
+                {
+                    lu /= 100L;
+                    ls -= 2;
+                }
+                if (ls >= 1 && lu % 10L == 0)
+                {
+                    lu /= 10L;
+                    ls -= 1;
+                }
                 return ls == _scale ? this : FromCompact(lu, ls);
             }
             // An odd mantissa cannot end in a decimal 0: nothing to strip, no BigInteger DivRem.
@@ -715,17 +813,29 @@ namespace OutSmart.DAXon.Internal.Numerics
             if (s >= 4)
             {
                 var q4 = SysBigInt.DivRem(u, POW10_BI[4], out var r4);
-                if (r4.IsZero) { u = q4; s -= 4; }
+                if (r4.IsZero)
+                {
+                    u = q4;
+                    s -= 4;
+                }
             }
             if (s >= 2)
             {
                 var q2 = SysBigInt.DivRem(u, POW10_BI[2], out var r2);
-                if (r2.IsZero) { u = q2; s -= 2; }
+                if (r2.IsZero)
+                {
+                    u = q2;
+                    s -= 2;
+                }
             }
             if (s >= 1)
             {
                 var q1 = SysBigInt.DivRem(u, 10, out var r1);
-                if (r1.IsZero) { u = q1; s -= 1; }
+                if (r1.IsZero)
+                {
+                    u = q1;
+                    s -= 1;
+                }
             }
             return s == _scale ? this : new BigDecimal(u, s);
         }
@@ -738,7 +848,7 @@ namespace OutSmart.DAXon.Internal.Numerics
             int ns = _scale + n;
             return ns >= 0 ? new BigDecimal(Unscaled, ns) : new BigDecimal(Unscaled * Pow10(-ns), 0);
         }
-        // Runtime 2026-06-10: the old Math.Max(0, ...) clamp silently DROPPED a factor of 10^k when n > Scale().
+        // No Math.Max(0, ...) clamp here — it would silently drop a factor of 10^k when n > Scale().
         public BigDecimal MovePointRight(int n)
         {
             int ns = _scale - n;
@@ -748,7 +858,7 @@ namespace OutSmart.DAXon.Internal.Numerics
         // Java toBigInteger(): truncates toward zero. Returns System.Numerics.BigInteger directly (the compat
         // wrapper struct OutSmart.DAXon.Internal.Numerics.BigInteger was retired; the engine is idiomatic
         // System.Numerics.BigInteger, with Java-semantics helpers in BigIntegers).
-        public SysBigInt ToBigInteger() => Unscaled / Pow10(global::System.Math.Max(0, _scale));
+        public SysBigInt ToBigInteger() => Unscaled / Pow10(Math.Max(0, _scale));
         // Java toBigIntegerExact(): throws on a nonzero fractional part (was: silent truncation).
         public SysBigInt ToBigIntegerExact()
         {

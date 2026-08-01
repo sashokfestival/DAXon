@@ -15,10 +15,9 @@ namespace OutSmart.DAXon.Internal.Net
         public string Host => Inner.IsAbsoluteUri ? Inner.Host : null;
         public int Port => Inner.IsAbsoluteUri ? Inner.Port : -1;
         public string Fragment => Inner.IsAbsoluteUri ? (Inner.Fragment.Length > 1 ? Inner.Fragment.Substring(1) : null) : null;
-        // Phase 7.33: Java URI methods used by Saxon URI handling.
         public string RawFragment => Inner.IsAbsoluteUri ? (Inner.Fragment.Length > 1 ? Inner.Fragment.Substring(1) : null) : null;
-        // Java URI.getRawQuery(): the raw (un-decoded) query without the leading '?'. System.Uri.Query is already
-        // the raw query string (.NET does not decode it), so this mirrors GetQuery(). Used by StandardCollationURIResolver.
+        // Unlike Java getRawQuery(), System.Uri.Query is NORMALIZED (a lone '%' gets escaped, unreserved escapes
+        // are pre-decoded) — not byte-for-byte raw. The collation-URI funnel relies on that normalization (round BS).
         public string RawQuery => Inner.IsAbsoluteUri ? (Inner.Query.Length > 1 ? Inner.Query.Substring(1) : null) : null;
         public string SchemeSpecificPart => Inner.IsAbsoluteUri ? Inner.PathAndQuery : Inner.OriginalString;
         public string UserInfo => Inner.IsAbsoluteUri ? Inner.UserInfo : null;
@@ -69,7 +68,10 @@ namespace OutSmart.DAXon.Internal.Net
                 return this;
             string s = Inner.OriginalString;
             int schemeSep = s.IndexOf("://", StringComparison.Ordinal);
-            if (schemeSep < 0) return this; // opaque URI — nothing to normalize
+            if (schemeSep < 0) // opaque URI — nothing to normalize
+            {
+                return this;
+            }
             int pathStart = s.IndexOf('/', schemeSep + 3);
             if (pathStart < 0)
                 return this;
@@ -86,18 +88,37 @@ namespace OutSmart.DAXon.Internal.Net
             var sb = new System.Text.StringBuilder(inp.Length);
             while (inp.Length > 0)
             {
-                if (inp.StartsWith("../", StringComparison.Ordinal)) { inp = inp.Substring(3); }
-                else if (inp.StartsWith("./", StringComparison.Ordinal)) { inp = inp.Substring(2); }
-                else if (inp.StartsWith("/./", StringComparison.Ordinal)) { inp = "/" + inp.Substring(3); }
-                else if (inp == "/.") { inp = "/"; }
+                if (inp.StartsWith("../", StringComparison.Ordinal))
+                {
+                    inp = inp.Substring(3);
+                }
+                else if (inp.StartsWith("./", StringComparison.Ordinal))
+                {
+                    inp = inp.Substring(2);
+                }
+                else if (inp.StartsWith("/./", StringComparison.Ordinal))
+                {
+                    inp = "/" + inp.Substring(3);
+                }
+                else if (inp == "/.")
+                {
+                    inp = "/";
+                }
                 else if (inp.StartsWith("/../", StringComparison.Ordinal)) { inp = "/" + inp.Substring(4); TrimLastSegment(sb); }
                 else if (inp == "/..") { inp = "/"; TrimLastSegment(sb); }
-                else if (inp == "." || inp == "..") { inp = ""; }
+                else if (inp == "." || inp == "..")
+                {
+                    inp = "";
+                }
                 else
                 {
                     int idx = inp[0] == '/' ? inp.IndexOf('/', 1) : inp.IndexOf('/');
                     if (idx < 0) { sb.Append(inp); inp = ""; }
-                    else { sb.Append(inp, 0, idx); inp = inp.Substring(idx); }
+                    else
+                    {
+                        sb.Append(inp, 0, idx);
+                        inp = inp.Substring(idx);
+                    }
                 }
             }
 
@@ -108,17 +129,19 @@ namespace OutSmart.DAXon.Internal.Net
         {
             for (int i = sb.Length - 1; i >= 0; i--)
             {
-                if (sb[i] == '/') { sb.Length = i; return; }
+                if (sb[i] == '/')
+                {
+                    sb.Length = i;
+                    return;
+                }
             }
 
             sb.Length = 0;
         }
-        // Phase 5: implicit conversion to string (paulirwin sometimes passes URI where string expected).
+        // Implicit conversion to string (paulirwin sometimes passes URI where string expected).
         public static implicit operator string(URI uri) => uri?.ToString();
-        // Phase 7.10: implicit conversion FROM string — Java has no explicit conversion;
+        // Implicit conversion FROM string — Java has no explicit conversion;
         // Saxon code often passes a string literal where URI is expected.
         public static implicit operator URI(string s) => s == null ? null : new URI(s);
-        // Phase 5: ToURL — Java's URI.toURL() returns a URL.
-        public URL ToURL() => new URL(Inner.AbsoluteUri);
     }
 }

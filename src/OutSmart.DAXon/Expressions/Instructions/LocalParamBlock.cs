@@ -33,9 +33,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public virtual int NumberOfParams => operanda.Length;
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override int ImplementationMethod => PROCESS_METHOD;
         public LocalParamBlock(LocalParam[] @params)
         {
@@ -76,17 +73,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return ErrorType.GetInstance();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.EMPTY;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("params", this);
@@ -98,17 +89,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new LocalParamBlockElaborator();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public class LocalParamBlockElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

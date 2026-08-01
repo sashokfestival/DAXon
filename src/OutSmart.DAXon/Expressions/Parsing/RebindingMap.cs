@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
     public class RebindingMap
     {
         private Dictionary<IBinding, IBinding> map = null; // created lazily
-        // Phase 7.8d: indexer for `rebindings[binding]` syntax
+        // Indexer for `rebindings[binding]` syntax
         public virtual IBinding this[IBinding key]
         {
             get { return Get(key); }
@@ -30,12 +30,12 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 map = new Dictionary<IBinding, IBinding>();
             }
 
-            map.Put(oldBinding, newBinding);
+            map[oldBinding] = newBinding;
         }
 
         public virtual IBinding Get(IBinding oldBinding)
         {
-            return map == null ? null : map.Get(oldBinding);
+            return map == null ? null : map.GetOrDefault(oldBinding);
         }
 
     }

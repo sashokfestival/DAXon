@@ -18,7 +18,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -129,7 +128,7 @@ namespace OutSmart.DAXon.Functions
             string found = null;
             foreach (string s in keys)
             {
-                if (map.Get(s) != null)
+                if (map.GetOrDefault(s) != null)
                 {
                     if (found != null)
                     {
@@ -197,7 +196,7 @@ namespace OutSmart.DAXon.Functions
 
         private void SetRequestedProperties(Dictionary<string, IGroundedValue> options)
         {
-            MapItem requestedProps = (MapItem)options.Get("requested-properties").Head();
+            MapItem requestedProps = (MapItem)options.GetOrDefault("requested-properties").Head();
             foreach (KeyValuePair entry in requestedProps.KeyValuePairs())
             {
                 if (!(entry.key is QNameValue))
@@ -301,7 +300,7 @@ namespace OutSmart.DAXon.Functions
 
         private void SetStaticParams(Dictionary<string, IGroundedValue> options, XsltCompiler xsltCompiler)
         {
-            MapItem staticParamsMap = (MapItem)options.Get("static-params").Head();
+            MapItem staticParamsMap = (MapItem)options.GetOrDefault("static-params").Head();
             foreach (KeyValuePair entry in staticParamsMap.KeyValuePairs())
             {
                 if (!(entry.key is QNameValue))
@@ -316,10 +315,10 @@ namespace OutSmart.DAXon.Functions
 
         private XsltExecutable GetStylesheet(Dictionary<string, IGroundedValue> options, XsltCompiler xsltCompiler, string styleOptionStr, IXPathContext context)
         {
-            IItem styleOptionItem = options.Get(styleOptionStr).Head();
+            IItem styleOptionItem = options.GetOrDefault(styleOptionStr).Head();
             URI stylesheetBaseUri = null;
             IGroundedValue seq;
-            if ((seq = options.Get("stylesheet-base-uri")) != null)
+            if ((seq = options.GetOrDefault("stylesheet-base-uri")) != null)
             {
                 string styleBaseUri = seq.Head().GetStringValue();
                 stylesheetBaseUri = URI.Create(styleBaseUri);
@@ -332,10 +331,10 @@ namespace OutSmart.DAXon.Functions
             List<IXmlProcessingError> compileErrors = new List<IXmlProcessingError>();
             IErrorReporter originalReporter = xsltCompiler.GetErrorReporter();
             xsltCompiler.SetErrorReporter(new TransformErrorReporter(compileErrors, originalReporter));
-            bool cacheable = options.Get("static-params") == null;
-            if (options.Get("cache") != null)
+            bool cacheable = options.GetOrDefault("static-params") == null;
+            if (options.GetOrDefault("cache") != null)
             {
-                cacheable &= ((BooleanValue)options.Get("cache").Head()).GetBooleanValue();
+                cacheable &= ((BooleanValue)options.GetOrDefault("cache").Head()).GetBooleanValue();
             }
 
             StylesheetCache cache = context.GetController().GetStylesheetCache();
@@ -466,9 +465,9 @@ namespace OutSmart.DAXon.Functions
                     {
                         string packageName = styleOptionItem.GetStringValue().Trim();
                         string packageVersion = null;
-                        if (options.Get("package-version") != null)
+                        if (options.GetOrDefault("package-version") != null)
                         {
-                            packageVersion = options.Get("package-version").Head().GetStringValue();
+                            packageVersion = options.GetOrDefault("package-version").Head().GetStringValue();
                         }
 
                         try
@@ -512,10 +511,13 @@ namespace OutSmart.DAXon.Functions
             Configuration config = processor.UnderlyingConfiguration;
             SerializerFactory sf = config.SerializerFactory;
             PipelineConfiguration pipe = config.MakePipelineConfiguration();
-            IReceiver outr = sf.GetReceiver(uwResult, new SerializationProperties(props), pipe);
-            outr.Open();
-            outr.Append(node);
-            outr.Dispose();
+            using (IReceiver outr = sf.GetReceiver(uwResult, new SerializationProperties(props), pipe))
+            {
+                outr.Open();
+                outr.Append(node);
+                outr.Close();
+            }
+
             return builder.ToString();
         }
 
@@ -561,7 +563,73 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
+        // Depth of fn:transform calls open on this thread. A transformation is single-threaded and a
+        // nested transform runs to completion inside its caller's frame, so this counts exactly the
+        // open nesting - the same quantity the include chain reads off compilation.ImportStack.
+        [ThreadStatic]
+        private static int transformNesting;
+
+        // QTDBG_XF=1 prints the open nesting on entry.
+        private static readonly bool DbgNesting = Environment.GetEnvironmentVariable("QTDBG_XF") != null;
+
+        // Stack the UNWIND needs per open level, over and above StackGuard's own margin. MEASURED in
+        // three steps, and each step was needed (see Call for the shape of the guard):
+        //   1. A plain "1 idiv 0" raised 30 levels deep already killed a 1 MB thread while 10 levels
+        //      reported fine - so the error path costs tens of KB per level against ~1.2 KB to descend.
+        //   2. At 32 KB the guard fired exactly where the arithmetic said it would (QTDBG_XF showed
+        //      nesting=23, ~990 KB still free) and the process died ANYWAY on the unwind.
+        //   3. That pins the real cost: >43 KB per level. The reserve must therefore be >= the unwind
+        //      cost itself, not merely proportional to depth - with k < u, a deeper n always outruns
+        //      the reserve, which is why step 2 failed while looking arithmetically correct.
+        // 64 KB caps nesting near 11 on a 1 MB thread and ~59 on 4 MB; real stylesheets nest one or
+        // two transforms, and the alternative at any depth past the cap is process death.
+        private const ulong UnwindReservePerTransform = 64 * 1024;
+
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
+        {
+            // A sheet may call fn:transform on ITSELF (stylesheet-location pointing at its own URI),
+            // and nothing else bounds that nesting: every level builds a fresh Processor and
+            // Controller below, so the SXLM0001 recursion counter starts over at each one, and the
+            // compile-time stylesheet-depth probes only measure the depth WITHIN one sheet. Measured
+            // before this guard: ~500 levels completed on a 1 MB thread and 700 killed the process
+            // outright, while the same 700 completed on 4 MB - stack-bound, uncatchable, no diagnosis.
+            //   The reserve scales with the open nesting, and that was MEASURED rather than assumed
+            // (round AW's lesson, and the first attempt here got it wrong): a plain Probe() does fire
+            // exactly as designed - QTDBG_SG showed "THREW at remaining=255KB" - and the process died
+            // anyway, because unwinding several hundred open levels costs more than the whole fixed
+            // margin. The per-level unwind cost is small (~1 KB, far below the include chain's ~28 KB,
+            // since round BC made RecursionDepthError a type no catch site re-decorates), but small
+            // times depth still beats any constant, which is the whole point of the AW rule.
+            if (DbgNesting)
+            {
+                // How the reserve above was calibrated, and the only way to see it: an uncatchable
+                // overflow leaves no trace, so the last nesting printed is the diagnosis.
+                Console.Error.WriteLine("[XF] nesting=" + transformNesting);
+                Console.Error.Flush();
+            }
+
+            try
+            {
+                StackGuard.Probe(UnwindReservePerTransform * (ulong)transformNesting);
+            }
+            catch (RecursionDepthError e) when (!e.Described)
+            {
+                throw e.Describe("fn:transform nesting is too deep (insufficient stack on this thread)",
+                    "FOXT0003", null);
+            }
+
+            transformNesting++;
+            try
+            {
+                return CallTransform(context, arguments);
+            }
+            finally
+            {
+                transformNesting--;
+            }
+        }
+
+        private ISequence CallTransform(IXPathContext context, ISequence[] arguments)
         {
             Dictionary<string, IGroundedValue> options = Details.optionDetails.ProcessSuppliedOptions((MapItem)arguments[0].Head(), context);
 
@@ -575,9 +643,9 @@ namespace OutSmart.DAXon.Functions
             }
 
             CheckTransformOptions(options, context, languageVersion);
-            if (options.Get("xslt-version") != null)
+            if (options.GetOrDefault("xslt-version") != null)
             {
-                DecimalValue requestedVersion = (DecimalValue)options.Get("xslt-version").Head();
+                DecimalValue requestedVersion = (DecimalValue)options.GetOrDefault("xslt-version").Head();
                 if (requestedVersion.GetDoubleValue() * 10 > languageVersion)
                 {
                     throw new XPathException("The transform option xslt-version is higher than the language version supported by the calling transformation", "FOXT0002");
@@ -591,22 +659,22 @@ namespace OutSmart.DAXon.Functions
             if (!invocationName.Equals("initial-template") && !invocationName.Equals("initial-function") && principalInput == null)
             {
                 invocationName = "initial-template";
-                options.Put("initial-template", new QNameValue("", NamespaceUri.XSLT, "initial-template"));
+                options["initial-template"] = new QNameValue("", NamespaceUri.XSLT, "initial-template");
             }
 
-            if (invocationName.Equals("initial-function") && options.Get("function-params") == null)
+            if (invocationName.Equals("initial-function") && options.GetOrDefault("function-params") == null)
             {
                 throw new XPathException("Use of the transform option initial-function requires the function parameters to be supplied using the option function-params", "FOXT0002");
             }
 
-            if (!invocationName.Equals("initial-function") && options.Get("function-params") != null)
+            if (!invocationName.Equals("initial-function") && options.GetOrDefault("function-params") != null)
             {
                 throw new XPathException("The transform option function-params can only be used if the option initial-function is also used", "FOXT0002");
             }
 
             string styleOption = CheckStylesheetMutualExclusion30(options);
 
-            if (options.Get("requested-properties") != null)
+            if (options.GetOrDefault("requested-properties") != null)
             {
                 SetRequestedProperties(options);
             }
@@ -615,12 +683,12 @@ namespace OutSmart.DAXon.Functions
             xsltCompiler.SetResourceResolver(context.GetResourceResolver());
             xsltCompiler.SetJustInTimeCompilation(false);
             xsltCompiler.SetErrorReporter(context.GetErrorReporter());
-            if (options.Get("enable-assertions") != null)
+            if (options.GetOrDefault("enable-assertions") != null)
             {
-                xsltCompiler.SetAssertionsEnabled(AsBoolean((AtomicValue)options.Get("enable-assertions").Head()));
+                xsltCompiler.SetAssertionsEnabled(AsBoolean((AtomicValue)options.GetOrDefault("enable-assertions").Head()));
             }
 
-            if (options.Get("static-params") != null)
+            if (options.GetOrDefault("static-params") != null)
             {
                 SetStaticParams(options, xsltCompiler);
             }
@@ -629,10 +697,15 @@ namespace OutSmart.DAXon.Functions
             Xslt30Transformer transformer = sheet.Load30();
             transformer.SetErrorReporter(context.GetErrorReporter());
 
+            // The nested run arms its own controller from its own Processor, so without this it
+            // would start a FULL fresh time budget inside a run that is already on the clock -
+            // and could do so recursively. Cap it at the calling run's deadline.
+            transformer.UnderlyingController.CapDeadlineTo(context.GetController());
+
             bool enableMessages = true;
-            if (options.Get("enable-messages") != null)
+            if (options.GetOrDefault("enable-messages") != null)
             {
-                enableMessages = AsBoolean((AtomicValue)options.Get("enable-messages").Head());
+                enableMessages = AsBoolean((AtomicValue)options.GetOrDefault("enable-messages").Head());
             }
 
             if (!enableMessages)
@@ -659,7 +732,7 @@ namespace OutSmart.DAXon.Functions
 
             foreach (string name in options.Keys)
             {
-                IGroundedValue value = options.Get(name);
+                IGroundedValue value = options.GetOrDefault(name);
                 IItem head = value.Head();
                 switch (name)
                 {
@@ -876,7 +949,7 @@ namespace OutSmart.DAXon.Functions
                 }
 
                 QName paramName = new QName(((QNameValue)entry.key).GetStructuredQName());
-                checkedParams.Put(paramName, XdmValue.Wrap(entry.value));
+                checkedParams[paramName] = XdmValue.Wrap(entry.value);
             }
         }
 
@@ -1103,7 +1176,7 @@ namespace OutSmart.DAXon.Functions
                     IGroundedValue res = PostProcess(absolute.ToASCIIString(), root.UnderlyingValue);
                     lock (results)
                     {
-                        results.Put(absolute.ToASCIIString(), res);
+                        results[absolute.ToASCIIString()] = res;
                     }
                 });
                 PipelineConfiguration pipe = context.GetController().MakePipelineConfiguration();
@@ -1171,7 +1244,7 @@ namespace OutSmart.DAXon.Functions
                     IGroundedValue res = PostProcess(absolute.ToASCIIString(), new StringValue(writer.ToString()));
                     lock (results)
                     {
-                        results.Put(absolute.ToASCIIString(), res);
+                        results[absolute.ToASCIIString()] = res;
                     }
                 });
                 PipelineConfiguration pipe = context.GetController().MakePipelineConfiguration();
@@ -1216,11 +1289,11 @@ namespace OutSmart.DAXon.Functions
                 RawDestination dest = new RawDestination();
                 dest.OnClose(() =>
                 {
-                    dest.Dispose();   // upstream closes the destination before reading its value
+                    dest.Close();   // upstream closes the destination before reading its value
                     IGroundedValue res = PostProcess(absolute.ToASCIIString(), (ISequence)dest.GetXdmValue().UnderlyingValue);
                     lock (results)
                     {
-                        results.Put(absolute.ToASCIIString(), res);
+                        results[absolute.ToASCIIString()] = res;
                     }
                 });
                 PipelineConfiguration pipe = context.GetController().MakePipelineConfiguration();

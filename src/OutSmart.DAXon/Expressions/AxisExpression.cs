@@ -13,7 +13,6 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -43,23 +42,11 @@ namespace OutSmart.DAXon.Expressions
 
         public override string ExpressionName => "axisStep";
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
         public Types.ItemType ContextItemType => staticInfo.GetItemType();
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
@@ -85,86 +72,29 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public int Axis { get => axis; set => this.axis = value; }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override string StreamerName => "AxisExpression";
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public HashSet<Expression> Preconditions
         {
             get
@@ -207,12 +137,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Types.ItemType contextItemType = contextInfo.GetItemType();
@@ -272,12 +196,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private Expression CheckPlausibility(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, bool warnings)
         {
             IStaticContext env = visitor.StaticContext;
@@ -812,12 +730,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
@@ -852,12 +764,6 @@ namespace OutSmart.DAXon.Expressions
             return "Q{" + uri + "}" + name.GetLocalPart();
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
@@ -878,12 +784,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
@@ -908,12 +808,6 @@ namespace OutSmart.DAXon.Expressions
             return test;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
@@ -927,12 +821,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
@@ -944,18 +832,9 @@ namespace OutSmart.DAXon.Expressions
             return other is AxisExpression && axis == ((AxisExpression)other).axis && object.Equals(test, ((AxisExpression)other).test);
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeHashCode()
         {
 
@@ -970,18 +849,9 @@ namespace OutSmart.DAXon.Expressions
             return h;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             AxisExpression a2 = new AxisExpression(axis, test);
@@ -993,35 +863,17 @@ namespace OutSmart.DAXon.Expressions
             return a2;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             return StaticProperty.CONTEXT_DOCUMENT_NODESET | StaticProperty.SINGLE_DOCUMENT_NODESET | StaticProperty.NO_NODES_NEWLY_CREATED | (AxisInfo.isForwards[axis] ? StaticProperty.ORDERED_NODESET : StaticProperty.REVERSE_DOCUMENT_ORDER) | (AxisInfo.isPeerAxis[axis] || IsPeerNodeTest(test) ? StaticProperty.PEER_NODESET : 0) | (AxisInfo.isSubtreeAxis[axis] ? StaticProperty.SUBTREE_NODESET : 0) | (axis == AxisInfo.ATTRIBUTE || axis == AxisInfo.NAMESPACE ? StaticProperty.ATTRIBUTE_NS_NODESET : 0);
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         private static bool IsPeerNodeTest(NodeTest test)
         {
             if (test == null)
@@ -1048,18 +900,9 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             if (itemType != null)
@@ -1087,18 +930,9 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
 
@@ -1114,21 +948,9 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             NodeTest originNodeType;
@@ -1215,61 +1037,25 @@ namespace OutSmart.DAXon.Expressions
             } // the parent axis isn't handled by this class
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override bool IsSubtreeExpression()
         {
             return AxisInfo.isSubtreeAxis[axis];
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public NodeTest GetNodeTest()
         {
             return test;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             if (pathMapNodeSet == null)
@@ -1282,61 +1068,25 @@ namespace OutSmart.DAXon.Expressions
             return pathMapNodeSet.CreateArc(axis, test == null ? AnyNodeTest.GetInstance() : test);
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public bool IsContextPossiblyUndefined()
         {
             return staticInfo.IsPossiblyAbsent();
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public ContextItemStaticInfo GetContextItemStaticInfo()
         {
             return staticInfo;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override Patterns.Pattern ToPattern(Configuration config)
         {
             NodeTest test = GetNodeTest();
@@ -1414,21 +1164,9 @@ namespace OutSmart.DAXon.Expressions
             return pat;
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             IItem item = context.GetContextItem();
@@ -1456,35 +1194,23 @@ namespace OutSmart.DAXon.Expressions
             }
             catch (NotSupportedException err)
             {
-                if (err.GetCause() is XPathException)
+                if (err.InnerException is XPathException)
                 {
-                    throw ((XPathException)err.GetCause()).MaybeWithLocation(GetLocation()).MaybeWithContext(context);
+                    throw ((XPathException)err.InnerException).MaybeWithLocation(GetLocation()).MaybeWithContext(context);
                 }
                 else
                 {
 
                     // the namespace axis is not supported for all tree implementations
-                    DynamicError(err.GetMessage(), "XPST0010", context);
+                    DynamicError(err.Message, "XPST0010", context);
                     return null;
                 }
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public IAxisIterator Iterate(NodeInfo origin)
         {
             if (test == null)
@@ -1497,21 +1223,9 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("axis", this);
@@ -1520,21 +1234,9 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override string ToString()
         {
             StringBuilder fsb = new StringBuilder(16);
@@ -1544,21 +1246,9 @@ namespace OutSmart.DAXon.Expressions
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         public override string ToShortString()
         {
             StringBuilder fsb = new StringBuilder(16);
@@ -1567,7 +1257,7 @@ namespace OutSmart.DAXon.Expressions
             }
             else if (axis == AxisInfo.ATTRIBUTE)
             {
-                fsb.Append("@");
+                fsb.Append('@');
             }
             else
             {
@@ -1598,21 +1288,9 @@ namespace OutSmart.DAXon.Expressions
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         /*Expression args[] = new Expression[1];
         args[0] = this.copy();
         pre.add(SystemFunctionCall.makeSystemFunction(
@@ -1622,21 +1300,9 @@ namespace OutSmart.DAXon.Expressions
             return new AxisExpressionElaborator();
         }
 
-        /// <summary>
-        /// Simplify an expression
-        /// </summary>
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*
      * Get a string representation of a name to use in diagnostics
      */
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the result of this expression
-        /// </summary>
         /*Expression args[] = new Expression[1];
         args[0] = this.copy();
         pre.add(SystemFunctionCall.makeSystemFunction(

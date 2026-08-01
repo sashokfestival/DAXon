@@ -11,7 +11,6 @@
 using OutSmart.DAXon.Serialization.CharCodes;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Text;
 using static OutSmart.DAXon.Text.StrHelpers;
@@ -78,7 +77,7 @@ namespace OutSmart.DAXon.Text
             for (int i = (start + RequireInt(from)) * 3; i < end * 3; i += 3)
             {
                 int cp = ((bytes[i] << 16 | (bytes[i + 1] & 0xff) << 8) | (bytes[i + 2] & 0xff)) & 0xffffff;
-                if (predicate.Test(cp))
+                if (predicate(cp))
                 {
                     return i / 3 - start;
                 }

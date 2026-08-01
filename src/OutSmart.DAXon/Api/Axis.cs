@@ -48,7 +48,6 @@ namespace OutSmart.DAXon.Api
         NAMESPACE
 
         // --------------------
-        // TODO enum body members
         // private final int axisNumber;
     }
 }

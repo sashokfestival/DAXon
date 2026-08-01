@@ -96,9 +96,6 @@ namespace OutSmart.DAXon.Xslt
         public static bool IsCompatible(Visibility declared, Visibility exposed)
         {
 
-            //        if (declared == null || declared == exposed) {
-            //            return true;
-            //        }
             switch (declared)
             {
                 case Visibility.PUBLIC:

@@ -36,8 +36,7 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual string ModuleUri => throw new NotImplementedException();
+        public virtual string ModuleUri => exception.GetLocator()?.GetSystemId(); // module of the error locus
         public XmlProcessingException(XPathException exception)
         {
             this.exception = exception;
@@ -79,7 +78,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual string GetMessage()
         {
-            return exception.GetMessage();
+            return exception.Message;
         }
 
         public virtual ILocation GetLocation()
@@ -99,7 +98,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual Exception GetCause()
         {
-            return (Exception)exception.GetCause();
+            return (Exception)exception.InnerException;
         }
 
         public virtual Expression GetFailingExpression()

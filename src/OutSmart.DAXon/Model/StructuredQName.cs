@@ -271,9 +271,9 @@ namespace OutSmart.DAXon.Model
             return 0x5004a00b ^ local.GetHashCode() ^ uri.GetHashCode();
         }
 
-        public virtual QName ToJaxpQName()
+        public virtual System.Xml.XmlQualifiedName ToXmlQualifiedName()
         {
-            return new QName(GetNamespaceUri().ToString(), GetLocalPart(), GetPrefix());
+            return new System.Xml.XmlQualifiedName(GetLocalPart(), GetNamespaceUri().ToString());
         }
 
         public virtual NamespaceBinding GetNamespaceBinding()

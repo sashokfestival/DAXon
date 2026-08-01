@@ -295,43 +295,25 @@ namespace OutSmart.DAXon.XQuery
             {
                 object obj = ((ObjectValue<object>)item).GetObject();
                 @out.StartElement(resultExternalValue, Untyped.INSTANCE, Loc.NONE, ReceiverOption.NONE);
-                @out.Attribute(new NoNamespaceName("class"), BuiltInAtomicType.UNTYPED_ATOMIC, obj.GetType().GetName(), Loc.NONE, ReceiverOption.NONE);
+                @out.Attribute(new NoNamespaceName("class"), BuiltInAtomicType.UNTYPED_ATOMIC, obj.GetType().FullName, Loc.NONE, ReceiverOption.NONE);
                 @out.StartContent();
                 @out.Characters(StringView.Of(obj.ToString()), locationId, ReceiverOption.NONE);
                 @out.EndElement();
             }
         }
 
-        /// <summary>
-        /// Output an item (atomic value or node) to the sequence
-        /// </summary>
-        /// <summary>
-        /// Notify the end of the event stream
-        /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
             EndWrapper(); // close the result:sequence element
             @out.EndDocument();
-            @out.Dispose();
+            @out.Close();
         }
 
-        /// <summary>
-        /// Output an item (atomic value or node) to the sequence
-        /// </summary>
-        /// <summary>
-        /// Notify the end of the event stream
-        /// </summary>
         public override bool UsesTypeAnnotations()
         {
             return true;
         }
 
-        /// <summary>
-        /// Output an item (atomic value or node) to the sequence
-        /// </summary>
-        /// <summary>
-        /// Notify the end of the event stream
-        /// </summary>
         private void Attribute(INodeName attName, ISimpleType typeCode, string value, ILocation locationId, int properties)
         {
             IAttributeMap atts = SingletonAttributeMap.Of(new AttributeInfo(attName, typeCode, value.ToString(), locationId, properties));
@@ -346,12 +328,6 @@ namespace OutSmart.DAXon.XQuery
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Output an item (atomic value or node) to the sequence
-        /// </summary>
-        /// <summary>
-        /// Notify the end of the event stream
-        /// </summary>
         private void Namespace(INamespaceBindingSet namespaceBindings, int properties)
         {
             NamespaceMap ns = NamespaceMap.EmptyMap();

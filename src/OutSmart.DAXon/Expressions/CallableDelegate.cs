@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Expressions
 {
-    // Phase 7.8f: CallableDelegate is a class implementing ICallable so that
+    // CallableDelegate is a class implementing ICallable so that
     //   `ICallable callable = new CallableDelegate((ctx, args) => ...);`
     // compiles. Wraps a lambda that returns ISequence.
     public class CallableDelegate : ICallable

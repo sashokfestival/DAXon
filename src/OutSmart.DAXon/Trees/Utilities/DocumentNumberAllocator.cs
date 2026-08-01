@@ -16,6 +16,7 @@ namespace OutSmart.DAXon.Trees.Utilities
 {
     public class DocumentNumberAllocator
     {
+        private readonly object syncLock = new object();
         // Changed to a long in Saxon 9.4, because a user reported an int overflowing
         // on a system that had been in live operation for several months. The effect wasn't fatal,
         // but could cause incorrect node identity tests.
@@ -26,7 +27,7 @@ namespace OutSmart.DAXon.Trees.Utilities
         private long nextStreamedDocumentNumber = -2; // -1 is special
         public virtual long AllocateDocumentNumber()
         {
-            lock (this)
+            lock (syncLock)
             {
                 return nextDocumentNumber++;
             }
@@ -34,7 +35,7 @@ namespace OutSmart.DAXon.Trees.Utilities
 
         public virtual long AllocateStreamedDocumentNumber()
         {
-            lock (this)
+            lock (syncLock)
             {
                 return nextStreamedDocumentNumber--;
             }

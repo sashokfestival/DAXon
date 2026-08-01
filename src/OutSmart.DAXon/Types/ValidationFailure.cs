@@ -21,7 +21,6 @@ using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Collections.Trie;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Types
 {
@@ -169,7 +168,7 @@ namespace OutSmart.DAXon.Types
             }
             else if (exception is XPathException)
             {
-                ValidationFailure failure = new ValidationFailure(exception.GetMessage());
+                ValidationFailure failure = new ValidationFailure(exception.Message);
                 if (((XPathException)exception).ErrorCodeQName == null)
                 {
                     failure.SetErrorCode("FORG0001");
@@ -184,7 +183,7 @@ namespace OutSmart.DAXon.Types
             }
             else
             {
-                return new ValidationFailure(exception.GetMessage());
+                return new ValidationFailure(exception.Message);
             }
         }
 

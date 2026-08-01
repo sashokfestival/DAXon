@@ -126,8 +126,14 @@ namespace OutSmart.DAXon.Expressions.Sorting
         private static Base64BinaryValue AlphanumericCollationKey(UnicodeString s, IStringCollator collator)
         {
             AtomicValue val = collator.GetCollationKey(s).AsAtomic();
-            if (val is Base64BinaryValue) { return (Base64BinaryValue)val; }
-            if (val is StringValue) { return ((StringValue)val).CodepointCollationKey; }
+            if (val is Base64BinaryValue)
+            {
+                return (Base64BinaryValue)val;
+            }
+            if (val is StringValue)
+            {
+                return ((StringValue)val).CodepointCollationKey;
+            }
             throw new InvalidOperationException("Collation key must be Base64Binary");
         }
         private static void WriteByte(MemoryStream baos, byte val)

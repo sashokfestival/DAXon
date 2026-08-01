@@ -110,7 +110,7 @@ namespace OutSmart.DAXon.Functions
                     return new AnyURIValue(relative);
                 }
 
-                throw new XPathException("Relative URI " + Err.Wrap(relative) + " is invalid: " + e.GetMessage(), "FORG0002", context);
+                throw new XPathException("Relative URI " + Err.Wrap(relative) + " is invalid: " + e.Message, "FORG0002", context);
             }
 
             if (relativeURI.IsAbsolute())
@@ -124,7 +124,10 @@ namespace OutSmart.DAXon.Functions
             foreach (char __d in new[] { '/', '?', '#' })
             {
                 int __p = relative.IndexOf(__d);
-                if (__p >= 0 && __p < __segEnd) { __segEnd = __p; }
+                if (__p >= 0 && __p < __segEnd)
+                {
+                    __segEnd = __p;
+                }
             }
             int __colon = relative.IndexOf(':');
             if (__colon >= 0 && __colon < __segEnd)
@@ -139,7 +142,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (URISyntaxException e)
             {
-                throw new XPathException("Base URI " + Err.Wrap(@base) + " is invalid: " + e.GetMessage(), "FORG0002", context);
+                throw new XPathException("Base URI " + Err.Wrap(@base) + " is invalid: " + e.Message, "FORG0002", context);
             }
 
             if (!absoluteURI.IsAbsolute())
@@ -183,7 +186,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (URISyntaxException e)
             {
-                throw new XPathException(e.GetMessage(), "FORG0002");
+                throw new XPathException(e.Message, "FORG0002");
             }
 
             if (!resolved.ToASCIIString().StartsWith("file:////", StringComparison.Ordinal))
@@ -284,7 +287,10 @@ namespace OutSmart.DAXon.Functions
             foreach (char d in new[] { '/', '?', '#' })
             {
                 int p = uri.IndexOf(d);
-                if (p >= 0 && p < segEnd) { segEnd = p; }
+                if (p >= 0 && p < segEnd)
+                {
+                    segEnd = p;
+                }
             }
             int colon = uri.IndexOf(':');
             return colon < 0 || colon >= segEnd;
@@ -299,10 +305,10 @@ namespace OutSmart.DAXon.Functions
 
             try
             {
-                new URL(systemId);
+                new Uri(systemId);
                 return systemId; // all is well
             }
-            catch (MalformedURLException err)
+            catch (UriFormatException err)
             {
                 return ResolveAgainstCurrentDirectory(systemId);
             }
@@ -377,7 +383,7 @@ namespace OutSmart.DAXon.Functions
                 // Resolving a classpath: URI involves searching the classpath.
                 // There's no sense in which it makes sense to attempt to make one absolute
                 // against some base URI. They're effectively absolute already.
-                // (If we don't do this, passing them to OutSmart.DAXon.Internal.Net.URL causes an exception
+                // (If we don't do this, passing them to System.Uri causes an exception
                 // anyway.)
                 return new URI(relativeURI);
             }
@@ -415,16 +421,16 @@ namespace OutSmart.DAXon.Functions
                     // represent Windows UNC filenames. However, the OutSmart.DAXon.Internal.Net.URI algorithm for resolving
                     // a relative URI against such a base URI fails to produce a usable UNC filename (it's not
                     // clear whether Java is implementing RFC 3986 correctly here, it depends on interpretation).
-                    // So we use the OutSmart.DAXon.Internal.Net.URL algorithm for this case too, because it works.
+                    // So we resolve via System.Uri(base, relative) for this case too, because it works.
                     try
                     {
-                        URL baseURL = new URL(@base);
-                        URL absoluteURL = new URL(baseURL, relativeURI);
-                        absoluteURI = absoluteURL.ToURI();
+                        Uri baseURL = new Uri(@base);
+                        Uri absoluteURL = new Uri(baseURL, relativeURI);
+                        absoluteURI = new URI(absoluteURL);
                     }
-                    catch (MalformedURLException err)
+                    catch (UriFormatException err)
                     {
-                        throw Failure(@base + " " + relativeURI, err.GetMessage());
+                        throw Failure(@base + " " + relativeURI, err.Message);
                     }
                 }
                 else if (@base.StartsWith("classpath:", StringComparison.Ordinal))
@@ -469,7 +475,7 @@ namespace OutSmart.DAXon.Functions
                     }
                     catch (URISyntaxException e)
                     {
-                        throw Failure(@base, "Invalid base URI: " + e.GetMessage());
+                        throw Failure(@base, "Invalid base URI: " + e.Message);
                     }
 
                     int hash = @base.IndexOf('#');
@@ -483,7 +489,7 @@ namespace OutSmart.DAXon.Functions
                         }
                         catch (URISyntaxException e)
                         {
-                            throw Failure(@base, "Invalid base URI: " + e.GetMessage());
+                            throw Failure(@base, "Invalid base URI: " + e.Message);
                         }
                     }
 
@@ -495,7 +501,7 @@ namespace OutSmart.DAXon.Functions
                     }
                     catch (URISyntaxException e)
                     {
-                        throw Failure(@base, "Invalid relative URI: " + e.GetMessage());
+                        throw Failure(@base, "Invalid relative URI: " + e.Message);
                     }
 
                     if (absOrRel.IsAbsolute())

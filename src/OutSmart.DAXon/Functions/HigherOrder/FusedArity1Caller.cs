@@ -114,11 +114,11 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             {
                 rawResult = (direct ? target.EvaluateBodyDirect(c2) : target.Call(c2, args)).Materialize();
             }
-            catch (Internal.RecursionDepthError)
+            catch (Internal.RecursionDepthError e) when (!e.Described)
             {
-                // Same conversion the classic UserFunctionCall elaborators apply — this fused
-                // path bypasses them, so the stack-guard signal must be converted here.
-                throw new XPathException.StackOverflow("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, Loc.NONE);
+                // Same description the classic UserFunctionCall elaborators apply — this fused
+                // path bypasses them, so the stack-guard signal must be described here.
+                throw e.Describe("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, Loc.NONE);
             }
 
             if (resultType.Matches(rawResult, th))

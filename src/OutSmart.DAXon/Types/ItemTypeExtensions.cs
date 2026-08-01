@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Types
     // is implicitly imported by every Saxon file).
     public static class ItemTypeExtensions
     {
-        // Phase 5: GetUType moved to Saxon side (excluded stubs.cs) where UType is accessible.
+        // GetUType moved to Saxon side (excluded stubs.cs) where UType is accessible.
         // Removed `public static object GetUType(this ItemType t) => null;` -- object return broke 42 sites.
         // ItemType has no instance GetPrimitiveItemType, so BuiltInAtomicType's own recursive reduction
         // (walk to the base type until a Saxon-primitive) resolves THROUGH this extension whenever it
@@ -44,9 +44,9 @@ namespace OutSmart.DAXon.Types
         // OutSmart.DAXon.Internal cannot reference Saxon's NodeTest at compile time, so the real dispatch lives Saxon-side in
         // excluded stubs.cs (alongside the GetUType/GetGenre dispatch shims).
         public static bool Matches(this ItemType t, object item, object th) => true;
-        // Phase 7.24: 1-arg Matches overload (Java's `boolean matches(Item)`).
+        // 1-arg Matches overload (Java's `boolean matches(Item)`).
         public static bool Matches(this ItemType t, object item) => true;
-        // Phase 7.8: Java's String.matches(regex) moved to Extensions/JavaApiExtensions.cs
+        // Java's String.matches(regex) moved to Extensions/JavaApiExtensions.cs
         // because resolution from ItemTypeExtensions class was unreliable across callsites.
         // GetBasicAlphaCode promoted to a real ItemType interface member (above) so interface-typed calls in
         // TypeHierarchy.Relationship virtual-dispatch to each item type's real impl instead of this ""-stub
@@ -67,7 +67,7 @@ namespace OutSmart.DAXon.Types
         // type is xs:error, and TypeChecker rule-3 raises XPTY0004 (same code path,
         // TypeChecker.java:192-204) — Java-parity WONTFIX.
         public static bool IsAtomizable(this ItemType t) => true;
-        // Phase 5: 1-arg form taking TypeHierarchy (TypeChecker uses this).
+        // 1-arg form taking TypeHierarchy (TypeChecker uses this).
         public static bool IsAtomizable(this ItemType t, object th) => true;
         public static string ExplainMismatch(this ItemType t, object item, object th) => "";
         public static string ToExportString(this ItemType t) => "";

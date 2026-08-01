@@ -34,14 +34,8 @@ namespace OutSmart.DAXon.Xslt
         private ILocation containingLocation = null;
         private RetainedStaticContext retainedStaticContext = null;
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual StructuredQName AttributeName => attributeName;
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual string StaticBaseURI => element.GetBaseURI();
         public ExpressionContext(StyleElement styleElement, StructuredQName attributeName)
         {
@@ -49,41 +43,26 @@ namespace OutSmart.DAXon.Xslt
             this.attributeName = attributeName;
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual Configuration GetConfiguration()
         {
             return element.GetConfiguration();
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual StylesheetPackage GetPackageData()
         {
             return element.GetPackageData();
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual bool IsSchemaAware()
         {
             return element.IsSchemaAware();
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual IXPathContext MakeEarlyEvaluationContext()
         {
             return new EarlyEvaluationContext(GetConfiguration());
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual RetainedStaticContext MakeRetainedStaticContext()
         {
             if (retainedStaticContext == null)
@@ -101,9 +80,6 @@ namespace OutSmart.DAXon.Xslt
             return retainedStaticContext;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual ILocation GetContainingLocation()
         {
             if (containingLocation == null)
@@ -129,49 +105,31 @@ namespace OutSmart.DAXon.Xslt
             element.IssueWarning(s, errorCode, locator);
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual string GetSystemId()
         {
             return element.GetSystemId();
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual INamespaceResolver GetNamespaceResolver()
         {
             return element.AllNamespaces;
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual Types.ItemType GetRequiredContextItemType()
         {
             return AnyItemType.GetInstance();
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual DecimalFormatManager GetDecimalFormatManager()
         {
             return element.GetCompilation().GetPrincipalStylesheetModule().GetDecimalFormatManager();
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual OptimizerOptions GetOptimizerOptions()
         {
             return element.GetCompilation().GetCompilerInfo().GetOptimizerOptions();
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual Expression BindVariable(StructuredQName qName)
         {
             SourceBinding sourceBinding = element.BindVariable(qName, attributeName);
@@ -217,7 +175,11 @@ namespace OutSmart.DAXon.Xslt
                     StyleElement catcher = null;
                     for (NodeInfo anc = element; anc != null; anc = anc.GetParent())
                     {
-                        if (anc is XSLCatch) { catcher = (StyleElement)anc; break; }
+                        if (anc is XSLCatch)
+                        {
+                            catcher = (StyleElement)anc;
+                            break;
+                        }
                     }
                     if (catcher != null)
                     {
@@ -272,9 +234,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         public virtual IFunctionLibrary GetFunctionLibrary()
         {
 
@@ -282,9 +241,6 @@ namespace OutSmart.DAXon.Xslt
             return element.ContainingPackage.GetFunctionLibrary();
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
         /// <summary>
         /// Get the default collation. Return null if no default collation has been defined
         /// </summary>
@@ -294,9 +250,6 @@ namespace OutSmart.DAXon.Xslt
         }
 
         /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
         /// Get the default collation. Return null if no default collation has been defined
         /// </summary>
         public virtual NamespaceUri GetDefaultElementNamespace()
@@ -305,9 +258,6 @@ namespace OutSmart.DAXon.Xslt
         }
 
         /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
         /// Get the default function @namespace
         /// </summary>
         public virtual NamespaceUri GetDefaultFunctionNamespace()
@@ -315,23 +265,11 @@ namespace OutSmart.DAXon.Xslt
             return NamespaceUri.FN;
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public virtual bool IsInBackwardsCompatibleMode()
         {
             return element.XPath10ModeIsEnabled();
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public virtual int GetXPathVersion()
         {
             if (element.GetCompilation().GetCompilerInfo().XsltVersion == 40 || GetConfiguration().GetBooleanProperty(Feature<bool>.ALLOW_SYNTAX_EXTENSIONS))
@@ -343,17 +281,9 @@ namespace OutSmart.DAXon.Xslt
             //        if ((element.getEffectiveVersion() == 40
             //                || element.getCompilation().getCompilerInfo().getXsltVersion() == 40
             //                || (attributeName != null && attributeName.hasURI(NamespaceUri.SAXON)))
-            //            return 40;
-            //        } else {
             return GetConfiguration().GetConfigurationProperty(Feature<int>.XPATH_VERSION_FOR_XSLT); //        }
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public virtual bool IsImportedSchema(NamespaceUri @namespace)
         {
 
@@ -363,66 +293,26 @@ namespace OutSmart.DAXon.Xslt
             //}
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
-        //} else {
-        //}
         public virtual HashSet<NamespaceUri> GetImportedSchemaNamespaces()
         {
             return element.GetPrincipalStylesheetModule().ImportedSchemaTable;
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
-        //} else {
-        //}
         public virtual KeyManager GetKeyManager()
         {
             return element.GetCompilation().GetPrincipalStylesheetModule().GetKeyManager();
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
-        //} else {
-        //}
         public virtual StyleElement GetStyleElement()
         {
             return element;
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
-        //} else {
-        //}
         public virtual Types.ItemType ResolveTypeAlias(StructuredQName typeName)
         {
             return GetPackageData().ObtainTypeAliasManager().GetItemType(typeName);
         }
 
-        /// <summary>
-        /// Get the System ID of the entity containing the expression (used for diagnostics)
-        /// </summary>
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
-        //} else {
-        //}
         public virtual UnprefixedElementMatchingPolicy GetUnprefixedElementMatchingPolicy()
         {
             return element.GetCompilation().GetCompilerInfo().GetUnprefixedElementMatchingPolicy();

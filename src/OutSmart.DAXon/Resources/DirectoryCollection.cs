@@ -133,7 +133,11 @@ namespace OutSmart.DAXon.Resources
 
                 if (entry is DirectoryInfo)
                 {
-                    if (recurse)
+                    // Do not descend into reparse points (junctions / directory symlinks): one
+                    // pointing at an ancestor is a cycle, and this walk had no cycle detection, so
+                    // it recursed until it exhausted the stack or hit MAX_PATH. Skipping them also
+                    // matches the default "don't follow symlinks" of the reference implementation.
+                    if (recurse && (entry.Attributes & FileAttributes.ReparsePoint) == 0)
                     {
                         IEnumerator<string> inner = Walk((DirectoryInfo)entry, true, filter);
                         while (inner.MoveNext())

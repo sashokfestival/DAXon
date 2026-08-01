@@ -15,7 +15,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,143 +30,44 @@ namespace OutSmart.DAXon.Functions.Registry
     /// </summary>
     public abstract class BuiltInFunctionSet : IFunctionLibrary
     {
-        /// <summary>
-        /// Local names used for cardinality values
-        /// </summary>
         public const int ONE = StaticProperty.ALLOWS_ONE;
-        /// <summary>
-        /// Local names used for cardinality values
-        /// </summary>
         public const int OPT = StaticProperty.ALLOWS_ZERO_OR_ONE;
-        /// <summary>
-        /// Local names used for cardinality values
-        /// </summary>
         public const int STAR = StaticProperty.ALLOWS_ZERO_OR_MORE;
-        /// <summary>
-        /// Local names used for cardinality values
-        /// </summary>
         public const int PLUS = StaticProperty.ALLOWS_ONE_OR_MORE;
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int AS_ARG0 = 1; // Result has same type as first argument
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int AS_PRIM_ARG0 = 2; // Result has same primitive type as first argument
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int CITEM = 4; // Depends on context item
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int BASE = 8; // Depends on base URI
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int NS = 16; // Depends on namespace context
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int DCOLL = 32; // Depends on default collation
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int DLANG = 64; // Depends on default language
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int FILTER = 256; // Result is a subset of the value of the first arg
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int LATE = 512; // Disallow compile-time evaluation
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int UO = 1024; // Ordering in first argument is irrelevant
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int POSN = 1024 * 2; // Depends on position
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int LAST = 1024 * 4; // Depends on last
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int SIDE = 1024 * 8; // Has side-effects
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int CDOC = 1024 * 16; // Depends on context document
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int CARD0 = 1024 * 32; // Result is empty only if first arg is empty
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int NEW = 1024 * 64; // All nodes in the result are newly created
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int CTRL = 1024 * 128; // Controls the optimization of its arguments
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int SEQV = 1024 * 256; // ISequence-variadic, like concat() in 4.0
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int DEPENDS_ON_STATIC_CONTEXT = BASE | NS | DCOLL;
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public const int FOCUS = CITEM | POSN | LAST | CDOC;
-        /// <summary>
-        /// Function properties
-        /// </summary>
         protected const int INS = 1 << 24; // = usage INSPECTION
-        /// <summary>
-        /// Function properties
-        /// </summary>
         protected const int ABS = 1 << 25; // = usage ABSORPTION (implicit when type is atomic)
-        /// <summary>
-        /// Function properties
-        /// </summary>
         protected const int TRA = 1 << 26; // = usage TRANSMISSION (node is included in function result)
-        /// <summary>
-        /// Function properties
-        /// </summary>
         protected const int NAV = 1 << 27; // = usage NAVIGATION (function navigates from this node)
         public static ISequence EMPTY = EmptySequence.GetInstance();
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         private readonly Dictionary<string, Entry> functionTable = new Dictionary<string, Entry>(200);
-        /// <summary>
-        /// Function properties
-        /// </summary>
         private readonly Dictionary<string, int> sequenceVariadicFunctions = new Dictionary<string, int>(10);
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public virtual string ConventionalPrefix => "fn";
-        /// <summary>
-        /// Function properties
-        /// </summary>
         protected static RecordTest.Field Field(string name, SequenceType type, bool optional)
         {
             return new RecordTest.Field(name, type, optional);
         }
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public void ImportFunctionSet(BuiltInFunctionSet importee)
         {
             if (!importee.GetNamespace().Equals(GetNamespace()))
@@ -179,9 +79,6 @@ namespace OutSmart.DAXon.Functions.Registry
             sequenceVariadicFunctions.PutAll(importee.sequenceVariadicFunctions); //importedFunctions.add(importee);
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public virtual Entry GetFunctionDetails(string name, int arity)
         {
             if (arity == -1)
@@ -199,7 +96,7 @@ namespace OutSmart.DAXon.Functions.Registry
             }
 
             string key = name + "#" + arity;
-            Entry entry = functionTable.Get(key);
+            Entry entry = functionTable.GetOrDefault(key);
             if (entry != null)
             {
                 return entry;
@@ -211,7 +108,7 @@ namespace OutSmart.DAXon.Functions.Registry
             if (minArity != -1 && arity >= minArity)
             {
                 key = name + "#" + (minArity + 1);
-                return functionTable.Get(key);
+                return functionTable.GetOrDefault(key);
             }
 
 
@@ -219,14 +116,9 @@ namespace OutSmart.DAXon.Functions.Registry
             //        if (name.equals("concat") && arity >= 2 && getNamespace().equals(NamespaceConstant.FN)) {
             //            key = "concat#-1";
             //            entry = functionTable.get(key);
-            //            return entry;
-            //        }
             return null;
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public virtual Expression Bind(SymbolicName.F symbolicName, Expression[] staticArgs, Dictionary<StructuredQName, int> keywords, IStaticContext env, IList<string> reasons)
         {
             StructuredQName functionName = symbolicName.ComponentName;
@@ -276,7 +168,7 @@ namespace OutSmart.DAXon.Functions.Registry
                     //                }
                     //                staticArgs = newArgs;
                 }
-                else if ((keywords != null && !keywords.IsEmpty()) || staticArgs.Length < entry.maxArity)
+                else if ((keywords != null && keywords.Count > 0) || staticArgs.Length < entry.maxArity)
                 {
                     staticArgs = UserFunction.MakeExpandedArgumentArray(staticArgs, keywords, entry);
                 }
@@ -292,7 +184,7 @@ namespace OutSmart.DAXon.Functions.Registry
                 }
                 catch (XPathException e)
                 {
-                    reasons.Add(e.GetMessage());
+                    reasons.Add(e.Message);
                     return null;
                 }
             }
@@ -302,9 +194,6 @@ namespace OutSmart.DAXon.Functions.Registry
             }
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public virtual SystemFunction MakeFunction(string name, int arity)
         {
             Entry entry = GetFunctionDetails(name, arity);
@@ -322,15 +211,12 @@ namespace OutSmart.DAXon.Functions.Registry
             }
 
             entry.EnsurePopulated();
-            SystemFunction f = entry.implementationFactory.Get();
+            SystemFunction f = entry.implementationFactory();
             f.Details = entry;
             f.SetArity(arity);
             return f;
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         private static string PluralArguments(int num)
         {
             if (num == 0)
@@ -346,9 +232,6 @@ namespace OutSmart.DAXon.Functions.Registry
             return num + " arguments";
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public virtual bool IsAvailable(SymbolicName.F symbolicName, int languageLevel)
         {
             StructuredQName qn = symbolicName.ComponentName;
@@ -377,18 +260,12 @@ namespace OutSmart.DAXon.Functions.Registry
             return true;
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         //}
         public virtual IFunctionLibrary Copy()
         {
             return this;
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public virtual IFunctionItem GetFunctionItem(SymbolicName.F symbolicName, IStaticContext staticContext)
         {
             StructuredQName functionName = symbolicName.ComponentName;
@@ -413,11 +290,6 @@ namespace OutSmart.DAXon.Functions.Registry
             }
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
-        //}
-        //    }
         protected virtual Entry Register(string name, int arity, Func<Entry, Entry> populator)
         {
             Entry e = new Entry();
@@ -426,13 +298,10 @@ namespace OutSmart.DAXon.Functions.Registry
             e.maxArity = arity;
             e.populator = populator;
             e.functionSet = this;
-            functionTable.Put(name + "#" + arity, e);
+            functionTable[name + "#" + arity] = e;
             return e;
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         protected virtual Entry Register(string name, int minArity, int maxArity, Func<Entry, Entry> populator)
         {
             Entry e = new Entry();
@@ -443,38 +312,26 @@ namespace OutSmart.DAXon.Functions.Registry
             e.functionSet = this;
             for (int a = minArity; a <= maxArity; a++)
             {
-                functionTable.Put(name + "#" + a, e);
+                functionTable[name + "#" + a] = e;
             }
 
             return e;
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         protected virtual Entry RegisterVariadic(string name, int arity, Func<Entry, Entry> populator)
         {
             Entry e = Register(name, arity, populator);
-            sequenceVariadicFunctions.Put(name, arity - 1);
+            sequenceVariadicFunctions[name] = arity - 1;
             return e;
         }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
         public virtual NamespaceUri GetNamespace()
         {
             return NamespaceUri.FN;
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
 
-        /// <summary>
-        /// Function properties
-        /// </summary>
-        //}
-        //    }
         /// <summary>
         /// An entry in the table describing the properties of a function
         /// </summary>
@@ -520,52 +377,26 @@ namespace OutSmart.DAXon.Functions.Registry
             /// An array holding the names of the parameters to the function
             /// </summary>
             public string[] paramNames;
-            /// <summary>
-            /// An array holding the types of the parameters to the function
-            /// </summary>
             public SequenceType[] paramTypes;
-            /// <summary>
-            /// An array holding the types of the parameters to the function
-            /// </summary>
             public ISequence[] resultIfEmpty;
-            /// <summary>
-            /// An array holding the types of the parameters to the function
-            /// </summary>
             public IntHashMap<Expression> defaultValueExpressions;
-            /// <summary>
-            /// An array holding the types of the parameters to the function
-            /// </summary>
             public int properties;
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             public OptionsParameter optionDetails;
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             //
-            /// <summary>
-            /// Add details for options parameters (only applies to one argument, the function is expected to know which)
-            /// </summary>
             public virtual int NumberOfParameters => maxArity;
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
+            private readonly object populateLock = new object();
             public virtual void EnsurePopulated()
             {
-                lock (this)
+                lock (populateLock)
                 {
                     if (implementationFactory == null)
                     {
-                        populator.Apply(this);
+                        populator(this);
                     }
                 }
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             public virtual Entry Populate(Func<SystemFunction> functionFactory, ItemType itemType, int cardinality, int properties)
             {
                 this.implementationFactory = functionFactory;
@@ -589,7 +420,7 @@ namespace OutSmart.DAXon.Functions.Registry
 
                 if ((properties & SEQV) != 0)
                 {
-                    this.functionSet.sequenceVariadicFunctions.Put(name.GetLocalPart(), this.maxArity - 1);
+                    this.functionSet.sequenceVariadicFunctions[name.GetLocalPart()] = this.maxArity - 1;
                 }
 
                 NamespaceUri ns = name.GetNamespaceUri();
@@ -626,18 +457,13 @@ namespace OutSmart.DAXon.Functions.Registry
                     keywords = "a|b|c|d|e|f";
                 }
 
-                this.paramNames = keywords.Split("\\|");
+                this.paramNames = keywords.SplitRegex("\\|");
                 return this;
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             public virtual Entry Arg(int a, ItemType type, int options, ISequence resultIfEmpty)
             {
 
-                //            return arg(a, type, options, resultIfEmpty, null);
-                //        }
                 //
                 //        public OutSmart.DAXon.Functions.Registry.BuiltInFunctionSet.Entry arg(
                 //                int a, ItemType type, int options, ISequence resultIfEmpty, Expression defaultValue) {
@@ -676,62 +502,32 @@ namespace OutSmart.DAXon.Functions.Registry
                 return this;
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             //
-            /// <summary>
-            /// Add details for options parameters (only applies to one argument, the function is expected to know which)
-            /// </summary>
             public virtual Entry SetOptionDetails(OptionsParameter details)
             {
                 this.optionDetails = details;
                 return this;
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             //
-            /// <summary>
-            /// Add details for options parameters (only applies to one argument, the function is expected to know which)
-            /// </summary>
             public virtual StructuredQName GetFunctionName()
             {
                 return name;
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             //
-            /// <summary>
-            /// Add details for options parameters (only applies to one argument, the function is expected to know which)
-            /// </summary>
             public virtual int GetMinimumArity()
             {
                 return minArity;
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             //
-            /// <summary>
-            /// Add details for options parameters (only applies to one argument, the function is expected to know which)
-            /// </summary>
             public virtual StructuredQName GetParameterName(int i)
             {
                 return new StructuredQName("", "", paramNames[i]);
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             //
-            /// <summary>
-            /// Add details for options parameters (only applies to one argument, the function is expected to know which)
-            /// </summary>
             public virtual Expression GetDefaultValueExpression(int i)
             {
                 if (defaultValueExpressions != null)
@@ -744,13 +540,7 @@ namespace OutSmart.DAXon.Functions.Registry
                 }
             }
 
-            /// <summary>
-            /// For options parameters, details of the accepted options, their defaults, and required type
-            /// </summary>
             //
-            /// <summary>
-            /// Add details for options parameters (only applies to one argument, the function is expected to know which)
-            /// </summary>
             public virtual int GetPositionOfParameter(StructuredQName name)
             {
                 for (int i = 0; i < maxArity; i++)

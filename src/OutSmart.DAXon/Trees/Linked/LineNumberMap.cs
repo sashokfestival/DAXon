@@ -18,6 +18,7 @@ namespace OutSmart.DAXon.Trees.Linked
 {
     public class LineNumberMap
     {
+        private readonly object syncLock = new object();
         private int[] sequenceNumbers;
         private int[] lineNumbers;
         private int[] columnNumbers;
@@ -90,7 +91,7 @@ namespace OutSmart.DAXon.Trees.Linked
 
         private void Condense()
         {
-            lock (this)
+            lock (syncLock)
             {
                 Array.Resize(ref sequenceNumbers, allocated);
                 Array.Resize(ref lineNumbers, allocated);

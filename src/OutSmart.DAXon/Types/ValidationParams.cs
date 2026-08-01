@@ -25,10 +25,10 @@ namespace OutSmart.DAXon.Types
 
         public static void SetValidationParams(Dictionary<StructuredQName, XPathVariable> declaredParams, ValidationParams actualParams, XPathDynamicContext context)
         {
-            foreach (StructuredQName p in declaredParams.KeySet())
+            foreach (StructuredQName p in declaredParams.Keys)
             {
-                XPathVariable var = declaredParams.Get(p);
-                ISequence paramValue = ((Dictionary<StructuredQName, ISequence>)actualParams).Get(p);
+                XPathVariable var = declaredParams.GetOrDefault(p);
+                ISequence paramValue = ((Dictionary<StructuredQName, ISequence>)actualParams).GetOrDefault(p);
                 if (paramValue != null)
                 {
                     context.SetVariable(var, paramValue);

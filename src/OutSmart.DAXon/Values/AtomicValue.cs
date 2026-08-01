@@ -27,9 +27,6 @@ namespace OutSmart.DAXon.Values
     {
         protected readonly IAtomicType typeLabel;
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual UnicodeString UnicodeStringValue
         {
             get
@@ -48,19 +45,10 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual UnicodeString CanonicalLexicalRepresentation => this.UnicodeStringValue;
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public abstract BuiltInAtomicType PrimitiveType { get; }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public abstract UnicodeString PrimitiveStringValue { get; }
         public AtomicValue(IAtomicType typeLabel)
         {
@@ -110,17 +98,11 @@ namespace OutSmart.DAXon.Values
             throw new NotSupportedException("equals() not implemented");
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             throw new NotSupportedException("hashCode() not implemented");
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual bool IsIdentical(AtomicValue v)
         {
 
@@ -128,17 +110,11 @@ namespace OutSmart.DAXon.Values
             return SimpleTypeComparison.GetInstance().Equal(this, v);
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual bool IsIdentical(IIdentityComparable other)
         {
             return other is AtomicValue && IsIdentical((AtomicValue)other);
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual int IdentityHashCode()
         {
 
@@ -146,67 +122,40 @@ namespace OutSmart.DAXon.Values
             return GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public AtomicValue ItemAt(int n)
         {
             return n == 0 ? Head() : null;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public IAtomicType GetItemType()
         {
             return typeLabel;
         }
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public UType GetUType()
         {
             return GetItemType().GetUType();
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public int GetCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public abstract AtomicValue CopyAsSubType(IAtomicType typeLabel);
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual bool IsNaN()
         {
             return false;
         }
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual bool EffectiveBooleanValue()
         {
             throw new XPathException("Effective boolean value is not defined for an atomic value of type " + Types.Type.DisplayTypeName(this)).AsTypeError().WithErrorCode("FORG0006"); // unless otherwise specified in a subclass
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual AtomicValue GetComponent(AccessorFn.Component component)
         {
             throw new NotSupportedException("Data type does not support component extraction");
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual void CheckPermittedContents(ISchemaType parentType, IStaticContext env, bool whole)
         {
             if (whole)
@@ -243,83 +192,41 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual void CheckValidInJavascript()
         {
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public virtual AtomicValue AsAtomic()
         {
             return this;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
-        /// <summary>
-        /// Get string value.
-        /// </summary>
         public override string ToString()
         {
             return GetStringValue(); //throw new global::System.NotSupportedException();
             //return typeLabel + "(\"" + getStringValueCS() + "\")";
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
-        /// <summary>
-        /// Get string value.
-        /// </summary>
         public virtual string ToShortString()
         {
             return Show();
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
-        /// <summary>
-        /// Get string value.
-        /// </summary>
         public virtual string Show()
         {
             return typeLabel + "(\"" + this.UnicodeStringValue + "\")";
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
-        /// <summary>
-        /// Get string value.
-        /// </summary>
         public virtual SingleAtomicIterator Iterate()
         {
             return (SingleAtomicIterator)SingleAtomicIterator.MakeIterator(this);
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
-        /// <summary>
-        /// Get string value.
-        /// </summary>
         public virtual IEnumerator<AtomicValue> IIterator()
         {
             yield return this;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
-        /// <summary>
-        /// Get string value.
-        /// </summary>
         public Genre GetGenre()
         {
             return Genre.ATOMIC;
@@ -330,7 +237,7 @@ namespace OutSmart.DAXon.Values
         IItem IGroundedValue.Head() => Head();
         IItem ISequence.Head() => Head();
         ISequenceIterator ISequence.Iterate() => Iterate();
-        public virtual IGroundedValue Subsequence(int arg0, int arg1) => throw new NotImplementedException();
+        public virtual IGroundedValue Subsequence(int arg0, int arg1) => (arg0 <= 0 && (long)arg0 + arg1 > 0) ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance(); // singleton item (upstream GroundedValue default)
         public virtual string GetStringValue() => UnicodeStringValue.ToString();
         public IEnumerator<AtomicValue> GetEnumerator() { yield return this; }
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

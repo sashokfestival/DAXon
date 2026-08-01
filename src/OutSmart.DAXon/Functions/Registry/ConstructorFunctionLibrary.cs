@@ -115,7 +115,7 @@ namespace OutSmart.DAXon.Functions.Registry
                     return null;
                 }
 
-                if (keywords != null && !keywords.IsEmpty())
+                if (keywords != null && keywords.Count > 0)
                 {
                     if (keywords.Count != 1)
                     {
@@ -123,7 +123,7 @@ namespace OutSmart.DAXon.Functions.Registry
                         return null;
                     }
 
-                    foreach (var kw in keywords.EntrySet())
+                    foreach (var kw in keywords)
                     {
                         if (kw.Key.EQName.Equals("Q{}value"))
                         {
@@ -178,7 +178,7 @@ namespace OutSmart.DAXon.Functions.Registry
                         }
                         catch (MissingComponentException e)
                         {
-                            reasons.Add("Missing schema component: " + e.GetMessage());
+                            reasons.Add("Missing schema component: " + e.Message);
                             return null;
                         }
                     }
@@ -211,7 +211,7 @@ namespace OutSmart.DAXon.Functions.Registry
                         }
                         catch (MissingComponentException e)
                         {
-                            reasons.Add("Missing schema component: " + e.GetMessage());
+                            reasons.Add("Missing schema component: " + e.Message);
                             return null;
                         }
                     }
@@ -233,6 +233,5 @@ namespace OutSmart.DAXon.Functions.Registry
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
     }
 }

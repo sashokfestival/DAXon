@@ -27,9 +27,6 @@ namespace OutSmart.DAXon.Functions
         // PHASE7_FLL_INDEXER
         public IFunctionLibrary this[int n] { get { return Get(n); } }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual IList<IFunctionLibrary> LibraryList => libraryList;
         public FunctionLibraryList()
         {
@@ -41,17 +38,11 @@ namespace OutSmart.DAXon.Functions
             return libraryList.Count - 1;
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual IFunctionLibrary Get(int n)
         {
             return libraryList[n];
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual IFunctionItem GetFunctionItem(SymbolicName.F functionName, IStaticContext staticContext)
         {
             foreach (IFunctionLibrary lib in libraryList)
@@ -66,9 +57,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual bool IsAvailable(SymbolicName.F functionName, int languageLevel)
         {
             foreach (IFunctionLibrary lib in libraryList)
@@ -82,9 +70,6 @@ namespace OutSmart.DAXon.Functions
             return false;
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual Expression Bind(SymbolicName.F functionName, Expression[] staticArgs, Dictionary<StructuredQName, int> keywords, IStaticContext env, IList<string> reasons)
         {
             bool debug = env.GetConfiguration().GetBooleanProperty(Feature<bool>.TRACE_EXTERNAL_FUNCTIONS) && !NamespaceUri.IsReserved(functionName.ComponentName.GetNamespaceUri());
@@ -98,7 +83,7 @@ namespace OutSmart.DAXon.Functions
             {
                 if (debug)
                 {
-                    err.Info("Trying " + lib.GetType().GetName());
+                    err.Info("Trying " + lib.GetType().FullName);
                 }
 
                 Expression func = lib.Bind(functionName, staticArgs, keywords, env, reasons);
@@ -116,9 +101,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual XQueryFunction GetDeclaration(StructuredQName functionName, int staticArgs)
         {
             foreach (IFunctionLibrary lib in libraryList)
@@ -136,9 +118,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual bool BindUnboundFunctionCall(UserFunctionCall call, IList<string> reasons)
         {
             foreach (IFunctionLibrary lib in libraryList)
@@ -156,9 +135,6 @@ namespace OutSmart.DAXon.Functions
             return false;
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         public virtual IFunctionLibrary Copy()
         {
             FunctionLibraryList fll = new FunctionLibraryList();
@@ -171,9 +147,6 @@ namespace OutSmart.DAXon.Functions
             return fll;
         }
 
-        /// <summary>
-        /// Get the n'th function library in the list
-        /// </summary>
         private static List<IFunctionLibrary> EmptyFunctionLibraryList(int allocated)
         {
 
@@ -182,6 +155,5 @@ namespace OutSmart.DAXon.Functions
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
     }
 }

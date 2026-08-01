@@ -21,8 +21,7 @@ namespace OutSmart.DAXon.Types
 {
     public interface IAtomicType : ISimpleType, IPlainType, ICastingTarget
     {
-        Genre GetGenre()
-;
+        Genre GetGenre();
 
 
 
@@ -30,7 +29,6 @@ namespace OutSmart.DAXon.Types
         bool IsOrdered(bool optimistic);
         bool IsAbstract();
         bool IsPrimitiveType();
-        BuiltInAtomicType PrimitiveAtomicType { get; }
 
 
 
@@ -39,8 +37,7 @@ namespace OutSmart.DAXon.Types
         bool IsBuiltInType();
         StructuredQName TypeName { get; }
         StringConverter GetStringConverter(ConversionRules rules);
-        string ExplainMismatch(IItem item, TypeHierarchy th)
-;
+        string ExplainMismatch(IItem item, TypeHierarchy th);
 
 
 

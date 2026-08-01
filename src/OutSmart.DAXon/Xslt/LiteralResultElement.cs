@@ -48,25 +48,16 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Specify that this is an instruction
-        /// </summary>
         public override bool IsInstruction()
         {
             return true;
         }
 
-        /// <summary>
-        /// Specify that this is an instruction
-        /// </summary>
         public override bool IsInXsltNamespace()
         {
             return false;
         }
 
-        /// <summary>
-        /// Specify that this is an instruction
-        /// </summary>
         public override void ProcessStandardAttributes(NamespaceUri @namespace)
         {
             int processorVersion = GetCompilation().GetCompilerInfo().XsltVersion;
@@ -165,9 +156,6 @@ namespace OutSmart.DAXon.Xslt
         }
 
         /// <summary>
-        /// Process the attribute list
-        /// </summary>
-        /// <summary>
         /// Validate that this node is OK
         /// </summary>
         public override void Validate(ComponentDeclaration decl)
@@ -192,8 +180,6 @@ namespace OutSmart.DAXon.Xslt
                 retainedNamespaces = AllNamespaces;
 
                 // Spec bug 5857: if there is no other binding for the default @namespace, add an undeclaration
-                //            String defaultNamespace = getURIForPrefix("", true);
-                //            if (defaultNamespace.length()==0) {
                 //                namespaceCodes.add(NamespaceBinding.DEFAULT_UNDECLARATION);
                 //            }
                 // apply any aliases required to create the list of output namespaces
@@ -322,9 +308,6 @@ namespace OutSmart.DAXon.Xslt
         }
 
         /// <summary>
-        /// Process the attribute list
-        /// </summary>
-        /// <summary>
         /// Validate that this node is OK
         /// </summary>
         protected override void ValidateChildren(ComponentDeclaration decl, bool excludeStylesheet)
@@ -335,15 +318,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Process the attribute list
-        /// </summary>
-        /// <summary>
-        /// Validate that this node is OK
-        /// </summary>
-        /// <summary>
-        /// Compile code to process the literal result element at runtime
-        /// </summary>
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
 
@@ -406,15 +380,6 @@ namespace OutSmart.DAXon.Xslt
             return inst;
         }
 
-        /// <summary>
-        /// Process the attribute list
-        /// </summary>
-        /// <summary>
-        /// Validate that this node is OK
-        /// </summary>
-        /// <summary>
-        /// Compile code to process the literal result element at runtime
-        /// </summary>
         public virtual DocumentImpl MakeStylesheet(bool topLevel)
         {
 
@@ -479,7 +444,7 @@ namespace OutSmart.DAXon.Xslt
                 builder.EndElement();
                 builder.EndElement();
                 builder.EndDocument();
-                builder.Dispose();
+                builder.Close();
                 DocumentImpl newRoot = (DocumentImpl)builder.CurrentRoot;
                 newRoot.GraftLocationMap(oldRoot);
                 return newRoot;
@@ -490,15 +455,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Process the attribute list
-        /// </summary>
-        /// <summary>
-        /// Validate that this node is OK
-        /// </summary>
-        /// <summary>
-        /// Compile code to process the literal result element at runtime
-        /// </summary>
         public override StructuredQName GetObjectName()
         {
             return new StructuredQName(GetPrefix(), GetNamespaceUri(), GetLocalPart());

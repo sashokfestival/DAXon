@@ -14,7 +14,9 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Xpath;
+// The engine XPathException: PreEvaluate's back-off catch used to bind to the (never-thrown)
+// JAXP stub of the same name, so a fold-time error crashed compilation instead of backing off.
+using XPathException = OutSmart.DAXon.Transformation.XPathException;
 using System.Collections.Generic;
 using System.Text;
 

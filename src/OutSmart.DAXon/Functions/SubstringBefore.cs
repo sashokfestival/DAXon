@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Expressions.Elaboration;
 using OutSmart.DAXon.Lib;

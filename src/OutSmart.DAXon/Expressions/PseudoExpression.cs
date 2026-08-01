@@ -64,7 +64,7 @@ namespace OutSmart.DAXon.Expressions
 
         private void CannotEvaluate()
         {
-            throw new XPathException("Cannot evaluate " + GetType().GetName());
+            throw new XPathException("Cannot evaluate " + GetType().FullName);
         }
 
         protected override int ComputeCardinality()

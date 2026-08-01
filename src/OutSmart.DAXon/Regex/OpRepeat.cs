@@ -88,7 +88,7 @@ namespace OutSmart.DAXon.Regex
         {
             Stack<IIntIterator> iterators = new Stack<IIntIterator>();
             Stack<int> positions = new Stack<int>();
-            int bound = System.Math.Min(max, matcher.search.Length32() - position + 1);
+            int bound = Math.Min(max, matcher.search.Length32() - position + 1);
             int p = position;
             if (greedy)
             {
@@ -124,7 +124,7 @@ namespace OutSmart.DAXon.Regex
 
                 // Now return an iterator which returns all the matching positions in order
                 IIntIterator @base = new AnonymousIntIterator(this, iterators, positions, bound, op, matcher);
-                return new ForceProgressIterator(@base, MaxLoopingDepth);
+                return new ForceProgressIterator(@base, MaxLoopingDepth, matcher);
             }
             else
             {
@@ -132,7 +132,7 @@ namespace OutSmart.DAXon.Regex
                 // reluctant (non-greedy) repeat.
                 // rewritten for bug 3902
                 IIntIterator iter = new AnonymousIntIterator1(this, position, op, matcher);
-                return new ForceProgressIterator(iter, MaxLoopingDepth);
+                return new ForceProgressIterator(iter, MaxLoopingDepth, matcher);
             }
         }
 

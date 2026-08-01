@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Transformation
         }
         public virtual void RegisterTypeAlias(StructuredQName name, ItemType type)
         {
-            typeAliases.Put(name, type);
+            typeAliases[name] = type;
             unresolvedDeclarations.Remove(name);
         }
 
@@ -43,7 +43,7 @@ namespace OutSmart.DAXon.Transformation
             }
             else
             {
-                unresolvedDeclarations.Put(sta.GetObjectName(), declaration);
+                unresolvedDeclarations[sta.GetObjectName()] = declaration;
             }
         }
 
@@ -60,7 +60,7 @@ namespace OutSmart.DAXon.Transformation
             int unresolved = unresolvedDeclarations.Count;
             while (unresolved > 0)
             {
-                HashSet<ComponentDeclaration> pending = new HashSet<ComponentDeclaration>(unresolvedDeclarations.Values());
+                HashSet<ComponentDeclaration> pending = new HashSet<ComponentDeclaration>(unresolvedDeclarations.Values);
                 foreach (ComponentDeclaration decl in pending)
                 {
                     ProcessDeclaration(decl);
@@ -70,7 +70,7 @@ namespace OutSmart.DAXon.Transformation
                 {
                     StringBuilder fsb = new StringBuilder(256);
                     fsb.Append("Cannot resolve all type aliases, because of missing or circular definitions. Unresolved names: ");
-                    foreach (StructuredQName name in unresolvedDeclarations.KeySet())
+                    foreach (StructuredQName name in unresolvedDeclarations.Keys)
                     {
                         fsb.Append(name.DisplayName);
                         fsb.Append(' ');
@@ -85,7 +85,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual ItemType GetItemType(StructuredQName alias)
         {
-            return typeAliases.Get(alias);
+            return typeAliases.GetOrDefault(alias);
         }
     }
 }

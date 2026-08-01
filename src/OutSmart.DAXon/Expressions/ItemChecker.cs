@@ -14,7 +14,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,11 +31,8 @@ namespace OutSmart.DAXon.Expressions
         private readonly ItemType requiredItemType;
         private readonly Func<RoleDiagnostic> roleSupplier;
 
-        public RoleDiagnostic RoleLocator => roleSupplier.Get();
+        public RoleDiagnostic RoleLocator => roleSupplier();
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod
         {
             get
@@ -51,31 +47,10 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string StreamerName => "ItemChecker";
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override IntegerValue[] IntegerBounds => BaseExpression.IntegerBounds;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ExpressionName => "treatAs";
         public ItemChecker(Expression sequence, ItemType itemType, Func<RoleDiagnostic> roleSupplier) : base(sequence)
         {
@@ -105,9 +80,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);
@@ -125,7 +97,7 @@ namespace OutSmart.DAXon.Expressions
                     checkedOperands.Add(checkedOp);
                 }
 
-                Block newBlock = new Block(checkedOperands.ToArray(new Expression[0]));
+                Block newBlock = new Block(checkedOperands.ToArray());
                 ExpressionTool.CopyLocationInfo(this, newBlock);
                 return newBlock.TypeCheck(visitor, contextInfo);
             }
@@ -153,14 +125,14 @@ namespace OutSmart.DAXon.Expressions
                 {
                     if (!(operand is Literal))
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         string message = role.ComposeErrorMessage(requiredItemType, operand, th);
                         visitor.StaticContext.IssueWarning("The only value that can pass type-checking is an empty sequence. " + message, DAXonErrorCode.SXWN9026, GetLocation());
                     }
                 }
                 else
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     string message = role.ComposeErrorMessage(requiredItemType, operand, th);
                     throw new XPathException(message).WithErrorCode(role.ErrorCode).WithLocation(this.GetLocation()).AsTypeErrorIf(role.IsTypeError());
                 }
@@ -169,9 +141,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().Optimize(visitor, contextInfo);
@@ -186,9 +155,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Iterate over the sequence of values
         /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
@@ -196,9 +162,6 @@ namespace OutSmart.DAXon.Expressions
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /// <summary>
         /// Iterate over the sequence of values
         /// </summary>
@@ -217,7 +180,7 @@ namespace OutSmart.DAXon.Expressions
             {
                 if (!requiredItemType.Matches(item, th))
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     string message = role.ComposeErrorMessage(requiredItemType, item, th);
                     string errorCode = role.ErrorCode;
                     XPathException te = new XPathException(message, errorCode).WithFailingExpression(baseExpr).WithLocation(baseExpr.GetLocation()).AsTypeErrorIf(!"XPDY0050".Equals(errorCode));
@@ -226,29 +189,11 @@ namespace OutSmart.DAXon.Expressions
             };
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         public IItem CheckItem(IItem item, IXPathContext context)
         {
             return CheckItem(item, context.GetConfiguration().GetTypeHierarchy(), context);
@@ -267,7 +212,7 @@ namespace OutSmart.DAXon.Expressions
             }
             else
             {
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 string message = role.ComposeErrorMessage(requiredItemType, item, th);
                 string errorCode = role.ErrorCode;
                 if ("XPDY0050".Equals(errorCode))
@@ -285,29 +230,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             DispatchTailCall(MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ItemChecker exp = new ItemChecker(BaseExpression.Copy(rebindings), requiredItemType, roleSupplier);
@@ -315,15 +242,6 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         /// <summary>
         /// Determine the data type of the items returned by the expression
         /// </summary>
@@ -358,15 +276,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
         /// Determine the data type of the items returned by the expression
         /// </summary>
         public override UType GetStaticUType(UType contextItemType)
@@ -374,146 +283,41 @@ namespace OutSmart.DAXon.Expressions
             return UType.FromTypeCode(requiredItemType.PrimitiveType);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             return base.Equals(other) && requiredItemType == ((ItemChecker)other).requiredItemType;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return base.ComputeHashCode() ^ requiredItemType.GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("treat", this);
             @out.EmitAttribute("as", AlphaCode.FromItemType(requiredItemType));
-            @out.EmitAttribute("diag", roleSupplier.Get().Save());
+            @out.EmitAttribute("diag", roleSupplier().Save());
             BaseExpression.Export(@out);
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToString()
         {
             string typeDesc = requiredItemType.ToString();
             return "(" + BaseExpression + ") treat as " + typeDesc;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToShortString()
         {
             return BaseExpression.ToShortString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ItemCheckerElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public class ItemCheckerElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
@@ -552,7 +356,7 @@ namespace OutSmart.DAXon.Expressions
                     return (output, context) =>
                     {
                         TypeCheckingFilter filter = new TypeCheckingFilter(output);
-                        filter.SetRequiredType(expr.requiredItemType, finalCard, expr.roleSupplier.Get(), expr.GetLocation());
+                        filter.SetRequiredType(expr.requiredItemType, finalCard, expr.roleSupplier(), expr.GetLocation());
                         ITailCall tc = argPush.ProcessLeavingTail(filter, context);
                         Expression.DispatchTailCall(tc);
                         filter.FinalCheck();

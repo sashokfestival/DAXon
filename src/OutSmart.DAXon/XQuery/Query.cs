@@ -10,12 +10,10 @@ using System.Collections.Generic;
 using OutSmart.DAXon.Model;
 using System.IO;
 
-// InsertIterator stub REMOVED 2026-05-27: conflicts with real OutSmart.DAXon.Functions.InsertBefore.InsertIterator (nested).
-// Net zero effect either way (CS0246 -1 vs CS0029 +3).
 
 namespace OutSmart.DAXon.XQuery
 {
-    // Phase B: real Query.cs (the XQuery command-line main) is excluded; XsltPackage.Save uses only
+    // Real Query.cs (the XQuery command-line main) is excluded; XsltPackage.Save uses only
     // the static utility Query.CreateFileIfNecessary. Faithful re-impl (identical to Query.cs:1298).
     public class Query
     {
@@ -25,7 +23,10 @@ namespace OutSmart.DAXon.XQuery
             if (!(File.Exists(file) || Directory.Exists(file)))
             {
                 string directory = Path.GetDirectoryName(file);
-                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory)) { Directory.CreateDirectory(directory); }
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
                 using (File.Create(file)) { }
             }
         }

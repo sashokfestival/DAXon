@@ -42,17 +42,12 @@ namespace OutSmart.DAXon.Api
         DEFAULT
 
         // --------------------
-        // TODO enum body members
         // private final int number;
         // ValidationMode(int number) {
         //     this.number = number;
         // }
         // protected int getNumber() {
-        //     return number;
-        // }
         // protected static ValidationMode get(int number) {
-        //     switch(number) {
-        //         case Validation.STRICT:
         //             return STRICT;
         //         case Validation.LAX:
         //             return LAX;
@@ -60,11 +55,7 @@ namespace OutSmart.DAXon.Api
         //             return STRIP;
         //         case Validation.PRESERVE:
         //             return PRESERVE;
-        //         case Validation.DEFAULT:
-        //         default:
         //             return DEFAULT;
-        //     }
-        // }
         // --------------------
     }
 }

@@ -26,7 +26,10 @@ namespace OutSmart.DAXon.Expressions.Numbering
         {
 
             knownTimeZones.Add("UTC");
-            foreach (TimeZoneInfo tz in TimeZoneInfo.GetSystemTimeZones()) { knownTimeZones.Add(tz.Id); }
+            foreach (TimeZoneInfo tz in TimeZoneInfo.GetSystemTimeZones())
+            {
+                knownTimeZones.Add(tz.Id);
+            }
             // The table starts with countries that use multiple timezones, then proceeds in alphabetical order
             Tz("us", "America/New_York", true);
             Tz("us", "America/Chicago", true);
@@ -218,14 +221,14 @@ namespace OutSmart.DAXon.Expressions.Numbering
 
         static void Tz(string country, string zoneId)
         {
-            IList<string> list = idForCountry.Get(country);
+            IList<string> list = idForCountry.GetOrDefault(country);
             if (list == null)
             {
                 list = new List<string>(4);
             }
 
             list.Add(zoneId);
-            idForCountry.Put(country, list);
+            idForCountry[country] = list;
         }
 
         static void Tz(string country, string zoneId, bool major)
@@ -344,7 +347,7 @@ namespace OutSmart.DAXon.Expressions.Numbering
                 return "";
             }
 
-            IList<string> possibleIds = idForCountry.Get(country.ToLowerCase());
+            IList<string> possibleIds = idForCountry.GetOrDefault(country.ToLowerInvariant());
             string exampleId;
             if (possibleIds == null)
             {
@@ -376,7 +379,7 @@ namespace OutSmart.DAXon.Expressions.Numbering
             string olsonName;
             if (region.Length == 2)
             {
-                IList<string> possibleIds = idForCountry.Get(region.ToLowerCase());
+                IList<string> possibleIds = idForCountry.GetOrDefault(region.ToLowerInvariant());
                 if (possibleIds == null)
                 {
                     return null;

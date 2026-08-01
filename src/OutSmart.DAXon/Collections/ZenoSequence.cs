@@ -25,9 +25,6 @@ namespace OutSmart.DAXon.Collections.Zeno
     {
         private readonly ZenoChain<IItem> chain;
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual UnicodeString UnicodeStringValue
         {
             get
@@ -52,42 +49,27 @@ namespace OutSmart.DAXon.Collections.Zeno
                 }
             }
         }
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public ZenoSequence()
         {
             chain = new ZenoChain<IItem>();
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public ZenoSequence(ZenoChain<IItem> chain)
         {
             this.chain = chain;
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public static ZenoSequence FromList(IList<IItem> items)
         {
             ZenoChain<IItem> chain = new ZenoChain<IItem>().AddAll(items);
             return new ZenoSequence(chain);
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual ISequenceIterator Iterate()
         {
             return new ZenoSequenceIterator(this);
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual IItem ItemAt(int n)
         {
             try
@@ -100,17 +82,11 @@ namespace OutSmart.DAXon.Collections.Zeno
             }
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual IItem Head()
         {
             return chain.IsEmpty() ? null : chain[0];
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual IGroundedValue Subsequence(int start, int length)
         {
             if (start < 0)
@@ -139,17 +115,11 @@ namespace OutSmart.DAXon.Collections.Zeno
             }
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual int GetLength()
         {
             return chain.Count();
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual string GetStringValue()
         {
             switch (GetLength())
@@ -172,17 +142,11 @@ namespace OutSmart.DAXon.Collections.Zeno
             }
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual ZenoSequence Append(IItem item)
         {
             return new ZenoSequence(chain.Add(item));
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public virtual ZenoSequence AppendSequence(IGroundedValue items)
         {
             if (chain.IsEmpty() && items is ZenoSequence)
@@ -211,9 +175,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             }
         }
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         public static ZenoSequence Join(IList<IGroundedValue> segments)
         {
 
@@ -238,7 +199,7 @@ namespace OutSmart.DAXon.Collections.Zeno
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual bool EffectiveBooleanValue() => throw new NotImplementedException();
+        public virtual bool EffectiveBooleanValue() => OutSmart.DAXon.Expressions.Parsing.ExpressionTool.EffectiveBooleanValue(Iterate()); // upstream GroundedValue default
         public virtual IGroundedValue Reduce() => this;
         // A ZenoSequence is already a GroundedValue, so materialize()/reduce() return itself
         // (GroundedValue defaults). The stubs threw, breaking fold-left etc. whose accumulator is a
@@ -260,9 +221,6 @@ namespace OutSmart.DAXon.Collections.Zeno
         // `let $x := <zeno-seq>` binding is read more than once (XPathContextMinor.SetLocalVariable).
         public virtual ISequence MakeRepeatable() => this;
 
-        /// <summary>
-        /// Construct an empty ZenoSequence
-        /// </summary>
         /// <summary>
         /// A ISequenceIterator over a ZenoSequence
         /// </summary>

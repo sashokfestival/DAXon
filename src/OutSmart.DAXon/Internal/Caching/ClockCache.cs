@@ -26,6 +26,17 @@ namespace OutSmart.DAXon.Internal.Caching
         private readonly object _writeLock = new object();
         private readonly int _capacity;
 
+        // The clock is a REAL ring with a persistent hand (round BK). The first version swept
+        // the ConcurrentDictionary from the start on every eviction: enumeration order is not
+        // insertion order, so entries in late buckets were effectively immortal - a cache full
+        // of evicted-in-name-only 100 KB compiled regexes measured ~200 MB resident after the
+        // workload had long moved on. The hand makes eviction age-ordered (oldest unreferenced
+        // under the hand goes first), and a newcomer sits just BEHIND the hand, so it gets one
+        // full revolution of grace before it can be considered.
+        private readonly Entry[] _ring;
+        private int _hand;
+        private int _filled;
+
         public int Count => _map.Count;
 
         public ClockCache(int capacity)
@@ -36,6 +47,7 @@ namespace OutSmart.DAXon.Internal.Caching
             }
 
             _capacity = capacity;
+            _ring = new Entry[capacity];
             _map = new ConcurrentDictionary<TKey, Entry>(Environment.ProcessorCount, capacity);
         }
 
@@ -60,15 +72,23 @@ namespace OutSmart.DAXon.Internal.Caching
             TValue value = factory(key);
             lock (_writeLock)
             {
-                if (_map.Count >= _capacity && !_map.ContainsKey(key))
-                {
-                    EvictOne();
-                }
-
-                _map[key] = new Entry(value);
+                Insert(key, value);
             }
 
             return value;
+        }
+
+        /// <summary>
+        /// Stores <paramref name="value"/> under <paramref name="key"/>, evicting if full — the
+        /// insert half of GetOrAdd, for callers whose value is computed from more inputs than the
+        /// key (e.g. a rule search needing the node and dynamic context). Last writer wins.
+        /// </summary>
+        public void Set(TKey key, TValue value)
+        {
+            lock (_writeLock)
+            {
+                Insert(key, value);
+            }
         }
 
         /// <summary>Looks up <paramref name="key"/>; a hit counts as a use (sets the reference bit).</summary>
@@ -95,45 +115,76 @@ namespace OutSmart.DAXon.Internal.Caching
             lock (_writeLock)
             {
                 _map.Clear();
+                Array.Clear(_ring, 0, _ring.Length);
+                _hand = 0;
+                _filled = 0;
             }
         }
 
-        // Second chance, caller holds _writeLock: entries referenced since the last sweep get
-        // their bit cleared and stay; the first unreferenced entry is evicted. If every entry
-        // was referenced, the last one scanned (bit now cleared) is evicted.
-        private void EvictOne()
+        // Caller holds _writeLock. An existing key is replaced in place (same slot, count
+        // unchanged). A new key takes a free slot while warming up; at capacity the hand
+        // sweeps: a referenced entry gets its bit cleared and one more revolution, the first
+        // unreferenced one under the hand is evicted and its slot reused. The sweep is bounded
+        // to two revolutions: a hit sets the reference bit lock-free (GetOrAdd/TryGet), so a
+        // reader can re-set a bit the instant the hand clears it, and "one revolution clears
+        // every bit" does NOT hold under contention — without the cap the sweep could livelock.
+        // After each entry has had its second chance we force-evict the one under the hand.
+        private void Insert(TKey key, TValue value)
         {
-            TKey lastSeen = default;
-            bool any = false;
-            foreach (KeyValuePair<TKey, Entry> kv in _map)
+            if (_map.TryGetValue(key, out Entry old))
             {
-                if (kv.Value.Referenced == 0)
+                Entry replacement = new Entry(key, value, old.Slot);
+                _ring[old.Slot] = replacement;
+                _map[key] = replacement;
+                return;
+            }
+
+            int slot;
+            if (_filled < _capacity)
+            {
+                slot = _filled++;
+            }
+            else
+            {
+                int steps = 0;
+                int maxSteps = 2 * _capacity;
+                while (true)
                 {
-                    _map.TryRemove(kv.Key, out _);
-                    return;
+                    Entry cand = _ring[_hand];
+                    if (cand.Referenced != 0 && steps < maxSteps)
+                    {
+                        cand.Referenced = 0;
+                        _hand = (_hand + 1) % _capacity;
+                        steps++;
+                        continue;
+                    }
+
+                    _map.TryRemove(cand.Key, out _);
+                    slot = _hand;
+                    _hand = (_hand + 1) % _capacity;
+                    break;
                 }
-
-                kv.Value.Referenced = 0;
-                lastSeen = kv.Key;
-                any = true;
             }
 
-            if (any)
-            {
-                _map.TryRemove(lastSeen, out _);
-            }
+            Entry entry = new Entry(key, value, slot);
+            _ring[slot] = entry;
+            _map[key] = entry;
         }
 
         // Value is readonly: initialized before the entry is published through the dictionary,
         // so lock-free readers can never observe a half-written value.
         private sealed class Entry
         {
+            internal readonly TKey Key;
             internal readonly TValue Value;
+            internal readonly int Slot;
             internal int Referenced;
 
-            internal Entry(TValue value)
+            internal Entry(TKey key, TValue value, int slot)
             {
+                Key = key;
                 Value = value;
+                Slot = slot;
             }
         }
     }

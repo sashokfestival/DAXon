@@ -40,26 +40,8 @@ namespace OutSmart.DAXon.Expressions
 
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a boolean
-        /// </summary>
         public override string ExpressionName => "instance";
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a boolean
-        /// </summary>
         public override string StreamerName => "InstanceOf";
         public InstanceOfExpression(Expression source, SequenceType target) : base(source)
         {
@@ -187,9 +169,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
         /// Determine the data type of the result of the InstanceOf expression
         /// </summary>
         public override ItemType GetItemType()
@@ -197,9 +176,6 @@ namespace OutSmart.DAXon.Expressions
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /// <summary>
         /// Determine the data type of the result of the InstanceOf expression
         /// </summary>
@@ -209,12 +185,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
         /// Evaluate the expression
         /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
@@ -222,29 +192,11 @@ namespace OutSmart.DAXon.Expressions
             return BooleanValue.Get(EffectiveBooleanValue(context));
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a boolean
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             return MakeElaborator().ElaborateForBoolean().Eval(context);
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a boolean
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("instance", this);
@@ -254,56 +206,23 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a boolean
-        /// </summary>
         public override string ToString()
         {
             string occ = Cardinality.GetOccurrenceIndicator(targetCardinality);
             return "(" + BaseExpression.ToString() + " instance of " + targetType.ToString() + occ + ")";
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a boolean
-        /// </summary>
         public override string ToShortString()
         {
             string occ = Cardinality.GetOccurrenceIndicator(targetCardinality);
             return BaseExpression.ToShortString() + " instance of " + targetType.ToString() + occ;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a boolean
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new InstanceOfElaborator();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the InstanceOf expression
-        /// </summary>
         /// <summary>
         /// Elaborator for an {@code instance of} expression
         /// </summary>

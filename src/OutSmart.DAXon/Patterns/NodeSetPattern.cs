@@ -16,7 +16,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -60,7 +59,7 @@ namespace OutSmart.DAXon.Patterns
             }
             catch (XPathException e)
             {
-                visitor.IssueWarning("Pattern will never match anything. " + e.GetMessage(), DAXonErrorCode.SXWN9015, GetLocation());
+                visitor.IssueWarning("Pattern will never match anything. " + e.Message, DAXonErrorCode.SXWN9015, GetLocation());
                 @checked = Literal.MakeEmptySequence();
             }
 
@@ -116,10 +115,8 @@ namespace OutSmart.DAXon.Patterns
                 {
                     throw e;
                 }
-                catch (XPathException.StackOverflow e)
-                {
-                    throw e;
-                }
+                // No StackOverflow catch: RecursionDepthError (a foreign type since round BC) is not
+                // an XPathException, so it propagates untouched; the old subtype is never thrown here.
                 catch (XPathException e)
                 {
 
@@ -172,17 +169,11 @@ namespace OutSmart.DAXon.Patterns
             return (other is NodeSetPattern) && ((NodeSetPattern)other).SelectionExpression.IsEqual(SelectionExpression);
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return 0x73108728 ^ SelectionExpression.GetHashCode();
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             NodeSetPattern n = new NodeSetPattern(SelectionExpression.Copy(rebindings));
@@ -191,9 +182,6 @@ namespace OutSmart.DAXon.Patterns
             return n;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             presenter.StartElement("p.nodeSet");

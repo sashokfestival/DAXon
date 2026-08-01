@@ -207,9 +207,9 @@ namespace OutSmart.DAXon.Values
 
         private static void Fppfpp(UnicodeBuilder sb, int e, long f, int p)
         {
-            long R = f << System.Math.Max(e - p, 0);
-            long S = 1L << System.Math.Max(0, -(e - p));
-            long Mminus = 1L << System.Math.Max(e - p, 0);
+            long R = f << Math.Max(e - p, 0);
+            long S = 1L << Math.Max(0, -(e - p));
+            long Mminus = 1L << Math.Max(e - p, 0);
             long Mplus = Mminus;
             bool initial = true;
 
@@ -307,13 +307,13 @@ namespace OutSmart.DAXon.Values
         {
 
             //long R = f << Math.max(e-p, 0);
-            BigInteger R = new BigInteger(f) << System.Math.Max(e - p, 0);
+            BigInteger R = new BigInteger(f) << Math.Max(e - p, 0);
 
             //long S = 1L << Math.max(0, -(e-p));
-            BigInteger S = BigInteger.One << System.Math.Max(0, -(e - p));
+            BigInteger S = BigInteger.One << Math.Max(0, -(e - p));
 
             //long Mminus = 1 << Math.max(e-p, 0);
-            BigInteger Mminus = BigInteger.One << System.Math.Max(e - p, 0);
+            BigInteger Mminus = BigInteger.One << Math.Max(e - p, 0);
 
             //long Mplus = Mminus;
             BigInteger Mplus = Mminus;
@@ -412,13 +412,13 @@ namespace OutSmart.DAXon.Values
         {
 
             //long R = f << Math.max(e-p, 0);
-            BigInteger R = new BigInteger(f) << System.Math.Max(e - p, 0);
+            BigInteger R = new BigInteger(f) << Math.Max(e - p, 0);
 
             //long S = 1L << Math.max(0, -(e-p));
-            BigInteger S = BigInteger.One << System.Math.Max(0, -(e - p));
+            BigInteger S = BigInteger.One << Math.Max(0, -(e - p));
 
             //long Mminus = 1 << Math.max(e-p, 0);
-            BigInteger Mminus = BigInteger.One << System.Math.Max(e - p, 0);
+            BigInteger Mminus = BigInteger.One << Math.Max(e - p, 0);
 
             //long Mplus = Mminus;
             BigInteger Mplus = Mminus;
@@ -665,7 +665,5 @@ namespace OutSmart.DAXon.Values
         //                    //String input = (p + "." + q);
         //                    String input = "0.000" + q;
         //                    //System.Console.Error.println("input: " + input + " output: " + sb.toString() + " java: " + f);
-        //        }
-        //    }
     }
 }

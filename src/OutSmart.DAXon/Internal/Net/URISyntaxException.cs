@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Internal.Net
     /// need to catch URISyntaxException specifically should catch this type
     /// (we throw it where Saxon code expects it).
     /// </summary>
-    // Phase 5: extend Throwable so callers passing this to XPathException(Throwable err) ctor bind.
+    // Extend Throwable so callers passing this to XPathException(Throwable err) ctor bind.
     public class URISyntaxException : global::System.Exception
     {
         public string Input { get; }

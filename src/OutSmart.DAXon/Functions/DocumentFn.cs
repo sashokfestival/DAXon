@@ -24,7 +24,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Functions
 {
     /// <summary>
@@ -33,9 +32,6 @@ namespace OutSmart.DAXon.Functions
     public class DocumentFn : SystemFunction, ICallable
     {
         private ILocation location;
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override int GetCardinality(Expression[] arguments)
         {
             Expression expression = arguments[0];
@@ -49,9 +45,6 @@ namespace OutSmart.DAXon.Functions
             } // may have to revise this if the argument can be a list-valued element or attribute
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override int GetSpecialProperties(Expression[] arguments)
         {
             return StaticProperty.ORDERED_NODESET | StaticProperty.PEER_NODESET | StaticProperty.NO_NODES_NEWLY_CREATED; // Declaring it as a peer node-set expression avoids sorting of expressions such as
@@ -60,9 +53,6 @@ namespace OutSmart.DAXon.Functions
             // with the same arguments will produce identical results.
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override Expression MakeFunctionCall(params Expression[] arguments)
         {
             location = arguments[0].GetLocation();
@@ -70,17 +60,11 @@ namespace OutSmart.DAXon.Functions
             return expr == null ? base.MakeFunctionCall(arguments) : expr;
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public static bool SourceIsTree(ResolvedResource source)
         {
             return source != null && source.Node != null;
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             int numArgs = GetArity();
@@ -106,14 +90,8 @@ namespace OutSmart.DAXon.Functions
             ItemMappingIterator iter = new ItemMappingIterator(hrefSequence, map);
 
             return SequenceTool.ToLazySequence(new DocumentOrderIterator(iter, GlobalOrderComparer.GetInstance())); // this is to make sure we eliminate duplicates: two href's might be the same
-            //        } else {
-            //            return SequenceTool.toLazySequence(iter);
-            //        }
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public static NodeInfo MakeDoc(string href, string baseURI, PackageData packageData, ParseOptions options, IXPathContext c, ILocation locator, bool silent)
         {
             Configuration config = c.GetConfiguration();
@@ -162,7 +140,7 @@ namespace OutSmart.DAXon.Functions
 
             DocumentPool pool = controller.GetDocumentPool();
 
-            lock (controller)
+            lock (controller.syncLock)
             {
                 doc = pool.Find(documentKey);
                 if (doc != null)
@@ -291,7 +269,7 @@ namespace OutSmart.DAXon.Functions
                 // has built the same document and put it in the document pool. So we do another
                 // check on the document pool, and if this has happened, we discard the document
                 // we have just built and use the one from the pool instead.
-                lock (controller)
+                lock (controller.syncLock)
                 {
                     doc = pool.Find(documentKey);
                     if (doc != null)
@@ -308,18 +286,15 @@ namespace OutSmart.DAXon.Functions
 
                 return GetFragment(newdoc, fragmentId, c, locator);
             }
-            catch (TransformerException err)
+            catch (XPathException err)
             {
                 pool.MarkUnavailable(documentKey);
-                string code = (err.GetException() is URISyntaxException) ? "FODC0005" : "FODC0002";
+                string code = (err.InnerException is URISyntaxException) ? "FODC0005" : "FODC0002";
                 XPathException xerr = XPathException.MakeXPathException(err);
                 throw xerr.MaybeWithLocation(locator).MaybeWithErrorCode(code);
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         private static String[] ExtractFragment(string href)
         {
 
@@ -352,9 +327,6 @@ namespace OutSmart.DAXon.Functions
             };
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public static ResolvedResource ResolveURI(string href, string baseURI, string documentKey, IXPathContext context)
         {
             Configuration config = context.GetConfiguration();
@@ -421,23 +393,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Compute a document key
-        /// </summary>
         public static DocumentKey ComputeDocumentKey(string href, string baseURI, PackageData packageData, IXPathContext c)
         {
             return ComputeDocumentKey(href, baseURI, packageData, true);
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Compute a document key
-        /// </summary>
         public static DocumentKey ComputeDocumentKey(string href, string baseURI, PackageData packageData, bool strip)
         {
             string absURI;
@@ -504,12 +464,6 @@ namespace OutSmart.DAXon.Functions
             return new DocumentKey(absURI);
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Compute a document key
-        /// </summary>
         public static NodeInfo PreLoadDoc(string href, string baseURI, PackageData packageData, Configuration config, ILocation locator)
         {
             int hash = href.IndexOf('#');
@@ -574,12 +528,6 @@ namespace OutSmart.DAXon.Functions
             return newdoc.GetRootNode();
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Compute a document key
-        /// </summary>
         public static void SendDoc(string href, string baseURI, PackageData packageData, IXPathContext context, ILocation locator, IReceiver @out, ParseOptions parseOptions)
         {
             PipelineConfiguration pipe = @out.GetPipelineConfiguration();
@@ -637,7 +585,7 @@ namespace OutSmart.DAXon.Functions
                         source = new ResolvedResource { Node = startNode.Root };
                     }
                 }
-                catch (TransformerException err)
+                catch (XPathException err)
                 {
                     XPathException xerr = XPathException.MakeXPathException(err);
                     xerr.SetLocator(locator);
@@ -662,12 +610,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Compute a document key
-        /// </summary>
         // Get a Source from the resource resolver
         private static NodeInfo GetFragment(ITreeInfo doc, string fragmentId, IXPathContext context, ILocation locator)
         {
@@ -689,9 +631,6 @@ namespace OutSmart.DAXon.Functions
             return doc.SelectID(fragmentId, false);
         }
 
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         private class DocumentMappingFunction : IItemMappingFunction
         {
             public string baseURI;

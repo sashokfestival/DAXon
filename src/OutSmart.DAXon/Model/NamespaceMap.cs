@@ -112,7 +112,7 @@ namespace OutSmart.DAXon.Model
 
         public NamespaceMap(IList<NamespaceBinding> bindings)
         {
-            NamespaceBinding[] bindingArray = bindings.ToArray(NamespaceBinding.EMPTY_ARRAY);
+            NamespaceBinding[] bindingArray = bindings.ToArray();
             SortByPrefix(bindingArray);
             bool bindsXmlNamespace = false;
             prefixes = new string[bindingArray.Length];
@@ -605,8 +605,8 @@ namespace OutSmart.DAXon.Model
                 }
 
                 NamespaceMap n2 = new NamespaceMap();
-                n2.prefixes = prefixList.ToArray(new string[] { });
-                n2.uris = uriList.ToArray(new NamespaceUri[] { });
+                n2.prefixes = prefixList.ToArray();
+                n2.uris = uriList.ToArray();
                 return n2;
             }
         }
@@ -685,7 +685,7 @@ namespace OutSmart.DAXon.Model
                 }
                 else
                 {
-                    return result.ToArray(NamespaceBinding.EMPTY_ARRAY);
+                    return result.ToArray();
                 }
             }
         }
@@ -719,7 +719,7 @@ namespace OutSmart.DAXon.Model
         {
             IList<string> prefixList = new List<string>(prefixes.ToList());
             prefixList.Add("xml");
-            return prefixList.IIterator();
+            return prefixList.GetEnumerator();
         }
 
         public override string ToString()
@@ -727,7 +727,7 @@ namespace OutSmart.DAXon.Model
             StringBuilder sb = new StringBuilder();
             foreach (NamespaceBinding nb in this)
             {
-                sb.Append(nb.GetPrefix()).Append("=").Append(nb.GetNamespaceUri()).Append(" ");
+                sb.Append(nb.GetPrefix()).Append('=').Append(nb.GetNamespaceUri()).Append(' ');
             }
 
             return sb.ToString();
@@ -784,7 +784,11 @@ namespace OutSmart.DAXon.Model
 
             {
 
-                if (HasNext()) { _current = Next(); return true; }
+                if (HasNext())
+                {
+                    _current = Next();
+                    return true;
+                }
 
                 return false;
 

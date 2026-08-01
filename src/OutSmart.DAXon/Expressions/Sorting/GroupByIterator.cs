@@ -26,6 +26,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 {
     public class GroupByIterator : IGroupIterator, ILastPositionFinder, ILookaheadIterator
     {
+        private readonly object syncLock = new object();
         private ISequenceIterator population;
         protected Expression keyExpression;
         private IStringCollator collator;
@@ -127,13 +128,13 @@ namespace OutSmart.DAXon.Expressions.Sorting
                 comparisonKey = key.GetXPathMatchKey(collator, implicitTimezone);
             }
 
-            IList<IItem> g = index.Get(comparisonKey);
+            IList<IItem> g = index.GetOrDefault(comparisonKey);
             if (g == null)
             {
                 IList<IItem> newGroup = new Grp(item);
                 groups.Add(newGroup);
                 groupKeys.Add(key);
-                index.Put(comparisonKey, newGroup);
+                index[comparisonKey] = newGroup;
             }
             else
             {
@@ -192,13 +193,13 @@ namespace OutSmart.DAXon.Expressions.Sorting
                 }
 
                 CompositeAtomicKey cak = new CompositeAtomicKey(ckList);
-                IList<IItem> g = index.Get(cak);
+                IList<IItem> g = index.GetOrDefault(cak);
                 if (g == null)
                 {
                     IList<IItem> newGroup = new Grp(item);
                     groups.Add(newGroup);
                     groupKeys.Add(new AtomicArray(compositeKey));
-                    index.Put(cak, newGroup);
+                    index[cak] = newGroup;
                 }
                 else
                 {
@@ -209,7 +210,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public virtual IAtomicSequence GetCurrentGroupingKey()
         {
-            lock (this)
+            lock (syncLock)
             {
                 IAtomicSequence val = groupKeys[position - 1];
                 if (val == null)

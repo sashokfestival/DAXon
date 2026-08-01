@@ -44,7 +44,6 @@ namespace OutSmart.DAXon.Xslt
         public override void Validate(ComponentDeclaration decl)
         {
 
-            //checkWithinTemplate();
             foreach (NodeInfo child in Children())
             {
                 if (child is XSLWithParam)

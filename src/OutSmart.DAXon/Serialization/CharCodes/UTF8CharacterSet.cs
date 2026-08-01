@@ -13,7 +13,7 @@ using System.Text;
 
 namespace OutSmart.DAXon.Serialization.CharCodes
 {
-    // Phase 5: UTF8CharacterSet stub must implement ICharacterSet (10 callers assign to ICharacterSet).
+    // UTF8CharacterSet stub must implement ICharacterSet (10 callers assign to ICharacterSet).
     public class UTF8CharacterSet : ICharacterSet
     {
         private static readonly UTF8CharacterSet _instance = new UTF8CharacterSet();
@@ -26,7 +26,10 @@ namespace OutSmart.DAXon.Serialization.CharCodes
         public static byte[] Encode(IIntIterator codePoints)
         {
             var sb = new StringBuilder();
-            while (codePoints.MoveNext()) { sb.Append(char.ConvertFromUtf32(codePoints.Current)); }
+            while (codePoints.MoveNext())
+            {
+                sb.Append(char.ConvertFromUtf32(codePoints.Current));
+            }
             return Encoding.UTF8.GetBytes(sb.ToString());
         }
     }

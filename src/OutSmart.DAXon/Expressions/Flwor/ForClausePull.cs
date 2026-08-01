@@ -29,6 +29,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
         {
             while (true)
             {
+                // Per-tuple deadline check: this is the choke point every FLWOR tuple flows through
+                // (a where clause that rejects everything spins here, and the binding sequence may
+                // be a materialized ListIterator whose Next() checks nothing). The ForExpression
+                // path has the same check; the pull pipeline used to have none.
+                context.GetController().CheckTimeoutPerStep();
                 if (currentIteration == null)
                 {
                     if (!@base.NextTuple(context))

@@ -43,7 +43,6 @@ namespace OutSmart.DAXon.Values
                 return sb.ToUnicodeString();
             }
         }
-        //Pattern.compile("--([0-9][0-9])(--)?(Z|[+-][0-9][0-9]:[0-9][0-9])?");
         // The commented-out pattern tolerates the bogus format --MM-- which was wrongly permitted by the original schema spec
         private GMonthValue(MutableGDateValue m) : base(m)
         {

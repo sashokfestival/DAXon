@@ -13,7 +13,7 @@ using System.Collections;
 
 namespace OutSmart.DAXon.Lib
 {
-    // Phase 5: ActiveSAXSource — used inline in Configuration.cs.
+    // ActiveSAXSource — used inline in Configuration.cs.
     // ActiveSAXSource stub removed 2026-06-01: real OutSmart.DAXon.Events.ActiveSAXSource re-included (drives parser.Parse).
     // I5 B4b-1 (2026-06-12): the compat HashSet wrapper is RETIRED, so BOTH sides of this interface+impl
     // pair are now System.Collections.Generic.HashSet<string>. Crucially the divergence the run-31

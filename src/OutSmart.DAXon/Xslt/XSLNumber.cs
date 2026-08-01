@@ -12,7 +12,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -199,7 +198,7 @@ namespace OutSmart.DAXon.Xslt
 
             if (startAtAtt != null)
             {
-                if (startAtAtt.IndexOf('{') < 0 && !startAtAtt.Matches("-?[0-9]+(\\s+-?[0-9]+)*"))
+                if (startAtAtt.IndexOf('{') < 0 && !startAtAtt.MatchesRegex("-?[0-9]+(\\s+-?[0-9]+)*"))
                 {
                     CompileErrorInAttribute("Invalid format for start-at attribute", "XTSE0020", "start-at");
                 }

@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Api.Push
 {
-    public interface IContainer
+    public interface IContainer : global::System.IDisposable
     {
         void SetDefaultNamespace(string uri);
         IElement Element(QName name);
@@ -23,6 +23,6 @@ namespace OutSmart.DAXon.Api.Push
         IContainer Text(string value);
         IContainer Comment(string value);
         IContainer ProcessingInstruction(string name, string value);
-        void Dispose();
+        void Close();
     }
 }

@@ -62,8 +62,10 @@ namespace OutSmart.DAXon.Trees.Iterators
                 throw new InvalidOperationException(e.Message, e);
             }
         }
-        public virtual bool IsActuallyGrounded() => throw new NotImplementedException();
-        public virtual IItem Next() => throw new NotImplementedException();
+        public virtual bool IsActuallyGrounded() => true; // a range has GetResidue(): always grounded
+        // All three subclasses re-bridge ISequenceIterator.Next to their covariant IntegerValue
+        // Next(); this slot only fires if a future subclass forgets that bridge.
+        public virtual IItem Next() => throw new InvalidOperationException("RangeIterator subclass must bridge ISequenceIterator.Next to its covariant Next()");
         public virtual void Dispose() { }
 
         // upstream: RangeIterator has no materialize override — the GroundedIterator interface

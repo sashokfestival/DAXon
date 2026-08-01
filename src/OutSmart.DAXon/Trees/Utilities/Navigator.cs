@@ -16,7 +16,6 @@ using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Trees.Wrappers;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -136,18 +135,7 @@ namespace OutSmart.DAXon.Trees.Utilities
                             return null;
                         }
 
-                        string parentSysId = parentNode.GetSystemId();
-                        bool isTopWithinEntity = false; // TODO: variable is unused. What's going on here? - MHK 2020-07-04
-                        if (node is TinyElementImpl)
-                        {
-                            isTopWithinEntity = ((TinyElementImpl)node).Tree.IsTopWithinEntity(((TinyElementImpl)node).NodeNumber);
-                        }
-                        else
-                        {
-                            isTopWithinEntity = !startSysId.Equals(parentSysId);
-                        }
-
-                        URI @base = new URI(isTopElementWithinEntity.Test(node) ? startSysId : parentNode.GetBaseURI());
+                        URI @base = new URI(isTopElementWithinEntity(node) ? startSysId : parentNode.GetBaseURI());
 
                         //URI @base = new URI(parent.getBaseURI());  //bug 3530
                         baseURI = (xmlBase.Length == 0) ? @base : @base.Resolve(baseURI);
@@ -208,23 +196,7 @@ namespace OutSmart.DAXon.Trees.Utilities
                 case Types.Type.DOCUMENT:
                     return "/";
                 case Types.Type.ELEMENT:
-                    if (parent == null)
-                    {
-                        return node.DisplayName;
-                    }
-                    else
-                    {
-                        pre = GetPath(parent, context);
-                        if (pre.Equals("/"))
-                        {
-                            return '/' + node.DisplayName;
-                        }
-                        else
-                        {
-                            return pre + '/' + node.DisplayName + (streamed ? "" : "[" + GetNumberSimple(node, context) + "]");
-                        }
-                    }
-
+                    return parent == null ? node.DisplayName : ElementPath(node, context);
                 case Types.Type.ATTRIBUTE:
                     return GetPath(parent, context) + "/@" + node.DisplayName;
                 case Types.Type.TEXT:
@@ -249,6 +221,43 @@ namespace OutSmart.DAXon.Trees.Utilities
                 default:
                     return "";
             }
+        }
+
+        /// <summary>
+        /// The path of an element that has a parent. The ancestor chain is the only unbounded part
+        /// of a path - every other node kind steps to its parent once and lands here - so it is
+        /// walked iteratively: GetPath BUILDS error messages (a runtime error reports the path of
+        /// its context node), and a document deep enough to overflow would replace the real
+        /// diagnosis with a stack error.
+        /// </summary>
+        private static string ElementPath(NodeInfo node, IXPathContext context)
+        {
+            List<NodeInfo> chain = new List<NodeInfo>();
+            for (NodeInfo n = node; n != null && n.GetNodeKind() == Types.Type.ELEMENT; n = n.GetParent())
+            {
+                chain.Add(n);
+            }
+
+            // the outermost element carries no position: rooted at its document if it has one
+            NodeInfo top = chain[chain.Count - 1];
+            StringBuilder sb = new StringBuilder();
+            if (top.GetParent() != null)
+            {
+                sb.Append('/');
+            }
+
+            sb.Append(top.DisplayName);
+            for (int i = chain.Count - 2; i >= 0; i--)
+            {
+                NodeInfo e = chain[i];
+                sb.Append('/').Append(e.DisplayName);
+                if (!e.GetConfiguration().IsStreamedNode(e))
+                {
+                    sb.Append('[').Append(GetNumberSimple(e, context)).Append(']');
+                }
+            }
+
+            return sb.ToString();
         }
 
         public static AbsolutePath GetAbsolutePath(NodeInfo node)
@@ -543,7 +552,7 @@ namespace OutSmart.DAXon.Trees.Utilities
                 if (count.MatchesItem(curr, context))
                 {
                     int num = GetNumberSingle(curr, count, null, context);
-                    v.Add(0, (long)num);
+                    v.Insert(0,(long)num);
                 }
 
                 if (from != null && from.MatchesItem(curr, context))
@@ -588,6 +597,7 @@ namespace OutSmart.DAXon.Trees.Utilities
                 case Types.Type.DOCUMENT:
                     {
                         @out.StartDocument(CopyOptions.GetStartDocumentProperties(copyOptions));
+                        StackGuard.Probe();
                         foreach (NodeInfo child in node.Children())
                         {
                             child.Copy(@out, copyOptions, locationId);
@@ -630,6 +640,12 @@ namespace OutSmart.DAXon.Trees.Utilities
                         }
 
                         @out.StartElement(elementName, annotation, node.Attributes(), nsMap, locationId, ReceiverOption.BEQUEATH_INHERITED_NAMESPACES_ONLY | ReceiverOption.NAMESPACE_OK);
+
+                        // Only the children recurse, one level per level of the tree, so the depth
+                        // is the input document's. Probing here rather than on entry keeps it off
+                        // the leaf kinds below, which are most of a document's nodes. Unlike a
+                        // path, a copy is the RESULT, not a diagnostic: failing here is honest.
+                        StackGuard.Probe();
 
                         // output the children
                         foreach (NodeInfo child in node.Children())
@@ -691,6 +707,7 @@ namespace OutSmart.DAXon.Trees.Utilities
                 case Types.Type.DOCUMENT:
                     {
                         @out.StartDocument(CopyOptions.GetStartDocumentProperties(copyOptions));
+                        StackGuard.Probe();
                         foreach (NodeInfo child in node.Children())
                         {
                             Copy(child, @out, copyOptions, locationId);
@@ -718,6 +735,7 @@ namespace OutSmart.DAXon.Trees.Utilities
                             @out.Attribute(attr.GetNodeName(), attType, attr.Value, attr.GetLocation(), attr.GetProperties());
                         }
 
+                        StackGuard.Probe();   // as the IReceiver overload: only the children recurse
 
                         // output the children
                         foreach (NodeInfo child in node.Children())
@@ -1294,14 +1312,27 @@ namespace OutSmart.DAXon.Trees.Utilities
             public void Dispose() { }
         } // end of class AncestorEnumeration
 
+        /// <summary>
+        /// The descendant (or descendant-or-self) axis, in document order or reverse. Held as an
+        /// explicit stack of child iterators rather than a chain of nested enumerations: nesting
+        /// cost one stack frame per tree level on EVERY Next(), so a deep document was quadratic
+        /// in time and unbounded in stack - and the depth is the input's, not the stylesheet's.
+        /// </summary>
         public sealed class DescendantEnumeration : IAxisIterator
         {
-            private ISequenceIterator children = null;
-            private IAxisIterator descendants = null;
+            // Backwards, a node is emitted AFTER its descendants, so each open level remembers the
+            // node it still owes. Forwards nothing is owed - the node was emitted on the way down.
+            private struct Level
+            {
+                internal ISequenceIterator Children;
+                internal NodeInfo Owed;
+            }
+
+            private readonly List<Level> open = new List<Level>();
             private readonly NodeInfo start;
             private readonly bool includeSelf;
             private readonly bool forwards;
-            private bool atEnd = false;
+            private bool started = false;
             public DescendantEnumeration(NodeInfo start, bool includeSelf, bool forwards)
             {
                 this.start = start;
@@ -1309,90 +1340,61 @@ namespace OutSmart.DAXon.Trees.Utilities
                 this.forwards = forwards;
             }
 
+            private void Descend(NodeInfo node, NodeInfo owed)
+            {
+                ISequenceIterator children = EmptyIterator.OfNodes();
+                if (node.HasChildNodes())
+                {
+                    children = node.IterateAxis(AxisInfo.CHILD);
+                    if (!forwards)
+                    {
+                        children = Reverse.GetReverseIterator(children);
+                    }
+                }
+
+                open.Add(new Level { Children = children, Owed = owed });
+            }
+
             public NodeInfo Next()
             {
-                if (descendants != null)
+                if (!started)
                 {
-                    NodeInfo nextd = descendants.Next();
-                    if (nextd != null)
-                    {
-                        return nextd;
-                    }
-                    else
-                    {
-                        descendants = null;
-                    }
-                }
-
-                if (children != null)
-                {
-                    NodeInfo n = (NodeInfo)children.Next();
-                    if (n != null)
-                    {
-                        if (n.HasChildNodes())
-                        {
-                            if (forwards)
-                            {
-                                descendants = new DescendantEnumeration(n, false, true);
-                                return n;
-                            }
-                            else
-                            {
-                                descendants = new DescendantEnumeration(n, true, false);
-                                return Next();
-                            }
-                        }
-                        else
-                        {
-                            return n;
-                        }
-                    }
-                    else
-                    {
-                        if (forwards || !includeSelf)
-                        {
-                            return null;
-                        }
-                        else
-                        {
-                            atEnd = true;
-                            children = null;
-                            return start;
-                        }
-                    }
-                }
-                else if (atEnd)
-                {
-
-                    // we're just finishing a backwards scan
-                    return null;
-                }
-                else
-                {
-
-                    // we're just starting...
-                    if (start.HasChildNodes())
-                    {
-                        children = start.IterateAxis(AxisInfo.CHILD);
-                        if (!forwards)
-                        {
-                            children = Reverse.GetReverseIterator(children);
-                        }
-                    }
-                    else
-                    {
-                        children = EmptyIterator.OfNodes();
-                    }
-
+                    started = true;
+                    Descend(start, !forwards && includeSelf ? start : null);
                     if (forwards && includeSelf)
                     {
                         return start;
                     }
-                    else
+                }
+
+                while (open.Count != 0)
+                {
+                    Level level = open[open.Count - 1];
+                    NodeInfo n = (NodeInfo)level.Children.Next();
+                    if (n == null)
                     {
-                        return Next();
+                        open.RemoveAt(open.Count - 1);
+                        if (level.Owed != null)
+                        {
+                            return level.Owed;
+                        }
+
+                        continue;
+                    }
+
+                    if (!n.HasChildNodes())
+                    {
+                        return n;
+                    }
+
+                    Descend(n, forwards ? null : n);
+                    if (forwards)
+                    {
+                        return n;
                     }
                 }
+
+                return null;
             }
 
             public void Advance()
@@ -1439,47 +1441,54 @@ namespace OutSmart.DAXon.Trees.Utilities
                 }
             }
 
+            // Looped rather than self-calling on the ancestor step: that recursion was one frame
+            // per level of the start node's depth, which the input document chooses.
             public NodeInfo Next()
             {
-                if (descendEnum != null)
+                while (true)
                 {
-                    NodeInfo nextd = descendEnum.Next();
-                    if (nextd != null)
+                    if (descendEnum != null)
                     {
-                        return nextd;
-                    }
-                    else
-                    {
-                        descendEnum = null;
-                    }
-                }
-
-                if (siblingEnum != null)
-                {
-                    NodeInfo nexts = siblingEnum.Next();
-                    if (nexts != null)
-                    {
-                        if (nexts.HasChildNodes())
+                        NodeInfo nextd = descendEnum.Next();
+                        if (nextd != null)
                         {
-                            descendEnum = new DescendantEnumeration(nexts, false, true);
+                            return nextd;
                         }
                         else
                         {
                             descendEnum = null;
                         }
-
-                        return nexts;
                     }
-                    else
+
+                    if (siblingEnum != null)
                     {
-                        descendEnum = null;
-                        siblingEnum = null;
-                    }
-                }
+                        NodeInfo nexts = siblingEnum.Next();
+                        if (nexts != null)
+                        {
+                            if (nexts.HasChildNodes())
+                            {
+                                descendEnum = new DescendantEnumeration(nexts, false, true);
+                            }
+                            else
+                            {
+                                descendEnum = null;
+                            }
 
-                NodeInfo nexta = ancestorEnum.Next();
-                if (nexta != null)
-                {
+                            return nexts;
+                        }
+                        else
+                        {
+                            descendEnum = null;
+                            siblingEnum = null;
+                        }
+                    }
+
+                    NodeInfo nexta = ancestorEnum.Next();
+                    if (nexta == null)
+                    {
+                        return null;
+                    }
+
                     if (nexta.GetNodeKind() == Types.Type.DOCUMENT)
                     {
                         siblingEnum = EmptyIterator.OfNodes();
@@ -1488,12 +1497,6 @@ namespace OutSmart.DAXon.Trees.Utilities
                     {
                         siblingEnum = nexta.IterateAxis(AxisInfo.FOLLOWING_SIBLING);
                     }
-
-                    return Next();
-                }
-                else
-                {
-                    return null;
                 }
             }
             IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
@@ -1526,47 +1529,53 @@ namespace OutSmart.DAXon.Trees.Utilities
                 }
             }
 
+            // Looped for the same reason as FollowingEnumeration.Next.
             public NodeInfo Next()
             {
-                if (descendEnum != null)
+                while (true)
                 {
-                    NodeInfo nextd = descendEnum.Next();
-                    if (nextd != null)
+                    if (descendEnum != null)
                     {
-                        return nextd;
-                    }
-                    else
-                    {
-                        descendEnum = null;
-                    }
-                }
-
-                if (siblingEnum != null)
-                {
-                    NodeInfo nexts = siblingEnum.Next();
-                    if (nexts != null)
-                    {
-                        if (nexts.HasChildNodes())
+                        NodeInfo nextd = descendEnum.Next();
+                        if (nextd != null)
                         {
-                            descendEnum = new DescendantEnumeration(nexts, true, false);
-                            return Next();
+                            return nextd;
                         }
                         else
                         {
                             descendEnum = null;
-                            return nexts;
                         }
                     }
-                    else
-                    {
-                        descendEnum = null;
-                        siblingEnum = null;
-                    }
-                }
 
-                NodeInfo nexta = ancestorEnum.Next();
-                if (nexta != null)
-                {
+                    if (siblingEnum != null)
+                    {
+                        NodeInfo nexts = siblingEnum.Next();
+                        if (nexts != null)
+                        {
+                            if (nexts.HasChildNodes())
+                            {
+                                descendEnum = new DescendantEnumeration(nexts, true, false);
+                                continue;
+                            }
+                            else
+                            {
+                                descendEnum = null;
+                                return nexts;
+                            }
+                        }
+                        else
+                        {
+                            descendEnum = null;
+                            siblingEnum = null;
+                        }
+                    }
+
+                    NodeInfo nexta = ancestorEnum.Next();
+                    if (nexta == null)
+                    {
+                        return null;
+                    }
+
                     if (nexta.GetNodeKind() == Types.Type.DOCUMENT)
                     {
                         siblingEnum = EmptyIterator.OfNodes();
@@ -1576,18 +1585,10 @@ namespace OutSmart.DAXon.Trees.Utilities
                         siblingEnum = nexta.IterateAxis(AxisInfo.PRECEDING_SIBLING);
                     }
 
-                    if (!includeAncestors)
-                    {
-                        return Next();
-                    }
-                    else
+                    if (includeAncestors)
                     {
                         return nexta;
                     }
-                }
-                else
-                {
-                    return null;
                 }
             }
             IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration

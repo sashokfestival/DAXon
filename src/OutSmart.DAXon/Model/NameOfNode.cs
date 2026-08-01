@@ -120,9 +120,6 @@ namespace OutSmart.DAXon.Model
             return StructuredQName.ComputeHashCode(GetNamespaceUri(), GetLocalPart());
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object obj)
         {
             if (obj is INodeName)
@@ -143,23 +140,17 @@ namespace OutSmart.DAXon.Model
             }
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public virtual bool IsIdentical(IIdentityComparable other)
         {
             return other is INodeName && this.Equals(other) && this.GetPrefix().Equals(((INodeName)other).GetPrefix());
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public virtual int IdentityHashCode()
         {
             return GetHashCode() ^ GetPrefix().GetHashCode();
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual string GetURI() => throw new NotImplementedException();
+        public virtual string GetURI() => GetNamespaceUri().ToString(); // NodeImpl/Orphan.GetURI() route through this
     }
 }

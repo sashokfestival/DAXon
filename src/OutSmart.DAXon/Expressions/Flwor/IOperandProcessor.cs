@@ -16,6 +16,6 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Flwor
 {
-    // Phase 5: IOperandProcessor interface->delegate.
+    // IOperandProcessor interface->delegate.
     public delegate void IOperandProcessor(Operand expr);
 }

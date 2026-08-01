@@ -26,19 +26,10 @@ namespace OutSmart.DAXon.Patterns
         private readonly Configuration config;
         private bool nillable = false;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override double DefaultPriority => 0;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override int PrimitiveType => kind;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override ISchemaType ContentType => schemaType;
         public ContentTypeTest(int nodeKind, ISchemaType schemaType, Configuration config, bool nillable)
         {
@@ -112,9 +103,6 @@ namespace OutSmart.DAXon.Patterns
             return r == Affinity.SAME_TYPE || r == Affinity.SUBSUMED_BY;
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override IAtomicType GetAtomizedItemType()
         {
             ISchemaType type = schemaType;
@@ -157,33 +145,21 @@ namespace OutSmart.DAXon.Patterns
             return BuiltInAtomicType.ANY_ATOMIC;
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override bool IsAtomizable(TypeHierarchy th)
         {
             return !(schemaType.IsComplexType() && ((IComplexType)schemaType).Variety == ComplexVariety.ELEMENT_ONLY);
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override string ToString()
         {
             return (kind == Types.Type.ELEMENT ? "element(*, " : "attribute(*, ") + schemaType.EQName + ')';
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public string ToExportString()
         {
             return (kind == Types.Type.ELEMENT ? "element(*, " : "attribute(*, ") + TypeHierarchy.GetNearestNamedType(schemaType).EQName + ')';
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         /// <summary>
         /// Returns a hash code value for the object.
         /// </summary>
@@ -193,9 +169,6 @@ namespace OutSmart.DAXon.Patterns
         }
 
         /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
         /// Indicates whether some other object is "equal to" this one.
         /// </summary>
         public override bool Equals(object other)
@@ -203,9 +176,6 @@ namespace OutSmart.DAXon.Patterns
             return other is ContentTypeTest && ((ContentTypeTest)other).kind == kind && ((ContentTypeTest)other).schemaType == schemaType && ((ContentTypeTest)other).nillable == nillable;
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         /// <summary>
         /// Indicates whether some other object is "equal to" this one.
         /// </summary>

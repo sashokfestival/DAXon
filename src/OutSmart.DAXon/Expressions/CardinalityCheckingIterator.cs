@@ -10,7 +10,6 @@ using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,7 +36,7 @@ namespace OutSmart.DAXon.Expressions
                 first = @base.Next();
                 if (first == null)
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     if (!Cardinality.AllowsZero(requiredCardinality))
                     {
                         TypeError("An empty sequence is not allowed as the " + role.GetMessage(), role.ErrorCode);
@@ -47,14 +46,14 @@ namespace OutSmart.DAXon.Expressions
                 {
                     if (requiredCardinality == StaticProperty.EMPTY)
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         TypeError("The only value allowed for the " + role.GetMessage() + " is an empty sequence", role.ErrorCode);
                     }
 
                     second = @base.Next();
                     if (second != null && !Cardinality.AllowsMany(requiredCardinality))
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         TypeError("A sequence of more than one item {" + CardinalityChecker.DepictSequenceStart(new TwoItemIterator(first, second), 2) + "} is not allowed as the " + role.GetMessage(), role.ErrorCode);
                     }
                 }

@@ -65,8 +65,8 @@ namespace OutSmart.DAXon.Json
                 MapItem suppliedOptions = (MapItem)arguments[1].Head();
                 Dictionary<string, IGroundedValue> options = Details.optionDetails.ProcessSuppliedOptions(suppliedOptions, context);
                 Options o = new Options();
-                o.indent = ((BooleanValue)options.Get("indent").Head()).GetBooleanValue();
-                ISequence format = options.Get("number-formatter");
+                o.indent = ((BooleanValue)options.GetOrDefault("indent").Head()).GetBooleanValue();
+                ISequence format = options.GetOrDefault("number-formatter");
                 if (format != null)
                 {
                     o.numberFormatter = (IFunctionItem)format.Head();
@@ -118,7 +118,7 @@ namespace OutSmart.DAXon.Json
 
             r.Open();
             xml.Copy(r, 0, Loc.NONE);
-            r.Dispose();
+            r.Close();
         }
 
         private class Options

@@ -104,7 +104,7 @@ namespace OutSmart.DAXon.Events
             buffer.Add(new OutputterEvent.Append(item, location, properties));
         }
 
-        public override void Dispose()
+        public override void Close()
         {
             // no action (Java close())
         }

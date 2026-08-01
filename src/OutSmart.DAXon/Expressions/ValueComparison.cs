@@ -13,7 +13,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -90,9 +89,6 @@ namespace OutSmart.DAXon.Expressions
             return needsRuntimeCheck;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             ResetLocalStaticProperties();
@@ -185,9 +181,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private void MustBeOrdered(IPlainType t1, BuiltInAtomicType p1)
         {
             if (!p1.IsOrdered(true))
@@ -196,9 +189,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Lhs.Optimize(visitor, contextInfo);
@@ -206,9 +196,6 @@ namespace OutSmart.DAXon.Expressions
             return visitor.ObtainOptimizer().OptimizeValueComparison(this, visitor, contextInfo);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public bool IsNegatable(TypeHierarchy th)
         {
 
@@ -216,17 +203,11 @@ namespace OutSmart.DAXon.Expressions
             return IsNeverNaN(GetLhsExpression(), th) && IsNeverNaN(GetRhsExpression(), th);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private bool IsNeverNaN(Expression exp, TypeHierarchy th)
         {
             return th.Relationship(exp.GetItemType(), BuiltInAtomicType.DOUBLE) == Affinity.DISJOINT && th.Relationship(exp.GetItemType(), BuiltInAtomicType.FLOAT) == Affinity.DISJOINT;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Expression Negate()
         {
             ValueComparison vc = new ValueComparison(GetLhsExpression(), Token.Negate(@operator), GetRhsExpression());
@@ -244,25 +225,16 @@ namespace OutSmart.DAXon.Expressions
             return vc;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is ValueComparison && base.Equals(other);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return base.ComputeHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ValueComparison vc = new ValueComparison(GetLhsExpression().Copy(rebindings), @operator, GetRhsExpression().Copy(rebindings));
@@ -272,17 +244,11 @@ namespace OutSmart.DAXon.Expressions
             return vc;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             return MakeElaborator().ElaborateForBoolean().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public static bool Compare(AtomicValue v0, int op, AtomicValue v1, IAtomicComparer comparer, bool checkTypes)
         {
             if (checkTypes && !Types.Type.IsGuaranteedComparable(v0.PrimitiveType, v1.PrimitiveType, Token.IsOrderedOperator(op)))
@@ -322,41 +288,25 @@ namespace OutSmart.DAXon.Expressions
             catch (InvalidCastException err)
             {
 
-                //err.printStackTrace();
                 throw new XPathException("Cannot compare " + Types.Type.DisplayTypeName(v0) + " to " + Types.Type.DisplayTypeName(v1)).WithErrorCode("XPTY0004").AsTypeError();
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return (BooleanValue)MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override ItemType GetItemType()
         {
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return UType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality.
-        /// </summary>
         protected override int ComputeCardinality()
         {
             if (resultWhenEmpty != null)
@@ -369,23 +319,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality.
-        /// </summary>
         protected override string Tag()
         {
             return "vc";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality.
-        /// </summary>
         protected override void ExplainExtraAttributes(ExpressionPresenter @out)
         {
             if (resultWhenEmpty != null)
@@ -402,23 +340,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ValueComparisonElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality.
-        /// </summary>
         public class ValueComparisonElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()

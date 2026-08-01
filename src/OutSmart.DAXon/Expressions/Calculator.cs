@@ -223,7 +223,7 @@ namespace OutSmart.DAXon.Expressions
         }
         public virtual string Code()
         {
-            string name = GetType().GetSimpleName();
+            string name = GetType().Name;
             return name.Replace("Any", "a").Replace("Double", "d").Replace("Float", "f").Replace("Decimal", "c").Replace("Integer", "i").Replace("Numeric", "n").Replace("DateTime", "t").Replace("Duration", "u").Replace("Plus", "+").Replace("Minus", "-").Replace("Times", "*").Replace("Div", "/").Replace("Idiv", "~").Replace("Mod", "%");
         }
         private static void Def(int typeA, int typeB, Calculator[] calculatorSet, string setName)
@@ -368,7 +368,7 @@ namespace OutSmart.DAXon.Expressions
 
         private static BigDecimal InternalDecimalDivide(BigDecimal A, BigDecimal B)
         {
-            int scale = System.Math.Max(BigDecimalValue.DIVIDE_PRECISION, A.Scale() - B.Scale() + BigDecimalValue.DIVIDE_PRECISION);
+            int scale = Math.Max(BigDecimalValue.DIVIDE_PRECISION, A.Scale() - B.Scale() + BigDecimalValue.DIVIDE_PRECISION);
             return A.Divide(B, scale, RoundingMode.HALF_DOWN);
         }
         /// <summary>

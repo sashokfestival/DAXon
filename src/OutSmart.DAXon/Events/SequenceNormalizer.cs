@@ -127,9 +127,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void EndElement()
         {
             try
@@ -145,19 +142,16 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// End of element
-        /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
             if (failed)
             {
-                base.Dispose();
+                base.Close();
             }
             else
             {
                 NextReceiver.EndDocument();
-                base.Dispose();
+                base.Close();
                 try
                 {
                     if (actionList != null)
@@ -175,17 +169,11 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// End of element
-        /// </summary>
         public virtual void OnClose(IList<IAction> actionList)
         {
             this.actionList = actionList;
         }
 
-        /// <summary>
-        /// End of element
-        /// </summary>
         public virtual void OnClose(IAction action)
         {
             if (actionList == null)

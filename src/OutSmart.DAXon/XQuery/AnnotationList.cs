@@ -24,34 +24,22 @@ namespace OutSmart.DAXon.XQuery
     /// </summary>
     public class AnnotationList : IEnumerable<Annotation>
     {
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public static AnnotationList EMPTY = new AnnotationList(new List<Annotation>());
         private readonly IList<Annotation> list;
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public AnnotationList(IList<Annotation> list)
         {
             this.list = list;
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public static AnnotationList Singleton(Annotation ann)
         {
             return new AnnotationList(new List<Annotation>(1) { ann });
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual void Check(Configuration config, string where)
         {
             Dictionary<NamespaceUri, IList<Annotation>> map = GroupByNamespace();
-            foreach (KeyValuePair<NamespaceUri, IList<Annotation>> entry in map.EntrySet())
+            foreach (KeyValuePair<NamespaceUri, IList<Annotation>> entry in map)
             {
                 IFunctionAnnotationHandler handler = config.GetFunctionAnnotationHandler(entry.Key);
                 if (handler != null)
@@ -61,9 +49,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         private Dictionary<NamespaceUri, IList<Annotation>> GroupByNamespace()
         {
             Dictionary<NamespaceUri, IList<Annotation>> result = new Dictionary<NamespaceUri, IList<Annotation>>();
@@ -72,22 +57,19 @@ namespace OutSmart.DAXon.XQuery
                 NamespaceUri ns = ann.AnnotationQName.GetNamespaceUri();
                 if (result.ContainsKey(ns))
                 {
-                    result.Get(ns).Add(ann);
+                    result.GetOrDefault(ns).Add(ann);
                 }
                 else
                 {
                     IList<Annotation> list = new List<Annotation>();
                     list.Add(ann);
-                    result.Put(ns, list);
+                    result[ns] = list;
                 }
             }
 
             return result;
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual AnnotationList FilterByNamespace(NamespaceUri ns)
         {
             IList<Annotation> @out = new List<Annotation>();
@@ -102,41 +84,26 @@ namespace OutSmart.DAXon.XQuery
             return new AnnotationList(@out);
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual IEnumerator<Annotation> IIterator()
         {
-            return list.IIterator();
+            return list.GetEnumerator();
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual bool IsEmpty()
         {
-            return list.IsEmpty();
+            return list.Count == 0;
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual int Size()
         {
             return list.Count;
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual Annotation Get(int i)
         {
             return list[i];
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual bool Includes(StructuredQName name)
         {
             foreach (Annotation a in list)
@@ -150,9 +117,6 @@ namespace OutSmart.DAXon.XQuery
             return false;
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public virtual bool Includes(string localName)
         {
             foreach (Annotation a in list)
@@ -166,9 +130,6 @@ namespace OutSmart.DAXon.XQuery
             return false;
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public override bool Equals(object other)
         {
 
@@ -176,9 +137,6 @@ namespace OutSmart.DAXon.XQuery
             return other is AnnotationList && list.Equals(((AnnotationList)other).list);
         }
 
-        /// <summary>
-        /// An empty annotation list
-        /// </summary>
         public override int GetHashCode()
         {
             return list.GetHashCode();

@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Text
             completeSegments = new List<ISegment>(4);
             lastSegment = EMPTY_SEGMENT;
             lastSegmentLength = 0;
-            this.initialSize = System.Math.Max(initialSize, 65536);
+            this.initialSize = Math.Max(initialSize, 65536);
         }
 
         private void AddSegment(ISegment segment)
@@ -78,7 +78,7 @@ namespace OutSmart.DAXon.Text
                     newWidth = 8;
                 }
 
-                int newLength = System.Math.Max(initialSize, (int)charsSupplied) & 65535;
+                int newLength = Math.Max(initialSize, (int)charsSupplied) & 65535;
                 if (newWidth <= 8)
                 {
                     lastSegment = new Segment8(new byte[newLength]);
@@ -149,8 +149,6 @@ namespace OutSmart.DAXon.Text
 
             lastSegmentLength += addedLen;
 
-            //            lastSegment.substring(0, lastSegmentLength).verifyCharacters();
-            //        }
             if (lastSegmentLength == SEGLEN)
             {
                 AddSegment(lastSegment);
@@ -247,7 +245,7 @@ namespace OutSmart.DAXon.Text
                     // drop the current "last segment", and make the last segment in the completed list
                     // the new "last segment"
                     lastSegment = completeSegments[segCount - 1];
-                    completeSegments.Remove(segCount - 1);
+                    completeSegments.RemoveAt(segCount - 1);
                 }
 
                 lastSegmentLength = newLength & MASK;
@@ -280,7 +278,7 @@ namespace OutSmart.DAXon.Text
                 {
                     if (newLength > bytes.Length)
                     {
-                        bytes = ArrayTools.CopyOf(bytes, System.Math.Max(newLength, System.Math.Min(oldLength * 2, SEGLEN)));
+                        bytes = ArrayTools.CopyOf(bytes, Math.Max(newLength, Math.Min(oldLength * 2, SEGLEN)));
                     }
 
                     return this;
@@ -329,7 +327,7 @@ namespace OutSmart.DAXon.Text
                 {
                     if (newLength > chars.Length)
                     {
-                        chars = ArrayTools.CopyOf(chars, System.Math.Max(newLength, System.Math.Min(oldLength * 2, SEGLEN)));
+                        chars = ArrayTools.CopyOf(chars, Math.Max(newLength, Math.Min(oldLength * 2, SEGLEN)));
                     }
 
                     return this;
@@ -370,7 +368,7 @@ namespace OutSmart.DAXon.Text
             {
                 if (newLength * 3 > bytes.Length)
                 {
-                    bytes = ArrayTools.CopyOf(bytes, System.Math.Max(newLength * 3, System.Math.Min(oldLength * 6, SEGLEN * 3)));
+                    bytes = ArrayTools.CopyOf(bytes, Math.Max(newLength * 3, Math.Min(oldLength * 6, SEGLEN * 3)));
                 }
 
                 return this;

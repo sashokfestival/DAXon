@@ -17,7 +17,7 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Lib
 {
     public interface IExternalObjectModel
@@ -27,6 +27,6 @@ namespace OutSmart.DAXon.Lib
         PJConverter GetPJConverter(System.Type targetClass);
         JPConverter GetJPConverter(System.Type sourceClass, Configuration config);
         PJConverter GetNodeListCreator(object node);
-        IReceiver GetDocumentBuilder(Result result);
+        IReceiver GetDocumentBuilder(IResultTarget result);
     }
 }

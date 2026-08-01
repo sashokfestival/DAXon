@@ -61,33 +61,21 @@ namespace OutSmart.DAXon.Functions
             return new CurrentGroupingKeyCall();
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             return SequenceTool.ToLazySequence(Iterate(context));
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CurrentGroupingKeyCallElaborator();
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         private class CurrentGroupingKeyCallElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

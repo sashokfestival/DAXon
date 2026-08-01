@@ -7,12 +7,11 @@
 
 using System;
 using System.Collections.Generic;
+using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Types;
 
-// Phase 7.8: UnicodeChar.cs re-included into project. Stub removed to avoid CS0101.
 // namespace OutSmart.DAXon.Text
 // {
 //     public class UnicodeChar { public UnicodeChar() {} public UnicodeChar(int cp) {} }
@@ -25,9 +24,11 @@ namespace OutSmart.DAXon.Functions
     // the inherited nested type and `new StringToDateTime()` failed with CS7036. Qualify to this stub.
     public class StringToDateTime : StringConverter
     {
+        private readonly StringConverter inner;
         public StringToDateTime() { }
-        public StringToDateTime(object rules) { }
+        public StringToDateTime(object rules) : base(rules as ConversionRules) { inner = new StringConverter.StringToDateTime(rules as ConversionRules); }
         public static Func<Functions.StringToDateTime> New() => () => new Functions.StringToDateTime();
-        public override IConversionResult ConvertString(UnicodeString input) => throw new NotImplementedException("STUB: StringToDateTime.ConvertString not ported (excluded stub)");
+        // Delegates to the proven nested converter (this top-level copy is what ConversionRules binds).
+        public override IConversionResult ConvertString(UnicodeString input) => inner.ConvertString(input);
     }
 }

@@ -26,9 +26,6 @@ namespace OutSmart.DAXon.Xslt
         public const int ANNOTATION_STRIP = 1;
         public const int ANNOTATION_PRESERVE = 2;
 
-        /// <summary>
-        /// Process the attributes of every node in the stylesheet module
-        /// </summary>
         public virtual int InputTypeAnnotationsAttribute
         {
             get
@@ -58,9 +55,6 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Process the attributes of every node in the stylesheet module
-        /// </summary>
         public override void ProcessAllAttributes()
         {
             PrepareAttributes();
@@ -77,9 +71,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Process the attributes of every node in the stylesheet module
-        /// </summary>
         public override void Index(ComponentDeclaration decl, PrincipalStylesheetModule top)
         {
             CompileError(DisplayName + " can appear only as the outermost element", "XTSE0010");

@@ -129,6 +129,9 @@ namespace OutSmart.DAXon.Expressions
             BigInteger v = start;
             while (Test(v))
             {
+                // Same per-item check as Next(): grounding is the one path that walks the whole
+                // range in a single instruction step, and it can box up to 2^31 values.
+                OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
                 list.Add(IntegerValue.MakeIntegerValue(v));
                 v = v + step;
             }

@@ -146,7 +146,7 @@ namespace OutSmart.DAXon.Expressions
             {
                 int baseId = ObtainComponentId(baseComponent, componentIdMap);
                 @out.EmitAttribute("base", "" + baseId);
-                @out.EmitAttribute("dpack", packageIdMap.Get(declaringPackage) + "");
+                @out.EmitAttribute("dpack", packageIdMap.GetOrDefault(declaringPackage) + "");
             }
             else
             {
@@ -165,7 +165,7 @@ namespace OutSmart.DAXon.Expressions
                 int targetId = ObtainComponentId(target, componentIdMap);
                 if (fsb.Length != 0)
                 {
-                    fsb.Append(" ");
+                    fsb.Append(' ');
                 }
 
                 fsb.Append("" + targetId);
@@ -180,7 +180,7 @@ namespace OutSmart.DAXon.Expressions
             if (id == int.MinValue)
             {
                 id = componentIdMap.Count;
-                componentIdMap.Put(component, id);
+                componentIdMap[component] = id;
             }
 
             return id;

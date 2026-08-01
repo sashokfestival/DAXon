@@ -37,12 +37,21 @@ namespace OutSmart.DAXon.Internal
         // round(-2.5)=-2, round(0.49999999999999994)=0).
         public static long Round(double a)
         {
-            if (double.IsNaN(a)) return 0L; // Java: round(NaN) == 0
-            double f = global::System.Math.Floor(a);
+            if (double.IsNaN(a)) // Java: round(NaN) == 0
+            {
+                return 0L;
+            }
+            double f = Math.Floor(a);
             double d = a - f; // exact for finite doubles (Sterbenz-adjacent: both same scale)
             f = d >= 0.5d ? f + 1.0d : f;
-            if (f >= 9223372036854775808.0d) return long.MaxValue;   // >= 2^63 (incl. +Infinity)
-            if (f <= -9223372036854775808.0d) return long.MinValue;  // <= -2^63 (incl. -Infinity; -2^63 IS long.MinValue)
+            if (f >= 9223372036854775808.0d)   // >= 2^63 (incl. +Infinity)
+            {
+                return long.MaxValue;
+            }
+            if (f <= -9223372036854775808.0d)  // <= -2^63 (incl. -Infinity; -2^63 IS long.MinValue)
+            {
+                return long.MinValue;
+            }
             return (long)f;
         }
 
@@ -50,13 +59,22 @@ namespace OutSmart.DAXon.Internal
         // addition defect for float too: round(0.49999997f) == 0).
         public static int Round(float a)
         {
-            if (float.IsNaN(a)) return 0; // Java: round(NaN) == 0
+            if (float.IsNaN(a)) // Java: round(NaN) == 0
+            {
+                return 0;
+            }
             double x = a; // float -> double widening is exact
-            double f = global::System.Math.Floor(x);
+            double f = Math.Floor(x);
             double d = x - f;
             f = d >= 0.5d ? f + 1.0d : f;
-            if (f >= 2147483648.0d) return int.MaxValue;    // >= 2^31 (incl. +Infinity)
-            if (f <= -2147483648.0d) return int.MinValue;   // <= -2^31 (incl. -Infinity; -2^31 IS int.MinValue)
+            if (f >= 2147483648.0d)    // >= 2^31 (incl. +Infinity)
+            {
+                return int.MaxValue;
+            }
+            if (f <= -2147483648.0d)   // <= -2^31 (incl. -Infinity; -2^31 IS int.MinValue)
+            {
+                return int.MinValue;
+            }
             return (int)f;
         }
 
@@ -65,6 +83,6 @@ namespace OutSmart.DAXon.Internal
         // including NaN -> NaN, +/-Infinity -> unchanged, already-integral -> unchanged,
         // |x| >= 2^52 -> unchanged. Kept as a named utility (paired with Round) so the
         // Java rounding call sites stay greppable and the forward is documented once.
-        public static double Rint(double a) => global::System.Math.Round(a);
+        public static double Rint(double a) => Math.Round(a);
     }
 }

@@ -75,7 +75,6 @@ namespace OutSmart.DAXon.Types
 
         // TBA
         public virtual int RedefinitionLevel => 0;
-        public virtual BuiltInAtomicType PrimitiveAtomicType => throw new NotImplementedException();
         public EnumerationType(HashSet<string> values)
         {
             this.values = values;
@@ -283,8 +282,8 @@ namespace OutSmart.DAXon.Types
                 fsb.Append(delim).Append(st).Append(delim).Append(", ");
             }
 
-            fsb.SetLength(fsb.Length - 2);
-            fsb.Append(")");
+            fsb.Length = fsb.Length - 2;
+            fsb.Append(')');
             return fsb.ToString();
         }
 
@@ -300,8 +299,8 @@ namespace OutSmart.DAXon.Types
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual Genre GetGenre() => throw new NotImplementedException();
-        public virtual string ExplainMismatch(IItem item, TypeHierarchy th) => throw new NotImplementedException();
+        public virtual Genre GetGenre() => Genre.ATOMIC; // enum values are atomic items
+        public virtual string ExplainMismatch(IItem item, TypeHierarchy th) => null; // upstream default: no extra explanation (diagnostics must not throw)
 
         // TBA
         private class StringToEnumConverter : StringConverter

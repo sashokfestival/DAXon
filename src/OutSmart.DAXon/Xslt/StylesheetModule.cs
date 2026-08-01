@@ -23,12 +23,18 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System.IO;
 namespace OutSmart.DAXon.Xslt
 {
     public class StylesheetModule
     {
+        // Stack reserved per already-open module for the unwind of a failed include (measured ~11 KB
+        // on net472 x64 once the two no-op catch sites per level became filters; see
+        // LoadStylesheetModule). Caps nesting at ~43 modules on a 1 MB worker thread and >200 on a
+        // 4 MB one, against a measured ~95 (1 MB) from which an error can still be REPORTED rather
+        // than kill the process - i.e. the cap keeps roughly a 2x safety factor over the wall.
+        private const ulong UnwindReservePerModule = 16 * 1024;
+
         private readonly StyleElement rootElement;
         private int precedence;
         private int minImportPrecedence;
@@ -94,6 +100,25 @@ namespace OutSmart.DAXon.Xslt
                 throw new XPathException("The stylesheet module includes/imports itself directly or indirectly", "XTSE0180");
             }
 
+            // Every nested xsl:include/xsl:import is loaded from here, and each one recurses -
+            // parsing a module runs UseWhenFilter, which loads that module's own includes. The
+            // cycle check above only catches a REPEATED uri, so a chain that hands out a fresh uri
+            // per level recurses without bound and overflows the uncatchable .NET stack while
+            // compiling (~900 levels on a 1 MB worker thread, round AW).
+            // The reserve scales with depth because FAILING here costs ~11 KB of stack per level -
+            // every level that catches and re-codes the error re-enters exception dispatch, so the
+            // stack grows on the unwind - against ~1.2 KB for the descent. A fixed margin, however
+            // large, cannot cover that: before this guard, ANY error raised 40 include levels deep
+            // killed a 1 MB thread (the pre-existing XTSE0180 cycle error included).
+            try
+            {
+                StackGuard.Probe(UnwindReservePerModule * (ulong)compilation.ImportStack.Count);
+            }
+            catch (RecursionDepthError e) when (!e.Described)
+            {
+                throw e.Describe("Stylesheet include/import nesting is too deep (insufficient stack on this thread)", "XTSE0010", null);
+            }
+
             compilation.ImportStack.Push(docURI);
             Configuration config = compilation.GetConfiguration();
             PipelineConfiguration pipe = config.MakePipelineConfiguration();
@@ -101,7 +126,6 @@ namespace OutSmart.DAXon.Xslt
             LinkedTreeBuilder styleBuilder = new LinkedTreeBuilder(pipe, Durability.LASTING);
             styleBuilder.SetSystemId(styleSource.SystemId);
 
-            //styleBuilder.freezeSystemIdAndBaseURI();
             styleBuilder.SetNodeFactory(compilation.GetStyleNodeFactory(topLevelModule));
             styleBuilder.SetLineNumbering(true);
             UseWhenFilter useWhenFilter = new UseWhenFilter(compilation, styleBuilder, precedence);
@@ -128,16 +152,15 @@ namespace OutSmart.DAXon.Xslt
                 compilation.ImportStack.Pop();
                 return doc;
             }
-            catch (XPathException err)
+            // A FILTER, not a plain catch: for a nested module (or an already-reported error) the
+            // body would do nothing, and an unentered filter costs no funclet and no re-dispatch -
+            // which is what sets the include-nesting ceiling, since the unwind is what runs out of
+            // stack, not the descent (AW).
+            catch (XPathException err) when (topLevelModule && !err.HasBeenReported())
             {
-                if (topLevelModule && !err.HasBeenReported())
-                {
-
-                    // bug 2244
-                    compilation.ReportError(err);
-                }
-
-                throw err;
+                // bug 2244
+                compilation.ReportError(err);
+                throw;
             }
             finally
             {
@@ -172,7 +195,6 @@ namespace OutSmart.DAXon.Xslt
             LinkedTreeBuilder styleBuilder = new LinkedTreeBuilder(pipe, Durability.LASTING);
             styleBuilder.SetSystemId(styleSource.SystemId);
 
-            //styleBuilder.freezeSystemIdAndBaseURI();
             styleBuilder.SetNodeFactory(compilation.GetStyleNodeFactory(true));
             styleBuilder.SetLineNumbering(true);
 
@@ -394,7 +416,7 @@ namespace OutSmart.DAXon.Xslt
 
                 return CompositeStylesheet(config, source.SystemId, sources);
             }
-            catch (TransformerException err)
+            catch (XPathException err)
             {
                 if (err is XPathException)
                 {
@@ -536,7 +558,7 @@ namespace OutSmart.DAXon.Xslt
                                     last--;
                                 }
 
-                                topLevel.Add(last + 1, decl);
+                                topLevel.Insert(last + 1,decl);
                             }
                         }
                     }

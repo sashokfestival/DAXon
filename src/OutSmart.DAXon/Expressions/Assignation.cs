@@ -40,9 +40,6 @@ namespace OutSmart.DAXon.Expressions
 
         public int LocalSlotNumber => slotNumber;
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual Expression Sequence
         {
             get => sequenceOp.GetChildExpression(); set
@@ -51,19 +48,10 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual int RequiredSlots => 1;
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public override double Cost => Sequence.Cost + 5 * GetAction().Cost;
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual string VariableName
         {
             get
@@ -79,9 +67,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual string VariableEQName
         {
             get
@@ -101,9 +86,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual int NominalReferenceCount
         {
             get
@@ -173,9 +155,6 @@ namespace OutSmart.DAXon.Expressions
             return d;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public ISequence EvaluateVariable(IXPathContext context)
         {
             ISequence actual = context.EvaluateLocalVariable(slotNumber);
@@ -188,33 +167,21 @@ namespace OutSmart.DAXon.Expressions
             return actual;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual void SetAction(Expression action)
         {
             actionOp.SetChildExpression(action);
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public bool IsGlobal()
         {
             return false;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public bool IsAssignable()
         {
             return false;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public override void CheckForUpdatingSubexpressions()
         {
             Sequence.CheckForUpdatingSubexpressions();
@@ -228,58 +195,37 @@ namespace OutSmart.DAXon.Expressions
             GetAction().CheckForUpdatingSubexpressions();
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public override bool IsUpdatingExpression()
         {
             return GetAction().IsUpdatingExpression();
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual Expression GetAction()
         {
             return actionOp.GetChildExpression();
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual void SetSlotNumber(int nr)
         {
             slotNumber = nr;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public override bool HasVariableBinding(IBinding binding)
         {
             return this == binding;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public override Expression Unordered(bool retainAllNodes, bool forStreaming)
         {
             SetAction(GetAction().Unordered(retainAllNodes, forStreaming));
             return this;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public override void SuppressValidation(int validationMode)
         {
             GetAction().SuppressValidation(validationMode);
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             PathMap.PathMapNodeSet varPath = Sequence.AddToPathMap(pathMap, pathMapNodeSet);
@@ -287,9 +233,6 @@ namespace OutSmart.DAXon.Expressions
             return GetAction().AddToPathMap(pathMap, pathMapNodeSet);
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual void RefineTypeInformation(ItemType type, int cardinality, IGroundedValue constantValue, int properties, Assignation currentExpression)
         {
             ExpressionTool.ProcessExpressionTree(currentExpression.GetAction(), null, (exp, result) =>
@@ -303,9 +246,6 @@ namespace OutSmart.DAXon.Expressions
             });
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public void AddReference(VariableReference @ref, bool isLoopingReference)
         {
             hasLoopingReference |= isLoopingReference;
@@ -325,9 +265,6 @@ namespace OutSmart.DAXon.Expressions
             references.Add(@ref);
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         protected virtual bool RemoveDeadReferences()
         {
             bool inLoop = false;
@@ -355,7 +292,7 @@ namespace OutSmart.DAXon.Expressions
 
                     if (!found)
                     {
-                        references.Remove(i);
+                        references.RemoveAt(i);
                     }
                 }
             }
@@ -363,17 +300,11 @@ namespace OutSmart.DAXon.Expressions
             return inLoop;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         protected virtual void VerifyReferences()
         {
             RebuildReferenceList(false);
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual void RebuildReferenceList(bool force)
         {
             int[] results = new int[]
@@ -386,9 +317,6 @@ namespace OutSmart.DAXon.Expressions
             this.references = results[1] <= 0 ? null : references;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         private static void CountReferences(IBinding binding, Expression exp, IList<VariableReference> references, int[] results)
         {
 
@@ -423,17 +351,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public bool IsIndexedVariable()
         {
             return indexedVariable;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual bool ReplaceVariable(Expression seq)
         {
             bool done = ExpressionTool.InlineVariableReferences(GetAction(), this, seq);
@@ -449,9 +371,6 @@ namespace OutSmart.DAXon.Expressions
             return done;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public void SetIndexedVariable()
         {
             indexedVariable = true;

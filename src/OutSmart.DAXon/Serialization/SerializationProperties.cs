@@ -17,7 +17,6 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Serialization
 {
     public class SerializationProperties
@@ -108,7 +107,7 @@ namespace OutSmart.DAXon.Serialization
             foreach (string prop in this.GetProperties().StringPropertyNames())
             {
                 string value = this.GetProperties().GetProperty(prop);
-                if (prop.Equals(OutputKeys.CDATA_SECTION_ELEMENTS) || prop.Equals(DAXonOutputKeys.SUPPRESS_INDENTATION) || prop.Equals(DAXonOutputKeys.USE_CHARACTER_MAPS))
+                if (prop.Equals(DAXonOutputKeys.CDATA_SECTION_ELEMENTS) || prop.Equals(DAXonOutputKeys.SUPPRESS_INDENTATION) || prop.Equals(DAXonOutputKeys.USE_CHARACTER_MAPS))
                 {
                     string existing = defaults.GetProperty(prop);
                     if (existing == null || existing.Equals(value))
@@ -146,7 +145,7 @@ namespace OutSmart.DAXon.Serialization
             StringBuilder sb = new StringBuilder();
             foreach (string k in properties.StringPropertyNames())
             {
-                sb.Append(k).Append("=").Append(properties.GetProperty(k)).Append(" ");
+                sb.Append(k).Append('=').Append(properties.GetProperty(k)).Append(' ');
             }
 
             if (charMapIndex != null)

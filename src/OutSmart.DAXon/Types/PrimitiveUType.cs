@@ -77,24 +77,15 @@ namespace OutSmart.DAXon.Types
         EXTENSION
 
         // --------------------
-        // TODO enum body members
         // private final int bit;
         // PrimitiveUType(int bit) {
         //     this.bit = bit;
         // }
         // public int getBit() {
-        //     return bit;
-        // }
         // public UType toUType() {
-        //     return new UType(1 << bit);
-        // }
         // public static PrimitiveUType forBit(int bit) {
-        //     return values()[bit];
-        // }
         // @CSharpModifiers(code = { "public", "override" })
         // public String toString() {
-        //     switch(this) {
-        //         case DOCUMENT:
         //             return "document";
         //         case ELEMENT:
         //             return "element";
@@ -154,11 +145,7 @@ namespace OutSmart.DAXon.Types
         //             return "external object";
         //         default:
         //             return "???";
-        //     }
-        // }
         // public ItemType toItemType() {
-        //     switch(this) {
-        //         case DOCUMENT:
         //             return NodeKindTest.DOCUMENT;
         //         case ELEMENT:
         //             return NodeKindTest.ELEMENT;
@@ -172,8 +159,6 @@ namespace OutSmart.DAXon.Types
         //             return NodeKindTest.PROCESSING_INSTRUCTION;
         //         case NAMESPACE:
         //             return NodeKindTest.NAMESPACE;
-        //         case FUNCTION:
-        //         case STRING:
         //             return BuiltInAtomicType.STRING;
         //         case BOOLEAN:
         //             return BuiltInAtomicType.BOOLEAN;
@@ -217,8 +202,6 @@ namespace OutSmart.DAXon.Types
         //             //return JavaExternalObjectType.EXTERNAL_OBJECT_TYPE;
         //         default:
         //             throw new global::System.ArgumentException();
-        //     }
-        // }
         // --------------------
     }
 }

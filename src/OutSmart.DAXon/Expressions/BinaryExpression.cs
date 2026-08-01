@@ -39,8 +39,6 @@ namespace OutSmart.DAXon.Expressions
         {
             @operator = op;
 
-            //        p0.verifyParentPointers();
-            //        p1.verifyParentPointers();
             lhs = new Operand(this, p0, GetOperandRole(0));
             rhs = new Operand(this, p1, GetOperandRole(1));
             AdoptChildExpression(p0);
@@ -173,9 +171,6 @@ namespace OutSmart.DAXon.Expressions
             return op1 != op2 && op1 == Token.Inverse(op2);
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             if (other is BinaryExpression && HasCompatibleStaticContext((Expression)other))
@@ -209,18 +204,12 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private IList<Expression> FlattenExpression()
         {
             IList<Expression> list = new List<Expression>();
             return FlattenExpression(list);
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private IList<Expression> FlattenExpression(IList<Expression> list)
         {
             if (GetLhsExpression() is BinaryExpression && ((BinaryExpression)GetLhsExpression()).@operator == @operator)
@@ -260,9 +249,6 @@ namespace OutSmart.DAXon.Expressions
             return list;
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private bool PairwiseEqual<T>(IList<T> a, IList<T> b)
         {
             if (a.Count != b.Count)
@@ -281,37 +267,25 @@ namespace OutSmart.DAXon.Expressions
             return true;
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
 
             // Ensure that an operator and its inverse get the same hash code,
             // so that (A lt B) has the same hash code as (B gt A)
-            int op = System.Math.Min(@operator, Token.Inverse(@operator));
+            int op = Math.Min(@operator, Token.Inverse(@operator));
             return ("BinaryExpression " + op).GetHashCode() ^ GetLhsExpression().GetHashCode() ^ GetRhsExpression().GetHashCode();
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToString()
         {
             return ExpressionTool.Parenthesize(GetLhsExpression()) + " " + DisplayOperator() + " " + ExpressionTool.Parenthesize(GetRhsExpression());
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToShortString()
         {
             return Parenthesize(GetLhsExpression()) + " " + DisplayOperator() + " " + Parenthesize(GetRhsExpression());
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private string Parenthesize(Expression operand)
         {
             string operandStr = operand.ToShortString();
@@ -323,9 +297,6 @@ namespace OutSmart.DAXon.Expressions
             return operandStr;
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement(Tag(), this);
@@ -336,24 +307,15 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected virtual string Tag()
         {
             return "operator";
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected virtual void ExplainExtraAttributes(ExpressionPresenter @out)
         {
         }
 
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected virtual string DisplayOperator()
         {
             return Token.tokens[@operator];

@@ -14,7 +14,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -185,7 +184,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     throw DynamicError(GetLocation(), e, context);
                 }
 
-                if (expandedName.EqualsIgnoreCase("xml"))
+                if (expandedName.Equals("xml", global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     XPathException e = new XPathException("Processing instructions cannot be named 'xml' in any combination of upper/lower case").WithXPathContext(context).WithErrorCode(IsXSLT() ? "XTDE0890" : "XQDY0064");
                     throw DynamicError(GetLocation(), e, context);

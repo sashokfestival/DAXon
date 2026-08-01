@@ -19,7 +19,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Transformation.Packages
 {
@@ -31,9 +30,6 @@ namespace OutSmart.DAXon.Transformation.Packages
         private int elementCount = 0;
         private string diagnostics;
 
-        /// <summary>
-        /// Abort the parse when the first start element tag is found
-        /// </summary>
         private VersionedPackageName NameAndVersion
         {
             get
@@ -54,17 +50,11 @@ namespace OutSmart.DAXon.Transformation.Packages
             }
         }
 
-        /// <summary>
-        /// Abort the parse when the first start element tag is found
-        /// </summary>
         public virtual string Diagnostics => diagnostics;
         public PackageInspector(PipelineConfiguration pipe) : base(new Sink(pipe))
         {
         }
 
-        /// <summary>
-        /// Abort the parse when the first start element tag is found
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             if (elementCount++ >= 1)
@@ -104,9 +94,6 @@ namespace OutSmart.DAXon.Transformation.Packages
             }
         }
 
-        /// <summary>
-        /// Abort the parse when the first start element tag is found
-        /// </summary>
         public virtual PackageDetails GetPackageDetails(string top, Configuration config)
         {
             try
@@ -118,7 +105,7 @@ namespace OutSmart.DAXon.Transformation.Packages
             {
 
                 // early exit is expected
-                if (!e.GetMessage().Equals("#start#"))
+                if (!e.Message.Equals("#start#"))
                 {
                     throw e;
                 }

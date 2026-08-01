@@ -561,7 +561,7 @@ namespace OutSmart.DAXon.Lib
                         case StandardNames.XS_DATE_TIME_STAMP:
                             StringConverter first = new StringToDateTime(this);
                             UnfailingConverter.DownCastingConverter second = new UnfailingConverter.DownCastingConverter(targetType, this);
-                            return new StringToNonStringDerivedType(first, second);
+                            return new StringConverter.StringToNonStringDerivedType(first, second);
                         default:
                             throw new InvalidOperationException("Unknown built in type " + targetType);
                     }
@@ -575,13 +575,13 @@ namespace OutSmart.DAXon.Lib
                     {
 
                         // converter to user-defined subtypes of xs:string
-                        return new StringToStringSubtype(this, targetType);
+                        return new StringConverter.StringToStringSubtype(this, targetType);
                     }
                     else
                     {
 
                         // converter to user-defined subtypes of built-in subtypes of xs:string
-                        return new StringToDerivedStringSubtype(this, targetType);
+                        return new StringConverter.StringToDerivedStringSubtype(this, targetType);
                     }
                 }
                 else
@@ -590,7 +590,7 @@ namespace OutSmart.DAXon.Lib
                     // converter to user-defined types derived from types other than xs:string
                     StringConverter first = ((IAtomicType)targetType.GetPrimitiveItemType()).GetStringConverter(this);
                     UnfailingConverter.DownCastingConverter second = new UnfailingConverter.DownCastingConverter(targetType, this);
-                    return new StringToNonStringDerivedType(first, second);
+                    return new StringConverter.StringToNonStringDerivedType(first, second);
                 }
             }
         }

@@ -192,7 +192,7 @@ namespace OutSmart.DAXon.Trees
         public virtual void GenerateId(StringBuilder buffer)
         {
             element.GenerateId(buffer);
-            buffer.Append("n");
+            buffer.Append('n');
             buffer.Append(position);
         }
 
@@ -227,7 +227,7 @@ namespace OutSmart.DAXon.Trees
         public virtual IEnumerable<IItem> AsIterable() => new IItem[] { this };
         public virtual bool ContainsNode(NodeInfo sought) => sought != null && IsSameNodeInfo(sought);
         public virtual ISequence MakeRepeatable() => this;
-        public virtual IGroundedValue Subsequence(int start, int length) => throw new NotImplementedException();
+        public virtual IGroundedValue Subsequence(int start, int length) => (start <= 0 && (long)start + length > 0) ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance(); // singleton item (upstream GroundedValue default)
         public virtual IGroundedValue Concatenate(IGroundedValue[] others)
         {
             // upstream GroundedValue default: chain this value's items with the others

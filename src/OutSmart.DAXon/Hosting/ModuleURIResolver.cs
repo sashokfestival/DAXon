@@ -13,7 +13,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Lib

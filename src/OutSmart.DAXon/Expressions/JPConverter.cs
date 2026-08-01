@@ -12,7 +12,6 @@ using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Reflect;
 using OutSmart.DAXon.Internal.Numerics;
 using OutSmart.DAXon.Internal.Net;
 using System;
@@ -26,9 +25,7 @@ using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Events;
-using OutSmart.DAXon.Internal.Jaxp.Namespace;
 using System.Numerics;
 namespace OutSmart.DAXon.Expressions
 {
@@ -56,135 +53,116 @@ namespace OutSmart.DAXon.Expressions
 
         {
 
-            converterMap.Put(typeof(XdmValue), new FromXdmValue(AnyItemType.GetInstance(), StaticProperty.ALLOWS_ZERO_OR_MORE));
-            converterMap.Put(typeof(XdmItem), new FromXdmValue(AnyItemType.GetInstance(), StaticProperty.ALLOWS_ONE));
-            converterMap.Put(typeof(XdmAtomicValue), new FromXdmValue(BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ONE));
-            converterMap.Put(typeof(XdmNode), new FromXdmValue(AnyNodeTest.GetInstance(), StaticProperty.ALLOWS_ONE));
-            converterMap.Put(typeof(XdmFunctionItem), new FromXdmValue(AnyFunctionType.GetInstance(), StaticProperty.ALLOWS_ONE));
-            converterMap.Put(typeof(XdmMap), new FromXdmValue(MapType.ANY_MAP_TYPE, StaticProperty.ALLOWS_ONE));
-            converterMap.Put(typeof(XdmArray), new FromXdmValue(ArrayItemType.GetInstance(), StaticProperty.ALLOWS_ONE));
-            converterMap.Put(typeof(XdmEmptySequence), new FromXdmValue(ErrorType.GetInstance(), StaticProperty.ALLOWS_ZERO));
-            converterMap.Put(typeof(ISequenceIterator), FromSequenceIterator.INSTANCE);
-            converterMap.Put(typeof(ISequence), FromSequence.INSTANCE);
-            converterMap.Put(typeof(OneOrMore<>), FromSequence.INSTANCE);
-            converterMap.Put(typeof(One<>), FromSequence.INSTANCE);
-            converterMap.Put(typeof(ZeroOrOne<>), FromSequence.INSTANCE);
-            converterMap.Put(typeof(ZeroOrMore<>), FromSequence.INSTANCE);
-            converterMap.Put(typeof(string), FromString.INSTANCE);
-            converterMap.Put(typeof(UnicodeString), FromUnicodeString.INSTANCE);
-            converterMap.Put(typeof(bool), FromBoolean.INSTANCE);
-            converterMap.Put(typeof(bool), FromBoolean.INSTANCE);
-            converterMap.Put(typeof(double), FromDouble.INSTANCE);
-            converterMap.Put(typeof(double), FromDouble.INSTANCE);
-            converterMap.Put(typeof(float), FromFloat.INSTANCE);
-            converterMap.Put(typeof(float), FromFloat.INSTANCE);
-            converterMap.Put(typeof(BigDecimal), FromBigDecimal.INSTANCE);
-            converterMap.Put(typeof(BigInteger), FromBigInteger.INSTANCE);
-            converterMap.Put(typeof(long), FromLong.INSTANCE);
-            converterMap.Put(typeof(long), FromLong.INSTANCE);
-            converterMap.Put(typeof(int), FromInt.INSTANCE);
-            converterMap.Put(typeof(int), FromInt.INSTANCE);
-            converterMap.Put(typeof(Short), FromShort.INSTANCE);
-            converterMap.Put(typeof(short), FromShort.INSTANCE);
-            converterMap.Put(typeof(byte), FromByte.INSTANCE);
-            converterMap.Put(typeof(byte), FromByte.INSTANCE);
-            converterMap.Put(typeof(char), FromCharacter.INSTANCE);
-            converterMap.Put(typeof(URI), FromURI.INSTANCE);
-            converterMap.Put(typeof(URL), FromURI.INSTANCE);
-            converterMap.Put(typeof(Date), FromDate.INSTANCE);
-            converterMap.Put(typeof(long[]), FromLongArray.INSTANCE);
-            converterMap.Put(typeof(int[]), FromIntArray.INSTANCE);
-            converterMap.Put(typeof(short[]), FromShortArray.INSTANCE);
-            converterMap.Put(typeof(byte[]), FromByteArray.INSTANCE);
-            converterMap.Put(typeof(char[]), FromCharArray.INSTANCE);
-            converterMap.Put(typeof(double[]), FromDoubleArray.INSTANCE);
-            converterMap.Put(typeof(float[]), FromFloatArray.INSTANCE);
-            converterMap.Put(typeof(bool[]), FromBooleanArray.INSTANCE);
-            converterMap.Put(typeof(Collection<>), FromCollection.INSTANCE);
+            converterMap[typeof(XdmValue)] = new FromXdmValue(AnyItemType.GetInstance(), StaticProperty.ALLOWS_ZERO_OR_MORE);
+            converterMap[typeof(XdmItem)] = new FromXdmValue(AnyItemType.GetInstance(), StaticProperty.ALLOWS_ONE);
+            converterMap[typeof(XdmAtomicValue)] = new FromXdmValue(BuiltInAtomicType.ANY_ATOMIC, StaticProperty.ALLOWS_ONE);
+            converterMap[typeof(XdmNode)] = new FromXdmValue(AnyNodeTest.GetInstance(), StaticProperty.ALLOWS_ONE);
+            converterMap[typeof(XdmFunctionItem)] = new FromXdmValue(AnyFunctionType.GetInstance(), StaticProperty.ALLOWS_ONE);
+            converterMap[typeof(XdmMap)] = new FromXdmValue(MapType.ANY_MAP_TYPE, StaticProperty.ALLOWS_ONE);
+            converterMap[typeof(XdmArray)] = new FromXdmValue(ArrayItemType.GetInstance(), StaticProperty.ALLOWS_ONE);
+            converterMap[typeof(XdmEmptySequence)] = new FromXdmValue(ErrorType.GetInstance(), StaticProperty.ALLOWS_ZERO);
+            converterMap[typeof(ISequenceIterator)] = FromSequenceIterator.INSTANCE;
+            converterMap[typeof(ISequence)] = FromSequence.INSTANCE;
+            converterMap[typeof(OneOrMore<>)] = FromSequence.INSTANCE;
+            converterMap[typeof(One<>)] = FromSequence.INSTANCE;
+            converterMap[typeof(ZeroOrOne<>)] = FromSequence.INSTANCE;
+            converterMap[typeof(ZeroOrMore<>)] = FromSequence.INSTANCE;
+            converterMap[typeof(string)] = FromString.INSTANCE;
+            converterMap[typeof(UnicodeString)] = FromUnicodeString.INSTANCE;
+            converterMap[typeof(bool)] = FromBoolean.INSTANCE;
+            converterMap[typeof(bool)] = FromBoolean.INSTANCE;
+            converterMap[typeof(double)] = FromDouble.INSTANCE;
+            converterMap[typeof(double)] = FromDouble.INSTANCE;
+            converterMap[typeof(float)] = FromFloat.INSTANCE;
+            converterMap[typeof(float)] = FromFloat.INSTANCE;
+            converterMap[typeof(BigDecimal)] = FromBigDecimal.INSTANCE;
+            converterMap[typeof(BigInteger)] = FromBigInteger.INSTANCE;
+            converterMap[typeof(long)] = FromLong.INSTANCE;
+            converterMap[typeof(long)] = FromLong.INSTANCE;
+            converterMap[typeof(int)] = FromInt.INSTANCE;
+            converterMap[typeof(int)] = FromInt.INSTANCE;
+            converterMap[typeof(short)] = FromShort.INSTANCE;
+            converterMap[typeof(byte)] = FromByte.INSTANCE;
+            converterMap[typeof(byte)] = FromByte.INSTANCE;
+            converterMap[typeof(char)] = FromCharacter.INSTANCE;
+            converterMap[typeof(URI)] = FromURI.INSTANCE;
+            converterMap[typeof(global::System.Uri)] = FromURI.INSTANCE;
+            converterMap[typeof(global::System.DateTime)] = FromDate.INSTANCE;
+            converterMap[typeof(long[])] = FromLongArray.INSTANCE;
+            converterMap[typeof(int[])] = FromIntArray.INSTANCE;
+            converterMap[typeof(short[])] = FromShortArray.INSTANCE;
+            converterMap[typeof(byte[])] = FromByteArray.INSTANCE;
+            converterMap[typeof(char[])] = FromCharArray.INSTANCE;
+            converterMap[typeof(double[])] = FromDoubleArray.INSTANCE;
+            converterMap[typeof(float[])] = FromFloatArray.INSTANCE;
+            converterMap[typeof(bool[])] = FromBooleanArray.INSTANCE;
+            converterMap[typeof(Collection<>)] = FromCollection.INSTANCE;
         }
 
         private static void InitItemTypeMap()
 
         {
 
-            itemTypeMap.Put(typeof(BooleanValue), BuiltInAtomicType.BOOLEAN);
-            itemTypeMap.Put(typeof(StringValue), BuiltInAtomicType.STRING);
-            itemTypeMap.Put(typeof(DoubleValue), BuiltInAtomicType.DOUBLE);
-            itemTypeMap.Put(typeof(FloatValue), BuiltInAtomicType.FLOAT);
-            itemTypeMap.Put(typeof(BigDecimalValue), BuiltInAtomicType.DECIMAL);
-            itemTypeMap.Put(typeof(IntegerValue), BuiltInAtomicType.INTEGER);
-            itemTypeMap.Put(typeof(DurationValue), BuiltInAtomicType.DURATION);
-            itemTypeMap.Put(typeof(DayTimeDurationValue), BuiltInAtomicType.DAY_TIME_DURATION);
-            itemTypeMap.Put(typeof(YearMonthDurationValue), BuiltInAtomicType.YEAR_MONTH_DURATION);
-            itemTypeMap.Put(typeof(DateTimeValue), BuiltInAtomicType.DATE_TIME);
-            itemTypeMap.Put(typeof(DateValue), BuiltInAtomicType.DATE);
-            itemTypeMap.Put(typeof(TimeValue), BuiltInAtomicType.TIME);
-            itemTypeMap.Put(typeof(GYearValue), BuiltInAtomicType.G_YEAR);
-            itemTypeMap.Put(typeof(GYearMonthValue), BuiltInAtomicType.G_YEAR_MONTH);
-            itemTypeMap.Put(typeof(GMonthValue), BuiltInAtomicType.G_MONTH);
-            itemTypeMap.Put(typeof(GMonthDayValue), BuiltInAtomicType.G_MONTH_DAY);
-            itemTypeMap.Put(typeof(GDayValue), BuiltInAtomicType.G_DAY);
-            itemTypeMap.Put(typeof(AnyURIValue), BuiltInAtomicType.ANY_URI);
-            itemTypeMap.Put(typeof(QNameValue), BuiltInAtomicType.QNAME);
-            itemTypeMap.Put(typeof(NotationValue), BuiltInAtomicType.NOTATION);
-            itemTypeMap.Put(typeof(HexBinaryValue), BuiltInAtomicType.HEX_BINARY);
-            itemTypeMap.Put(typeof(Base64BinaryValue), BuiltInAtomicType.BASE64_BINARY);
-            itemTypeMap.Put(typeof(NodeInfo), AnyNodeTest.GetInstance());
-            itemTypeMap.Put(typeof(ITreeInfo), NodeKindTest.DOCUMENT);
-            itemTypeMap.Put(typeof(MapItem), MapType.GetInstance());
-            itemTypeMap.Put(typeof(ArrayItem), ArrayItemType.GetInstance());
-            itemTypeMap.Put(typeof(IFunctionItem), AnyFunctionType.GetInstance());
-            itemTypeMap.Put(typeof(AtomicValue), BuiltInAtomicType.ANY_ATOMIC); //itemTypeMap.put(UntypedAtomicValue.class, BuiltInAtomicType.UNTYPED_ATOMIC);
+            itemTypeMap[typeof(BooleanValue)] = BuiltInAtomicType.BOOLEAN;
+            itemTypeMap[typeof(StringValue)] = BuiltInAtomicType.STRING;
+            itemTypeMap[typeof(DoubleValue)] = BuiltInAtomicType.DOUBLE;
+            itemTypeMap[typeof(FloatValue)] = BuiltInAtomicType.FLOAT;
+            itemTypeMap[typeof(BigDecimalValue)] = BuiltInAtomicType.DECIMAL;
+            itemTypeMap[typeof(IntegerValue)] = BuiltInAtomicType.INTEGER;
+            itemTypeMap[typeof(DurationValue)] = BuiltInAtomicType.DURATION;
+            itemTypeMap[typeof(DayTimeDurationValue)] = BuiltInAtomicType.DAY_TIME_DURATION;
+            itemTypeMap[typeof(YearMonthDurationValue)] = BuiltInAtomicType.YEAR_MONTH_DURATION;
+            itemTypeMap[typeof(DateTimeValue)] = BuiltInAtomicType.DATE_TIME;
+            itemTypeMap[typeof(DateValue)] = BuiltInAtomicType.DATE;
+            itemTypeMap[typeof(TimeValue)] = BuiltInAtomicType.TIME;
+            itemTypeMap[typeof(GYearValue)] = BuiltInAtomicType.G_YEAR;
+            itemTypeMap[typeof(GYearMonthValue)] = BuiltInAtomicType.G_YEAR_MONTH;
+            itemTypeMap[typeof(GMonthValue)] = BuiltInAtomicType.G_MONTH;
+            itemTypeMap[typeof(GMonthDayValue)] = BuiltInAtomicType.G_MONTH_DAY;
+            itemTypeMap[typeof(GDayValue)] = BuiltInAtomicType.G_DAY;
+            itemTypeMap[typeof(AnyURIValue)] = BuiltInAtomicType.ANY_URI;
+            itemTypeMap[typeof(QNameValue)] = BuiltInAtomicType.QNAME;
+            itemTypeMap[typeof(NotationValue)] = BuiltInAtomicType.NOTATION;
+            itemTypeMap[typeof(HexBinaryValue)] = BuiltInAtomicType.HEX_BINARY;
+            itemTypeMap[typeof(Base64BinaryValue)] = BuiltInAtomicType.BASE64_BINARY;
+            itemTypeMap[typeof(NodeInfo)] = AnyNodeTest.GetInstance();
+            itemTypeMap[typeof(ITreeInfo)] = NodeKindTest.DOCUMENT;
+            itemTypeMap[typeof(MapItem)] = MapType.GetInstance();
+            itemTypeMap[typeof(ArrayItem)] = ArrayItemType.GetInstance();
+            itemTypeMap[typeof(IFunctionItem)] = AnyFunctionType.GetInstance();
+            itemTypeMap[typeof(AtomicValue)] = BuiltInAtomicType.ANY_ATOMIC; //itemTypeMap.put(UntypedAtomicValue.class, BuiltInAtomicType.UNTYPED_ATOMIC);
         }
 
         private static void InitCardinalityMap()
 
         {
-            cardinalityMap.Put(typeof(ISequence), StaticProperty.ALLOWS_ZERO_OR_MORE);
-            cardinalityMap.Put(typeof(ZeroOrMore<>), StaticProperty.ALLOWS_ZERO_OR_MORE);
-            cardinalityMap.Put(typeof(OneOrMore<>), StaticProperty.ALLOWS_ONE_OR_MORE);
-            cardinalityMap.Put(typeof(One<>), StaticProperty.EXACTLY_ONE);
-            cardinalityMap.Put(typeof(ZeroOrOne<>), StaticProperty.ALLOWS_ZERO_OR_ONE);
-            cardinalityMap.Put(typeof(XdmValue), StaticProperty.ALLOWS_ZERO_OR_MORE);
-            cardinalityMap.Put(typeof(XdmItem), StaticProperty.ALLOWS_ZERO_OR_MORE);
-            cardinalityMap.Put(typeof(XdmEmptySequence), StaticProperty.ALLOWS_ZERO);
+            cardinalityMap[typeof(ISequence)] = StaticProperty.ALLOWS_ZERO_OR_MORE;
+            cardinalityMap[typeof(ZeroOrMore<>)] = StaticProperty.ALLOWS_ZERO_OR_MORE;
+            cardinalityMap[typeof(OneOrMore<>)] = StaticProperty.ALLOWS_ONE_OR_MORE;
+            cardinalityMap[typeof(One<>)] = StaticProperty.EXACTLY_ONE;
+            cardinalityMap[typeof(ZeroOrOne<>)] = StaticProperty.ALLOWS_ZERO_OR_ONE;
+            cardinalityMap[typeof(XdmValue)] = StaticProperty.ALLOWS_ZERO_OR_MORE;
+            cardinalityMap[typeof(XdmItem)] = StaticProperty.ALLOWS_ZERO_OR_MORE;
+            cardinalityMap[typeof(XdmEmptySequence)] = StaticProperty.ALLOWS_ZERO;
         }
 
-        public static JPConverter Allocate(System.Type javaClass, OutSmart.DAXon.Internal.Reflect.Type genericType, Configuration config)
+        public static JPConverter Allocate(System.Type javaClass, Configuration config)
         {
-            if (typeof(OutSmart.DAXon.Internal.Jaxp.Namespace.QName).IsAssignableFrom(javaClass))
+            if (typeof(System.Xml.XmlQualifiedName).IsAssignableFrom(javaClass))
             {
                 return FromQName.INSTANCE;
             }
 
             if (typeof(ISequence).IsAssignableFrom(javaClass))
             {
-
-                // Following code caters for classes such as OneOrMore<BooleanValue>
-                if (genericType is ParameterizedType)
+                Types.ItemType itemType = itemTypeMap.GetOrDefault(javaClass);
+                if (itemType != null)
                 {
-                    OutSmart.DAXon.Internal.Reflect.Type[] @params = (OutSmart.DAXon.Internal.Reflect.Type[])((ParameterizedType)genericType).ActualTypeArguments;
-                    if (@params.Length == 1 && @params[0] is System.Type && typeof(IItem).IsAssignableFrom((System.Type)@params[0]))
-                    {
-                        Types.ItemType itemType = itemTypeMap.Get((System.Type)(@params[0]));
-                        int cardinality = cardinalityMap.Get(javaClass);
-                        if (itemType != null && cardinality != null)
-                        {
-                            return new FromSequence(itemType, cardinality);
-                        }
-                    }
-                }
-                else
-                {
-                    Types.ItemType itemType = itemTypeMap.Get(javaClass);
-                    if (itemType != null)
-                    {
-                        return new FromSequence(itemType, StaticProperty.ALLOWS_ZERO_OR_ONE);
-                    }
+                    return new FromSequence(itemType, StaticProperty.ALLOWS_ZERO_OR_ONE);
                 }
             }
 
-            JPConverter c = converterMap.Get(javaClass);
+            JPConverter c = converterMap.GetOrDefault(javaClass);
             if (c != null)
             {
                 return c;
@@ -207,7 +185,7 @@ namespace OutSmart.DAXon.Expressions
                 return FromSource.INSTANCE;
             }
 
-            foreach (KeyValuePair<System.Type, JPConverter> e in converterMap.EntrySet())
+            foreach (KeyValuePair<System.Type, JPConverter> e in converterMap)
             {
                 if (e.Key.IsAssignableFrom(javaClass))
                 {
@@ -235,7 +213,7 @@ namespace OutSmart.DAXon.Expressions
             if (javaClass.IsArray)
             {
                 System.Type itemClass = javaClass.GetElementType();
-                return new FromObjectArray(Allocate(itemClass, null, config));
+                return new FromObjectArray(Allocate(itemClass, config));
             }
 
             if (javaClass.Equals(typeof(void)))
@@ -244,7 +222,7 @@ namespace OutSmart.DAXon.Expressions
             }
 
             JavaExternalObjectType result;
-            lock (config)
+            lock (config.syncLock)
             {
                 result = JavaExternalObjectType.Of(javaClass);
             }
@@ -267,7 +245,7 @@ namespace OutSmart.DAXon.Expressions
             public override IGroundedValue Convert(object @object, IXPathContext context)
             {
                 System.Type theClass = @object.GetType();
-                JPConverter instanceConverter = Allocate(theClass, null, context.GetConfiguration());
+                JPConverter instanceConverter = Allocate(theClass, context.GetConfiguration());
                 if (instanceConverter is FromObject)
                 {
                     JavaExternalObjectType result;
@@ -503,7 +481,8 @@ namespace OutSmart.DAXon.Expressions
             public static readonly FromShort INSTANCE = new FromShort();
             public override IGroundedValue Convert(object @object, IXPathContext context)
             {
-                return new Int64Value(((Short)@object).IntValue());
+                // Unbox directly: the old (Short)@object reference-cast threw InvalidCastException on a boxed short.
+                return new Int64Value((short)@object);
             }
 
             public override Types.ItemType GetItemType()
@@ -517,7 +496,7 @@ namespace OutSmart.DAXon.Expressions
             public static readonly FromByte INSTANCE = new FromByte();
             public override IGroundedValue Convert(object @object, IXPathContext context)
             {
-                return new Int64Value(((byte)@object).IntValue());
+                return new Int64Value((byte)@object);
             }
 
             public override Types.ItemType GetItemType()
@@ -545,8 +524,8 @@ namespace OutSmart.DAXon.Expressions
             public static readonly FromQName INSTANCE = new FromQName();
             public override IGroundedValue Convert(object @object, IXPathContext context)
             {
-                OutSmart.DAXon.Internal.Jaxp.Namespace.QName qn = (OutSmart.DAXon.Internal.Jaxp.Namespace.QName)@object;
-                return new QNameValue(qn.GetPrefix(), NamespaceUri.Of(qn.GetNamespaceURI()), qn.GetLocalPart());
+                System.Xml.XmlQualifiedName qn = (System.Xml.XmlQualifiedName)@object;
+                return new QNameValue("", NamespaceUri.Of(qn.Namespace), qn.Name);
             }
 
             public override Types.ItemType GetItemType()
@@ -574,7 +553,14 @@ namespace OutSmart.DAXon.Expressions
             public static readonly FromDate INSTANCE = new FromDate();
             public override IGroundedValue Convert(object @object, IXPathContext context)
             {
-                return DateTimeValue.FromJavaDate((Date)@object);
+                // Unspecified kind is treated as UTC (the shim-Date predecessor was epoch-based UTC).
+                global::System.DateTime dt = (global::System.DateTime)@object;
+                if (dt.Kind == global::System.DateTimeKind.Unspecified)
+                {
+                    dt = global::System.DateTime.SpecifyKind(dt, global::System.DateTimeKind.Utc);
+                }
+
+                return DateTimeValue.FromJavaTime(new global::System.DateTimeOffset(dt).ToUnixTimeMilliseconds());
             }
 
             public override Types.ItemType GetItemType()
@@ -597,13 +583,13 @@ namespace OutSmart.DAXon.Expressions
                 {
                     return null;
                 }
-                else if (resultType.JavaClass.IsInstance(@object))
+                else if (resultType.JavaClass.IsInstanceOfType(@object))
                 {
                     return new ObjectValue<object>(@object, resultType.JavaClass);
                 }
                 else
                 {
-                    throw new XPathException("Java external object of type " + @object.GetType().GetName() + " is not an instance of the required type " + resultType.JavaClass.GetName(), "XPTY0004");
+                    throw new XPathException("Java external object of type " + @object.GetType().FullName + " is not an instance of the required type " + resultType.JavaClass.FullName, "XPTY0004");
                 }
             }
 
@@ -643,7 +629,7 @@ namespace OutSmart.DAXon.Expressions
                 int a = 0;
                 foreach (object obj in (Collection<object>)@object)
                 {
-                    JPConverter itemConverter = Allocate(obj.GetType(), null, context.GetConfiguration());
+                    JPConverter itemConverter = Allocate(obj.GetType(), context.GetConfiguration());
                     try
                     {
                         IItem item = SequenceTool.AsItem(itemConverter.Convert(obj, context));
@@ -654,7 +640,7 @@ namespace OutSmart.DAXon.Expressions
                     }
                     catch (XPathException e)
                     {
-                        throw new XPathException("Returned Collection contains an object that cannot be converted to an Item (" + obj.GetType() + "): " + e.GetMessage(), DAXonErrorCode.SXJE0051);
+                        throw new XPathException("Returned Collection contains an object that cannot be converted to an Item (" + obj.GetType() + "): " + e.Message, DAXonErrorCode.SXJE0051);
                     }
                 }
 
@@ -914,7 +900,7 @@ namespace OutSmart.DAXon.Expressions
                         }
                         catch (XPathException e)
                         {
-                            throw new XPathException("Returned array contains an object that cannot be converted to an Item (" + member.GetType() + "): " + e.GetMessage(), DAXonErrorCode.SXJE0051);
+                            throw new XPathException("Returned array contains an object that cannot be converted to an Item (" + member.GetType() + "): " + e.Message, DAXonErrorCode.SXJE0051);
                         }
                     }
                     else

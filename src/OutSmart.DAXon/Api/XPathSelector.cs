@@ -19,7 +19,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Api
 {
@@ -66,6 +65,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XdmItem GetContextItem()
@@ -80,7 +83,7 @@ namespace OutSmart.DAXon.Api
             if (value == null)
                 throw new NullReferenceException("value");
             StructuredQName qn = name.GetStructuredQName();
-            XPathVariable var = declaredVariables.Get(qn);
+            XPathVariable var = declaredVariables.GetOrDefault(qn);
             if (var == null)
             {
                 throw new DAXonApiException(new XPathException("Variable has not been declared: " + name));
@@ -93,6 +96,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
             catch (UncheckedXPathException e)
             {
@@ -108,23 +115,6 @@ namespace OutSmart.DAXon.Api
         public virtual IResourceResolver GetResourceResolver()
         {
             return dynamicContext.ResourceResolver;
-        }
-
-        public virtual void SetURIResolver(URIResolver resolver)
-        {
-            dynamicContext.ResourceResolver = new ResourceResolverWrappingURIResolver(resolver);
-        }
-
-        public virtual URIResolver GetURIResolver()
-        {
-            if (dynamicContext.ResourceResolver is ResourceResolverWrappingURIResolver)
-            {
-                return ((ResourceResolverWrappingURIResolver)dynamicContext.ResourceResolver).WrappedURIResolver;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         public virtual void SetUnparsedTextResolver(IUnparsedTextURIResolver resolver)
@@ -157,6 +147,14 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                // The stack-guard abort is deliberately not an XPathException (see
+                // RecursionDepthError), so every API method that reports engine errors carries this
+                // clause too. Converting HERE and nowhere deeper is the whole point: on its way up
+                // the abort must not meet a handler that runs.
+                throw new DAXonApiException(e.ToXPathException());
+            }
 
             return XdmValue.Wrap(value);
         }
@@ -177,6 +175,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XdmSequenceIterator<XdmItem> IIterator()
@@ -188,6 +190,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiUncheckedException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiUncheckedException(e.ToXPathException());
             }
         }
 
@@ -206,8 +212,21 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
-        public IEnumerator<XdmItem> GetEnumerator() => throw new NotImplementedException();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        // s9api XPathSelector is Iterable<XdmItem>: foreach over the selector evaluates it.
+        public IEnumerator<XdmItem> GetEnumerator()
+        {
+            XdmSequenceIterator<XdmItem> it = IIterator();
+            while (it.HasNext())
+            {
+                yield return it.Next();
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
     }
 }

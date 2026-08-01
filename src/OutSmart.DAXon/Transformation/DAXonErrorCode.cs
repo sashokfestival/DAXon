@@ -22,6 +22,10 @@ namespace OutSmart.DAXon.Transformation
         /// </summary>
         public const string SXLM0001 = "SXLM0001";
         /// <summary>
+        /// SXLM0002: a tree is nested deeper than the implementation's depth limit
+        /// </summary>
+        public const string SXLM0002 = "SXLM0002";
+        /// <summary>
         /// SXCH0002: cannot supply output to ContentHandler because it is not well-formed
         /// </summary>
         public const string SXCH0002 = "SXCH0002";

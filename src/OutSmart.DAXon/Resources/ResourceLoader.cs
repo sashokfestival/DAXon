@@ -17,7 +17,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 using System.IO.Compression;
@@ -26,16 +25,16 @@ namespace OutSmart.DAXon.Resources
     public class ResourceLoader
     {
         public static int MAX_REDIRECTS = 20;
-        public static URLConnection UrlConnection(URL url)
+        public static URLConnection UrlConnection(Uri url)
         {
-            if ("http".Equals(url.Protocol) || "https".Equals(url.Protocol))
+            if (url.Scheme == Uri.UriSchemeHttp || url.Scheme == Uri.UriSchemeHttps)
             {
                 var visited = new HashSet<string>();
                 string cookies = null;
                 int count = MAX_REDIRECTS;
                 for (; ; )
                 {
-                    HttpURLConnection conn = (HttpURLConnection)url.OpenConnection();
+                    HttpURLConnection conn = new HttpURLConnection(url);
                     conn.SetInstanceFollowRedirects(false);
                     conn.SetRequestProperty("Accept-Encoding", "gzip");
                     if (cookies != null)
@@ -46,9 +45,20 @@ namespace OutSmart.DAXon.Resources
                     int status = conn.ResponseCode;
                     if (status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_MOVED_TEMP)
                     {
-                        string location = conn.GetHeaderField("ILocation");
-                        url = new URL(url, location);
+                        // Normally dormant on .NET: HttpWebRequest auto-follows redirects inside
+                        // GetResponse (SetInstanceFollowRedirects is a no-op here), so this manual
+                        // loop only runs if a host disables that. The header name had been mangled
+                        // to "ILocation" by the ILocation-type rename sweep - a silent artifact
+                        // precisely because the loop is dormant.
+                        string location = conn.GetHeaderField("Location");
+                        url = new Uri(url, location);
                         cookies = conn.GetHeaderField("Set-Cookie");
+
+                        // Every header read above needs the response, so release it only now - but
+                        // release it on EVERY exit from this hop, including the two throws below.
+                        // Nobody will ever read this hop's body, and an abandoned response keeps its
+                        // socket checked out of the pool until finalization.
+                        conn.Disconnect();
                         if (visited.Contains(location))
                         {
                             throw new IOException("HTTP redirect loop through " + location);
@@ -63,13 +73,15 @@ namespace OutSmart.DAXon.Resources
                     }
                     else
                     {
+                        // The caller reads this one's body, so it stays open: closing it is the
+                        // caller's job, via the stream it obtains from InputStream.
                         return conn;
                     }
                 }
             }
             else
             {
-                return url.OpenConnection();
+                return new URLConnection(url);
             }
         }
 
@@ -87,11 +99,17 @@ namespace OutSmart.DAXon.Resources
                     path = url.Substring(10);
                 }
 
+                // DynamicLoader has no default implementation; without one, classpath: URIs are unresolvable.
+                if (config.DynamicLoader == null)
+                {
+                    throw new IOException("Cannot resolve classpath: URI (no dynamic loader configured): " + url);
+                }
+
                 return config.DynamicLoader.GetResourceAsStream(path);
             }
             else
             {
-                URLConnection conn = ResourceLoader.UrlConnection(new URL(url));
+                URLConnection conn = ResourceLoader.UrlConnection(new Uri(url));
                 System.IO.Stream inputStream = conn.InputStream;
                 string contentEncoding = conn.ContentEncoding;
                 if ("gzip".Equals(contentEncoding))
@@ -111,7 +129,7 @@ namespace OutSmart.DAXon.Resources
             }
             else
             {
-                URLConnection conn = ResourceLoader.UrlConnection(new URL(url));
+                URLConnection conn = ResourceLoader.UrlConnection(new Uri(url));
                 System.IO.Stream inputStream = conn.InputStream;
                 if ("gzip".Equals(conn.ContentEncoding))
                 {
@@ -141,7 +159,7 @@ namespace OutSmart.DAXon.Resources
             }
             else
             {
-                conn = ResourceLoader.UrlConnection(new URL(url));
+                conn = ResourceLoader.UrlConnection(new Uri(url));
                 inputStream = conn.InputStream;
                 string contentEncoding = conn.ContentEncoding;
                 if ("gzip".Equals(contentEncoding))
@@ -198,11 +216,11 @@ namespace OutSmart.DAXon.Resources
                     throw new NullReferenceException();
                 if (resourceEncoding == null)
                     throw new NullReferenceException();
-                Charset charset2 = Charset.ForName(resourceEncoding);
-
-                // ensure that encoding errors are not recovered
-                // decoder line removed (System.IO.TextReader cluster -> BCL StreamReader)
-                return new StreamReader((System.IO.Stream)inputStream, charset2.Inner);
+                // Unknown encodings fall back to UTF-8 (preserves the old Charset.ForName swallow).
+                Encoding enc;
+                try { enc = Encoding.GetEncoding(resourceEncoding); }
+                catch (ArgumentException) { enc = Encoding.UTF8; }
+                return new StreamReader((System.IO.Stream)inputStream, enc);
             }
             catch (Exception e)
             {

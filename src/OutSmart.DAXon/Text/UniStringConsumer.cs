@@ -15,15 +15,10 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Text
 {
-    public interface IUniStringConsumer
+    public interface IUniStringConsumer : global::System.IDisposable
     {
-        void Open()
-;
-
-
+        void Open();
         IUniStringConsumer Accept(UnicodeString chars);
-        void Dispose()
-;
-
+        void Close();
     }
 }

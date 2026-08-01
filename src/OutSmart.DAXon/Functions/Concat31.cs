@@ -140,7 +140,7 @@ namespace OutSmart.DAXon.Functions
                 }
             }
 
-            output.Dispose();
+            output.Close();
         }
 
         /// <summary>

@@ -12,7 +12,7 @@ using OutSmart.DAXon.Types;
 
 namespace OutSmart.DAXon.Api
 {
-    // Phase 5: ConstructedItemType extends ItemType (s9api) for 6 callers expecting ItemType.
+    // ConstructedItemType extends ItemType (s9api) for 6 callers expecting ItemType.
     public class ConstructedItemType : ItemType
     {
         public ConstructedItemType() : base(null) { }

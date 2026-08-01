@@ -13,7 +13,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -128,11 +127,10 @@ namespace OutSmart.DAXon.Json
         public virtual void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             string local = elemName.GetLocalPart();
-            string parent = stack.Empty() ? null : stack.Peek();
-            bool inMap = "map".Equals(parent) || stack.IsEmpty();
+            string parent = stack.Count == 0 ? null : stack.Peek();
+            bool inMap = "map".Equals(parent) || stack.Count == 0;
             stack.Push(local);
 
-            //started.push(false);
             if (!elemName.HasURI(NamespaceUri.FN))
             {
                 throw new XPathException("xml-to-json: element found in wrong namespace: " + elemName.GetStructuredQName().EQName, ERR_INPUT);
@@ -194,8 +192,8 @@ namespace OutSmart.DAXon.Json
         // the attribute loop above performs.
         internal void StartEntryDirect(string local, string key, string escapedAtt, string escapedKey)
         {
-            string parent = stack.Empty() ? null : stack.Peek();
-            bool inMap = "map".Equals(parent) || stack.IsEmpty();
+            string parent = stack.Count == 0 ? null : stack.Peek();
+            bool inMap = "map".Equals(parent) || stack.Count == 0;
             stack.Push(local);
             if (key != null && !inMap)
             {
@@ -229,7 +227,7 @@ namespace OutSmart.DAXon.Json
                 }
             }
 
-            if (inMap && !keyChecker.IsEmpty())
+            if (inMap && keyChecker.Count > 0)
             {
                 if (key == null)
                 {
@@ -292,7 +290,6 @@ namespace OutSmart.DAXon.Json
                     break;
                 case "null":
 
-                    //checkParent(local, parent);
                     output.Accept(TOK_NULL);
                     atStart = false;
                     break;
@@ -310,20 +307,18 @@ namespace OutSmart.DAXon.Json
                     }
 
 
-                    //checkParent(local, parent);
                     atStart = false;
                     break;
                 case "boolean":
                 case "number":
 
-                    //checkParent(local, parent);
                     atStart = false;
                     break;
                 default:
                     throw new XPathException("xml-to-json: unknown element <" + local + ">", ERR_INPUT);
             }
 
-            textBuffer.SetLength(0);
+            textBuffer.Length = 0;
             pendingChunk = null;
         }
 
@@ -363,7 +358,7 @@ namespace OutSmart.DAXon.Json
             if (local.Equals("string") && !escaped && IsCleanString(uContent))
             {
                 output.Accept(TOK_QUOTE).Accept(uContent).Accept(TOK_QUOTE);
-                textBuffer.SetLength(0);
+                textBuffer.Length = 0;
                 escaped = false;
                 atStart = false;
                 return;
@@ -426,7 +421,7 @@ namespace OutSmart.DAXon.Json
                 throw new XPathException("xml-to-json: Element " + local + " must have no text content", ERR_INPUT);
             }
 
-            textBuffer.SetLength(0);
+            textBuffer.Length = 0;
             escaped = false;
             if (local.Equals("array"))
             {
@@ -507,7 +502,7 @@ namespace OutSmart.DAXon.Json
             {
                 char c = @in[i];
                 if (c == '\\' || c == '\b' || c == '\f' || c == '\n' || c == '\r' || c == '\t'
-                    || (c == '"' && !retainQuot) || (c == '/' && !retainSlash) || hexEscapes.Test(c))
+                    || (c == '"' && !retainQuot) || (c == '/' && !retainSlash) || hexEscapes(c))
                 {
                     clean = false;
                     break;
@@ -550,7 +545,7 @@ namespace OutSmart.DAXon.Json
                         @out.Append("\\\\");
                         break;
                     default:
-                        if (hexEscapes.Test(c))
+                        if (hexEscapes(c))
                         {
                             @out.Append("\\u");
                             @out.Append(Hex4(c));
@@ -573,7 +568,7 @@ namespace OutSmart.DAXon.Json
         }
         public virtual void Characters(UnicodeString chars, ILocation locationId, int properties)
         {
-            if (!stack.Empty() && !Whitespace.IsAllWhite(chars))
+            if (stack.Count > 0 && !Whitespace.IsAllWhite(chars))
             {
                 string local = stack.Peek();
                 if (local.Equals("map") || local.Equals("array"))
@@ -604,6 +599,15 @@ namespace OutSmart.DAXon.Json
 
         public virtual void Comment(UnicodeString content, ILocation locationId, int properties)
         {
+        }
+
+        public virtual void Close()
+        {
+            if (output != null)
+            {
+                output.Close();
+                output = null;
+            }
         }
 
         public virtual void Dispose()
@@ -765,9 +769,10 @@ namespace OutSmart.DAXon.Json
             }
         }
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void Append(IItem item, ILocation locationId, int properties) { throw new NotImplementedException(); }
-        public virtual void Append(IItem item) { throw new NotImplementedException(); }
-        public virtual bool HandlesAppend() => throw new NotImplementedException();
+        // Upstream Receiver defaults: this receiver takes the xml-to-json element vocabulary as
+        // events, never composed items.
+        public virtual void Append(IItem item, ILocation locationId, int properties) => throw new InvalidOperationException("The xml-to-json receiver does not accept composed items");
+        public virtual void Append(IItem item) => throw new InvalidOperationException("The xml-to-json receiver does not accept composed items");
+        public virtual bool HandlesAppend() => false;
     }
 }

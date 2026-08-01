@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Values
 {
     public sealed class DateTimeValue : CalendarValue, IXPathComparable
     {
-
-
         /// <summary>
         /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
         /// </summary>
@@ -43,67 +41,25 @@ namespace OutSmart.DAXon.Values
         private readonly int nanosecond; // the number of nanoseconds within the current second
         private readonly bool hasNoYearZero; // true if XSD 1.0 rules apply for negative years
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.DATE_TIME;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public int Year => year;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public byte Month => month;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public byte Day => day;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public byte Hour => hour;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public byte Minute => minute;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public byte Second => second;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public int Microsecond => nanosecond / 1000;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public int Nanosecond => nanosecond;
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override UnicodeString PrimitiveStringValue
         {
             get
@@ -153,9 +109,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override UnicodeString CanonicalLexicalRepresentation
         {
             get
@@ -171,9 +124,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public DateTimeComparable SchemaComparable => new DateTimeComparable(this);
         public DateTimeValue(int year, byte month, byte day, byte hour, byte minute, byte second, int nanosecond, bool hasNoYearZero, int tzMinutes, IAtomicType typeLabel) : base(typeLabel, tzMinutes)
         {
@@ -187,16 +137,10 @@ namespace OutSmart.DAXon.Values
             this.hasNoYearZero = hasNoYearZero;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public DateTimeValue(int year, byte month, byte day, byte hour, byte minute, byte second, int nanosecond, int tz) : this(year, month, day, hour, minute, second, nanosecond, false, tz, BuiltInAtomicType.DATE_TIME)
         {
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public DateTimeValue(int year, byte month, byte day, byte hour, byte minute, byte second, int microsecond, int tz, bool hasNoYearZero) : this(year, month, day, hour, minute, second, microsecond * 1000, hasNoYearZero, tz, BuiltInAtomicType.DATE_TIME)
         {
         }
@@ -246,45 +190,10 @@ namespace OutSmart.DAXon.Values
                 (int)(subSecondTicks * 100), false, (int)now.Offset.TotalMinutes, BuiltInAtomicType.DATE_TIME_STAMP);
         }
 
-        public static DateTimeValue FromCalendar(Calendar calendar, bool tzSpecified)
-        {
-            MutableDateTimeValue m = new MutableDateTimeValue();
-            int era = calendar[GregorianCalendar.ERA];
-            m.year = calendar[Calendar.YEAR];
-            if (era == GregorianCalendar.BC)
-            {
-                m.year = 1 - m.year;
-            }
-
-            m.month = (byte)(calendar[Calendar.MONTH] + 1);
-            m.day = (byte)calendar[Calendar.DATE];
-            m.hour = (byte)calendar[Calendar.HOUR_OF_DAY];
-            m.minute = (byte)calendar[Calendar.MINUTE];
-            m.second = (byte)calendar[Calendar.SECOND];
-            m.nanosecond = calendar[Calendar.MILLISECOND] * 1000000;
-            if (tzSpecified)
-            {
-                m.tzMinutes = (calendar[Calendar.ZONE_OFFSET] + calendar[Calendar.DST_OFFSET]) / 60000;
-            }
-
-            m.typeLabel = BuiltInAtomicType.DATE_TIME;
-            m.hasNoYearZero = true;
-            return FromMutableCopy(m);
-        }
-
-        public static DateTimeValue FromJavaDate(Date suppliedDate)
-        {
-            long millis = suppliedDate.GetTime();
-            return (DateTimeValue)EPOCH.Add(DayTimeDurationValue.FromMilliseconds(millis));
-        }
-
         public static DateTimeValue FromJavaTime(long time)
         {
             return (DateTimeValue)EPOCH.Add(DayTimeDurationValue.FromMilliseconds(time));
         }
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public static DateTimeValue MakeDateTimeValue(DateValue date, TimeValue time)
         {
             if (date == null || time == null)
@@ -304,15 +213,12 @@ namespace OutSmart.DAXon.Values
             v.minute = time.Minute;
             v.second = time.Second;
             v.nanosecond = time.Nanosecond;
-            v.tzMinutes = System.Math.Max(tz1, tz2);
+            v.tzMinutes = Math.Max(tz1, tz2);
             v.typeLabel = BuiltInAtomicType.DATE_TIME;
             v.hasNoYearZero = date.hasNoYearZero;
             return FromMutableCopy(v);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public static IConversionResult MakeDateTimeValue(UnicodeString s, ConversionRules rules)
         {
 
@@ -641,7 +547,7 @@ namespace OutSmart.DAXon.Values
                     }
 
                     part = tok.NextToken();
-                    if (part.Length > 9 && part.Matches("^[0-9]+$"))
+                    if (part.Length > 9 && part.MatchesRegex("^[0-9]+$"))
                     {
                         part = part.Substring(0, 9);
                     }
@@ -741,7 +647,7 @@ namespace OutSmart.DAXon.Values
                         return BadDate("Timezone minute is out of range", s);
                     }
 
-                    if (System.Math.Abs(tz) == 14 * 60 && tzminute != 0)
+                    if (Math.Abs(tz) == 14 * 60 && tzminute != 0)
                     {
                         return BadDate("Timezone is out of range (-14:00 to +14:00)", s);
                     }
@@ -768,13 +674,7 @@ namespace OutSmart.DAXon.Values
             return null;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         private static ValidationFailure BadDate(string msg, UnicodeString value)
         {
             ValidationFailure err = new ValidationFailure("Invalid dateTime value " + Err.Wrap(value, Err.VALUE) + " (" + msg + ")");
@@ -782,9 +682,6 @@ namespace OutSmart.DAXon.Values
             return err;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         private static ValidationFailure BadDate(string msg, UnicodeString value, string errorCode)
         {
             ValidationFailure err = new ValidationFailure("Invalid dateTime value " + Err.Wrap(value, Err.VALUE) + " (" + msg + ")");
@@ -792,25 +689,16 @@ namespace OutSmart.DAXon.Values
             return err;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override DateTimeValue ToDateTime()
         {
             return this;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public bool IsXsd10Rules()
         {
             return hasNoYearZero;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override void CheckValidInJavascript()
         {
             if (year <= 0 || year > 9999)
@@ -819,9 +707,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public DateTimeValue AdjustToUTC(int implicitTimezone)
         {
             if (HasTimezone())
@@ -841,9 +726,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public BigDecimal ToJulianInstant()
         {
             int julianDay = DateValue.GetJulianDayNumber(year, month, day);
@@ -860,9 +742,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public static DateTimeValue FromJulianInstant(BigDecimal instant)
         {
             BigInteger julianSecond = instant.ToBigInteger();
@@ -878,63 +757,23 @@ namespace OutSmart.DAXon.Values
             return new DateTimeValue(date.Year, date.Month, date.Day, hour, minute, (byte)js, nanoseconds.IntValue(), 0);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
+        // Milliseconds since the epoch (was GetCalendar().TimeInMillis, which read the no-op
+        // Calendar shim and always answered 0 -- a time-based seed that never varied).
         public long RandomSeed()
         {
-            return GetCalendar().TimeInMillis;
+            return (long)(SecondsSinceEpoch().DoubleValue() * 1000);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        public override GregorianCalendar GetCalendar()
-        {
-            int tz = HasTimezone() ? TimezoneInMinutes * 60000 : 0;
-            TimeZoneInfo zone = new SimpleTimeZone(tz, "LLL");
-            GregorianCalendar calendar = new GregorianCalendar(zone);
-            if (tz < calendar.GetMinimum(Calendar.ZONE_OFFSET) || tz > calendar.GetMaximum(Calendar.ZONE_OFFSET))
-            {
-                return AdjustTimezone(0).GetCalendar();
-            }
-
-            calendar.SetGregorianChange(new Date(long.MinValue));
-            calendar.SetLenient(false);
-            int yr = year;
-            if (year <= 0)
-            {
-                yr = hasNoYearZero ? 1 - year : -year;
-                calendar[Calendar.ERA] = GregorianCalendar.BC;
-            }
-
-
-            calendar.Set(yr, month - 1, day, hour, minute, second);
-            calendar[Calendar.MILLISECOND] = nanosecond / 1000000; // loses precision unavoidably
-            calendar[Calendar.ZONE_OFFSET] = tz;
-            calendar[Calendar.DST_OFFSET] = 0;
-            return calendar;
-        }
-
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public DateValue ToDateValue()
         {
             return new DateValue(year, month, day, TimezoneInMinutes, hasNoYearZero);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public TimeValue ToTimeValue()
         {
             return new TimeValue(hour, minute, second, nanosecond, TimezoneInMinutes, BuiltInAtomicType.TIME);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)
         {
             MutableDateTimeValue v = MakeMutableCopy();
@@ -942,9 +781,6 @@ namespace OutSmart.DAXon.Values
             return FromMutableCopy(v);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override CalendarValue AdjustTimezone(int timezone)
         {
             if (!HasTimezone() || timezone == NO_TIMEZONE)
@@ -966,7 +802,7 @@ namespace OutSmart.DAXon.Values
             mi += tz;
             if (mi < 0 || mi > 59)
             {
-                h += (int)System.Math.Floor((double)mi / 60.0); // upstream: Math.floor(mi / 60.0). The old
+                h += (int)Math.Floor((double)mi / 60.0); // upstream: Math.floor(mi / 60.0). The old
                 // (double)(mi / 60) divided as INTEGERS first (truncating toward zero, not flooring), so a
                 // negative mi (adjusting to a negative timezone, e.g. 09:15Z -> -14:00) lost an hour of borrow.
                 mi = (mi + 60 * 24) % 60;
@@ -998,9 +834,6 @@ namespace OutSmart.DAXon.Values
             return dt;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override CalendarValue Add(DurationValue duration)
         {
             if (duration is DayTimeDurationValue)
@@ -1040,9 +873,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override DayTimeDurationValue Subtract(CalendarValue other, IXPathContext context)
         {
             if (!(other is DateTimeValue))
@@ -1053,9 +883,6 @@ namespace OutSmart.DAXon.Values
             return base.Subtract(other, context);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public BigDecimal SecondsSinceEpoch()
         {
             try
@@ -1071,9 +898,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override AtomicValue GetComponent(AccessorFn.Component component)
         {
             switch (component)
@@ -1120,15 +944,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override int CompareTo(CalendarValue other, int implicitTimezone)
         {
             if (!(other is DateTimeValue))
@@ -1182,9 +997,6 @@ namespace OutSmart.DAXon.Values
             return AdjustToUTC(implicitTimezone).CompareTo(v2.AdjustToUTC(implicitTimezone), implicitTimezone);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             if (HasTimezone())
@@ -1201,9 +1013,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
         public int CompareTo(IXPathComparable v2)
         {
             if (v2 is DateTimeValue)
@@ -1223,34 +1032,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// DateTimeComparable is an object that implements the XML Schema rules for comparing date/time values
-        /// </summary>
         public override bool Equals(object o)
         {
             return o is DateTimeValue && CompareTo((DateTimeValue)o) == 0;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// DateTimeComparable is an object that implements the XML Schema rules for comparing date/time values
-        /// </summary>
         public override int GetHashCode()
         {
             return ComputeHashCode(year, month, day, hour, minute, second, nanosecond, TimezoneInMinutes);
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// DateTimeComparable is an object that implements the XML Schema rules for comparing date/time values
-        /// </summary>
         public static int ComputeHashCode(int year, byte month, byte day, byte hour, byte minute, byte second, int nanosecond, int tzMinutes)
         {
             int tz = tzMinutes == CalendarValue.NO_TIMEZONE ? 0 : -tzMinutes;
@@ -1259,7 +1050,7 @@ namespace OutSmart.DAXon.Values
             mi += tz;
             if (mi < 0 || mi > 59)
             {
-                h += (int)System.Math.Floor((double)mi / 60.0); // upstream: Math.floor(mi / 60.0). The old
+                h += (int)Math.Floor((double)mi / 60.0); // upstream: Math.floor(mi / 60.0). The old
                 mi = (mi + 60 * 24) % 60;
             }
 
@@ -1298,12 +1089,6 @@ namespace OutSmart.DAXon.Values
             public IAtomicType typeLabel = BuiltInAtomicType.DATE_TIME;
         }
 
-        /// <summary>
-        /// Fixed date/time used by Java (and Unix) as the origin of the universe: 1970-01-01T00:00:00Z
-        /// </summary>
-        /// <summary>
-        /// DateTimeComparable is an object that implements the XML Schema rules for comparing date/time values
-        /// </summary>
         public class DateTimeComparable : IComparable<DateTimeComparable>
         {
             private readonly DateTimeValue value;

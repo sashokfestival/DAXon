@@ -349,7 +349,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         }
         IAtomicComparer IAtomicComparer.ProvideContext(IXPathContext arg0) => ProvideContext(arg0);
 
-        // Phase 5: IAtomicComparisonFunction interface->delegate for lambda assignability.
+        // IAtomicComparisonFunction interface->delegate for lambda assignability.
         public delegate bool IAtomicComparisonFunction(AtomicValue v0, AtomicValue v1, IXPathContext context);
     }
 }

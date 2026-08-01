@@ -37,25 +37,13 @@ namespace OutSmart.DAXon.XPath
         protected OptimizerOptions optimizerOptions;
         protected bool parentlessContextItem;
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual IEnumerable<XPathVariable> ExternalVariables => variables.Values;
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual ICollection<XPathVariable> DeclaredVariables => variables.Values;
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public IndependentContext() : this(new Configuration())
         {
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public IndependentContext(Configuration config)
         {
             SetConfiguration(config);
@@ -69,9 +57,6 @@ namespace OutSmart.DAXon.XPath
             SetPackageData(pd);
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public IndependentContext(IndependentContext ic) : this(ic.GetConfiguration())
         {
             SetPackageData(ic.GetPackageData());
@@ -99,9 +84,6 @@ namespace OutSmart.DAXon.XPath
             SetOptimizerOptions(ic.GetOptimizerOptions());
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override RetainedStaticContext MakeRetainedStaticContext()
         {
             if (retainedStaticContext == null)
@@ -112,9 +94,6 @@ namespace OutSmart.DAXon.XPath
             return retainedStaticContext;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void DeclareNamespace(string prefix, NamespaceUri uri)
         {
             if (prefix == null)
@@ -133,13 +112,10 @@ namespace OutSmart.DAXon.XPath
             }
             else
             {
-                namespaces.Put(prefix, uri);
+                namespaces[prefix] = uri;
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override void SetDefaultElementNamespace(NamespaceUri uri)
         {
             if (uri == null)
@@ -148,12 +124,9 @@ namespace OutSmart.DAXon.XPath
             }
 
             base.SetDefaultElementNamespace(uri);
-            namespaces.Put("", uri);
+            namespaces[""] = uri;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void ClearNamespaces()
         {
             namespaces.Clear();
@@ -164,9 +137,6 @@ namespace OutSmart.DAXon.XPath
             DeclareNamespace("", NamespaceUri.NULL);
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void ClearAllNamespaces()
         {
             namespaces.Clear();
@@ -174,9 +144,6 @@ namespace OutSmart.DAXon.XPath
             DeclareNamespace("", NamespaceUri.NULL);
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void SetNamespaces(NodeInfo node)
         {
             namespaces.Clear();
@@ -212,53 +179,35 @@ namespace OutSmart.DAXon.XPath
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public void SetNamespaceResolver(INamespaceResolver resolver)
         {
             externalResolver = resolver;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void SetAllowUndeclaredVariables(bool allow)
         {
             autoDeclare = allow;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual bool IsAllowUndeclaredVariables()
         {
             return autoDeclare;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public XPathVariable DeclareVariable(QNameValue qname)
         {
             return DeclareVariable(qname.GetStructuredQName());
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public XPathVariable DeclareVariable(NamespaceUri namespaceURI, string localName)
         {
             StructuredQName qName = new StructuredQName("", namespaceURI == null ? NamespaceUri.NULL : namespaceURI, localName);
             return DeclareVariable(qName);
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual XPathVariable DeclareVariable(StructuredQName qName)
         {
-            XPathVariable var = variables.Get(qName);
+            XPathVariable var = variables.GetOrDefault(qName);
             if (var != null)
             {
                 return var;
@@ -268,26 +217,20 @@ namespace OutSmart.DAXon.XPath
                 var = XPathVariable.Make(qName);
                 int slot = variables.Count;
                 var.SetSlotNumber(slot);
-                variables.Put(qName, var);
+                variables[qName] = var;
                 return var;
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual XPathVariable GetExternalVariable(StructuredQName qName)
         {
-            return variables.Get(qName);
+            return variables.GetOrDefault(qName);
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual int GetSlotNumber(QNameValue qname)
         {
             StructuredQName sq = qname.GetStructuredQName();
-            XPathVariable var = variables.Get(sq);
+            XPathVariable var = variables.GetOrDefault(sq);
             if (var == null)
             {
                 return -1;
@@ -296,9 +239,6 @@ namespace OutSmart.DAXon.XPath
             return var.LocalSlotNumber;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override INamespaceResolver GetNamespaceResolver()
         {
             if (externalResolver != null)
@@ -311,9 +251,6 @@ namespace OutSmart.DAXon.XPath
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public NamespaceUri GetURIForPrefix(string prefix, bool useDefault)
         {
             if (externalResolver != null)
@@ -327,13 +264,10 @@ namespace OutSmart.DAXon.XPath
             }
             else
             {
-                return namespaces.Get(prefix);
+                return namespaces.GetOrDefault(prefix);
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public IEnumerator<string> IteratePrefixes()
         {
             if (externalResolver != null)
@@ -342,16 +276,13 @@ namespace OutSmart.DAXon.XPath
             }
             else
             {
-                return namespaces.KeySet().IIterator();
+                return namespaces.Keys.GetEnumerator();
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override Expression BindVariable(StructuredQName qName)
         {
-            XPathVariable var = variables.Get(qName);
+            XPathVariable var = variables.GetOrDefault(qName);
             if (var == null)
             {
                 if (autoDeclare)
@@ -369,9 +300,6 @@ namespace OutSmart.DAXon.XPath
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public SlotManager GetStackFrameMap()
         {
             SlotManager map = GetConfiguration().MakeSlotManager();
@@ -389,117 +317,75 @@ namespace OutSmart.DAXon.XPath
             return map;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override bool IsImportedSchema(NamespaceUri @namespace)
         {
             return importedSchemaNamespaces.Contains(@namespace);
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override HashSet<NamespaceUri> GetImportedSchemaNamespaces()
         {
             return importedSchemaNamespaces;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void SetImportedSchemaNamespaces(HashSet<NamespaceUri> namespaces)
         {
             importedSchemaNamespaces = namespaces;
-            if (!namespaces.IsEmpty())
+            if (namespaces.Count > 0)
             {
                 SetSchemaAware(true);
             }
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void SetRequiredContextItemType(Types.ItemType type)
         {
             requiredContextItemType = type;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override Types.ItemType GetRequiredContextItemType()
         {
             return requiredContextItemType;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void SetOptimizerOptions(OptimizerOptions options)
         {
             this.optimizerOptions = options;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public override OptimizerOptions GetOptimizerOptions()
         {
             return this.optimizerOptions;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void SetExecutable(Executable exec)
         {
             executable = exec;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual Executable GetExecutable()
         {
             return executable;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual int GetColumnNumber()
         {
             return -1;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual string GetPublicId()
         {
             return null;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual int GetLineNumber()
         {
             return -1;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public bool IsContextItemParentless()
         {
             return parentlessContextItem;
         }
 
-        /// <summary>
-        /// Create an IndependentContext along with a new (non-schema-aware) Saxon Configuration
-        /// </summary>
         public virtual void SetContextItemParentless(bool parentless)
         {
             parentlessContextItem = parentless;

@@ -25,8 +25,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Tracing
 {
@@ -85,7 +83,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
         }
 
@@ -94,7 +92,7 @@ namespace OutSmart.DAXon.Tracing
             SerializationProperties props = MakeDefaultProperties(config);
             if (config.XMLVersion == Configuration.XML11)
             {
-                props.SetProperty(OutputKeys.VERSION, "1.1");
+                props.SetProperty(DAXonOutputKeys.VERSION, "1.1");
             }
 
             try
@@ -111,7 +109,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
 
             this.config = config;
@@ -123,7 +121,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
         }
 
@@ -146,7 +144,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
         }
 
@@ -180,24 +178,24 @@ namespace OutSmart.DAXon.Tracing
         public static SerializationProperties MakeDefaultProperties(Configuration config)
         {
             SerializationProperties props = new SerializationProperties();
-            props.SetProperty(OutputKeys.METHOD, "xml");
-            props.SetProperty(OutputKeys.INDENT, "yes");
+            props.SetProperty(DAXonOutputKeys.METHOD, "xml");
+            props.SetProperty(DAXonOutputKeys.INDENT, "yes");
             if (config.IsLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION))
             {
                 props.SetProperty(DAXonOutputKeys.INDENT_SPACES, "1");
                 props.SetProperty(DAXonOutputKeys.LINE_LENGTH, "4096");
             }
 
-            props.SetProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            props.SetProperty(OutputKeys.ENCODING, "utf-8");
-            props.SetProperty(OutputKeys.VERSION, "1.0");
+            props.SetProperty(DAXonOutputKeys.OMIT_XML_DECLARATION, "no");
+            props.SetProperty(DAXonOutputKeys.ENCODING, "utf-8");
+            props.SetProperty(DAXonOutputKeys.VERSION, "1.0");
             props.SetProperty(DAXonOutputKeys.SINGLE_QUOTES, "yes");
             return props;
         }
 
         public virtual int StartElement(string name, Expression expr)
         {
-            Expression parent = expressionStack.IsEmpty() ? null : expressionStack.Peek();
+            Expression parent = expressionStack.Count == 0 ? null : expressionStack.Peek();
             expressionStack.Push(expr);
             nameStack.Push("*" + name);
             int n = _startElement(name);
@@ -233,7 +231,7 @@ namespace OutSmart.DAXon.Tracing
             {
 
                 // If not exporting the base URI, cut the filename used for diagnostic location of errors down to its last component
-                string[] parts = module.Split("/");
+                string[] parts = module.SplitRegex("/");
                 for (int p = parts.Length - 1; p >= 0; p--)
                 {
                     if (!(parts[p].Length == 0))
@@ -300,10 +298,10 @@ namespace OutSmart.DAXon.Tracing
                     //Bugs 6198, 6274
                     NamespaceUri uri = sc.GetURIForPrefix(p, true);
                     ub.Append(p);
-                    ub.Append("=");
+                    ub.Append('=');
                     if (uri.Equals(NamespaceUri.GetUriForConventionalPrefix(p)))
                     {
-                        ub.Append("~");
+                        ub.Append('~');
                     }
                     else
                     {
@@ -316,7 +314,7 @@ namespace OutSmart.DAXon.Tracing
                         ub.Append(uUri);
                     }
 
-                    ub.Append(" ");
+                    ub.Append(' ');
                 }
             }
 
@@ -360,7 +358,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
 
             inStartTag = true;
@@ -388,7 +386,7 @@ namespace OutSmart.DAXon.Tracing
                 catch (XPathException err)
                 {
                     err.ToString();
-                    throw new InvalidOperationException(err.GetMessage());
+                    throw new InvalidOperationException(err.Message);
                 }
             }
         }
@@ -403,7 +401,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
         }
 
@@ -416,7 +414,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException e)
             {
                 e.ToString();
-                throw new InvalidOperationException(e.GetMessage());
+                throw new InvalidOperationException(e.Message);
             }
         }
 
@@ -436,7 +434,7 @@ namespace OutSmart.DAXon.Tracing
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
 
             string name = nameStack.Pop();
@@ -477,12 +475,12 @@ namespace OutSmart.DAXon.Tracing
                 }
 
                 cco.EndDocument();
-                cco.Dispose();
+                cco.Close();
             }
             catch (XPathException err)
             {
                 err.ToString();
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
         }
 
@@ -537,7 +535,7 @@ namespace OutSmart.DAXon.Tracing
                         if (c < 32 || (c > 127 && c < 160) || c > UTF16CharacterSet.SURROGATE1_MIN)
                         {
                             @out.Append("\\u");
-                            StringBuilder hex = new StringBuilder(((int)(c)).ToString("x").ToUpperCase());
+                            StringBuilder hex = new StringBuilder(((int)(c)).ToString("x").ToUpperInvariant());
                             while (hex.Length < 4)
                             {
                                 hex.Insert(0, "0");

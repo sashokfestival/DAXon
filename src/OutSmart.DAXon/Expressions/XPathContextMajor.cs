@@ -41,9 +41,6 @@ namespace OutSmart.DAXon.Expressions
         private Component currentComponent;
         XPathException currentException;
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual IContextOriginator Origin
         {
             get => origin; set
@@ -52,14 +49,8 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual ISequence[] AllVariableValues => stackFrame.StackFrameValues;
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual TailCallLoop.ITailCallInfo TailCallInfo
         {
             get
@@ -76,16 +67,10 @@ namespace OutSmart.DAXon.Expressions
             origin = controller;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         private XPathContextMajor()
         {
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public XPathContextMajor(IItem item, Executable exec)
         {
             controller = exec is PreparedStylesheet ? new XsltController(exec.GetConfiguration(), (PreparedStylesheet)exec) : new Controller(exec.GetConfiguration(), exec);
@@ -100,9 +85,6 @@ namespace OutSmart.DAXon.Expressions
             origin = controller;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override XPathContextMajor NewContext()
         {
             XPathContextMajor c = new XPathContextMajor();
@@ -129,9 +111,6 @@ namespace OutSmart.DAXon.Expressions
             return c;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public static XPathContextMajor NewContext(XPathContextMinor prev)
         {
             XPathContextMajor c = new XPathContextMajor();
@@ -159,9 +138,6 @@ namespace OutSmart.DAXon.Expressions
             return c;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public static XPathContextMajor NewThreadContext(XPathContextMinor prev)
         {
             XPathContextMajor c = NewContext(prev);
@@ -169,25 +145,16 @@ namespace OutSmart.DAXon.Expressions
             return c;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override ThreadManager GetThreadManager()
         {
             return threadManager;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void CreateThreadManager()
         {
             threadManager = GetConfiguration().MakeThreadManager();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override void WaitForChildThreads()
         {
             if (threadManager != null)
@@ -196,9 +163,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override ParameterSet GetLocalParameters()
         {
             if (localParameters == null)
@@ -209,33 +173,21 @@ namespace OutSmart.DAXon.Expressions
             return localParameters;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetLocalParameters(ParameterSet localParameters)
         {
             this.localParameters = localParameters;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override ParameterSet GetTunnelParameters()
         {
             return tunnelParameters;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetTunnelParameters(ParameterSet tunnelParameters)
         {
             this.tunnelParameters = tunnelParameters;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetStackFrame(SlotManager map, ISequence[] variables)
         {
             stackFrame = new StackFrame(map, variables);
@@ -251,9 +203,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void ResetStackFrameMap(SlotManager map, int numberOfParams)
         {
             stackFrame.map = map;
@@ -271,25 +220,16 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void ResetAllVariableValues(ISequence[] values)
         {
             stackFrame.StackFrameValues = values;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void ResetParameterValues(ISequence[] values)
         {
             Array.Copy(values, 0, stackFrame.slots, 0, values.Length);
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void RequestTailCall(TailCallLoop.ITailCallInfo targetFn, ISequence[] variables)
         {
             if (variables != null)
@@ -307,9 +247,6 @@ namespace OutSmart.DAXon.Expressions
             tailCallInfo = targetFn;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void OpenStackFrame(SlotManager map)
         {
             int numberOfSlots = map.NumberOfVariables;
@@ -323,25 +260,16 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void OpenStackFrame(int numberOfVariables)
         {
             stackFrame = new StackFrame(new SlotManager(numberOfVariables), SequenceTool.MakeSequenceArray(numberOfVariables));
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetCurrentMode(Component.M mode)
         {
             currentMode = mode;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override Component.M GetCurrentMode()
         {
             Component.M m = currentMode;
@@ -363,73 +291,46 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetCurrentTemplateRule(Rule rule)
         {
             currentTemplate = rule;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override Rule GetCurrentTemplateRule()
         {
             return currentTemplate;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetCurrentGroupIterator(IGroupIterator iterator)
         {
             currentGroupIterator = iterator;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override IGroupIterator GetCurrentGroupIterator()
         {
             return currentGroupIterator;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetCurrentMergeGroupIterator(IGroupIterator iterator)
         {
             currentMergeGroupIterator = iterator;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override IGroupIterator GetCurrentMergeGroupIterator()
         {
             return currentMergeGroupIterator;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetCurrentRegexIterator(IRegexIterator iterator)
         {
             currentRegexIterator = iterator;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override IRegexIterator GetCurrentRegexIterator()
         {
             return currentRegexIterator;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override int UseLocalParameter(StructuredQName paramName, int slotNumber, bool isTunnel)
         {
             ParameterSet @params = isTunnel ? GetTunnelParameters() : localParameters;
@@ -450,83 +351,47 @@ namespace OutSmart.DAXon.Expressions
             return @checked ? ParameterSet.SUPPLIED_AND_CHECKED : ParameterSet.SUPPLIED;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetResourceResolver(IResourceResolver resolver)
         {
             resourceResolver = resolver;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override IResourceResolver GetResourceResolver()
         {
             return resourceResolver == null ? controller.ResourceResolver : resourceResolver;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetErrorReporter(IErrorReporter reporter)
         {
             errorReporter = reporter;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override IErrorReporter GetErrorReporter()
         {
             return errorReporter == null ? controller.ErrorReporter : errorReporter;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual void SetCurrentException(XPathException exception)
         {
             currentException = exception;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public override XPathException GetCurrentException()
         {
             return currentException;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Get the current component
-        /// </summary>
         public override Component GetCurrentComponent()
         {
             return currentComponent;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Get the current component
-        /// </summary>
         public virtual void SetCurrentComponent(Component component)
         {
 
             currentComponent = component;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Get the current component
-        /// </summary>
         public override Component GetTargetComponent(int bindingSlot)
         {
             try
@@ -550,9 +415,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public abstract class ThreadManager
         {
             public abstract void WaitForChildThreads();

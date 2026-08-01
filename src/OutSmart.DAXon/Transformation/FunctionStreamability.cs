@@ -35,20 +35,12 @@ namespace OutSmart.DAXon.Transformation
         ASCENT
 
         // --------------------
-        // TODO enum body members
         // public String streamabilityStr;
         // public boolean isConsuming() {
-        //     return this == ABSORBING || this == SHALLOW_DESCENT || this == DEEP_DESCENT;
-        // }
         // public boolean isStreaming() {
-        //     return this != UNCLASSIFIED;
-        // }
-        // FunctionStreamability(String v) {
         //     streamabilityStr = v;
         // }
         // public static FunctionStreamability of(String v) {
-        //     switch(v) {
-        //         case "unclassified":
         //             return UNCLASSIFIED;
         //         case "absorbing":
         //             return ABSORBING;
@@ -64,8 +56,6 @@ namespace OutSmart.DAXon.Transformation
         //             return ASCENT;
         //         default:
         //             throw new global::System.ArgumentException();
-        //     }
-        // }
         // --------------------
     }
 }

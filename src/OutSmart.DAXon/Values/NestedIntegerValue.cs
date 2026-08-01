@@ -126,7 +126,7 @@ namespace OutSmart.DAXon.Values
                 }
             }
 
-            return System.Math.Sign(value.Length - v2.value.Length);
+            return Math.Sign(value.Length - v2.value.Length);
         }
     }
 }

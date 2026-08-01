@@ -88,7 +88,10 @@ namespace OutSmart.DAXon.Tracing
                 throw new UncheckedXPathException(e);
             }
 
-            return new TraceClause(expression, clause);
+            // Clause operands are traced in place; the upstream TraceClause wrapper (a clause-
+            // boundary trace event) is not ported - returning the old stub here crashed with
+            // NotImplementedException the moment tracing met a FLWOR expression.
+            return null;
         }
     }
 }

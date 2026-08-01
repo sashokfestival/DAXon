@@ -21,8 +21,7 @@ namespace OutSmart.DAXon.Trees.Iterators
     {
         bool IsActuallyGrounded();
         IGroundedValue GetResidue();
-        IGroundedValue Materialize()
-;
+        IGroundedValue Materialize();
 
 
     }

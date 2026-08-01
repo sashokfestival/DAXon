@@ -15,7 +15,6 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using static OutSmart.DAXon.Xslt.SourceBinding.BindingProperty;
 using System;
 using System.Collections.Generic;
@@ -348,7 +347,7 @@ namespace OutSmart.DAXon.Xslt
                 }
                 catch (XPathException e)
                 {
-                    sourceElement.CompileErrorInAttribute(e.GetMessage(), e.ShowErrorCode(), "as");
+                    sourceElement.CompileErrorInAttribute(e.Message, e.ShowErrorCode(), "as");
                 }
             }
 
@@ -361,7 +360,7 @@ namespace OutSmart.DAXon.Xslt
                 }
                 catch (XPathException e)
                 {
-                    sourceElement.CompileErrorInAttribute(e.GetMessage(), e.ShowErrorCode(), "saxon:as");
+                    sourceElement.CompileErrorInAttribute(e.Message, e.ShowErrorCode(), "saxon:as");
                     extraResultType = Values.SequenceType.ANY_SEQUENCE;
                 }
 

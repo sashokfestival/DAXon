@@ -23,7 +23,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Regex.CharClass
@@ -61,7 +60,7 @@ namespace OutSmart.DAXon.Regex.CharClass
             System.IO.Stream @in = Core.Version.platform.LocateResource("categories.xml", new List<string>());
             if (@in == null)
             {
-                throw new Exception("Unable to read categories.xml file");
+                throw new InvalidOperationException("Unable to read categories.xml file");
             }
 
             Configuration config = new Configuration();
@@ -76,7 +75,7 @@ namespace OutSmart.DAXon.Regex.CharClass
             }
             catch (XPathException e)
             {
-                throw new Exception("Failed to build categories.xml", e);
+                throw new InvalidOperationException("Failed to build categories.xml", e);
             }
 
             int fp_name = config.GetNamePool().AllocateFingerprint(NamespaceUri.NULL, "name");
@@ -94,7 +93,7 @@ namespace OutSmart.DAXon.Regex.CharClass
                     irs.AddRange(Convert.ToInt32(from, 16), Convert.ToInt32(to, 16));
                 }
 
-                CATEGORIES.Put(cat, new Category(cat, new IntSetPredicate(irs)));
+                CATEGORIES[cat] = new Category(cat, new IntSetPredicate(irs));
             }
 
             string c = "CLMNPSZ";
@@ -102,7 +101,7 @@ namespace OutSmart.DAXon.Regex.CharClass
             {
                 char ch = c[i];
                 IIntPredicateProxy ip = null;
-                foreach (KeyValuePair<string, Category> entry in CATEGORIES.EntrySet())
+                foreach (KeyValuePair<string, Category> entry in CATEGORIES)
                 {
                     if (entry.Key[0] == ch)
                     {
@@ -111,14 +110,14 @@ namespace OutSmart.DAXon.Regex.CharClass
                 }
 
                 string label = ch + "";
-                CATEGORIES.Put(label, new Category(label, ip));
+                CATEGORIES[label] = new Category(label, ip);
             }
         }
         public static Category GetCategory(string cat)
         {
             lock (typeof(Categories))
             {
-                return GetInstance().CATEGORIES.Get(cat);
+                return GetInstance().CATEGORIES.GetOrDefault(cat);
             }
         }
         public class Category : ICharacterClass

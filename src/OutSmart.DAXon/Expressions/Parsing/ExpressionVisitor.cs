@@ -147,10 +147,14 @@ namespace OutSmart.DAXon.Expressions.Parsing
             {
                 StackGuard.Probe();
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
                 staticTreeDepth--;
-                throw TooDeep("insufficient stack on this thread");
+
+                // Described rather than converted: static analysis also runs at evaluation time
+                // (xsl:evaluate, fn:transform), where an XPathException would unwind through the
+                // engine stack above it. TooDeep stays for the deterministic counter path.
+                throw e.Describe("Expression is too deeply nested (insufficient stack on this thread)", "XPST0003", null);
             }
         }
 

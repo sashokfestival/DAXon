@@ -21,8 +21,10 @@ namespace OutSmart.DAXon.Patterns
         public static AnchorPattern GetInstance() => _instance;
         public override Expression Copy(RebindingMap rebindings) => this;
         public override void Export(ExpressionPresenter ep) { }
-        public override ItemType GetItemType() => throw new NotImplementedException("STUB: AnchorPattern.GetItemType not ported (excluded stub)");
-        public override UType GetUType() => throw new NotImplementedException("STUB: AnchorPattern.GetUType not ported (excluded stub)");
+        public override ItemType GetItemType() => AnyNodeTest.GetInstance(); // upstream: the anchor "." can be any node
+        public override UType GetUType() => UType.ANY_NODE;
+        // KNOWN GAP: upstream anchors via matchesBeneathAnchor (node == anchor); this port answers
+        // false unconditionally — see docs/known-gaps.md §P2c.
         public override bool Matches(IItem item, IXPathContext context) => false;
     }
 }

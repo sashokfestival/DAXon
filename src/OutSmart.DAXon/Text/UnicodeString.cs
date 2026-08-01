@@ -8,7 +8,6 @@ using OutSmart.DAXon.Expressions.Sorting;
 using OutSmart.DAXon.Serialization.CharCodes;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -282,7 +281,10 @@ namespace OutSmart.DAXon.Text
         {
             StringBuilder __sb = new StringBuilder();
             IIntIterator __it = CodePoints();
-            while (__it != null && __it.MoveNext()) { __sb.Append(char.ConvertFromUtf32(__it.Current)); }
+            while (__it != null && __it.MoveNext())
+            {
+                __sb.Append(char.ConvertFromUtf32(__it.Current));
+            }
             return __sb.ToString();
         }
 
@@ -303,7 +305,7 @@ namespace OutSmart.DAXon.Text
                 throw new NotSupportedException("String exceeds 2^31 characters");
             }
 
-            return (int)System.Math.Max(value, 0);
+            return (int)Math.Max(value, 0);
         }
 
         public virtual void Copy8bit(byte[] target, int offset)

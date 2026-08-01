@@ -103,7 +103,7 @@ namespace OutSmart.DAXon.Functions
         {
             foreach (string s in dayNames)
             {
-                if (s.EqualsIgnoreCase(str))
+                if (s.Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -115,7 +115,7 @@ namespace OutSmart.DAXon.Functions
         {
             foreach (string s in monthNames)
             {
-                if (s.EqualsIgnoreCase(str))
+                if (s.Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -126,51 +126,51 @@ namespace OutSmart.DAXon.Functions
 
         private byte GetMonthNumber(string str)
         {
-            if ("Jan".EqualsIgnoreCase(str))
+            if ("Jan".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)1;
             }
-            else if ("Feb".EqualsIgnoreCase(str))
+            else if ("Feb".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)2;
             }
-            else if ("Mar".EqualsIgnoreCase(str))
+            else if ("Mar".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)3;
             }
-            else if ("Apr".EqualsIgnoreCase(str))
+            else if ("Apr".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)4;
             }
-            else if ("May".EqualsIgnoreCase(str))
+            else if ("May".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)5;
             }
-            else if ("Jun".EqualsIgnoreCase(str))
+            else if ("Jun".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)6;
             }
-            else if ("Jul".EqualsIgnoreCase(str))
+            else if ("Jul".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)7;
             }
-            else if ("Aug".EqualsIgnoreCase(str))
+            else if ("Aug".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)8;
             }
-            else if ("Sep".EqualsIgnoreCase(str))
+            else if ("Sep".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)9;
             }
-            else if ("Oct".EqualsIgnoreCase(str))
+            else if ("Oct".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)10;
             }
-            else if ("Nov".EqualsIgnoreCase(str))
+            else if ("Nov".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)11;
             }
-            else if ("Dec".EqualsIgnoreCase(str))
+            else if ("Dec".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return (byte)12;
             }
@@ -215,7 +215,7 @@ namespace OutSmart.DAXon.Functions
         {
             foreach (string s in timezoneNames)
             {
-                if (s.EqualsIgnoreCase(str))
+                if (s.Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -226,39 +226,39 @@ namespace OutSmart.DAXon.Functions
 
         private int GetTimezoneOffsetFromName(string str)
         {
-            if ("UT".EqualsIgnoreCase(str) | "UTC".EqualsIgnoreCase(str) | "GMT".EqualsIgnoreCase(str))
+            if ("UT".Equals(str, global::System.StringComparison.OrdinalIgnoreCase) | "UTC".Equals(str, global::System.StringComparison.OrdinalIgnoreCase) | "GMT".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return 0;
             }
-            else if ("EST".EqualsIgnoreCase(str))
+            else if ("EST".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -5 * 60;
             }
-            else if ("EDT".EqualsIgnoreCase(str))
+            else if ("EDT".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -4 * 60;
             }
-            else if ("CST".EqualsIgnoreCase(str))
+            else if ("CST".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -6 * 60;
             }
-            else if ("CDT".EqualsIgnoreCase(str))
+            else if ("CDT".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -5 * 60;
             }
-            else if ("MST".EqualsIgnoreCase(str))
+            else if ("MST".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -7 * 60;
             }
-            else if ("MDT".EqualsIgnoreCase(str))
+            else if ("MDT".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -6 * 60;
             }
-            else if ("PST".EqualsIgnoreCase(str))
+            else if ("PST".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -8 * 60;
             }
-            else if ("PDT".EqualsIgnoreCase(str))
+            else if ("PDT".Equals(str, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return -7 * 60;
             }
@@ -276,7 +276,7 @@ namespace OutSmart.DAXon.Functions
             IList<TimeValue> timeValue = new List<TimeValue>();
             int i = 0;
             string currentToken = tokens[i];
-            if (currentToken.Matches("[A-Za-z]+") && IsDayName(currentToken))
+            if (currentToken.MatchesRegex("[A-Za-z]+") && IsDayName(currentToken))
             {
                 currentToken = tokens[++i];
                 if (",".Equals(currentToken))
@@ -297,7 +297,7 @@ namespace OutSmart.DAXon.Functions
                 month = GetMonthNumber(currentToken);
                 i = RequireDSep(tokens, i + 1, input);
                 currentToken = tokens[i];
-                if (!currentToken.Matches("[0-9]+"))
+                if (!currentToken.MatchesRegex("[0-9]+"))
                 {
                     BadDate("Day number expected after month name", input);
                 }
@@ -323,7 +323,7 @@ namespace OutSmart.DAXon.Functions
                 }
 
                 currentToken = tokens[++i];
-                if (currentToken.Matches("[0-9]+"))
+                if (currentToken.MatchesRegex("[0-9]+"))
                 {
                     year = CheckTwoOrFourDigits(input, currentToken);
                 }
@@ -332,7 +332,7 @@ namespace OutSmart.DAXon.Functions
                     BadDate("Year number expected after time", input);
                 }
             }
-            else if (currentToken.Matches("[0-9]+"))
+            else if (currentToken.MatchesRegex("[0-9]+"))
             {
                 if (currentToken.Length > 2)
                 {
@@ -350,7 +350,7 @@ namespace OutSmart.DAXon.Functions
                 month = GetMonthNumber(currentToken);
                 i = RequireDSep(tokens, ++i, input);
                 currentToken = tokens[i];
-                if (currentToken.Matches("[0-9]+"))
+                if (currentToken.MatchesRegex("[0-9]+"))
                 {
                     year = CheckTwoOrFourDigits(input, currentToken);
                 }
@@ -433,7 +433,7 @@ namespace OutSmart.DAXon.Functions
             int i = currentPosition;
             int n = currentPosition; /* the final token index, returned by the method */
             StringBuilder currentToken = new StringBuilder(tokens[i]);
-            if (!currentToken.ToString().Matches("[0-9]+"))
+            if (!currentToken.ToString().MatchesRegex("[0-9]+"))
             {
                 BadDate("Hour number expected", input);
             }
@@ -451,7 +451,7 @@ namespace OutSmart.DAXon.Functions
             }
 
             currentToken = new StringBuilder(tokens[++i]);
-            if (!currentToken.ToString().Matches("[0-9]+"))
+            if (!currentToken.ToString().MatchesRegex("[0-9]+"))
             {
                 BadDate("Minutes expected after hour", input);
             }
@@ -473,7 +473,7 @@ namespace OutSmart.DAXon.Functions
             else if (":".Equals(currentToken.ToString()))
             {
                 currentToken = new StringBuilder(tokens[++i]);
-                if (!currentToken.ToString().Matches("[0-9]+"))
+                if (!currentToken.ToString().MatchesRegex("[0-9]+"))
                 {
                     BadDate("Seconds expected after ':' separator after minutes", input);
                 }
@@ -494,16 +494,16 @@ namespace OutSmart.DAXon.Functions
                 else if (".".Equals(currentToken.ToString()))
                 {
                     currentToken = new StringBuilder(tokens[++i]);
-                    if (!currentToken.ToString().Matches("[0-9]+"))
+                    if (!currentToken.ToString().MatchesRegex("[0-9]+"))
                     {
                         BadDate("Fractional part of seconds expected after decimal point", input);
                     }
 
-                    int len = System.Math.Min(6, currentToken.Length);
-                    currentToken = new StringBuilder(currentToken.Substring(0, len));
+                    int len = Math.Min(6, currentToken.Length);
+                    currentToken = new StringBuilder(currentToken.ToString(0, (len) - (0)));
                     while (currentToken.Length < 6)
                     {
-                        currentToken.Append("0");
+                        currentToken.Append('0');
                     }
 
                     microsecond = int.Parse(currentToken.ToString());
@@ -519,7 +519,7 @@ namespace OutSmart.DAXon.Functions
                 if (" ".Equals(currentToken.ToString()))
                 {
                     currentToken = new StringBuilder(tokens[++i]);
-                    if (currentToken.ToString().Matches("[0-9]+"))
+                    if (currentToken.ToString().MatchesRegex("[0-9]+"))
                     {
                         /* no timezone is given in the time, we must have reached a year */
                         n = i - 2;
@@ -529,7 +529,7 @@ namespace OutSmart.DAXon.Functions
 
                 if (!finished)
                 {
-                    if (currentToken.ToString().Matches("[A-Za-z]+"))
+                    if (currentToken.ToString().MatchesRegex("[A-Za-z]+"))
                     {
                         if (!IsTimezoneName(currentToken.ToString()))
                         {
@@ -546,7 +546,7 @@ namespace OutSmart.DAXon.Functions
                         int tzOffsetHours = 0;
                         int tzOffsetMinutes = 0;
                         currentToken = new StringBuilder(tokens[++i]);
-                        if (!currentToken.ToString().Matches("[0-9]+"))
+                        if (!currentToken.ToString().MatchesRegex("[0-9]+"))
                         {
                             BadDate("Parsing timezone offset, number expected after '" + sign + "'", input);
                         }
@@ -558,8 +558,8 @@ namespace OutSmart.DAXon.Functions
                         }
                         else if (tLength >= 3)
                         {
-                            tzOffsetHours = int.Parse(currentToken.Substring(0, tLength - 2));
-                            tzOffsetMinutes = int.Parse(currentToken.Substring(tLength - 2, tLength));
+                            tzOffsetHours = int.Parse(currentToken.ToString(0, (tLength - 2) - (0)));
+                            tzOffsetMinutes = int.Parse(currentToken.ToString(tLength - 2, (tLength) - (tLength - 2)));
                             currentToken = new StringBuilder(tokens[++i]);
                         }
                         else
@@ -569,7 +569,7 @@ namespace OutSmart.DAXon.Functions
                             if (":".Equals(currentToken.ToString()))
                             {
                                 currentToken = new StringBuilder(tokens[++i]);
-                                if (currentToken.ToString().Matches("[0-9]+"))
+                                if (currentToken.ToString().MatchesRegex("[0-9]+"))
                                 {
                                     if (currentToken.Length != 2)
                                     {
@@ -604,7 +604,7 @@ namespace OutSmart.DAXon.Functions
                         else if (" ".Equals(currentToken.ToString()))
                         {
                             currentToken = new StringBuilder(tokens[++i]);
-                            if (currentToken.ToString().Matches("[0-9]+"))
+                            if (currentToken.ToString().MatchesRegex("[0-9]+"))
                             {
                                 /* we must have reached the year */
                                 n = i - 2;
@@ -620,11 +620,11 @@ namespace OutSmart.DAXon.Functions
                                 currentToken = new StringBuilder(tokens[++i]);
                             }
 
-                            if (!currentToken.ToString().Matches("[A-Za-z]+"))
+                            if (!currentToken.ToString().MatchesRegex("[A-Za-z]+"))
                             {
                                 BadDate("Timezone name expected after '('", input);
                             }
-                            else if (currentToken.ToString().Matches("[A-Za-z]+"))
+                            else if (currentToken.ToString().MatchesRegex("[A-Za-z]+"))
                             {
                                 if (!IsTimezoneName(currentToken.ToString()))
                                 {

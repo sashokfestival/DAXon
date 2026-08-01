@@ -110,11 +110,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
 
             // Delete the following five lines to fix bug 3450
-            //if (a instanceof UntypedAtomicValue) {
-            //    return ((UntypedAtomicValue) a).compareTo(b, collator, context);
-            //} else if (b instanceof UntypedAtomicValue) {
-            //    return -((UntypedAtomicValue) b).compareTo(a, collator, context);
-            //} else
             // End of fix for 3450
             // Double/double (the numeric-sort common case): same result as the general chain below —
             // NaN screen, then NumericValue.CompareTo's ==/< compare (±0 equal) — without 2× virtual

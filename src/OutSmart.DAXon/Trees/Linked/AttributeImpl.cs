@@ -51,12 +51,6 @@ namespace OutSmart.DAXon.Trees.Linked
         public override UnicodeString UnicodeStringValue => StringView.Tidy(GetAttributeInfo().Value);
 
         /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
         /// Get the previous node in document order (skipping attributes)
         /// </summary>
         public override NodeImpl PreviousInDocument => GetParent();
@@ -143,9 +137,6 @@ namespace OutSmart.DAXon.Trees.Linked
         }
 
         /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
         /// Get previous sibling - not defined for attributes
         /// </summary>
         public override NodeImpl GetPreviousSibling()
@@ -153,18 +144,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return null;
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
         public override NodeImpl GetNextInDocument(NodeImpl anchor)
         {
             if (anchor == this)
@@ -172,18 +151,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return GetParent().GetNextInDocument(anchor);
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
         public override void GenerateId(StringBuilder buffer)
         {
             GetParent().GenerateId(buffer);
@@ -191,38 +158,11 @@ namespace OutSmart.DAXon.Trees.Linked
             buffer.Append(GetSiblingPosition());
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
         public override void Copy(IReceiver @out, int copyOptions, ILocation locationId)
         {
             throw new ArgumentException();
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void Delete()
         {
             if (!IsDeleted())
@@ -238,21 +178,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override bool IsDeleted()
         {
 
@@ -260,21 +185,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return GetRawParent() == null || GetAttributeInfo() is AttributeInfo.Deleted || GetRawParent().IsDeleted();
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void Replace(NodeInfo[] replacement, bool inherit)
         {
             if (IsDeleted())
@@ -300,21 +210,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void Rename(INodeName newNameCode, bool inherit)
         {
 
@@ -345,21 +240,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void ReplaceStringValue(UnicodeString stringValue)
         {
             ElementImpl owner = (ElementImpl)GetRawParent();
@@ -370,21 +250,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void RemoveTypeAnnotation()
         {
             ElementImpl owner = (ElementImpl)GetRawParent();
@@ -396,21 +261,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Get next sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get previous sibling - not defined for attributes
-        /// </summary>
-        /// <summary>
-        /// Get the previous node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Get the next node in document order (skipping attributes)
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public override void SetTypeAnnotation(ISchemaType type)
         {
             if (!(type is ISimpleType))

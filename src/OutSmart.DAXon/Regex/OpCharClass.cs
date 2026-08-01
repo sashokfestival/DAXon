@@ -79,15 +79,15 @@ namespace OutSmart.DAXon.Regex
                 {
                     StringBuilder fsb = new StringBuilder(64);
                     IntRangeSet irs = (IntRangeSet)s;
-                    fsb.Append("[");
+                    fsb.Append('[');
                     for (int i = 0; i < irs.NumberOfRanges; i++)
                     {
                         fsb.Append((char)irs.StartPoints[1]);
-                        fsb.Append("-");
+                        fsb.Append('-');
                         fsb.Append((char)irs.EndPoints[1]);
                     }
 
-                    fsb.Append("[");
+                    fsb.Append('[');
                     return fsb.ToString();
                 }
                 else

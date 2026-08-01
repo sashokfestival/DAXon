@@ -116,9 +116,9 @@ namespace OutSmart.DAXon.Events
         /// End of output. Note that closing this receiver also closes the rest of the
         /// pipeline.
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
-            base.Dispose();
+            base.Close();
         }
 
         /// <summary>

@@ -24,7 +24,10 @@ namespace OutSmart.DAXon.Types
         public static IConversionResult Convert(Converter conv, AtomicValue item)
         {
             object r = conv.Convert(item);
-            if (r != null) { return (IConversionResult)r; }
+            if (r != null)
+            {
+                return (IConversionResult)r;
+            }
             switch (conv.GetType().Name)
             {
                 case "IdentityConverter":

@@ -145,12 +145,6 @@ namespace OutSmart.DAXon.Events
             } //pendingStartTag = false;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void EndElement()
         {
             if (--level == 0)
@@ -168,12 +162,6 @@ namespace OutSmart.DAXon.Events
             pendingStartTag = false;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public virtual void ReleaseStartTag()
         {
             if (level >= 1 && pendingStartTag)
@@ -193,12 +181,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
         {
             if (level == 0)
@@ -222,12 +204,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void ProcessingInstruction(string name, UnicodeString data, ILocation location, int properties)
         {
             if (level == 0)
@@ -251,12 +227,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void Comment(UnicodeString content, ILocation location, int properties)
         {
             if (level == 0)
@@ -280,12 +250,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void Append(IItem item)
         {
             if (level == 0)
@@ -340,12 +304,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of element
-        /// </summary>
         public override void Append(IItem item, ILocation locationId, int copyNamespaces)
         {
             if (level == 0)

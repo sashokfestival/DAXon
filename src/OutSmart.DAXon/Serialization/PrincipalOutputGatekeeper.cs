@@ -23,6 +23,7 @@ namespace OutSmart.DAXon.Serialization
 {
     public class PrincipalOutputGatekeeper : ProxyReceiver
     {
+        private readonly object syncLock = new object();
         private readonly XsltController controller;
         private bool usedAsPrimaryResult = false;
         private bool usedAsSecondaryResult = false;
@@ -47,7 +48,7 @@ namespace OutSmart.DAXon.Serialization
 
         public override void StartDocument(int properties)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (!opened)
                 {
@@ -55,7 +56,6 @@ namespace OutSmart.DAXon.Serialization
                 }
 
 
-                //checkNotClosed();
                 nextReceiver.StartDocument(properties);
             }
         }
@@ -68,7 +68,7 @@ namespace OutSmart.DAXon.Serialization
 
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
         {
-            lock (this)
+            lock (syncLock)
             {
                 UseAsPrimary();
                 nextReceiver.Characters(chars, locationId, properties);
@@ -95,7 +95,7 @@ namespace OutSmart.DAXon.Serialization
 
         private void UseAsPrimary()
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (closed)
                 {
@@ -113,7 +113,7 @@ namespace OutSmart.DAXon.Serialization
 
         public virtual void UseAsSecondary()
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (usedAsPrimaryResult)
                 {
@@ -153,12 +153,12 @@ namespace OutSmart.DAXon.Serialization
             return uri == null ? "(no URI supplied)" : uri;
         }
 
-        public override void Dispose()
+        public override void Close()
         {
             closed = true;
             if (usedAsPrimaryResult)
             {
-                nextReceiver.Dispose();
+                nextReceiver.Close();
             }
         }
     }

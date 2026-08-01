@@ -21,7 +21,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Functions
 {
     /// <summary>
@@ -140,17 +139,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Implementation of IFold class to do the summation in push mode
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new SumFnElaborator();
         }
 
-        /// <summary>
-        /// Implementation of IFold class to do the summation in push mode
-        /// </summary>
         public class SumFold : IFold
         {
             private readonly IXPathContext context;
@@ -368,9 +361,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Implementation of IFold class to do the summation in push mode
-        /// </summary>
         public class SumFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()

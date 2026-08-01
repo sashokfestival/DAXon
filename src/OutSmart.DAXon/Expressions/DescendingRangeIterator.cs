@@ -31,10 +31,14 @@ namespace OutSmart.DAXon.Expressions
         public bool HasNext => currentValue - step >= limit;
         public DescendingRangeIterator(long start, long step, long end)
         {
+            // Backstop matching the ascending sibling's guard in MakeRangeIterator: every caller
+            // already checks the length, but the guard used to be commented out, and start - end
+            // overflows a long for spans past 2^63. CountExceedsLimit is overflow-safe.
+            if (IntegerRange.CountExceedsLimit(start, step, end))
+            {
+                throw new XPathException("Saxon limit on sequence length exceeded (2^31)", "XPDY0130");
+            }
 
-            //        if (start - end > int.MaxValue) {
-            //            throw new UncheckedXPathException("Saxon limit on sequence length exceeded (2^31)", "XPDY0130");
-            //        }
             this.start = start;
             this.step = step;
             currentValue = start + step;

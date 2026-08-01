@@ -11,7 +11,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -31,9 +30,6 @@ namespace OutSmart.DAXon.Regex
         // q flag qualify too); benign race: concurrent writers store the same value.
         private int singleCharToken = -2;
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual string Flags => rawFlags;
         public ARegularExpression(UnicodeString pattern, string flags, string hostLanguage, IList<string> warnings, Configuration config)
         {
@@ -45,7 +41,7 @@ namespace OutSmart.DAXon.Regex
             }
             catch (RESyntaxException err)
             {
-                throw new XPathException(err.GetMessage(), "FORX0001");
+                throw new XPathException(err.Message, "FORX0001");
             }
 
             try
@@ -56,7 +52,7 @@ namespace OutSmart.DAXon.Regex
                 regex = comp2.Compile(rawPattern);
                 if (warnings != null)
                 {
-                    warnings.AddAll(comp2.Warnings);
+                    warnings.AddRange(comp2.Warnings);
                 }
 
                 if (config != null)
@@ -66,7 +62,7 @@ namespace OutSmart.DAXon.Regex
             }
             catch (RESyntaxException err)
             {
-                throw new XPathException(err.GetMessage(), "FORX0002");
+                throw new XPathException(err.Message, "FORX0002");
             }
         }
 
@@ -82,9 +78,6 @@ namespace OutSmart.DAXon.Regex
             }
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public static ARegularExpression Compile(UnicodeString pattern, string flags)
         {
             try
@@ -97,9 +90,6 @@ namespace OutSmart.DAXon.Regex
             }
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual bool Matches(UnicodeString input)
         {
             if (input.IsEmpty() && regex.IsNullable())
@@ -112,22 +102,23 @@ namespace OutSmart.DAXon.Regex
             {
                 return matcher.IsAnchoredMatch(input.Tidy());
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                throw StackOverflowError();
+                throw DescribeOverflow(e);
             }
         }
 
-        // Match-time conversion of the OpCapture/OpSequence stack-guard signal — one per public
-        // evaluation entry (analyze-string and tokenize convert in their own iterators).
-        internal static XPathException.StackOverflow StackOverflowError()
+        // Match-time description of the OpCapture/OpSequence stack-guard signal — one per public
+        // evaluation entry (analyze-string and tokenize describe in their own iterators). It stays
+        // a RecursionDepthError all the way to the API boundary: a regex driven from inside a
+        // recursive template carries the whole engine stack above it, and an XPathException would
+        // have to unwind through every decorating catch on the way up — which is what killed the
+        // process before round BC.
+        internal static Internal.RecursionDepthError DescribeOverflow(Internal.RecursionDepthError e)
         {
-            return new XPathException.StackOverflow("Stack overflow (excessive recursion) during regular expression evaluation", DAXonErrorCode.SXRE0001, Loc.NONE);
+            return e.Describe("Stack overflow (excessive recursion) during regular expression evaluation", DAXonErrorCode.SXRE0001, Loc.NONE);
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual bool ContainsMatch(UnicodeString input)
         {
             REMatcher matcher = new REMatcher(regex);
@@ -135,15 +126,12 @@ namespace OutSmart.DAXon.Regex
             {
                 return matcher.Match(input.Tidy(), 0);
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                throw StackOverflowError();
+                throw DescribeOverflow(e);
             }
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual IAtomicIterator Tokenize(UnicodeString input)
         {
             int cp = SingleCharLiteral();
@@ -180,17 +168,11 @@ namespace OutSmart.DAXon.Regex
             return result;
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual IRegexIterator Analyze(UnicodeString input)
         {
             return new ARegexIterator(input.Tidy(), rawPattern, new REMatcher(regex));
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual UnicodeString Replace(UnicodeString input, UnicodeString replacement)
         {
             REMatcher matcher = new REMatcher(regex);
@@ -200,17 +182,14 @@ namespace OutSmart.DAXon.Regex
             }
             catch (RESyntaxException err)
             {
-                throw new XPathException(err.GetMessage(), "FORX0004");
+                throw new XPathException(err.Message, "FORX0004");
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                throw StackOverflowError();
+                throw DescribeOverflow(e);
             }
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual UnicodeString ReplaceWith(UnicodeString input, Func<UnicodeString, UnicodeString[], UnicodeString> replacer)
         {
             REMatcher matcher = new REMatcher(regex);
@@ -220,17 +199,14 @@ namespace OutSmart.DAXon.Regex
             }
             catch (RESyntaxException err)
             {
-                throw new XPathException(err.GetMessage(), "FORX0004");
+                throw new XPathException(err.Message, "FORX0004");
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                throw StackOverflowError();
+                throw DescribeOverflow(e);
             }
         }
 
-        /// <summary>
-        /// Static factory method intended for simple static regular expressions known to be correct
-        /// </summary>
         public virtual bool IsPlatformNative()
         {
             return false;

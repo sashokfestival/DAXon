@@ -19,7 +19,6 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Api
@@ -89,16 +88,6 @@ namespace OutSmart.DAXon.Api
             {
                 throw new InvalidOperationException("Invalid base URI for query: " + staticQueryContext.BaseURI);
             }
-        }
-
-        public virtual void SetErrorListener(ErrorListener listener)
-        {
-            staticQueryContext.SetErrorListener(listener);
-        }
-
-        public virtual ErrorListener GetErrorListener()
-        {
-            return staticQueryContext.GetErrorListener();
         }
 
         public virtual void SetErrorReporter(IErrorReporter reporter)

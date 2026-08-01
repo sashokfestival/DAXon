@@ -23,8 +23,7 @@ namespace OutSmart.DAXon.Types
     public interface IUnionType : ItemType, ICastingTarget
     {
         StructuredQName TypeName { get; }
-        StructuredQName GetStructuredQName()
-;
+        StructuredQName GetStructuredQName();
 
 
 
@@ -33,8 +32,7 @@ namespace OutSmart.DAXon.Types
         SequenceType ResultTypeOfCast { get; }
         IAtomicSequence GetTypedValue(UnicodeString value, INamespaceResolver resolver, ConversionRules rules);
         ValidationFailure CheckAgainstFacets(AtomicValue value, ConversionRules rules);
-        string ExplainMismatch(IItem item, TypeHierarchy th)
-;
+        string ExplainMismatch(IItem item, TypeHierarchy th);
 
 
 

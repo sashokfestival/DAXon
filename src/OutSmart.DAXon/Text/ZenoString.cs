@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Expressions.Sorting;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,16 +21,10 @@ namespace OutSmart.DAXon.Text
     public class ZenoString : UnicodeString
     {
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public static readonly ZenoString EMPTY = new ZenoString();
         private IList<UnicodeString> segments = new List<UnicodeString>();
         private IList<long> offsets = new List<long>();
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override int Width
         {
             get
@@ -46,7 +39,7 @@ namespace OutSmart.DAXon.Text
                     }
                     else
                     {
-                        maxWidth = System.Math.Max(maxWidth, width);
+                        maxWidth = Math.Max(maxWidth, width);
                     }
                 }
 
@@ -68,9 +61,6 @@ namespace OutSmart.DAXon.Text
             segments.Add(content);
             offsets.Add(0);
         }
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public static ZenoString Of(UnicodeString content)
         {
             if (content is ZenoString)
@@ -87,9 +77,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         private int SegmentForOffset(long offset)
         {
             if (segments.Count == 0)
@@ -106,9 +93,6 @@ namespace OutSmart.DAXon.Text
             return result;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         private int BinarySearch(long offset, int start, int end)
         {
             if (start == end)
@@ -138,9 +122,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override IIntIterator CodePoints()
         {
             if (IsEmpty())
@@ -151,29 +132,20 @@ namespace OutSmart.DAXon.Text
             return new AnonymousIntIterator(this);
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override long Length()
         {
             int i = segments.Count - 1;
             return i < 0 ? 0 : offsets[i] + segments[i].Length();
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override bool IsEmpty()
         {
-            return segments.IsEmpty();
+            return segments.Count == 0;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override long IndexOf(int codePoint, long from)
         {
-            from = System.Math.Max(from, 0);
+            from = Math.Max(from, 0);
             if (from >= Length())
             {
                 return -1;
@@ -194,9 +166,6 @@ namespace OutSmart.DAXon.Text
             return -1;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override long IndexWhere(Func<int, bool> predicate, long from)
         {
             int first = SegmentForOffset(from);
@@ -214,9 +183,6 @@ namespace OutSmart.DAXon.Text
             return -1;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override int CodePointAt(long index)
         {
             int entry = SegmentForOffset(index);
@@ -224,9 +190,6 @@ namespace OutSmart.DAXon.Text
             return segment.CodePointAt(index - offsets[entry]);
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override UnicodeString Substring(long start, long end)
         {
             CheckSubstringBounds(start, end);
@@ -259,9 +222,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override bool HasSubstring(UnicodeString other, long offset)
         {
 
@@ -292,9 +252,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override UnicodeString Concat(UnicodeString other)
         {
 
@@ -313,7 +270,7 @@ namespace OutSmart.DAXon.Text
             {
                 ZenoString z = new ZenoString();
                 z.segments = new List<UnicodeString>(segments);
-                z.segments.AddAll(((ZenoString)other).segments);
+                z.segments.AddRange(((ZenoString)other).segments);
                 z.offsets = new List<long>(offsets);
                 long len = Length();
                 foreach (long offset in ((ZenoString)other).offsets)
@@ -334,9 +291,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override void Copy8bit(byte[] target, int offset)
         {
             foreach (UnicodeString us in segments)
@@ -346,9 +300,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override void Copy16bit(char[] target, int offset)
         {
             foreach (UnicodeString us in segments)
@@ -358,9 +309,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override void Copy24bit(byte[] target, int offset)
         {
             foreach (UnicodeString us in segments)
@@ -370,9 +318,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override void Copy32bit(int[] target, int offset)
         {
             foreach (UnicodeString us in segments)
@@ -382,9 +327,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         private ZenoString Consolidate()
         {
 
@@ -413,9 +355,6 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public virtual void WriteSegments(IUnicodeWriter writer)
         {
             foreach (UnicodeString str in segments)
@@ -424,9 +363,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public static UnicodeString ConcatSegments(UnicodeString left, UnicodeString right)
         {
             if (left.Width <= 8 && right.Width <= 8)
@@ -452,9 +388,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         private ZenoString Consolidate0()
         {
 
@@ -473,9 +406,6 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         private ZenoString Consolidate1()
         {
 
@@ -507,9 +437,6 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override UnicodeString Economize()
         {
             int segs = segments.Count;
@@ -533,9 +460,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -547,9 +471,6 @@ namespace OutSmart.DAXon.Text
             return sb.ToString();
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         public virtual IList<long> DebugSegmentLengths()
         {
             IList<long> result = new List<long>(segments.Count);
@@ -561,9 +482,6 @@ namespace OutSmart.DAXon.Text
             return result;
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         // Diagnostic method
         private void ShowSegmentLengths()
         {
@@ -576,9 +494,6 @@ namespace OutSmart.DAXon.Text
             Console.Error.WriteLine(sb);
         }
 
-        /// <summary>
-        /// An empty ZenoString
-        /// </summary>
         private void VerifySegmentLengths()
         {
             long total = 0;
@@ -607,7 +522,7 @@ namespace OutSmart.DAXon.Text
             public AnonymousIntIterator(ZenoString parent)
             {
                 this.parent = parent;
-                this.outerIterator = parent.segments.IIterator();
+                this.outerIterator = parent.segments.GetEnumerator();
             }
 
             private bool OuterHasNext()

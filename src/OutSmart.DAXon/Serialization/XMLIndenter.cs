@@ -23,7 +23,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Serialization
 {
     public class XMLIndenter : ProxyReceiver
@@ -39,38 +38,8 @@ namespace OutSmart.DAXon.Serialization
         private HashSet<INodeName> suppressedElements = null;
         private readonly XMLEmitter emitter;
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         protected virtual int Indentation => 3;
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         protected virtual int LineLength => 80;
         public XMLIndenter(XMLEmitter next) : base(next)
         {
@@ -79,8 +48,8 @@ namespace OutSmart.DAXon.Serialization
 
         public virtual void SetOutputProperties(Properties props)
         {
-            string omit = props.GetProperty(OutputKeys.OMIT_XML_DECLARATION);
-            afterEndTag = omit == null || !"yes".Equals(Whitespace.Trim(omit)) || props.GetProperty(OutputKeys.DOCTYPE_SYSTEM) != null;
+            string omit = props.GetProperty(DAXonOutputKeys.OMIT_XML_DECLARATION);
+            afterEndTag = omit == null || !"yes".Equals(Whitespace.Trim(omit)) || props.GetProperty(DAXonOutputKeys.DOCTYPE_SYSTEM) != null;
             string s = props.GetProperty(DAXonOutputKeys.SUPPRESS_INDENTATION);
             if (s == null)
             {
@@ -194,9 +163,6 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
         /// Output element end tag
         /// </summary>
         public override void EndElement()
@@ -223,12 +189,6 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
         /// Output a processing instruction
         /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
@@ -246,15 +206,6 @@ namespace OutSmart.DAXon.Serialization
             //afterEndTag = false;
         }
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
         /// <summary>
         /// Output character data
         /// </summary>
@@ -292,21 +243,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
             if (afterEndTag)
@@ -322,41 +258,11 @@ namespace OutSmart.DAXon.Serialization
             //afterEndTag = false;
         }
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override bool UsesTypeAnnotations()
         {
             return true;
         }
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private void Indent(bool doubleSpace)
         {
             if (suppressedAtLevel >= 0)
@@ -382,21 +288,6 @@ namespace OutSmart.DAXon.Serialization
             sameline = false;
         }
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private void FlushPendingWhitespace()
         {
             if (pendingWhitespace != null)
@@ -406,21 +297,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void EndDocument()
         {
             if (afterEndTag)
@@ -431,21 +307,6 @@ namespace OutSmart.DAXon.Serialization
             base.EndDocument();
         }
 
-        /// <summary>
-        /// Output element start tag
-        /// </summary>
-        /// <summary>
-        /// Output element end tag
-        /// </summary>
-        /// <summary>
-        /// Output a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Output character data
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         protected virtual bool IsDoubleSpaced(INodeName name)
         {
             return false;

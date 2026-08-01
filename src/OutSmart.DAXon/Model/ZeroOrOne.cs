@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Model
         {
             this.item = item;
         }
-        public static ZeroOrOne<T> Empty<T>() => (ZeroOrOne<T>)(object)EMPTY;
+        public static ZeroOrOne<TItem> Empty<TItem>() => (ZeroOrOne<TItem>)(object)EMPTY;
 
         public virtual string GetStringValue()
         {
@@ -46,17 +46,11 @@ namespace OutSmart.DAXon.Model
             return item;
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual int GetLength()
         {
             return item == null ? 0 : 1;
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual T ItemAt(int n)
         {
             if (n == 0 && item != null)
@@ -69,9 +63,6 @@ namespace OutSmart.DAXon.Model
             }
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual IGroundedValue Subsequence(int start, int length)
         {
             if (item != null && start <= 0 && start + length > 0)
@@ -85,9 +76,6 @@ namespace OutSmart.DAXon.Model
         }
 
         /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
-        /// <summary>
         /// Return an iterator over this value.
         /// </summary>
         public virtual ISequenceIterator Iterate()
@@ -95,34 +83,16 @@ namespace OutSmart.DAXon.Model
             return SingletonIterator.MakeIterator((IItem)item);
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         public virtual bool EffectiveBooleanValue()
         {
             return ExpressionTool.EffectiveBooleanValue((ISequenceIterator)(item));
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         public override string ToString()
         {
             return item == null ? "null" : item.ToString();
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
-        /// <summary>
-        /// Get the effective boolean value
-        /// </summary>
         public virtual IGroundedValue Reduce()
         {
             if (item == null)

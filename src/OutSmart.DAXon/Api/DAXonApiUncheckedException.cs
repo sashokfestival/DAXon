@@ -17,13 +17,13 @@ namespace OutSmart.DAXon.Api
 {
     public class DAXonApiUncheckedException : Exception
     {
-        public DAXonApiUncheckedException(Exception err) : base((err).ToString())
+        public DAXonApiUncheckedException(Exception err) : base((err).ToString(), err)
         {
         }
 
         public string GetMessage()
         {
-            return InnerException.GetMessage();
+            return InnerException.Message;
         }
     }
 }

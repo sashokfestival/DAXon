@@ -11,7 +11,6 @@ using OutSmart.DAXon.Collections;
 
 using OutSmart.DAXon.Internal.Collections;
 
-using OutSmart.DAXon.Internal.Functional;
 
 using System;
 
@@ -37,8 +36,6 @@ namespace OutSmart.DAXon.Text
         public Twine24(byte[] bytes)
         {
             this.bytes = bytes; //        if (Configuration.isAssertionsEnabled()) {
-            //            verifyCharacters();
-            //        }
         }
 
         public Twine24(int[] codePoints, int used)
@@ -221,12 +218,10 @@ namespace OutSmart.DAXon.Text
         {
             if (other is Twine24)
             {
-
-                // TODO: for Java9, use Arrays.compareUnsigned(bytes, o.bytes);
                 Twine24 o = (Twine24)other;
                 byte[] a = bytes;
                 byte[] b = o.bytes;
-                int len = System.Math.Min(a.Length, b.Length);
+                int len = Math.Min(a.Length, b.Length);
                 for (int i = 0; i < len; i++)
                 {
                     int diff = (a[i] & 0xff) - (b[i] & 0xff);
@@ -244,9 +239,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(Length32());
@@ -260,9 +252,6 @@ namespace OutSmart.DAXon.Text
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         // Was `protected virtual` — hid the public virtual UnicodeString.Copy24bit instead of overriding
         // it, so a base-typed call (LargeTextBuffer.ExtendLastSegment on astral-plane text) hit the base
         // and threw. Override it.
@@ -271,16 +260,13 @@ namespace OutSmart.DAXon.Text
             Array.Copy(bytes, 0, target, offset, bytes.Length);
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         public override long IndexWhere(Func<int, bool> predicate, long from)
         {
             for (int i = requireNonNegativeInt(from); i < Length(); i++)
             {
                 int offset = i * 3;
                 int cp = ((bytes[offset] << 16 | (bytes[offset + 1] & 0xff) << 8) | (bytes[offset + 2] & 0xff)) & 0xffffff;
-                if (predicate.Test(cp))
+                if (predicate(cp))
                 {
                     return i;
                 }
@@ -289,9 +275,6 @@ namespace OutSmart.DAXon.Text
             return -1;
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         public virtual string Details()
         {
             return "Twine24 bytes.length = " + bytes.Length;

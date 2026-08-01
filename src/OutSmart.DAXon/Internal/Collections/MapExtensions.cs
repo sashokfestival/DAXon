@@ -53,5 +53,43 @@ namespace OutSmart.DAXon.Internal.Collections
             foreach (var kv in src)
                 d[kv.Key] = kv.Value;
         }
+
+        // java.util.Map.get: null/default when absent (the BCL indexer throws). Mirrors the
+        // netcore GetValueOrDefault, which net472 lacks.
+        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key)
+        {
+            d.TryGetValue(key, out var v);
+            return v;
+        }
+
+        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key, TValue defaultValue)
+            => d.TryGetValue(key, out var v) ? v : defaultValue;
+
+        // java.util.Map.put returns the PREVIOUS value; statement-position call sites use the
+        // plain indexer instead — this is only for sites that consume the result.
+        public static TValue PutAndGetPrevious<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key, TValue value)
+        {
+            d.TryGetValue(key, out var prev);
+            d[key] = value;
+            return prev;
+        }
+
+        public static TValue ComputeIfAbsent<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key, global::System.Func<TKey, TValue> factory)
+        {
+            if (!d.TryGetValue(key, out var v))
+            {
+                v = factory(key);
+                d[key] = v;
+            }
+            return v;
+        }
+
+        public static TValue PutIfAbsent<TKey, TValue>(this IDictionary<TKey, TValue> d, TKey key, TValue value)
+        {
+            if (d.TryGetValue(key, out var existing))
+                return existing;
+            d[key] = value;
+            return default;
+        }
     }
 }

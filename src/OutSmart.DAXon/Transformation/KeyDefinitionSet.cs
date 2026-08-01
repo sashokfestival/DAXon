@@ -46,7 +46,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual void AddKeyDefinition(KeyDefinition keyDef)
         {
-            if (keyDefinitions.IsEmpty())
+            if (keyDefinitions.Count == 0)
             {
                 collationName = keyDef.CollationName;
                 composite = keyDef.IsComposite();

@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Runtime.CompilerServices;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
@@ -29,11 +30,19 @@ namespace OutSmart.DAXon.Transformation
 {
     public class KeyManager
     {
+        private readonly object syncLock = new object();
         private readonly PackageData packageData;
         private readonly Dictionary<StructuredQName, KeyDefinitionSet> keyDefinitions;
         // one entry for each named key; the entry contains
         // a KeyDefinitionSet holding the key definitions with that name
-        private Dictionary<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>> docIndexes;
+        // WEAK KEYS. The KeyManager belongs to the compiled package, so it outlives every run;
+        // a Dictionary keyed by the document therefore pinned every document a key() lookup ever
+        // touched, for as long as the host held the executable - the weak VALUE only let the index
+        // die, not the tree behind it (round AY: 15.4 MB retained per transform, unbounded).
+        // Java uses a WeakHashMap here; ConditionalWeakTable is the .NET equivalent - the entry
+        // disappears with the document. The value stays a WeakReference so the index itself can
+        // still be collected independently, exactly as upstream.
+        private ConditionalWeakTable<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>> docIndexes;
 
         public virtual ICollection<KeyDefinitionSet> AllKeyDefinitionSets => keyDefinitions.Values;
 
@@ -45,7 +54,7 @@ namespace OutSmart.DAXon.Transformation
         {
             packageData = pack;
             keyDefinitions = new Dictionary<StructuredQName, KeyDefinitionSet>(10);
-            docIndexes = new Dictionary<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>>(10);
+            docIndexes = new ConditionalWeakTable<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>>();
 
             // Create a key definition for the idref() function
             RegisterIdrefKey(config);
@@ -53,10 +62,10 @@ namespace OutSmart.DAXon.Transformation
 
         private void RegisterIdrefKey(Configuration config)
         {
-            lock (this)
+            lock (syncLock)
             {
                 StructuredQName qName = StandardNames.GetStructuredQName(StandardNames.XS_IDREFS);
-                if (keyDefinitions.Get(qName) == null)
+                if (keyDefinitions.GetOrDefault(qName) == null)
                 {
                     BasePatternWithPredicate pp = new BasePatternWithPredicate(new NodeTestPattern(new MultipleNodeKindTest(UType.ELEMENT_OR_ATTRIBUTE)), IntegratedFunctionLibrary.MakeFunctionCall(new IsIdRef(), new Expression[] { }));
                     try
@@ -83,26 +92,26 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual void PreRegisterKeyDefinition(StructuredQName keyName)
         {
-            lock (this)
+            lock (syncLock)
             {
-                KeyDefinitionSet keySet = keyDefinitions.Get(keyName);
+                KeyDefinitionSet keySet = keyDefinitions.GetOrDefault(keyName);
                 if (keySet == null)
                 {
                     keySet = new KeyDefinitionSet(keyName, keyDefinitions.Count);
-                    keyDefinitions.Put(keyName, keySet);
+                    keyDefinitions[keyName] = keySet;
                 }
             }
         }
 
         public virtual void AddKeyDefinition(StructuredQName keyName, KeyDefinition keydef, bool reusable, Configuration config)
         {
-            lock (this)
+            lock (syncLock)
             {
-                KeyDefinitionSet keySet = keyDefinitions.Get(keyName);
+                KeyDefinitionSet keySet = keyDefinitions.GetOrDefault(keyName);
                 if (keySet == null)
                 {
                     keySet = new KeyDefinitionSet(keyName, keyDefinitions.Count);
-                    keyDefinitions.Put(keyName, keySet);
+                    keyDefinitions[keyName] = keySet;
                 }
 
                 keySet.AddKeyDefinition(keydef);
@@ -133,7 +142,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual KeyDefinitionSet GetKeyDefinitionSet(StructuredQName qName)
         {
-            return keyDefinitions.Get(qName);
+            return keyDefinitions.GetOrDefault(qName);
         }
 
         public virtual KeyDefinitionSet FindKeyDefinition(Patterns.Pattern finder, Expression use, string collationName)
@@ -157,7 +166,7 @@ namespace OutSmart.DAXon.Transformation
 
         private KeyIndex BuildIndex(KeyDefinitionSet keySet, ITreeInfo doc, IXPathContext context)
         {
-            lock (this)
+            lock (syncLock)
             {
 
                 KeyIndex index = new KeyIndex(keySet.IsRangeKey());
@@ -257,7 +266,7 @@ namespace OutSmart.DAXon.Transformation
 
                 // Mark the index as being under construction, in case the definition is circular
                 index = new KeyIndex(keySet.IsRangeKey());
-                lock (this)
+                lock (syncLock)
                 {
                     index.SetStatus(UNDER_CONSTRUCTION);
                     KeyIndex index2 = PutSharedIndex(doc, keySetNumber, index, context);
@@ -279,7 +288,7 @@ namespace OutSmart.DAXon.Transformation
 
                 // On completion we synchronize again, and decide whether to use this index, or one that was
                 // completed earlier by a different thread.
-                lock (this)
+                lock (syncLock)
                 {
                     index.SetStatus(BUILT);
                     index = PutSharedIndex(doc, keySetNumber, index, context);
@@ -331,7 +340,7 @@ namespace OutSmart.DAXon.Transformation
                 // Mark the index as being under construction, in case the definition is circular
                 // putLocalIndex(doc, keySetNumber, underConstruction, context);
                 index = new KeyIndex(keySet.IsRangeKey());
-                lock (this)
+                lock (syncLock)
                 {
                     index.SetStatus(UNDER_CONSTRUCTION);
                     KeyIndex index2 = PutLocalIndex(doc, keySetNumber, index, context);
@@ -351,7 +360,7 @@ namespace OutSmart.DAXon.Transformation
                 // Now we build the index (which isn't synchronized because it doesn't write to any shared data)
                 BuildIndex(index, keySet, doc, context);
 
-                lock (this)
+                lock (syncLock)
                 {
                     index.SetStatus(BUILT);
                     index = PutLocalIndex(doc, keySetNumber, index, context);
@@ -363,18 +372,18 @@ namespace OutSmart.DAXon.Transformation
 
         private KeyIndex PutSharedIndex(ITreeInfo doc, int keyFingerprint, KeyIndex index, IXPathContext context)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (docIndexes == null)
                 {
 
                     // it's transient, so it will be null when reloading a compiled stylesheet
-                    docIndexes = new Dictionary<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>>(10);
+                    docIndexes = new ConditionalWeakTable<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>>();
                 }
 
-                WeakReference<IntHashMap<KeyIndex>> indexRef = docIndexes.Get(doc);
+                docIndexes.TryGetValue(doc, out WeakReference<IntHashMap<KeyIndex>> indexRef);
                 IntHashMap<KeyIndex> indexList;
-                if (indexRef == null || indexRef.Get() == null)
+                if (indexRef == null || !indexRef.TryGetTarget(out indexList))
                 {
                     indexList = new IntHashMap<KeyIndex>(10);
 
@@ -392,11 +401,8 @@ namespace OutSmart.DAXon.Transformation
                     }
 
 
-                    docIndexes.Put(doc, new WeakReference<IntHashMap<KeyIndex>>(indexList));
-                }
-                else
-                {
-                    indexList = indexRef.Get();
+                    docIndexes.Remove(doc);   // Add throws on a duplicate key; a stale entry can only be a dead index
+                    docIndexes.Add(doc, new WeakReference<IntHashMap<KeyIndex>>(indexList));
                 }
 
                 KeyIndex result = indexList[keyFingerprint];
@@ -414,7 +420,7 @@ namespace OutSmart.DAXon.Transformation
 
         private KeyIndex PutLocalIndex(ITreeInfo doc, int keyFingerprint, KeyIndex index, IXPathContext context)
         {
-            lock (this)
+            lock (syncLock)
             {
                 Controller controller = context.GetController();
                 IntHashMap<Dictionary<long, KeyIndex>> masterIndex = controller.LocalIndexes;
@@ -425,12 +431,12 @@ namespace OutSmart.DAXon.Transformation
                     masterIndex.Put(keyFingerprint, docIndexes);
                 }
 
-                KeyIndex result = docIndexes.Get(doc.GetDocumentNumber());
+                KeyIndex result = docIndexes.GetOrDefault(doc.GetDocumentNumber());
                 if (result == null || result.GetStatus() != BUILT)
                 {
 
                     // Use this index in preference to one that is under construction in another thread
-                    docIndexes.Put(doc.GetDocumentNumber(), index);
+                    docIndexes.PutAndGetPrevious(doc.GetDocumentNumber(), index);
                     result = index;
                 }
 
@@ -440,22 +446,22 @@ namespace OutSmart.DAXon.Transformation
 
         private KeyIndex GetSharedIndex(ITreeInfo doc, int keyFingerprint)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (docIndexes == null)
                 {
 
                     // it's transient, so it will be null when reloading a compiled stylesheet
-                    docIndexes = new Dictionary<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>>(10);
+                    docIndexes = new ConditionalWeakTable<ITreeInfo, WeakReference<IntHashMap<KeyIndex>>>();
                 }
 
-                WeakReference<IntHashMap<KeyIndex>> @ref = docIndexes.Get(doc);
+                docIndexes.TryGetValue(doc, out WeakReference<IntHashMap<KeyIndex>> @ref);
                 if (@ref == null)
                 {
                     return null;
                 }
 
-                IntHashMap<KeyIndex> indexList = @ref.Get();
+                @ref.TryGetTarget(out IntHashMap<KeyIndex> indexList);
                 if (indexList == null)
                 {
                     return null;
@@ -467,7 +473,7 @@ namespace OutSmart.DAXon.Transformation
 
         private KeyIndex GetLocalIndex(ITreeInfo doc, int keyFingerprint, IXPathContext context)
         {
-            lock (this)
+            lock (syncLock)
             {
                 Controller controller = context.GetController();
                 IntHashMap<Dictionary<long, KeyIndex>> masterIndex = controller.LocalIndexes;
@@ -478,14 +484,14 @@ namespace OutSmart.DAXon.Transformation
                 }
                 else
                 {
-                    return docIndexes.Get(doc.GetDocumentNumber());
+                    return docIndexes.GetOrDefault(doc.GetDocumentNumber());
                 }
             }
         }
 
         public virtual void ClearDocumentIndexes(ITreeInfo doc)
         {
-            lock (this)
+            lock (syncLock)
             {
                 docIndexes.Remove(doc);
             }
@@ -493,7 +499,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual void ExportKeys(ExpressionPresenter @out, Dictionary<Component, int> componentIdMap)
         {
-            foreach (KeyValuePair<StructuredQName, KeyDefinitionSet> e in keyDefinitions.EntrySet())
+            foreach (KeyValuePair<StructuredQName, KeyDefinitionSet> e in keyDefinitions)
             {
                 bool reusable = e.Value.IsReusable();
                 IList<KeyDefinition> list = e.Value.KeyDefinitions;

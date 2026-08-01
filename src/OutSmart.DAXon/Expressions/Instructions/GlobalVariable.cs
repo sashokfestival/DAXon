@@ -15,7 +15,6 @@ using OutSmart.DAXon.Trees.Utilities;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -44,14 +43,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private bool _isRequiredParam;
         private bool _isStatic;
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public override string TracingTag => "xsl:variable";
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual GlobalVariable OriginalVariable
         {
             get => originalVariable; set
@@ -60,9 +53,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual GlobalVariable UltimateOriginalVariable
         {
             get
@@ -78,9 +68,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual int BinderySlotNumber
         {
             get => binderySlotNumber; set
@@ -92,28 +79,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public IntegerValue[] IntegerBoundsForVariable => GetBody() == null ? null : GetBody().IntegerBounds;
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public virtual int LocalSlotNumber => 0;
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public virtual string Description
         {
             get
@@ -129,12 +98,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         protected virtual string Flags
         {
             get
@@ -163,225 +126,141 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 return flags;
             }
         }
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public GlobalVariable()
         {
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual void Init(Expression select, StructuredQName qName)
         {
             variableQName = qName;
             SetBody(select);
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public override SymbolicName GetSymbolicName()
         {
             return new SymbolicName(StandardNames.XSL_VARIABLE, variableQName);
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public void GatherProperties(Action<string, object> consumer)
         {
-            consumer.Accept("name", GetVariableQName());
+            consumer("name",GetVariableQName());
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual void SetStatic(bool declaredStatic)
         {
             _isStatic = declaredStatic;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual bool IsStatic()
         {
             return this._isStatic;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual void SetRequiredType(Values.SequenceType required)
         {
             requiredType = required;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public Values.SequenceType GetRequiredType()
         {
             return requiredType;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         private Configuration GetConfiguration()
         {
             return GetPackageData().GetConfiguration();
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual void SetUnused(bool unused)
         {
             this.binderySlotNumber = -9234;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual bool IsUnused()
         {
             return this.binderySlotNumber == -9234;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual bool IsPrivate()
         {
             return _isPrivate;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual void SetPrivate(bool b)
         {
             _isPrivate = b;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual void SetAssignable(bool assignable)
         {
             _isAssignable = assignable;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public bool IsAssignable()
         {
             return _isAssignable;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public StructuredQName GetObjectName()
         {
             return GetVariableQName();
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public override object GetProperty(string name)
         {
             return null;
         }
 
-        /// <summary>
-        /// Create a global variable
-        /// </summary>
         public virtual HostLanguage GetHostLanguage()
         {
             return GetPackageData().GetHostLanguage();
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual void SetIndexedVariable()
         {
             _indexed = true;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual bool IsIndexedVariable()
         {
             return _indexed;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual void SetContainsLocals(SlotManager map)
         {
             SetStackFrameMap(map);
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public bool IsGlobal()
         {
             return true;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual void RegisterReference(IBindingReference @ref)
         {
             references.Add(@ref);
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual IEnumerator<IBindingReference> IterateReferences()
         {
-            return references.IIterator();
+            return references.GetEnumerator();
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual int CountReferences()
         {
             return references.Count;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual void SetRequiredParam(bool requiredParam)
         {
             this._isRequiredParam = requiredParam;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual bool IsRequiredParam()
         {
             return this._isRequiredParam;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual void Compile(Executable exec, int slot)
         {
             TypeHierarchy th = GetConfiguration().GetTypeHierarchy();
@@ -424,16 +303,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
 
 
-            //exec.registerGlobalVariable(this);
             if (IsRequiredParam())
             {
                 exec.RegisterGlobalParameter((GlobalParam)this);
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual void TypeCheck(ExpressionVisitor visitor)
         {
             Expression value = GetBody();
@@ -493,9 +368,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual void LookForCycles(IndexedStack<object> referees, XQueryFunctionLibrary globalFunctionLibrary)
         {
             if (referees.Contains(this))
@@ -518,7 +390,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     else if (referees[i + 1] is XQueryFunction)
                     {
                         XQueryFunction next = (XQueryFunction)referees[i + 1];
-                        messageBuilder.Append(" calls ").Append(next.GetFunctionName().DisplayName).Append("#").Append(next.NumberOfParameters).Append("()");
+                        messageBuilder.Append(" calls ").Append(next.GetFunctionName().DisplayName).Append('#').Append(next.NumberOfParameters).Append("()");
                     }
                 }
 
@@ -574,9 +446,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         private static void LookForFunctionCycles(XQueryFunction f, IndexedStack<object> referees, XQueryFunctionLibrary globalFunctionLibrary)
         {
             Expression body = f.Body;
@@ -607,9 +476,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             referees.Pop();
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
         public virtual IGroundedValue GetSelectValue(IXPathContext context, Component target)
         {
             Expression select = GetBody();
@@ -691,12 +557,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public virtual IGroundedValue EvaluateVariable(IXPathContext context)
         {
             Controller controller = context.GetController();
@@ -718,12 +578,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public virtual IGroundedValue EvaluateVariable(IXPathContext context, Component target)
         {
             Controller controller = context.GetController();
@@ -751,12 +605,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         protected virtual IGroundedValue ActuallyEvaluate(IXPathContext context, Component target)
         {
             Controller controller = context.GetController();
@@ -774,7 +622,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     value = controller.GetConfiguration().ObtainOptimizer().MakeIndexedValue(value.Iterate());
                 }
 
-                lock (b)
+                lock (b.syncLock)
                 {
 
                     // This lock doesn't prevent two different threads evaluating the value in parallel. It does
@@ -830,12 +678,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         protected static void CheckCircularity(GlobalVariable var, IXPathContext context)
         {
             Controller controller = context.GetController();
@@ -861,12 +703,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         private static XPathContextMajor GetMajorCaller(IXPathContext context)
         {
             IXPathContext caller = context.GetCaller();
@@ -878,44 +714,20 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return (XPathContextMajor)caller;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public virtual void SetVariableQName(StructuredQName s)
         {
             variableQName = s;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public StructuredQName GetVariableQName()
         {
             return variableQName;
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public void AddReference(VariableReference @ref, bool isLoopingReference)
         {
         }
 
-        /// <summary>
-        /// Mark this as an indexed variable, to allow fast searching
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             bool asParam = this is GlobalParam && !IsStatic(); // bug 4035: export static params as variables

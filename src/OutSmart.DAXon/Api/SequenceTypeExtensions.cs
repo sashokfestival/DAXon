@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Api
 {
 
-    // Phase 7.16: ExplainMismatch / GetCardinality extension methods on
+    // ExplainMismatch / GetCardinality extension methods on
     // SequenceType. SequenceType wraps an ItemType + OccurrenceIndicator;
     // these methods delegate to the wrapped types.
     public static class SequenceTypeExtensions

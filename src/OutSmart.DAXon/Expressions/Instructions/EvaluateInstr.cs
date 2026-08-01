@@ -17,7 +17,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -46,19 +45,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private Operand dynamicParamsOp;
         private NamespaceUri defaultXPathNamespace = null;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_FOCUS | StaticProperty.DEPENDS_ON_XSLT_CONTEXT;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Expression Xpath
         {
             get => xpathOp.GetChildExpression(); set
@@ -74,9 +64,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Expression ContextItemExpr
         {
             get => contextItemOp == null ? null : contextItemOp.GetChildExpression(); set
@@ -92,9 +79,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Expression BaseUriExpr
         {
             get => baseUriOp == null ? null : baseUriOp.GetChildExpression(); set
@@ -110,9 +94,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Expression NamespaceContextExpr
         {
             get => namespaceContextOp == null ? null : namespaceContextOp.GetChildExpression(); set
@@ -128,9 +109,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Expression SchemaAwareExpr
         {
             get => schemaAwareOp == null ? null : schemaAwareOp.GetChildExpression(); set
@@ -146,14 +124,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public WithParam[] ActualParams { get => actualParams; set => this.actualParams = value; }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Expression DynamicParams
         {
             get => dynamicParamsOp.GetChildExpression(); set
@@ -228,9 +200,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             importedSchemaNamespaces.Add(ns);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             importedSchemaNamespaces = visitor.StaticContext.GetImportedSchemaNamespaces();
@@ -239,42 +208,27 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             OptimizeChildren(visitor, contextItemType);
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override ItemType GetItemType()
         {
             return requiredType.PrimaryType;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return requiredType.GetCardinality();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             throw new NotSupportedException("Cannot do document projection when xsl:evaluate is used");
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             IList<Operand> sub = new List<Operand>(8);
@@ -317,9 +271,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return sub;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             EvaluateInstr e2 = new EvaluateInstr(Xpath.Copy(rebindings), requiredType, ContextItemExpr.Copy(rebindings), BaseUriExpr == null ? null : BaseUriExpr.Copy(rebindings), NamespaceContextExpr == null ? null : NamespaceContextExpr.Copy(rebindings), SchemaAwareExpr == null ? null : SchemaAwareExpr.Copy(rebindings));
@@ -340,17 +291,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return e2;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("evaluate", this);
@@ -359,7 +304,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 @out.EmitAttribute("as", requiredType.ToAlphaCode());
             }
 
-            if (importedSchemaNamespaces != null && !importedSchemaNamespaces.IsEmpty())
+            if (importedSchemaNamespaces != null && importedSchemaNamespaces.Count > 0)
             {
                 StringBuilder buff = new StringBuilder(256);
                 foreach (NamespaceUri s in importedSchemaNamespaces)
@@ -368,7 +313,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     buff.Append(' ');
                 }
 
-                buff.SetLength(buff.Length - 1);
+                buff.Length = buff.Length - 1;
                 @out.EmitAttribute("schNS", buff.ToString());
             }
 
@@ -419,9 +364,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public bool IsActualParam(StructuredQName name)
         {
             foreach (WithParam wp in actualParams)
@@ -435,17 +377,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new EvaluateInstrElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private class EvaluateInstrElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
@@ -511,7 +447,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     Controller controller = context.GetController();
                     LFUCache<String, Object[]> cache;
 
-                    lock (controller)
+                    lock (controller.syncLock)
                     {
                         cache = (LFUCache<String, Object[]>)controller.GetUserData(instr.GetLocation(), "xsl:evaluate");
                         if (cache == null)
@@ -625,7 +561,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                                 }
 
                                 XPathVariable var = env.DeclareVariable((QNameValue)paramName);
-                                locals.Put(((QNameValue)paramName).GetStructuredQName(), var.LocalSlotNumber);
+                                locals[((QNameValue)paramName).GetStructuredQName()] = var.LocalSlotNumber;
                             });
                         }
 
@@ -637,7 +573,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                                 if (!locals.ContainsKey(name))
                                 {
                                     XPathVariable var = env.DeclareVariable(name);
-                                    locals.Put(name, var.LocalSlotNumber);
+                                    locals[name] = var.LocalSlotNumber;
                                 }
                             }
                         }
@@ -650,7 +586,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         }
                         catch (XPathException e)
                         {
-                            throw new XPathException("Static error in XPath expression supplied to xsl:evaluate: " + e.GetMessage() + ". Expression: {" + exprText + "}").WithErrorCode("XTDE3160").WithLocation(instr.GetLocation());
+                            throw new XPathException("Static error in XPath expression supplied to xsl:evaluate: " + e.Message + ". Expression: {" + exprText + "}").WithErrorCode("XTDE3160").WithLocation(instr.GetLocation());
                         }
 
 

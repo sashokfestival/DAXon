@@ -29,8 +29,6 @@ namespace OutSmart.DAXon.Expressions.Elaboration
         {
 
             //        monitoring = expr.toShortString().contains("$return-val");
-            //        if (monitoring) {
-            //        }
             this.expression = expr;
             this.evaluator = lazy;
             this.completed = 0;

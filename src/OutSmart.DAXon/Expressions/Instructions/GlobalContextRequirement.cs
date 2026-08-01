@@ -32,7 +32,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         {
             get
             {
-                if (requiredItemTypes.IsEmpty())
+                if (requiredItemTypes.Count == 0)
                 {
                     return AnyItemType.GetInstance();
                 }

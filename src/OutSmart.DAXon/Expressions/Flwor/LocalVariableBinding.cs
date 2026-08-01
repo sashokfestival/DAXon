@@ -86,25 +86,16 @@ namespace OutSmart.DAXon.Expressions.Flwor
             slotNumber = nr;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual ISequence EvaluateVariable(IXPathContext context)
         {
             return context.EvaluateLocalVariable(slotNumber);
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual bool IsAssignable()
         {
             return false;
         }
 
-        /// <summary>
-        /// Get the value of the range variable
-        /// </summary>
         public virtual bool IsGlobal()
         {
             return false;

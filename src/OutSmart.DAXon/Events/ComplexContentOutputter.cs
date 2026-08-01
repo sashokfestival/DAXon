@@ -14,7 +14,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Utilities;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Functional;
 using static OutSmart.DAXon.Events.RegularSequenceChecker.State;
 using System;
 using System.Collections.Generic;
@@ -27,11 +26,11 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Events
 {
-    public sealed class ComplexContentOutputter : Outputter, IReceiver, Result
+    public sealed class ComplexContentOutputter : Outputter, IReceiver, IResultTarget
     {
         private IReceiver nextReceiver;
         private INodeName pendingStartTag = null;
@@ -67,26 +66,8 @@ namespace OutSmart.DAXon.Events
 
         public IReceiver Receiver { get => nextReceiver; set => this.nextReceiver = value; }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Close the output
-        /// </summary>
-        /// <summary>
-        /// Flush out a pending start tag
-        /// </summary>
         private string ErrorCodeForDecomposingFunctionItems => GetPipelineConfiguration().IsXSLT() ? "XTDE0450" : "XQTY0105";
         public ComplexContentOutputter(IReceiver next)
         {
@@ -176,9 +157,6 @@ namespace OutSmart.DAXon.Events
             state = CONTENT;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         public override void EndDocument()
         {
             if (level == 0)
@@ -191,17 +169,11 @@ namespace OutSmart.DAXon.Events
             state = level < 0 ? OPEN : CONTENT;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         public override void SetUnparsedEntity(string name, string systemID, string publicID)
         {
             nextReceiver.SetUnparsedEntity(name, systemID, publicID);
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         public override void Characters(UnicodeString s, ILocation locationId, int properties)
         {
             if (level >= 0)
@@ -226,9 +198,6 @@ namespace OutSmart.DAXon.Events
             nextReceiver.Characters(s, locationId, properties);
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType typeCode, ILocation location, int properties)
         {
 
@@ -254,12 +223,6 @@ namespace OutSmart.DAXon.Events
             state = START_TAG;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         public override void Namespace(string prefix, NamespaceUri namespaceUri, int properties)
         {
             if (prefix == null)
@@ -316,12 +279,6 @@ namespace OutSmart.DAXon.Events
             previousAtomic = false;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         public override void Namespaces(INamespaceBindingSet bindings, int properties)
         {
             if (bindings is NamespaceMap && pendingNSMap.IsEmpty() && ReceiverOption.Contains(properties, ReceiverOption.NAMESPACE_OK))
@@ -334,12 +291,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         public override void Attribute(INodeName attName, ISimpleType typeCode, string value, ILocation locationId, int properties)
         {
 
@@ -411,12 +362,6 @@ namespace OutSmart.DAXon.Events
             previousAtomic = false;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
@@ -472,12 +417,6 @@ namespace OutSmart.DAXon.Events
             state = CONTENT;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
         private INodeName CheckProposedPrefix(INodeName nodeName, int seq)
@@ -510,12 +449,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
         private string GetSubstitutePrefix(string prefix, NamespaceUri uri, int seq)
@@ -528,12 +461,6 @@ namespace OutSmart.DAXon.Events
             return prefix + '_' + seq;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
         /// <summary>
@@ -562,17 +489,8 @@ namespace OutSmart.DAXon.Events
             inheritedNamespaces.Pop();
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
         /// <summary>
         /// Write a comment
         /// </summary>
@@ -591,20 +509,8 @@ namespace OutSmart.DAXon.Events
             nextReceiver.Comment(comment, locationId, properties);
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
         {
             if (level >= 0)
@@ -620,20 +526,8 @@ namespace OutSmart.DAXon.Events
             nextReceiver.ProcessingInstruction(target, data, locationId, properties);
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
         public override void Append(IItem item, ILocation locationId, int copyNamespaces)
         {
 
@@ -650,20 +544,8 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
         public override IUniStringConsumer GetStringReceiver(bool asTextNode, ILocation loc)
         {
             if (level >= 0)
@@ -689,51 +571,26 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
         /// <summary>
         /// Close the output
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
 
-            nextReceiver.Dispose();
+            nextReceiver.Close();
             previousAtomic = false;
             state = FINAL;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
+        public override void Dispose()
+        {
+            nextReceiver?.Dispose();
+        }
+
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Close the output
-        /// </summary>
-        /// <summary>
-        /// Flush out a pending start tag
-        /// </summary>
         public override void StartContent()
         {
             if (state != START_TAG)
@@ -746,7 +603,7 @@ namespace OutSmart.DAXon.Events
 
             int props = startElementProperties | ReceiverOption.NAMESPACE_OK;
             NamespaceMap mapAtEntry = pendingNSMap;
-            NamespaceMap inherited = inheritedNamespaces.IsEmpty() ? NamespaceMap.EmptyMap() : inheritedNamespaces.Peek();
+            NamespaceMap inherited = inheritedNamespaces.Count == 0 ? NamespaceMap.EmptyMap() : inheritedNamespaces.Peek();
 
             // attributes in no namespace cannot affect the namespace pipeline; only then is the
             // (name, map, inherited, props) memo a complete key for its outcome
@@ -831,26 +688,8 @@ namespace OutSmart.DAXon.Events
             FinishStartContent(inherited);
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Close the output
-        /// </summary>
-        /// <summary>
-        /// Flush out a pending start tag
-        /// </summary>
         private void FinishStartContent(NamespaceMap inherited)
         {
             bool inherit = !ReceiverOption.Contains(startElementProperties, ReceiverOption.DISINHERIT_NAMESPACES);
@@ -861,51 +700,15 @@ namespace OutSmart.DAXon.Events
             state = CONTENT;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Close the output
-        /// </summary>
-        /// <summary>
-        /// Flush out a pending start tag
-        /// </summary>
         public override bool UsesTypeAnnotations()
         {
             return nextReceiver.UsesTypeAnnotations();
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Close the output
-        /// </summary>
-        /// <summary>
-        /// Flush out a pending start tag
-        /// </summary>
         private void Flatten(ArrayItem array, ILocation locationId, int copyNamespaces)
         {
             foreach (ISequence member in array.Members())
@@ -914,26 +717,8 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Close the output
-        /// </summary>
-        /// <summary>
-        /// Flush out a pending start tag
-        /// </summary>
         private void Decompose(IItem item, ILocation locationId, int copyNamespaces)
         {
             if (item != null)
@@ -981,26 +766,8 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Close the output
-        /// </summary>
-        /// <summary>
-        /// Flush out a pending start tag
-        /// </summary>
         private void DecomposeNodeOrDefault(IItem item, ILocation locationId, int copyNamespaces)
         {
             NodeInfo node = (NodeInfo)item;
@@ -1049,20 +816,8 @@ namespace OutSmart.DAXon.Events
             previousAtomic = false;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// Add a namespace node to the content being constructed.
-        /// </summary>
         /**/
         /**/
-        /// <summary>
-        /// Output an element end tag.
-        /// </summary>
-        /// <summary>
-        /// Write a processing instruction
-        /// </summary>
         private class UnicodeStringReceiver : IUniStringConsumer
         {
             private readonly ComplexContentOutputter cco;
@@ -1097,9 +852,15 @@ namespace OutSmart.DAXon.Events
                 return this;
             }
 
+            // Abort-path release: the pooled slot is reclaimed by Close on the success path only;
+            // an aborted run just abandons it (safe -- the pool re-arms on next acquire).
             public virtual void Dispose()
             {
-                // Idempotent: a second Dispose from a misbehaving caller must not release the
+            }
+
+            public virtual void Close()
+            {
+                // Idempotent: a second Close from a misbehaving caller must not release the
                 // cached instance while a subsequent caller is using it
                 if (!inUse)
                 {

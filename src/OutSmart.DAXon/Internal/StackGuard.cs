@@ -47,7 +47,20 @@ namespace OutSmart.DAXon.Internal
 
         /// <summary>Throws RecursionDepthError if the remaining stack is too small to safely
         /// descend another recursion level. Adapts to the executing thread's stack size.</summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]   // sits on every guarded recursion entry
         public static void Probe()
+        {
+            Probe(0);
+        }
+
+        /// <summary>
+        /// As <see cref="Probe()"/>, plus caller-supplied headroom. For recursions whose ERROR path
+        /// costs far more stack than the descent: on .NET Framework every level that catches and
+        /// re-codes an exception re-enters exception dispatch from inside its catch, so the stack
+        /// grows while unwinding instead of shrinking. A caller that pays that per level must
+        /// reserve for it here - a fixed margin cannot, since the shortfall scales with depth.
+        /// </summary>
+        public static void Probe(ulong extraMargin)
         {
             if (noApi)
             {
@@ -80,7 +93,7 @@ namespace OutSmart.DAXon.Internal
                     Console.Error.WriteLine("[SG] remaining=" + remaining / 1024 + "KB");
                 }
 
-                if (remaining < Margin)
+                if (remaining < Margin + extraMargin)
                 {
                     if (Dbg)
                     {

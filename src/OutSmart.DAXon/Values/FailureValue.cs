@@ -14,26 +14,35 @@ using System.Linq;
 
 namespace OutSmart.DAXon.Values
 {
+    // A memoized FAILED evaluation (global variables/params keep it so a re-read reproduces the
+    // original error). The old shell dropped the error in every constructor and threw NIE from
+    // half its members while quietly answering "empty" from the other half.
     public class FailureValue : IGroundedValue
     {
-        public UnicodeString UnicodeStringValue => throw new NotImplementedException("STUB: FailureValue.GetUnicodeStringValue not ported (excluded stub)");
-        public FailureValue() { }
-        public FailureValue(string err) { }
-        public FailureValue(Exception err) { }
-        public FailureValue(XPathException err) { }
-        public IItem Head() => throw new NotImplementedException("STUB: FailureValue.Head not ported (excluded stub)");
-        public ISequenceIterator Iterate() => throw new NotImplementedException("STUB: FailureValue.Iterate not ported (excluded stub)");
-        public bool IsEmpty() => true;
-        public IItem ItemAt(int n) => throw new NotImplementedException("STUB: FailureValue.ItemAt not ported (excluded stub)");
-        public int GetLength() => 0;
-        public string GetStringValue() => "";
-        public bool EffectiveBooleanValue() => false;
+        private readonly XPathException error;
+
+        public FailureValue() : this(new XPathException("Evaluation failed")) { }
+        public FailureValue(string err) : this(new XPathException(err ?? "Evaluation failed")) { }
+        public FailureValue(Exception err) : this(err as XPathException ?? new XPathException(err?.Message ?? "Evaluation failed", err)) { }
+        public FailureValue(XPathException err) { error = err ?? new XPathException("Evaluation failed"); }
+
+        // Every access re-raises the stored error, as upstream: this value IS the failure.
+        private UncheckedXPathException Raise() => new UncheckedXPathException(error);
+
+        public UnicodeString UnicodeStringValue => throw Raise();
+        public IItem Head() => throw Raise();
+        public ISequenceIterator Iterate() => throw Raise();
+        public bool IsEmpty() => throw Raise();
+        public IItem ItemAt(int n) => throw Raise();
+        public int GetLength() => throw Raise();
+        public string GetStringValue() => throw Raise();
+        public bool EffectiveBooleanValue() => throw Raise();
         public IGroundedValue Materialize() => this;
         public IGroundedValue Reduce() => this;
         public IGroundedValue Subsequence(int start, int length) => this;
-        public string ToShortString() => "";
-        public IEnumerable<IItem> AsIterable() => Enumerable.Empty<IItem>();
-        public bool ContainsNode(NodeInfo node) => false;
+        public string ToShortString() => "fail(" + (error.Message ?? "") + ")";
+        public IEnumerable<IItem> AsIterable() => throw Raise();
+        public bool ContainsNode(NodeInfo node) => throw Raise();
         public IGroundedValue Concatenate(params IGroundedValue[] others) => this;
         public ISequence MakeRepeatable() => this;
     }

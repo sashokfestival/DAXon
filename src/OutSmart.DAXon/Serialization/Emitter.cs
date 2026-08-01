@@ -65,10 +65,12 @@ namespace OutSmart.DAXon.Serialization
         /// <summary>
         /// Notify the end of the event stream
         /// </summary>
-        public override void Dispose()
+        private bool released;
+        public override void Close()
         {
-            if (mustClose && writer != null)
+            if (mustClose && writer != null && !released)
             {
+                released = true;
                 try
                 {
                     writer.Dispose();
@@ -76,6 +78,23 @@ namespace OutSmart.DAXon.Serialization
                 catch (IOException e)
                 {
                     throw new XPathException("Failed to close output stream");
+                }
+            }
+        }
+
+        // Abort-path release: same writer release as Close, but silent (no XPathException
+        // on the unwind path) and idempotent with it.
+        public override void Dispose()
+        {
+            if (mustClose && writer != null && !released)
+            {
+                released = true;
+                try
+                {
+                    writer.Dispose();
+                }
+                catch (IOException)
+                {
                 }
             }
         }

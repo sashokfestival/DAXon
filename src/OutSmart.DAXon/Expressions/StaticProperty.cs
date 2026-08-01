@@ -145,52 +145,52 @@ namespace OutSmart.DAXon.Expressions
             s.Append("D(");
             if ((props & DEPENDS_ON_CURRENT_ITEM) != 0)
             {
-                s.Append("U");
+                s.Append('U');
             }
 
             if ((props & DEPENDS_ON_CONTEXT_ITEM) != 0)
             {
-                s.Append("C");
+                s.Append('C');
             }
 
             if ((props & DEPENDS_ON_POSITION) != 0)
             {
-                s.Append("P");
+                s.Append('P');
             }
 
             if ((props & DEPENDS_ON_LAST) != 0)
             {
-                s.Append("L");
+                s.Append('L');
             }
 
             if ((props & DEPENDS_ON_CONTEXT_DOCUMENT) != 0)
             {
-                s.Append("D");
+                s.Append('D');
             }
 
             if ((props & DEPENDS_ON_LOCAL_VARIABLES) != 0)
             {
-                s.Append("V");
+                s.Append('V');
             }
 
             if ((props & DEPENDS_ON_ASSIGNABLE_GLOBALS) != 0)
             {
-                s.Append("A");
+                s.Append('A');
             }
 
             if ((props & DEPENDS_ON_REGEX_GROUP) != 0)
             {
-                s.Append("R");
+                s.Append('R');
             }
 
             if ((props & DEPENDS_ON_RUNTIME_ENVIRONMENT) != 0)
             {
-                s.Append("E");
+                s.Append('E');
             }
 
             if ((props & DEPENDS_ON_STATIC_CONTEXT) != 0)
             {
-                s.Append("S");
+                s.Append('S');
             }
 
             s.Append(") C(");
@@ -198,63 +198,63 @@ namespace OutSmart.DAXon.Expressions
             bool z = Cardinality.AllowsZero(props);
             if (m && z)
             {
-                s.Append("*");
+                s.Append('*');
             }
             else if (m)
             {
-                s.Append("+");
+                s.Append('+');
             }
             else if (z)
             {
-                s.Append("?");
+                s.Append('?');
             }
             else
             {
-                s.Append("1");
+                s.Append('1');
             }
 
             s.Append(") S(");
             if ((props & HAS_SIDE_EFFECTS) != 0)
             {
-                s.Append("E");
+                s.Append('E');
             }
 
             if ((props & NO_NODES_NEWLY_CREATED) != 0)
             {
-                s.Append("N");
+                s.Append('N');
             }
 
             if ((props & NOT_UNTYPED_ATOMIC) != 0)
             {
-                s.Append("T");
+                s.Append('T');
             }
 
             if ((props & ORDERED_NODESET) != 0)
             {
-                s.Append("O");
+                s.Append('O');
             }
 
             if ((props & PEER_NODESET) != 0)
             {
-                s.Append("P");
+                s.Append('P');
             }
 
             if ((props & REVERSE_DOCUMENT_ORDER) != 0)
             {
-                s.Append("R");
+                s.Append('R');
             }
 
             if ((props & SINGLE_DOCUMENT_NODESET) != 0)
             {
-                s.Append("S");
+                s.Append('S');
             }
 
             if ((props & SUBTREE_NODESET) != 0)
             {
-                s.Append("D");
+                s.Append('D');
             }
 
-            s.Append(")");
+            s.Append(')');
             return s.ToString();
         }
     }

@@ -207,9 +207,6 @@ namespace OutSmart.DAXon.Text
             return Uncompress().CodePoints();
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object obj)
         {
             if (obj is CompressedWhitespace)
@@ -220,9 +217,6 @@ namespace OutSmart.DAXon.Text
             return Uncompress().Equals(obj);
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override int GetHashCode()
         {
 
@@ -230,9 +224,6 @@ namespace OutSmart.DAXon.Text
             return base.GetHashCode();
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override void Write(IUnicodeWriter writer)
         {
             for (int s = 56; s >= 0; s -= 8)
@@ -249,9 +240,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override void WriteEscape(bool[] specialChars, IUnicodeWriter writer)
         {
             for (int s = 56; s >= 0; s -= 8)

@@ -26,17 +26,8 @@ namespace OutSmart.DAXon.Values
     public class Base64BinaryValue : AtomicValue, IAtomicMatchKey, IXPathComparable, IContextFreeAtomicValue
     {
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         private static readonly string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         private static readonly int[] encoding = new int[64];
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         private static readonly int[] decoding = new int[128];
         private readonly byte[] binaryValue;
 
@@ -49,9 +40,6 @@ namespace OutSmart.DAXon.Values
         public virtual int LengthInOctets => binaryValue.Length;
 
         public IXPathComparable XPathComparable => this;
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         static Base64BinaryValue()
         {
             ArrayTools.Fill(decoding, -1);
@@ -92,29 +80,20 @@ namespace OutSmart.DAXon.Values
             return this;
         }
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is Base64BinaryValue && ArrayTools.Equals(binaryValue, ((Base64BinaryValue)other).binaryValue);
         }
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         public override int GetHashCode()
         {
             return ByteArrayHashCode(binaryValue);
         }
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         public static int ByteArrayHashCode(byte[] value)
         {
             long h = 0;
-            for (int i = 0; i < System.Math.Min(value.Length, 64); i++)
+            for (int i = 0; i < Math.Min(value.Length, 64); i++)
             {
                 h = (h << 1) ^ value[i];
             }
@@ -122,9 +101,6 @@ namespace OutSmart.DAXon.Values
             return (int)((h >> 32) ^ h);
         }
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         public static UnicodeString Encode(byte[] value)
         {
             UnicodeBuilder buff = new UnicodeBuilder(value.Length * 2);
@@ -169,7 +145,7 @@ namespace OutSmart.DAXon.Values
                         buff.Append((char)encoding[(val >> 12) & 0x3f]);
                         buff.Append((char)encoding[(val >> 6) & 0x3f]);
                         buff.Append((char)encoding[val & 0x3f]);
-                        buff.Append("=");
+                        buff.Append('=');
                         break;
                     }
             }
@@ -177,9 +153,6 @@ namespace OutSmart.DAXon.Values
             return buff.ToUnicodeString();
         }
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         public static byte[] Decode(UnicodeString @in)
         {
             @in = @in.Tidy();
@@ -291,9 +264,6 @@ namespace OutSmart.DAXon.Values
             return r3;
         }
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         private static int DecodeChar(int c)
         {
             int d = c < 128 ? decoding[c] : -1;
@@ -305,9 +275,6 @@ namespace OutSmart.DAXon.Values
             return d;
         }
 
-        /// <summary>
-        /// Test if the two base64Binary values are equal.
-        /// </summary>
         public int CompareTo(IXPathComparable o)
         {
             if (o is HexBinaryValue)
@@ -320,7 +287,7 @@ namespace OutSmart.DAXon.Values
                 byte[] other = ((Base64BinaryValue)o).binaryValue;
                 int len0 = binaryValue.Length;
                 int len1 = other.Length;
-                int shorter = System.Math.Min(len0, len1);
+                int shorter = Math.Min(len0, len1);
                 for (int i = 0; i < shorter; i++)
                 {
                     int a = (int)binaryValue[i] & 0xff;
@@ -331,7 +298,7 @@ namespace OutSmart.DAXon.Values
                     }
                 }
 
-                return System.Math.Sign(len0 - len1);
+                return Math.Sign(len0 - len1);
             }
             else
             {

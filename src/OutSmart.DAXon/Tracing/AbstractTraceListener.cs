@@ -28,7 +28,6 @@ namespace OutSmart.DAXon.Tracing
 {
     public abstract class AbstractTraceListener : StandardDiagnostics, ITraceListener
     {
-        private static readonly StringBuilder spaceBuffer = new StringBuilder("                ");
         protected int indent = 0;
         protected int detail = TraceLevel.NORMAL;
         protected Logger @out = new StandardLogger();
@@ -54,14 +53,16 @@ namespace OutSmart.DAXon.Tracing
         /// <summary>
         /// Called at end of a transformation
         /// </summary>
-        public void Dispose()
+        public void Close()
         {
             @out.Info(Spaces(indent--) + "</trace>");
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
+        // Abort-path release: the Logger is externally owned, nothing to free.
+        public virtual void Dispose()
+        {
+        }
+
         public void Enter(ITraceable info, Dictionary<string, object> properties, IXPathContext context)
         {
             if (IsApplicable(info))
@@ -73,10 +74,10 @@ namespace OutSmart.DAXon.Tracing
                 StringBuilder msg = new StringBuilder(AbstractTraceListener.Spaces(indent) + '<' + elementTag);
                 if (info is Expression && !((Expression)info).IsInstruction() && !properties.ContainsKey("expr"))
                 {
-                    properties.Put("expr", ((Expression)info).ToShortString());
+                    properties["expr"] = ((Expression)info).ToShortString();
                 }
 
-                foreach (KeyValuePair<string, object> entry in properties.EntrySet())
+                foreach (KeyValuePair<string, object> entry in properties)
                 {
                     object val = entry.Value;
                     if (val is StructuredQName)
@@ -90,7 +91,7 @@ namespace OutSmart.DAXon.Tracing
 
                     if (val != null)
                     {
-                        msg.Append(' ').Append(entry.Key).Append("=").Append(Escape(val.ToString()));
+                        msg.Append(' ').Append(entry.Key).Append('=').Append(Escape(val.ToString()));
                     }
                 }
 
@@ -102,15 +103,12 @@ namespace OutSmart.DAXon.Tracing
                 }
 
                 msg.Append(" module=").Append(Escape(file));
-                msg.Append(">");
+                msg.Append('>');
                 @out.Info(msg.ToString());
                 indent++;
             }
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
         public static ILocation GetLocation(ITraceable info)
         {
             ILocation rawLocation = info.GetLocation();
@@ -126,9 +124,6 @@ namespace OutSmart.DAXon.Tracing
             return rawLocation;
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
         public virtual string Escape(string @in)
         {
             if (@in == null)
@@ -179,9 +174,6 @@ namespace OutSmart.DAXon.Tracing
             return sb.Append(quot).ToString();
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
         public void Leave(ITraceable info)
         {
             if (IsApplicable(info))
@@ -192,25 +184,16 @@ namespace OutSmart.DAXon.Tracing
             }
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
         protected virtual bool IsApplicable(ITraceable info)
         {
             return Level(info) <= detail;
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
         protected virtual string Tag(ITraceable info)
         {
             return "expr";
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
         protected virtual int Level(ITraceable info)
         {
             if (info is ITraceableComponent || info is ApplyTemplates || info is CallTemplate)
@@ -227,9 +210,6 @@ namespace OutSmart.DAXon.Tracing
         }
 
         /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
         /// Called when an item becomes the context item
         /// </summary>
         public void StartCurrentItem(IItem item)
@@ -244,12 +224,6 @@ namespace OutSmart.DAXon.Tracing
             indent++;
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         public void EndCurrentItem(IItem item)
         {
             indent--;
@@ -261,65 +235,32 @@ namespace OutSmart.DAXon.Tracing
             }
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         protected static string Spaces(int n)
         {
-            n = System.Math.Max(n, 0);
-            while (spaceBuffer.Length < n)
-            {
-                spaceBuffer.Append(AbstractTraceListener.spaceBuffer);
-            }
-
-            return spaceBuffer.Substring(0, n);
+            // The Java static self-appending StringBuffer is synchronized; the ported
+            // StringBuilder was not (torn state under concurrent tracers) and pinned its
+            // high-water length for the life of the process. Substring allocated anyway.
+            return new string(' ', Math.Max(n, 0));
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         public void SetOutputDestination(Logger stream)
         {
             @out = stream;
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         public virtual Logger GetOutputDestination()
         {
             return @out;
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         public object Checkpoint()
         {
             return stack.Count;
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         public void Recover(object checkpoint, XPathException error)
         {
-            @out.Info(AbstractTraceListener.Spaces(indent) + "<error code='" + error.ErrorCodeQName.GetLocalPart() + "'>" + error.GetMessage() + "</error>");
+            @out.Info(AbstractTraceListener.Spaces(indent) + "<error code='" + error.ErrorCodeQName.GetLocalPart() + "'>" + error.Message + "</error>");
             while (stack.Count > (int)checkpoint)
             {
                 int size = stack.Count;
@@ -342,22 +283,10 @@ namespace OutSmart.DAXon.Tracing
             @out.Info(AbstractTraceListener.Spaces(indent) + "<catch/>");
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         public void EndRuleSearch(object rule, Mode mode, IItem item)
         {
         }
 
-        /// <summary>
-        /// Called when an instruction in the stylesheet gets processed
-        /// </summary>
-        /// <summary>
-        /// Called after a node of the source tree got processed
-        /// </summary>
         // do nothing
         /// <summary>
         /// Method called when a search for a template rule is about to start

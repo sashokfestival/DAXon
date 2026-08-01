@@ -13,11 +13,10 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Lib
 {
-    public interface IInvalidity : SourceLocator
+    public interface IInvalidity : OutSmart.DAXon.Api.ILocation
     {
         int SchemaPart { get; }
         string ConstraintName { get; }

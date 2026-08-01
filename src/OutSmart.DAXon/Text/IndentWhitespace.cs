@@ -76,9 +76,6 @@ namespace OutSmart.DAXon.Text
             return new ConcatenatingIntIterator(new IntRepeatIterator(10, newlines), () => new IntRepeatIterator(32, spaces));
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override string ToString()
         {
             char[] chars = new char[newlines + spaces];
@@ -87,9 +84,6 @@ namespace OutSmart.DAXon.Text
             return new string(chars);
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override void Write(IUnicodeWriter writer)
         {
             if (newlines > 0)
@@ -103,9 +97,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override void WriteEscape(bool[] specialChars, IUnicodeWriter writer)
         {
             if (specialChars[0x0A])

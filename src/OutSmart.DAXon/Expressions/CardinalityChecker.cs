@@ -16,7 +16,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,19 +34,10 @@ namespace OutSmart.DAXon.Expressions
 
         public int RequiredCardinality => requiredCardinality;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        public RoleDiagnostic RoleLocator => roleSupplier.Get();
+        public RoleDiagnostic RoleLocator => roleSupplier();
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public Func<RoleDiagnostic> RoleSupplier => roleSupplier;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod
         {
             get
@@ -62,43 +52,15 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override IntegerValue[] IntegerBounds => BaseExpression.IntegerBounds;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ExpressionName => "CheckCardinality";
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string StreamerName => "CardinalityChecker";
         private CardinalityChecker(Expression sequence, int cardinality, Func<RoleDiagnostic> role) : base(sequence)
         {
             requiredCardinality = cardinality;
             this.roleSupplier = role; //computeStaticProperties();
-            //adoptChildExpression(sequence);
         }
 
         public static Expression MakeCardinalityChecker(Expression sequence, int cardinality, Func<RoleDiagnostic> roleSupplier)
@@ -128,9 +90,6 @@ namespace OutSmart.DAXon.Expressions
             return OperandRole.SAME_FOCUS_ACTION;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);
@@ -143,9 +102,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().Optimize(visitor, contextInfo);
@@ -157,7 +113,7 @@ namespace OutSmart.DAXon.Expressions
 
             if ((@base.GetCardinality() & requiredCardinality) == 0)
             {
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 throw new XPathException("The " + role.GetMessage() + " does not satisfy the cardinality constraints", role.ErrorCode).WithLocation(GetLocation()).AsTypeErrorIf(role.IsTypeError());
             }
 
@@ -178,24 +134,12 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             ISequenceIterator @base = BaseExpression.Iterate(context);
             return CheckCardinality(@base, context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public ISequenceIterator CheckCardinality(ISequenceIterator @base, IXPathContext context)
         {
 
@@ -205,17 +149,17 @@ namespace OutSmart.DAXon.Expressions
                 int count = SequenceTool.GetLength(@base);
                 if (count == 0 && !Cardinality.AllowsZero(requiredCardinality))
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     TypeError("An empty sequence is not allowed as the " + role.GetMessage(), role.ErrorCode, context);
                 }
                 else if (count == 1 && requiredCardinality == StaticProperty.EMPTY)
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     TypeError("The only value allowed for the " + role.GetMessage() + " is an empty sequence", role.ErrorCode, context);
                 }
                 else if (count > 1 && !Cardinality.AllowsMany(requiredCardinality))
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     TypeError("A sequence of more than one item is not allowed as the " + role.GetMessage() + DepictSequenceStart(@base, 2), role.ErrorCode, context);
                 }
 
@@ -234,12 +178,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public static string DepictSequenceStart(ISequenceIterator seq, int max)
         {
             StringBuilder sb = new StringBuilder(64);
@@ -266,12 +204,6 @@ namespace OutSmart.DAXon.Expressions
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             try
@@ -282,7 +214,7 @@ namespace OutSmart.DAXon.Expressions
                 {
                     if (!Cardinality.AllowsZero(requiredCardinality))
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         TypeError("An empty sequence is not allowed as the " + role.GetMessage(), role.ErrorCode, context);
                     }
 
@@ -292,7 +224,7 @@ namespace OutSmart.DAXon.Expressions
                 {
                     if (requiredCardinality == StaticProperty.EMPTY)
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         TypeError("An empty sequence is required as the " + role.GetMessage(), role.ErrorCode, context);
                         return null;
                     }
@@ -300,7 +232,7 @@ namespace OutSmart.DAXon.Expressions
                     IItem second = iter.Next();
                     if (second != null)
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         TypeError("A sequence of more than one item is not allowed as the " + role.GetMessage() + DepictSequenceStart(new TwoItemIterator(first, second), 2), role.ErrorCode, context);
                         return null;
                     }
@@ -314,12 +246,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             IPushEvaluator pusher = MakeElaborator().ElaborateForPush();
@@ -327,54 +253,21 @@ namespace OutSmart.DAXon.Expressions
             Expression.DispatchTailCall(tc);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return BaseExpression.GetItemType();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return requiredCardinality;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             return BaseExpression.GetSpecialProperties();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             CardinalityChecker c2 = new CardinalityChecker(BaseExpression.Copy(rebindings), requiredCardinality, roleSupplier);
@@ -382,52 +275,16 @@ namespace OutSmart.DAXon.Expressions
             return c2;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             return base.Equals(other) && requiredCardinality == ((CardinalityChecker)other).requiredCardinality;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return base.ComputeHashCode() ^ requiredCardinality;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("check", this);
@@ -438,23 +295,11 @@ namespace OutSmart.DAXon.Expressions
             }
 
             @out.EmitAttribute("card", occ);
-            @out.EmitAttribute("diag", roleSupplier.Get().Save());
+            @out.EmitAttribute("diag", roleSupplier().Save());
             BaseExpression.Export(@out);
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToString()
         {
             Expression operand = BaseExpression;
@@ -473,69 +318,21 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToShortString()
         {
             return BaseExpression.ToShortString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void SetLocation(ILocation id)
         {
             base.SetLocation(id);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CardinalityCheckerElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public class CardinalityCheckerElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
@@ -572,7 +369,7 @@ namespace OutSmart.DAXon.Expressions
                     return (output, context) =>
                     {
                         TypeCheckingFilter filter = new TypeCheckingFilter(output);
-                        filter.SetRequiredType(finalType, expr.requiredCardinality, expr.roleSupplier.Get(), expr.GetLocation());
+                        filter.SetRequiredType(finalType, expr.requiredCardinality, expr.roleSupplier(), expr.GetLocation());
                         ITailCall tc = pushEval.ProcessLeavingTail(filter, context);
                         Expression.DispatchTailCall(tc);
                         try

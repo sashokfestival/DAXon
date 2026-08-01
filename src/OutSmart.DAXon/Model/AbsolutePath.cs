@@ -88,12 +88,12 @@ namespace OutSmart.DAXon.Model
 
         public virtual void AppendAttributeName(INodeName attributeName)
         {
-            if (!path.IsEmpty())
+            if (path.Count > 0)
             {
                 PathElement last = path[path.Count - 1];
                 if (last.GetNodeKind() == Types.Type.ATTRIBUTE)
                 {
-                    path.Remove(path.Count - 1);
+                    path.RemoveAt(path.Count - 1);
                 }
             }
 
@@ -171,7 +171,7 @@ namespace OutSmart.DAXon.Model
                             {
                                 fsb.Append("Q{");
                                 fsb.Append(name.GetNamespaceUri());
-                                fsb.Append("}");
+                                fsb.Append('}');
                             }
                             else if (option == 'p')
                             {
@@ -186,7 +186,7 @@ namespace OutSmart.DAXon.Model
                             {
                                 fsb.Append("Q{");
                                 fsb.Append(Err.AbbreviateURI(name.GetNamespaceUri()));
-                                fsb.Append("}");
+                                fsb.Append('}');
                             }
                         }
 
@@ -197,7 +197,7 @@ namespace OutSmart.DAXon.Model
                         {
                             fsb.Append("Q{");
                             fsb.Append(name.GetNamespaceUri());
-                            fsb.Append("}");
+                            fsb.Append('}');
                         }
                         else if (option == 'p')
                         {
@@ -214,7 +214,7 @@ namespace OutSmart.DAXon.Model
                             {
                                 fsb.Append("Q{");
                                 fsb.Append(Err.AbbreviateURI(name.GetNamespaceUri()));
-                                fsb.Append("}");
+                                fsb.Append('}');
                             }
                         }
 
@@ -231,7 +231,7 @@ namespace OutSmart.DAXon.Model
                     case Types.Type.PROCESSING_INSTRUCTION:
                         fsb.Append("processing-instruction(");
                         fsb.Append(name.GetLocalPart());
-                        fsb.Append(")");
+                        fsb.Append(')');
                         AppendPredicate(fsb);
                         break;
                     case Types.Type.NAMESPACE:

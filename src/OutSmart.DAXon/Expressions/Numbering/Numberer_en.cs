@@ -277,11 +277,11 @@ namespace OutSmart.DAXon.Expressions.Numbering
 
             if (wordCase == UPPER_CASE)
             {
-                return s.ToUpperCase();
+                return s.ToUpperInvariant();
             }
             else if (wordCase == LOWER_CASE)
             {
-                return s.ToLowerCase();
+                return s.ToLowerInvariant();
             }
             else
             {

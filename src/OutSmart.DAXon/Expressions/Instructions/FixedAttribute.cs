@@ -17,7 +17,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Utilities;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,24 +32,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
     {
         private readonly INodeName nodeName;
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_ATTRIBUTE;
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override string ExpressionName => "att";
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public INodeName AttributeName => nodeName;
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public int AttributeFingerprint => nodeName.Fingerprint;
         public FixedAttribute(INodeName nodeName, int validationAction, ISimpleType schemaType)
         {
@@ -60,17 +47,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             SetOptions(ReceiverOption.NONE);
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override void GatherProperties(Action<string, object> consumer)
         {
-            consumer.Accept("name", AttributeName);
+            consumer("name",AttributeName);
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override void LocalTypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
 
@@ -150,17 +131,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             FixedAttribute exp = new FixedAttribute(nodeName, GetValidationAction(), GetSchemaType());
@@ -170,17 +145,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return exp;
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override INodeName EvaluateNodeName(IXPathContext context)
         {
             return nodeName;
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             int fp = nodeName.Fingerprint;
@@ -222,9 +191,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             Orphan o = (Orphan)base.EvaluateItem(context);
@@ -232,9 +198,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return o;
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("att", this);
@@ -269,25 +232,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override string ToShortString()
         {
             return "attr{" + nodeName.DisplayName + "=...}";
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new FixedAttributeElaborator();
         }
 
-        /// <summary>
-        /// Get the name of this instruction (return 'xsl:attribute')
-        /// </summary>
         private class FixedAttributeElaborator : SimpleNodePushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

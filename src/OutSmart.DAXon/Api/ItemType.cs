@@ -12,7 +12,6 @@ using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -271,28 +270,13 @@ namespace OutSmart.DAXon.Api
         /// ItemType representing the built-in (but non-primitive) type xs:IDREF
         /// </summary>
         public static readonly ItemType IDREF = Atomic(BuiltInAtomicType.IDREF, defaultConversionRules);
-        /// <summary>
-        /// ItemType representing the built-in (but non-primitive) type xs:ENTITY
-        /// </summary>
         public static readonly ItemType ENTITY = Atomic(BuiltInAtomicType.ENTITY, defaultConversionRules);
-        /// <summary>
-        /// ItemType representing the built-in (but non-primitive) type xs:ENTITY
-        /// </summary>
         public static readonly ItemType DATE_TIME_STAMP = Atomic(BuiltInAtomicType.DATE_TIME_STAMP, defaultConversionRules);
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public static readonly ItemType NUMERIC = new AnonymousItemType13(NumericType.GetInstance());
         protected readonly Types.ItemType underlyingType;
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public virtual Types.ItemType UnderlyingItemType => underlyingType;
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public virtual QName TypeName
         {
             get
@@ -344,58 +328,34 @@ namespace OutSmart.DAXon.Api
         {
             return SequenceType.MakeSequenceType(this, OccurrenceIndicator.ZERO_OR_ONE);
         }
-        /// <summary>
-        /// ItemType representing the built-in (but non-primitive) type xs:ENTITY
-        /// </summary>
         private static ItemType Atomic(BuiltInAtomicType underlyingType, ConversionRules conversionRules)
         {
             return new BuiltInAtomicItemType(underlyingType, conversionRules);
         }
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public virtual ConversionRules GetConversionRules()
         {
             return defaultConversionRules;
         }
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public virtual bool Test(XdmItem item)
         {
             return Matches(item);
         }
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public abstract bool Matches(XdmItem item);
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public abstract bool Subsumes(ItemType other);
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is ItemType && UnderlyingItemType.Equals(((ItemType)other).UnderlyingItemType);
         }
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public override int GetHashCode()
         {
             return UnderlyingItemType.GetHashCode();
         }
 
-        /// <summary>
-        /// ItemType representing the built-in union type xs:numeric defined in XDM 3.1
-        /// </summary>
         public override string ToString()
         {
             Types.ItemType type = UnderlyingItemType;

@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Internal.Collections
         public static T[] CopyOf<T>(T[] src, int newLength)
         {
             var dst = new T[newLength];
-            Array.Copy(src, dst, global::System.Math.Min(src.Length, newLength));
+            Array.Copy(src, dst, Math.Min(src.Length, newLength));
             return dst;
         }
 
@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Internal.Collections
         {
             int len = to - from;
             var dst = new T[len];
-            Array.Copy(src, from, dst, 0, global::System.Math.Min(len, src.Length - from));
+            Array.Copy(src, from, dst, 0, Math.Min(len, src.Length - from));
             return dst;
         }
 
@@ -70,7 +70,7 @@ namespace OutSmart.DAXon.Internal.Collections
                 return hash;
             }
         }
-        // Phase 7.8: paulirwin sometimes translates Java's Arrays.hashCode(arr) as Arrays.GetHashCode(arr).
+        // Paulirwin sometimes translates Java's Arrays.hashCode(arr) as Arrays.GetHashCode(arr).
         public static int GetHashCode<T>(T[] a) => HashCode(a);
     }
 }

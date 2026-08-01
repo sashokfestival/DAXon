@@ -29,9 +29,6 @@ namespace OutSmart.DAXon.Patterns
     {
         private readonly NodeTest nodeTest;
 
-        /// <summary>
-        /// Get a NodeTest that all the nodes matching this pattern must satisfy
-        /// </summary>
         public override int Fingerprint => nodeTest.Fingerprint;
         public NodeTestPattern(NodeTest test)
         {
@@ -44,63 +41,36 @@ namespace OutSmart.DAXon.Patterns
             return item is NodeInfo && nodeTest.Test((NodeInfo)item);
         }
 
-        /// <summary>
-        /// Get a NodeTest that all the nodes matching this pattern must satisfy
-        /// </summary>
         public override ItemType GetItemType()
         {
             return nodeTest;
         }
 
-        /// <summary>
-        /// Get a NodeTest that all the nodes matching this pattern must satisfy
-        /// </summary>
         public override UType GetUType()
         {
             return nodeTest.GetUType();
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override string Reconstruct()
         {
             return nodeTest.ToString();
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override string ToShortString()
         {
             return nodeTest.ToShortString();
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
         public override bool Equals(object other)
         {
             return (other is NodeTestPattern) && ((NodeTestPattern)other).nodeTest.Equals(nodeTest);
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return 0x7aeffea8 ^ nodeTest.GetHashCode();
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Pattern ConvertToTypedPattern(string val)
         {
             if (nodeTest is NameTest && nodeTest.GetUType() == UType.ELEMENT)
@@ -131,12 +101,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             presenter.StartElement("p.nodeTest");
@@ -144,12 +108,6 @@ namespace OutSmart.DAXon.Patterns
             presenter.EndElement();
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             NodeTestPattern n = new NodeTestPattern(nodeTest.Copy());
@@ -159,12 +117,6 @@ namespace OutSmart.DAXon.Patterns
             return n;
         }
 
-        /// <summary>
-        /// Display the pattern for diagnostics
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public virtual NodeTest GetNodeTest()
         {
             return nodeTest;

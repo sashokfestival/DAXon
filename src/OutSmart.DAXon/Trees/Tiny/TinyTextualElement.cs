@@ -27,7 +27,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Trees.Tiny
 {
     public class TinyTextualElement : TinyElementImpl
@@ -189,57 +188,18 @@ namespace OutSmart.DAXon.Trees.Tiny
         /// <summary>
         /// Inner class representing the text node; this is created on demand
         /// </summary>
-        public class TinyTextualElementText : NodeInfo, SourceLocator
+        public class TinyTextualElementText : NodeInfo
         {
             private readonly TinyTextualElement element;
 
-            /// <summary>
-            /// Set the system ID for the entity containing the node.
-            /// </summary>
             public virtual UnicodeString UnicodeStringValue => element.UnicodeStringValue;
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual int Fingerprint => -1;
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual string DisplayName => "";
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual NamespaceMap AllNamespaces => null;
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual NodeInfo Root => element.Root;
             public TinyTextualElementText(TinyTextualElement element)
             {
@@ -256,32 +216,20 @@ namespace OutSmart.DAXon.Trees.Tiny
                 return element.GetTreeInfo();
             }
 
-            /// <summary>
-            /// Set the system ID for the entity containing the node.
-            /// </summary>
             public virtual void SetSystemId(string systemId)
             {
             }
 
-            /// <summary>
-            /// Set the system ID for the entity containing the node.
-            /// </summary>
             public virtual int GetNodeKind()
             {
                 return Types.Type.TEXT;
             }
 
-            /// <summary>
-            /// Set the system ID for the entity containing the node.
-            /// </summary>
             public override bool Equals(object other)
             {
                 return other is TinyTextualElementText && GetParent().Equals(((TinyTextualElementText)other).GetParent());
             }
 
-            /// <summary>
-            /// Set the system ID for the entity containing the node.
-            /// </summary>
             public override int GetHashCode()
             {
                 return GetParent().GetHashCode() ^ 0x01010101;
@@ -293,37 +241,19 @@ namespace OutSmart.DAXon.Trees.Tiny
             public virtual void GenerateId(StringBuilder buffer)
             {
                 element.GenerateId(buffer);
-                buffer.Append("T");
+                buffer.Append('T');
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
             public virtual string GetSystemId()
             {
                 return element.GetSystemId();
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
             public virtual string GetBaseURI()
             {
                 return element.GetBaseURI();
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
             public virtual int CompareOrder(NodeInfo other)
             {
                 if (other.Equals(this))
@@ -340,169 +270,61 @@ namespace OutSmart.DAXon.Trees.Tiny
                 }
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual string GetPrefix()
             {
                 return "";
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual NamespaceUri GetNamespaceUri()
             {
                 return NamespaceUri.NULL;
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual string GetLocalPart()
             {
                 return "";
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual bool HasChildNodes()
             {
                 return false;
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual string GetAttributeValue(NamespaceUri uri, string local)
             {
                 return null;
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual int GetLineNumber()
             {
                 return GetParent().GetLineNumber();
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual int GetColumnNumber()
             {
                 return GetParent().GetColumnNumber();
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual ILocation SaveLocation()
             {
                 return this;
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual ISchemaType GetSchemaType()
             {
                 return null;
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual NamespaceBinding[] GetDeclaredNamespaces(NamespaceBinding[] buffer)
             {
                 return null;
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual IAtomicSequence Atomize()
             {
                 return StringValue.MakeUntypedAtomic(UnicodeStringValue);
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual IAxisIterator IterateAxis(int axisNumber)
             {
                 switch (axisNumber)
@@ -534,15 +356,6 @@ namespace OutSmart.DAXon.Trees.Tiny
                 }
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual IAxisIterator IterateAxis(int axisNumber, INodePredicate predicate)
             {
                 NodeTest nodeTest = Navigator.NodeTestFromPredicate(predicate);
@@ -575,29 +388,11 @@ namespace OutSmart.DAXon.Trees.Tiny
                 }
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             public virtual NodeInfo GetParent()
             {
                 return element;
             }
 
-            /// <summary>
-            /// Get a character string that uniquely identifies this node
-            /// </summary>
-            /// <summary>
-            /// Get the system ID for the entity containing the node.
-            /// </summary>
-            /// <summary>
-            /// Get the fingerprint of the node, used for matching names
-            /// </summary>
             /// <summary>
             /// Copy the node to a given Outputter
             /// </summary>
@@ -636,23 +431,29 @@ namespace OutSmart.DAXon.Trees.Tiny
             public virtual IEnumerable<NodeInfo> Children()
             {
                 var __it = IterateAxis(AxisInfo.CHILD);
-                for (var __n = __it.Next(); __n != null; __n = __it.Next()) { yield return __n; }
+                for (var __n = __it.Next(); __n != null; __n = __it.Next())
+                {
+                    yield return __n;
+                }
             }
 
             public virtual IEnumerable<NodeInfo> Children(INodePredicate filter)
             {
                 var __it = IterateAxis(AxisInfo.CHILD, filter);
-                for (var __n = __it.Next(); __n != null; __n = __it.Next()) { yield return __n; }
+                for (var __n = __it.Next(); __n != null; __n = __it.Next())
+                {
+                    yield return __n;
+                }
             }
 
             public virtual IAttributeMap Attributes()
             {
-                throw new NotImplementedException();
+                return EmptyAttributeMap.GetInstance(); // a text node has no attributes
             }
 
             public virtual void Deliver(IReceiver receiver, ParseOptions options)
             {
-                throw new NotImplementedException();
+                Events.Sender.SendDocumentInfo(this, receiver, new Expressions.Parsing.Loc(GetSystemId(), -1, -1));
             }
 
             public virtual IActiveSource AsActiveSource()
@@ -717,7 +518,7 @@ namespace OutSmart.DAXon.Trees.Tiny
 
             public virtual IGroundedValue Subsequence(int start, int length)
             {
-                throw new NotImplementedException();
+                return (start <= 0 && (long)start + length > 0) ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance();
             }
 
             public virtual int GetLength()
@@ -742,7 +543,7 @@ namespace OutSmart.DAXon.Trees.Tiny
 
             public virtual IEnumerable<IItem> AsIterable()
             {
-                throw new NotImplementedException();
+                return new IItem[] { this }; // singleton grounded value (upstream GroundedValue default for an Item)
             }
 
             public virtual bool ContainsNode(NodeInfo sought) => OutSmart.DAXon.Expressions.SingletonIntersectExpression.ContainsNode(((OutSmart.DAXon.Model.ISequence)this).Iterate(), sought); // upstream GroundedValue default

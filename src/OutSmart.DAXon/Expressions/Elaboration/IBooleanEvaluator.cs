@@ -19,6 +19,6 @@ namespace OutSmart.DAXon.Expressions.Elaboration
     /// <summary>
     /// Interface implemented by expressions that return a boolean result.
     /// </summary>
-    // Phase 7: IBooleanEvaluator interface -> delegate for lambda assignability.
+    // IBooleanEvaluator interface -> delegate for lambda assignability.
     public delegate bool IBooleanEvaluator(IXPathContext context);
 }

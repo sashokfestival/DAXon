@@ -20,7 +20,6 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,44 +34,23 @@ namespace OutSmart.DAXon.Expressions.Sorting
     public class MergeInstr : Instruction
     {
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private static readonly OperandRole ROW_SELECT = new OperandRole(OperandRole.USES_NEW_FOCUS | OperandRole.HIGHER_ORDER, OperandUsage.INSPECTION, Values.SequenceType.ANY_SEQUENCE);
         protected MergeSource[] mergeSources;
         private Operand actionOp;
         protected IAtomicComparer[] comparators;
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public virtual MergeSource[] MergeSources => mergeSources;
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_MERGE;
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public virtual Expression GroupingKey => mergeSources[0].mergeKeyDefinitions.GetSortKeyDefinition(0).SortKey;
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override string StreamerName => "MergeInstr";
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public MergeInstr()
         {
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public virtual MergeInstr Init(MergeSource[] mSources, Expression action)
         {
             actionOp = new Operand(this, action, OperandRole.FOCUS_CONTROLLED_ACTION);
@@ -86,53 +64,34 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
             AdoptChildExpression(action);
 
-            //verifyParentPointers();
             return this;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public virtual void SetAction(Expression action)
         {
             actionOp.SetChildExpression(action);
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public virtual Expression GetAction()
         {
             return actionOp.GetChildExpression();
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             GetAction().CheckPermittedContents(parentType, false);
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override bool AllowExtractingCommonSubexpressions()
         {
             return false;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return GetAction().GetItemType();
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Configuration config = visitor.GetConfiguration();
@@ -218,17 +177,11 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return this;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public virtual void FixupGroupReferences()
         {
             FixupGroupReferences(this, this, false);
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private static void FixupGroupReferences(Expression exp, MergeInstr instr, bool isInLoop)
         {
             if (exp == null)
@@ -294,18 +247,12 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             int props = GetAction().GetSpecialProperties();
             return (props & StaticProperty.NO_NODES_NEWLY_CREATED) == 0;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Configuration config = visitor.GetConfiguration();
@@ -352,9 +299,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return this;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override void PrepareForStreaming()
         {
             foreach (MergeSource mergeSource in mergeSources)
@@ -363,9 +307,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private void CheckMergeAtt(SortKeyDefinition[] sortKeyDefs)
         {
             for (int i = 1; i < sortKeyDefs.Length; i++)
@@ -377,17 +318,11 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private ILastPositionFinder GetLastPositionFinder(IXPathContext context)
         {
             return new AnonymousILastPositionFinder(this, context);
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             try
@@ -412,9 +347,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private ISequenceIterator GetMergedInputIterator(IXPathContext context, IAtomicComparer[] comps)
         {
 
@@ -473,9 +405,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return inputIterator;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private ISequenceIterator GetInputIterator(IAtomicComparer[] comps, ISequenceIterator inputIterator, MergeSource ms, IXPathContext c2)
         {
             IXPathContext c4 = c2.NewMinorContext();
@@ -487,9 +416,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return inputIterator;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private IAtomicComparer[] GetComparators(IXPathContext context)
         {
 
@@ -525,9 +451,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return comps;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private ISequenceIterator MakeMergeIterator(ISequenceIterator result, IAtomicComparer[] comps, MergeSource ms, ContextMappingIterator contextMapKeysItr)
         {
             if (result == null || result is EmptyIterator)
@@ -541,9 +464,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
             return result;
         }
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             IList<Operand> list = new List<Operand>(6);
@@ -574,18 +494,12 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return list;
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public virtual IComparer<ObjectValue<ItemWithMergeKeys>> GetComparer(SortKeyDefinitionList sKeys, IAtomicComparer[] comps)
         {
 
             return new AnonymousComparator(this, sKeys, comps);
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             MergeInstr newMerge = new MergeInstr();
@@ -599,9 +513,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return newMerge.Init(c2, a2);
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("merge", this);
@@ -627,14 +538,14 @@ namespace OutSmart.DAXon.Expressions.Sorting
                     }
                 }
 
-                if (mergeSource.accumulators != null && !mergeSource.accumulators.IsEmpty())
+                if (mergeSource.accumulators != null && mergeSource.accumulators.Count > 0)
                 {
                     StringBuilder fsb = new StringBuilder(256);
                     foreach (Accumulator acc in mergeSource.accumulators)
                     {
                         if (fsb.Length != 0)
                         {
-                            fsb.Append(" ");
+                            fsb.Append(' ');
                         }
 
                         fsb.Append(acc.AccumulatorName.EQName);
@@ -671,16 +582,10 @@ namespace OutSmart.DAXon.Expressions.Sorting
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new MergeInstrElaborator();
         }
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public class MergeSource
         {
             private readonly MergeInstr instruction;
@@ -887,9 +792,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         public class MergeKeyMappingFunction
         {
             private readonly MergeSource ms;
@@ -916,9 +818,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Inner class representing one merge source
-        /// </summary>
         private class MergeInstrElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

@@ -13,8 +13,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Api
@@ -27,8 +25,6 @@ namespace OutSmart.DAXon.Api
         public SchemaManager()
         {
         }
-        public abstract void SetErrorListener(ErrorListener listener);
-        public abstract ErrorListener GetErrorListener();
         public abstract void Load(ResolvedResource source);
         public virtual void Load(string file)
         {

@@ -104,17 +104,11 @@ namespace OutSmart.DAXon.Expressions
             return "and";
         }
 
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext c)
         {
             return GetLhsExpression().EffectiveBooleanValue(c) && GetRhsExpression().EffectiveBooleanValue(c);
         }
 
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         public static Expression Distribute(Collection<Expression> exprs)
         {
             Expression result = null;
@@ -138,9 +132,6 @@ namespace OutSmart.DAXon.Expressions
             return result;
         }
 
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new AndElaborator();

@@ -113,18 +113,12 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on stylesheet functions. For most instructions, this does nothing.
-        /// </summary>
         public override bool MarkTailCalls()
         {
             StyleElement last = LastChildInstruction;
             return last != null && last.MarkTailCalls();
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on stylesheet functions. For most instructions, this does nothing.
-        /// </summary>
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
             if (test is Literal)
@@ -188,9 +182,6 @@ namespace OutSmart.DAXon.Xslt
             return choose;
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on stylesheet functions. For most instructions, this does nothing.
-        /// </summary>
         // fall through to non-optimizing case
         public override Expression CompileSequenceConstructor(Compilation compilation, ComponentDeclaration decl, bool includeParams)
         {

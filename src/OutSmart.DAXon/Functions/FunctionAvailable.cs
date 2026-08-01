@@ -113,15 +113,6 @@ namespace OutSmart.DAXon.Functions
             IFunctionLibrary lib = context.GetController().GetExecutable().FunctionLibrary;
             SymbolicName.F sn = new SymbolicName.F(qName, arity);
 
-            // TODO: reinstate something along these lines. Removed because it doesn't build in HE 9.8
-            //            // Target environment differs from compile-time environment: some functions might not be available
-            //            if (details != null) {
-            //                if (((details.applicability & BuiltInFunctionSet.HOF) != 0) && ("HE".equals(edition) || "JS".equals(edition))) {
-            //                    return false;
-            //                }
-            //                // TODO: some further functions are not available in SaxonJS
-            //            }
-            //        }
             return lib.IsAvailable(sn, rsc.GetPackageData().HostLanguageVersion);
         }
 

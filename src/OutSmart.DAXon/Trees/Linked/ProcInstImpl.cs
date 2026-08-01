@@ -8,14 +8,32 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Trees.Linked
 {
+    // Was a fully hollow shell (target and data dropped on construction, kind/copy/string-value
+    // all NIE): a processing-instruction in a linked tree crashed on first real use.
     public class ProcInstImpl : NodeImpl
     {
+        private string target = "";
+        private UnicodeString content = EmptyUnicodeString.GetInstance();
+
         public ProcInstImpl() { }
-        public ProcInstImpl(object target, object data) { }
+        public ProcInstImpl(object target, object data)
+        {
+            this.target = target?.ToString() ?? "";
+            content = data as UnicodeString ?? BMPString.Of(data?.ToString() ?? "");
+        }
         public void SetLocation(object _loc) { }
-        public void SetLocation(string systemId, int line, int column) { }
+        public void SetLocation(string systemId, int line, int column) { } /* location tracking not kept for linked-tree PIs */
+
+        public override string GetLocalPart() => target;
+        public override UnicodeString UnicodeStringValue => content;
+        public override int GetNodeKind() => Types.Type.PROCESSING_INSTRUCTION;
+        public override void ReplaceStringValue(UnicodeString value) => content = value;
+        public override void Copy(IReceiver @out, int copyOptions, ILocation locationId) => @out.ProcessingInstruction(target, content, locationId, 0);
     }
 }

@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Model;using OutSmart.DAXon.Functions;
 
 using OutSmart.DAXon.Trees.Iterators;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -44,7 +43,7 @@ namespace OutSmart.DAXon.Expressions
 
 
             // Call the supplied checking function
-            action.Accept(nextSource);
+            action(nextSource);
             return nextSource;
         }
 

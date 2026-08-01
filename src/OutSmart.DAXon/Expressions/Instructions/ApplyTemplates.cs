@@ -53,29 +53,14 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_APPLY_TEMPLATES;
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int ImplementationMethod => base.ImplementationMethod | Expression.WATCH_METHOD;
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int IntrinsicDependencies => base.IntrinsicDependencies | (useCurrentMode ? StaticProperty.DEPENDS_ON_CURRENT_ITEM : 0);
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public Component FixedTarget => mode.GetDeclaringComponent();
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual Expression Select
         {
             get => selectOp.GetChildExpression(); set
@@ -84,9 +69,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public int BindingSlot
         {
             get => bindingSlot; set
@@ -95,9 +77,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override string StreamerName => "ApplyTemplates";
         protected ApplyTemplates()
         {
@@ -160,9 +139,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return operanda;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression Simplify()
         {
             WithParam.Simplify(GetActualParams());
@@ -171,9 +147,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             WithParam.TypeCheck(actualParams, visitor, contextInfo);
@@ -208,9 +181,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             WithParam.Optimize(visitor, actualParams, contextInfo);
@@ -225,17 +195,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual RuleManager GetRuleManager()
         {
             return ruleManager;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ApplyTemplates a2 = new ApplyTemplates(Select.Copy(rebindings), useCurrentMode, _useTailRecursion, implicitSelect, inStreamableConstruct, mode, ruleManager);
@@ -251,17 +215,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return a2;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return true;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual Component.M GetTargetMode(IXPathContext context)
         {
             Component.M targetMode;
@@ -297,57 +255,36 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return targetMode;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual Expression GetSelectExpression()
         {
             return Select;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual bool IsImplicitSelect()
         {
             return implicitSelect;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual bool UseTailRecursion()
         {
             return _useTailRecursion;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual bool UsesCurrentMode()
         {
             return useCurrentMode;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual Mode GetMode()
         {
             return mode;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public SymbolicName GetSymbolicName()
         {
             return mode == null ? null : mode.GetSymbolicName();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
 
@@ -357,9 +294,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new PathMap.PathMapNodeSet(pathMap.MakeNewRoot(this));
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("applyT", this);
@@ -411,17 +345,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ApplyTemplatesElaborator();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         protected class ApplyTemplatesPackage : ITailCall
         {
             private readonly ISequence selectedItems;
@@ -453,9 +381,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public class ApplyTemplatesElaborator : PushElaborator
         {
             private NodeInfo MakeSeparator(IUnicodeStringEvaluator sep, IXPathContext context)
@@ -543,9 +468,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
                             ITailCall tc = thisMode.ApplyTemplates(@params, tunnels, separator, output, c2, expr.GetLocation());
                             DispatchTailCall(tc);
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw new XPathException.StackOverflow("Too many nested apply-templates calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, expr.GetLocation()).WithXPathContext(context);
+                            // Filtered: this catch sits at EVERY level of the apply-templates
+                            // recursion, so only the innermost may run a handler (see RecursionDepthError).
+                            throw e.Describe("Too many nested apply-templates calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, expr.GetLocation());
                         }
 
                         pipe.XPathContext = context;

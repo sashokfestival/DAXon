@@ -18,7 +18,6 @@ using OutSmart.DAXon.Trees.Linked;
 using OutSmart.DAXon.Internal.Numerics;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,8 +29,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Xslt
@@ -88,12 +85,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             int fp = elemName.ObtainFingerprint(GetNamePool());
@@ -154,12 +145,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private void CheckTargetDocument(DocumentImpl includedDoc)
         {
             if (includedDoc != null)
@@ -169,12 +154,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private bool CheckUseEvaluateWhen(ParsedAttributes pa, int fp, ILocation location, URI baseUri, NamespaceMap namespaces, INodeName elemName, NamespaceUri stdAttUri)
         {
             if (pa.useWhenAtt != null)
@@ -197,12 +176,6 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private int GetVersion(ParsedAttributes pa, int fp)
         {
             int version = int.MinValue;
@@ -213,18 +186,12 @@ namespace OutSmart.DAXon.Xslt
 
             if (version == int.MinValue)
             {
-                version = versionStack.IsEmpty() ? 30 : versionStack.Peek();
+                version = versionStack.Count == 0 ? 30 : versionStack.Peek();
             }
 
             return version;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private DocumentImpl ProcessIncludeImport(INodeName elemName, ILocation location, URI baseUri, string href, bool isImport)
         {
             if (href == null)
@@ -239,7 +206,7 @@ namespace OutSmart.DAXon.Xslt
             Dictionary<DocumentKey, ITreeInfo> map = compilation.StylesheetModules;
             if (map.ContainsKey(key))
             {
-                return (DocumentImpl)map.Get(key);
+                return (DocumentImpl)map.GetOrDefault(key);
             }
             else
             {
@@ -269,10 +236,15 @@ namespace OutSmart.DAXon.Xslt
                 try
                 {
                     DocumentImpl includedDoc = StylesheetModule.LoadStylesheetModule(source, false, compilation, newPrecedence);
-                    map.Put(key, includedDoc);
+                    map[key] = includedDoc;
                     return includedDoc;
                 }
-                catch (XPathException e)
+                // Filtered: every clause below is set-if-unset plus a report-once, so on an outer
+                // level of a nested include the body has nothing left to do - and an unentered
+                // filter costs no funclet and no re-dispatch on the unwind, which is what bounds
+                // include nesting (AW). The XTSE0180 exception to that: a cycle error still has to
+                // be re-coded to XTSE0210 by an importing level above the level that raised it.
+                catch (XPathException e) when (!e.HasBeenReported() || e.HasErrorCode("XTSE0180"))
                 {
                     e.MaybeSetErrorCode("XTSE0165");
                     if (e.HasErrorCode("SXXP0003"))
@@ -298,12 +270,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private ParsedAttributes StartElementProcessAttributes(INodeName elemName, IAttributeMap attributes, NamespaceMap namespaces, bool inXsltNamespace, NamespaceUri stdAttUri)
         {
             bool inSaxonNamespace = elemName.HasURI(NamespaceUri.SAXON);
@@ -346,12 +312,6 @@ namespace OutSmart.DAXon.Xslt
             return pa;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private void ProcessAttributeLocal(AttributeInfo att, string local, ParsedAttributes pa)
         {
             switch (local)
@@ -371,12 +331,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private DocumentImpl HandleXsltElement(INodeName elemName, URI baseUri, int fp, ParsedAttributes pa, IAttributeMap attributes, NamespaceMap namespaces, ILocation location)
         {
             DocumentImpl includedDoc = null;
@@ -450,12 +404,6 @@ namespace OutSmart.DAXon.Xslt
             return includedDoc;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private void RegisterModeName(string modeAtt, INamespaceResolver nsResolver)
         {
             if (modeAtt != null && !modeAtt.StartsWith("#", StringComparison.Ordinal))
@@ -471,17 +419,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private void RegisterModeNames(string modeAtt, INamespaceResolver nsResolver)
         {
             if (modeAtt != null)
             {
-                string[] tokens = Whitespace.Trim(modeAtt).Split("[ \t\n\r]+");
+                string[] tokens = Whitespace.Trim(modeAtt).SplitRegex("[ \t\n\r]+");
                 foreach (string token in tokens)
                 {
                     RegisterModeName(token, nsResolver);
@@ -489,12 +431,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private void ProcessStaticVariable(INodeName elemName, IAttributeMap attributes, INamespaceResolver nsResolver, ILocation location, URI baseUri, NestedIntegerValue precedence)
         {
             string nameStr = attributes.GetValue(NamespaceUri.NULL, "name");
@@ -525,7 +461,7 @@ namespace OutSmart.DAXon.Xslt
             }
             catch (XPathException err)
             {
-                throw CreateXPathException("Invalid variable name:" + nameStr + ". " + err.GetMessage(), err.ErrorCodeQName, location);
+                throw CreateXPathException("Invalid variable name:" + nameStr + ". " + err.Message, err.ErrorCodeQName, location);
             }
 
             bool isVariable = elemName.GetLocalPart().Equals("variable");
@@ -592,7 +528,7 @@ namespace OutSmart.DAXon.Xslt
                     }
                     catch (XPathException e)
                     {
-                        throw CreateXPathException("Error in " + elemName.GetLocalPart() + " expression. " + e.GetMessage(), e.ErrorCodeQName, attLoc);
+                        throw CreateXPathException("Error in " + elemName.GetLocalPart() + " expression. " + e.Message, e.ErrorCodeQName, attLoc);
                     }
                 }
 
@@ -606,24 +542,18 @@ namespace OutSmart.DAXon.Xslt
                 }
                 catch (XPathException e)
                 {
-                    throw CreateXPathException(e.GetMessage(), e.ErrorCodeQName, attLoc);
+                    throw CreateXPathException(e.Message, e.ErrorCodeQName, attLoc);
                 }
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private IAttributeMap ProcessShadowAttributes(INodeName elemName, IAttributeMap attributes, INamespaceResolver nsResolver, ILocation location, URI baseUri)
         {
             Dictionary<INodeName, AttributeInfo> attMap = new Dictionary<INodeName, AttributeInfo>();
             foreach (AttributeInfo att in attributes)
             {
                 INodeName attName = att.GetNodeName();
-                attMap.Put(attName, att);
+                attMap[attName] = att;
             }
 
             foreach (AttributeInfo att in attributes)
@@ -651,13 +581,13 @@ namespace OutSmart.DAXon.Xslt
                     // if a corresponding attribute exists with no underscore, overwrite it.
                     // Drop the shadow attribute itself.
                     AttributeInfo newAtt = new AttributeInfo(newName, att.GetType(), newValue, att.GetLocation(), ReceiverOption.NONE);
-                    attMap.Put(newName, newAtt);
+                    attMap[newName] = newAtt;
                     attMap.Remove(attName);
                 }
             }
 
             IAttributeMap resultAtts = EmptyAttributeMap.GetInstance();
-            foreach (AttributeInfo att in attMap.Values())
+            foreach (AttributeInfo att in attMap.Values)
             {
                 resultAtts = resultAtts.Put(new AttributeInfo(att.GetNodeName(), att.GetType(), att.Value, att.GetLocation(), att.GetProperties()));
             }
@@ -665,12 +595,6 @@ namespace OutSmart.DAXon.Xslt
             return resultAtts;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private URI ProcessBaseUri(ILocation location, string xmlBaseAtt)
         {
             string systemId = location.GetSystemId();
@@ -704,7 +628,7 @@ namespace OutSmart.DAXon.Xslt
                 }
                 catch (ArgumentException iae)
                 {
-                    throw new XPathException("Invalid URI in xml:base attribute: " + xmlBaseAtt + ". " + iae.GetMessage());
+                    throw new XPathException("Invalid URI in xml:base attribute: " + xmlBaseAtt + ". " + iae.Message);
                 }
             }
 
@@ -713,12 +637,6 @@ namespace OutSmart.DAXon.Xslt
             return baseUri;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private int ProcessVersionAttribute(string version)
         {
             if (version != null)
@@ -738,12 +656,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private string ProcessShadowAttribute(string expression, string baseUri, INamespaceResolver nsResolver, AttributeLocation loc)
         {
             UseWhenStaticContext staticContext = new UseWhenStaticContext(compilation, nsResolver);
@@ -758,12 +670,6 @@ namespace OutSmart.DAXon.Xslt
             return expr.EvaluateAsString(dynamicContext).ToString();
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private XPathException CreateXPathException(string message, StructuredQName errorCode, ILocation location)
         {
             XPathException err = new XPathException(message);
@@ -775,12 +681,6 @@ namespace OutSmart.DAXon.Xslt
             return err;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         /// <summary>
         /// End of element
         /// </summary>
@@ -801,12 +701,6 @@ namespace OutSmart.DAXon.Xslt
         }
 
         /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
         /// Character data
         /// </summary>
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
@@ -818,46 +712,16 @@ namespace OutSmart.DAXon.Xslt
         }
 
         /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
         /// Processing Instruction
         /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
         {
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private bool EvaluateUseWhen(string expression, AttributeLocation location, string baseUri, INamespaceResolver nsResolver)
         {
             UseWhenStaticContext staticContext = new UseWhenStaticContext(compilation, nsResolver);
@@ -874,18 +738,6 @@ namespace OutSmart.DAXon.Xslt
             return expr.EffectiveBooleanValue(dynamicContext);
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private SlotManager AllocateSlots(string expression, Expression expr)
         {
             SlotManager stackFrameMap = GetPipelineConfiguration().GetConfiguration().MakeSlotManager();
@@ -897,18 +749,6 @@ namespace OutSmart.DAXon.Xslt
             return stackFrameMap;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private void SetNamespaceBindings(UseWhenStaticContext staticContext)
         {
             staticContext.SetDefaultElementNamespace(NamespaceUri.NULL);
@@ -922,18 +762,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private Expression TypeCheck(Expression expr, UseWhenStaticContext staticContext)
         {
             Types.ItemType contextItemType = Types.Type.ITEM_TYPE;
@@ -942,18 +770,6 @@ namespace OutSmart.DAXon.Xslt
             return expr.TypeCheck(visitor, cit);
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private IXPathContext MakeDynamicContext(UseWhenStaticContext staticContext)
         {
             Controller controller = new Controller(GetConfiguration());
@@ -985,18 +801,6 @@ namespace OutSmart.DAXon.Xslt
             return dynamicContext;
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
-        /// <summary>
-        /// Processing Instruction
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public virtual ISequence EvaluateStatic(string expression, ILocation locationId, UseWhenStaticContext staticContext)
         {
             try
@@ -1016,12 +820,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Start of document
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element.
-        /// </summary>
         private class ParsedAttributes
         {
             public NamespaceUri xpathDefaultNamespaceAtt = null;

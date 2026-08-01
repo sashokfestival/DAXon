@@ -23,14 +23,8 @@ namespace OutSmart.DAXon.Trees.Iterators
     {
         private static readonly EmptyIterator theInstance = new EmptyIterator();
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual bool HasNext => false;
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         protected EmptyIterator()
         {
         }
@@ -39,89 +33,56 @@ namespace OutSmart.DAXon.Trees.Iterators
             return theInstance;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual IAtomicSequence NextAtomizedValue()
         {
             return null;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual IItem Next()
         {
             return null;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual bool SupportsGetLength()
         {
             return true;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual int GetLength()
         {
             return 0;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual EmptyIterator GetReverseIterator()
         {
             return this;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual IGroundedValue Materialize()
         {
             return EmptySequence.GetInstance();
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual IGroundedValue GetResidue()
         {
             return EmptySequence.GetInstance();
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual bool SupportsHasNext()
         {
             return true;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public virtual bool IsActuallyGrounded()
         {
             return true;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public static IAxisIterator OfNodes()
         {
             return OfNodesIter.THE_INSTANCE;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         public static IAtomicIterator OfAtomic()
         {
             return OfAtomicIter.THE_INSTANCE;
@@ -129,9 +90,6 @@ namespace OutSmart.DAXon.Trees.Iterators
         ISequenceIterator IReversibleIterator.GetReverseIterator() => GetReverseIterator();
         public virtual void Dispose() { }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         /// <summary>
         /// An empty iterator for use where a sequence of nodes is required
         /// </summary>
@@ -145,9 +103,6 @@ namespace OutSmart.DAXon.Trees.Iterators
             NodeInfo IAxisIterator.Next() => null;
         }
 
-        /// <summary>
-        /// Protected constructor
-        /// </summary>
         /// <summary>
         /// An empty iterator for use where a sequence of atomic values is required
         /// </summary>

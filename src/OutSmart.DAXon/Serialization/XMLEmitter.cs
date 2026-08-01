@@ -14,7 +14,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,7 +24,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
 {
@@ -35,33 +33,12 @@ namespace OutSmart.DAXon.Serialization
         protected static bool[] specialInAtt; // lookup table for special characters in attributes
         protected static bool[] specialInAttSingle; // lookup table for special characters in attributes with single-quote delimiter
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         private static readonly byte[] XML_DECL_VERSION = StringConstants.Bytes("<?xml version=");
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         private static readonly byte[] XML_DECL_ENCODING = StringConstants.Bytes("encoding=");
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         private static readonly byte[] XML_DECL_STANDALONE = StringConstants.Bytes(" standalone=");
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         protected static readonly byte[] DOCTYPE = StringConstants.Bytes("<!DOCTYPE ");
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         private static readonly byte[] SYSTEM = StringConstants.Bytes("  SYSTEM ");
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         private static readonly byte[] PUBLIC = StringConstants.Bytes("  PUBLIC ");
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         protected static readonly byte[] RIGHT_ANGLE_NEWLINE = StringConstants.Bytes(">\n");
         protected bool canonical = false;
         protected bool started = false;
@@ -149,22 +126,13 @@ namespace OutSmart.DAXon.Serialization
         {
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         public override void EndDocument()
         {
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         protected virtual void OpenDocument()
         {
 
-            //        if (writer == null) {
-            //            makeWriter();
-            //        }
             if (characterSet == null)
             {
                 characterSet = UTF8CharacterSet.GetInstance();
@@ -199,9 +167,6 @@ namespace OutSmart.DAXon.Serialization
             WriteDeclaration();
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         public virtual void WriteDeclaration()
         {
             if (declarationIsWritten)
@@ -212,20 +177,20 @@ namespace OutSmart.DAXon.Serialization
             declarationIsWritten = true;
             try
             {
-                indenting = "yes".Equals(outputProperties.GetProperty(OutputKeys.INDENT));
+                indenting = "yes".Equals(outputProperties.GetProperty(DAXonOutputKeys.INDENT));
                 string byteOrderMark = outputProperties.GetProperty(DAXonOutputKeys.BYTE_ORDER_MARK);
-                string encoding = outputProperties.GetProperty(OutputKeys.ENCODING);
-                if (encoding == null || encoding.EqualsIgnoreCase("utf8") || canonical)
+                string encoding = outputProperties.GetProperty(DAXonOutputKeys.ENCODING);
+                if (encoding == null || encoding.Equals("utf8", global::System.StringComparison.OrdinalIgnoreCase) || canonical)
                 {
                     encoding = "UTF-8";
                 }
 
-                if ("yes".Equals(byteOrderMark) && !canonical && ("UTF-8".EqualsIgnoreCase(encoding) || "UTF-16LE".EqualsIgnoreCase(encoding) || "UTF-16BE".EqualsIgnoreCase(encoding)))
+                if ("yes".Equals(byteOrderMark) && !canonical && ("UTF-8".Equals(encoding, global::System.StringComparison.OrdinalIgnoreCase) || "UTF-16LE".Equals(encoding, global::System.StringComparison.OrdinalIgnoreCase) || "UTF-16BE".Equals(encoding, global::System.StringComparison.OrdinalIgnoreCase)))
                 {
                     writer.WriteCodePoint(0xFEFF);
                 }
 
-                string omitXMLDeclaration = outputProperties.GetProperty(OutputKeys.OMIT_XML_DECLARATION);
+                string omitXMLDeclaration = outputProperties.GetProperty(DAXonOutputKeys.OMIT_XML_DECLARATION);
                 if (omitXMLDeclaration == null)
                 {
                     omitXMLDeclaration = "no";
@@ -236,7 +201,7 @@ namespace OutSmart.DAXon.Serialization
                     omitXMLDeclaration = "yes";
                 }
 
-                string version = outputProperties.GetProperty(OutputKeys.VERSION);
+                string version = outputProperties.GetProperty(DAXonOutputKeys.VERSION);
                 if (version == null)
                 {
                     version = GetConfiguration().XMLVersion == Configuration.XML10 ? "1.0" : "1.1";
@@ -255,7 +220,7 @@ namespace OutSmart.DAXon.Serialization
                         }
                     }
 
-                    if (!version.Equals("1.0") && omitXMLDeclaration.Equals("yes") && outputProperties.GetProperty(OutputKeys.DOCTYPE_SYSTEM) != null)
+                    if (!version.Equals("1.0") && omitXMLDeclaration.Equals("yes") && outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_SYSTEM) != null)
                     {
                         if (!unfailing)
                         {
@@ -282,7 +247,7 @@ namespace OutSmart.DAXon.Serialization
                     }
                 }
 
-                string standalone = outputProperties.GetProperty(OutputKeys.STANDALONE);
+                string standalone = outputProperties.GetProperty(DAXonOutputKeys.STANDALONE);
                 if ("omit".Equals(standalone))
                 {
                     standalone = null;
@@ -297,7 +262,7 @@ namespace OutSmart.DAXon.Serialization
                     }
                 }
 
-                string systemId = outputProperties.GetProperty(OutputKeys.DOCTYPE_SYSTEM);
+                string systemId = outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_SYSTEM);
                 if (systemId != null && !"".Equals(systemId))
                 {
                     requireWellFormed = true;
@@ -333,9 +298,6 @@ namespace OutSmart.DAXon.Serialization
                 throw new XPathException("Failure writing to " + GetSystemId(), err);
             }
         }
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
         protected virtual void WriteDocType(INodeName name, string displayName, string systemId, string publicId)
         {
             try
@@ -411,13 +373,7 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
 
             // if nothing has been written, we should still create the file and write an XML declaration
@@ -438,15 +394,9 @@ namespace OutSmart.DAXon.Serialization
                 throw new XPathException("Failure writing to " + GetSystemId(), err);
             }
 
-            base.Dispose();
+            base.Close();
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             previousAtomic = false;
@@ -454,7 +404,7 @@ namespace OutSmart.DAXon.Serialization
             {
                 OpenDocument();
             }
-            else if (requireWellFormed && elementStack.IsEmpty() && startedElement && !unfailing)
+            else if (requireWellFormed && elementStack.Count == 0 && startedElement && !unfailing)
             {
                 throw new XPathException("When 'standalone' or 'doctype-system' is specified, " + "the document must be well-formed; but this document contains more than one top-level element").WithErrorCode("SEPM0004");
             }
@@ -476,8 +426,8 @@ namespace OutSmart.DAXon.Serialization
             {
                 if (!started)
                 {
-                    string systemId = outputProperties.GetProperty(OutputKeys.DOCTYPE_SYSTEM);
-                    string publicId = outputProperties.GetProperty(OutputKeys.DOCTYPE_PUBLIC);
+                    string systemId = outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_SYSTEM);
+                    string publicId = outputProperties.GetProperty(DAXonOutputKeys.DOCTYPE_PUBLIC);
 
                     // Treat "" as equivalent to absent. This goes beyond what the spec strictly allows.
                     if ("".Equals(systemId))
@@ -544,23 +494,11 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         protected virtual bool WriteDocTypeWithNullSystemId()
         {
             return internalSubset != null;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         public virtual void Namespace(string nsprefix, NamespaceUri nsuri, bool isFirst)
         {
             try
@@ -610,24 +548,12 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         public virtual void SetIndentForNextAttribute(int indent)
         {
             indentForNextAttribute = indent;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         private void Attribute(INodeName nameCode, string value, int properties, bool isFirst)
         {
@@ -667,12 +593,6 @@ namespace OutSmart.DAXon.Serialization
             WriteAttribute(elementCode, displayName, value, properties);
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         protected virtual void WriteAttributeIndentString()
         {
@@ -687,12 +607,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         public virtual void CloseStartTag()
         {
@@ -710,12 +624,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         protected virtual void WriteEmptyElementTagCloser(string displayName, INodeName nameCode)
         {
@@ -732,12 +640,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         protected virtual void WriteAttribute(INodeName elCode, string attname, string value, int properties)
         {
@@ -784,12 +686,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         protected virtual int TestCharacters(UnicodeString chars)
         {
@@ -802,12 +698,6 @@ namespace OutSmart.DAXon.Serialization
             return 0;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         protected virtual UnicodeString ConvertToAscii(UnicodeString chars)
         {
@@ -829,12 +719,6 @@ namespace OutSmart.DAXon.Serialization
             return buff.ToUnicodeString();
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         /// <summary>
         /// End of an element.
@@ -862,12 +746,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
         /// <summary>
         /// Character data.
@@ -879,7 +757,7 @@ namespace OutSmart.DAXon.Serialization
                 OpenDocument();
             }
 
-            if (requireWellFormed && elementStack.IsEmpty() && !Whitespace.IsAllWhite(chars) && !unfailing)
+            if (requireWellFormed && elementStack.Count == 0 && !Whitespace.IsAllWhite(chars) && !unfailing)
             {
                 throw new XPathException("When 'standalone' or 'doctype-system' is specified, " + "the document must be well-formed; but this document contains a top-level text node").WithErrorCode("SEPM0004");
             }
@@ -963,19 +841,7 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
-        /// <summary>
-        /// Character data.
-        /// </summary>
-        /// <summary>
-        /// Handle a processing instruction.
-        /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
         {
             if (!started)
@@ -1032,19 +898,7 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
-        /// <summary>
-        /// Character data.
-        /// </summary>
-        /// <summary>
-        /// Handle a processing instruction.
-        /// </summary>
         protected virtual void WriteEscape(UnicodeString chars, bool inAttribute)
         {
             long segstart = 0;
@@ -1170,40 +1024,13 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
-        /// <summary>
-        /// Character data.
-        /// </summary>
-        /// <summary>
-        /// Handle a processing instruction.
-        /// </summary>
         protected virtual void WriteCodePoint(int c)
         {
             writer.WriteCodePoint(c);
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
-        /// <summary>
-        /// Character data.
-        /// </summary>
-        /// <summary>
-        /// Handle a processing instruction.
-        /// </summary>
-        /// <summary>
-        /// Handle a comment.
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
             if (!started)
@@ -1241,43 +1068,13 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
-        /// <summary>
-        /// Character data.
-        /// </summary>
-        /// <summary>
-        /// Handle a processing instruction.
-        /// </summary>
-        /// <summary>
-        /// Handle a comment.
-        /// </summary>
         public override bool UsesTypeAnnotations()
         {
             return false;
         }
 
-        /// <summary>
-        /// Notify the end of a document node
-        /// </summary>
-        /// <summary>
-        /// End of the document.
-        /// </summary>
         //return;
-        /// <summary>
-        /// Character data.
-        /// </summary>
-        /// <summary>
-        /// Handle a processing instruction.
-        /// </summary>
-        /// <summary>
-        /// Handle a comment.
-        /// </summary>
         public virtual bool IsStarted()
         {
             return started;

@@ -13,7 +13,6 @@ using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,9 +32,6 @@ namespace OutSmart.DAXon.Xslt
     public class XSLKey : StyleElement, IStylesheetComponent
     {
 
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         private static readonly Func<Expression, bool> containsGlobalVariable = (e) => (e is GlobalVariableReference || e is UserFunctionCall || e is CallTemplate || e is ApplyTemplates);
         private Patterns.Pattern match;
         private Expression use;
@@ -46,9 +42,6 @@ namespace OutSmart.DAXon.Xslt
         private bool composite = false;
         private KeyDefinition keyDefinition;
 
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         public virtual StructuredQName KeyName
         {
             get
@@ -93,17 +86,11 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         public SlotManager GetSlotManager()
         {
             return stackFrameMap;
         }
 
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         public override void PrepareAttributes()
         {
             string nameAtt = null;
@@ -178,9 +165,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             Configuration config = GetConfiguration();
@@ -245,9 +229,6 @@ namespace OutSmart.DAXon.Xslt
                 collationName = GetDefaultCollationName();
             }
         }
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         public override void Index(ComponentDeclaration decl, PrincipalStylesheetModule top)
         {
             StructuredQName keyName = KeyName;
@@ -257,9 +238,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         public override void CompileDeclaration(Compilation compilation, ComponentDeclaration decl)
         {
             IStaticContext env = GetStaticContext();
@@ -273,7 +251,7 @@ namespace OutSmart.DAXon.Xslt
                 }
                 catch (XPathException err)
                 {
-                    CompileError("Failed to load collation " + collationName + ": " + err.GetMessage(), "XTSE1210");
+                    CompileError("Failed to load collation " + collationName + ": " + err.Message, "XTSE1210");
                     collator = CodepointCollator.GetInstance(); // for recovery paths
                 }
 
@@ -376,9 +354,6 @@ namespace OutSmart.DAXon.Xslt
             keyDefinition = keydef;
         }
 
-        /// <summary>
-        /// Get the Procedure object that looks after any local variables declared in the content constructor
-        /// </summary>
         public void Optimize(ComponentDeclaration declaration)
         {
             ExpressionVisitor visitor = MakeExpressionVisitor();

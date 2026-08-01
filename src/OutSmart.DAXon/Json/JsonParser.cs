@@ -69,7 +69,7 @@ namespace OutSmart.DAXon.Json
             {
 
                 // e.g. unmatched surrogate pairs
-                InvalidJSON(e.GetMessage(), ERR_GRAMMAR, t.lineNumber);
+                InvalidJSON(e.Message, ERR_GRAMMAR, t.lineNumber);
             }
 
             if (t.Next() != JsonToken.EOF)
@@ -81,23 +81,23 @@ namespace OutSmart.DAXon.Json
         public static int GetFlags(Dictionary<string, IGroundedValue> options, bool allowValidate, bool isSchemaAware)
         {
             int flags = 0;
-            BooleanValue debug = options.ContainsKey("debug") ? (BooleanValue)options.Get("debug") : null;
+            BooleanValue debug = options.ContainsKey("debug") ? (BooleanValue)options.GetOrDefault("debug") : null;
             if (debug != null && debug.GetBooleanValue())
             {
                 flags |= DEBUG;
             }
 
-            BooleanValue escape = options.ContainsKey("escape") ? (BooleanValue)options.Get("escape") : null;
+            BooleanValue escape = options.ContainsKey("escape") ? (BooleanValue)options.GetOrDefault("escape") : null;
             if (escape != null && escape.GetBooleanValue())
             {
                 flags |= ESCAPE;
-                if (options.ContainsKey("fallback") && options.Get("fallback") != null)
+                if (options.ContainsKey("fallback") && options.GetOrDefault("fallback") != null)
                 {
                     throw new XPathException("Cannot specify a fallback function when escape=true", "FOJS0005");
                 }
             }
 
-            BooleanValue liberal = options.ContainsKey("liberal") ? (BooleanValue)options.Get("liberal") : null;
+            BooleanValue liberal = options.ContainsKey("liberal") ? (BooleanValue)options.GetOrDefault("liberal") : null;
             if (liberal != null && liberal.GetBooleanValue())
             {
                 flags |= LIBERAL;
@@ -107,7 +107,7 @@ namespace OutSmart.DAXon.Json
             bool validate = false;
             if (allowValidate)
             {
-                validate = options.ContainsKey("validate") && ((BooleanValue)options.Get("validate")).GetBooleanValue();
+                validate = options.ContainsKey("validate") && ((BooleanValue)options.GetOrDefault("validate")).GetBooleanValue();
                 if (validate)
                 {
                     if (!isSchemaAware)
@@ -121,7 +121,7 @@ namespace OutSmart.DAXon.Json
 
             if (options.ContainsKey("duplicates"))
             {
-                string duplicates = ((StringValue)options.Get("duplicates")).GetStringValue();
+                string duplicates = ((StringValue)options.GetOrDefault("duplicates")).GetStringValue();
                 switch (duplicates)
                 {
                     case "reject":
@@ -238,9 +238,12 @@ namespace OutSmart.DAXon.Json
                         ParseConstruct(h2, tokenizer, flags, context);
                     }
                 }
-                catch (RecursionDepthError)
+                catch (RecursionDepthError e) when (!e.Described)
                 {
-                    InvalidJSON("Objects are too deeply nested", ERR_LIMITS, tokenizer.lineNumber);
+                    // Described, not thrown as FOJS0001 here: parse-json can be called from inside a
+                    // recursive template, and an XPathException would unwind through the engine
+                    // stack above it. The code still reaches the host (round BC).
+                    throw e.Describe("Objects are too deeply nested", ERR_LIMITS, null);
                 }
 
                 tok = tokenizer.Next();
@@ -291,9 +294,10 @@ namespace OutSmart.DAXon.Json
                 {
                     ParseConstruct(handler, tokenizer, flags, context);
                 }
-                catch (RecursionDepthError)
+                catch (RecursionDepthError e) when (!e.Described)
                 {
-                    InvalidJSON("Arrays are too deeply nested", ERR_LIMITS, tokenizer.lineNumber);
+                    // Described, not thrown as FOJS0001 here — see ParseObject.
+                    throw e.Describe("Arrays are too deeply nested", ERR_LIMITS, null);
                 }
 
                 tok = tokenizer.Next();
@@ -376,7 +380,7 @@ namespace OutSmart.DAXon.Json
             }
             catch (FormatException e)
             {
-                InvalidJSON("Invalid numeric literal: " + e.GetMessage(), ERR_GRAMMAR, lineNumber);
+                InvalidJSON("Invalid numeric literal: " + e.Message, ERR_GRAMMAR, lineNumber);
                 return DoubleValue.NaN;
             }
         }
@@ -516,7 +520,7 @@ namespace OutSmart.DAXon.Json
 
         public virtual void SetNumberParser(Dictionary<string, IGroundedValue> options, IXPathContext context)
         {
-            ISequence val = options.ContainsKey("number-parser") ? options.Get("number-parser") : null;
+            ISequence val = options.ContainsKey("number-parser") ? options.GetOrDefault("number-parser") : null;
             if (val != null)
             {
                 IItem fn = val.Head();
@@ -670,7 +674,7 @@ namespace OutSmart.DAXon.Json
                         }
 
                         currentTokenString = null;
-                        currentTokenValue.SetLength(0);
+                        currentTokenValue.Length = 0;
                         currentTokenValue.Append(input, litStart, position - litStart);
                         bool afterBackslash = false;
                         while (true)

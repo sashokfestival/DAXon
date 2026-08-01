@@ -40,7 +40,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// End of event stream
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
         }
 

@@ -64,7 +64,7 @@ namespace OutSmart.DAXon.Functions
             {
                 this.@base = @base;
                 this.insert = insert;
-                this.insertPosition = System.Math.Max(insertPosition, 1);
+                this.insertPosition = Math.Max(insertPosition, 1);
                 this.inserting = insertPosition == 1;
             }
 

@@ -11,8 +11,6 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Expressions
 {
-    // Runtime 2026-06-09: LookupAllExpression null-stub REMOVED (implicit operator => null made XPathParser.LookupStar
-    // return null -> `?*` crashed the parser, NRE at Parse:485). Real OutSmart.DAXon.Expressions.LookupAllExpression re-included.
 
     // Treat Expression: implements "treat as data-type ( expression )". Factory only.
     // Ported from upstream net/sf/saxon/expr/TreatExpression.java: a CardinalityChecker

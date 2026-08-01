@@ -91,11 +91,11 @@ namespace OutSmart.DAXon.Transformation.Rules
                 throw new ArgumentException("#all is not a real mode");
             }
 
-            Mode m = modes.Get(modeName);
+            Mode m = modes.GetOrDefault(modeName);
             if (m == null && createIfAbsent)
             {
                 m = config.MakeMode(modeName, compilerInfo);
-                modes.Put(modeName, m);
+                modes[modeName] = m;
                 Component c = m.MakeDeclaringComponent(Visibility.PRIVATE, stylesheetPackage);
                 c.SetVisibility(Visibility.PRIVATE, VisibilityProvenance.DEFAULTED);
                 stylesheetPackage.AddComponent(c);
@@ -106,7 +106,7 @@ namespace OutSmart.DAXon.Transformation.Rules
 
         public void RegisterMode(Mode mode)
         {
-            modes.Put(mode.ModeName, mode);
+            modes[mode.ModeName] = mode;
         }
 
         public int AllocateSequenceNumber()

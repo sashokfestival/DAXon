@@ -58,18 +58,6 @@ namespace OutSmart.DAXon.Values
 
         public int LengthInMonths => _months * (_negative ? -1 : +1);
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Negate a duration (same as subtracting from zero, but it preserves the type of the original duration)
-        /// </summary>
         public IXPathComparable XPathComparable => this;
         public YearMonthDurationValue(int months, IAtomicType typeLabel) : base(0, months, 0, 0, 0, 0, 0, typeLabel)
         {
@@ -101,7 +89,7 @@ namespace OutSmart.DAXon.Values
         {
 
             // Fast path for simple cases
-            if (System.Math.Abs(factor) < 30000 && System.Math.Abs(_months) < 30000)
+            if (Math.Abs(factor) < 30000 && Math.Abs(_months) < 30000)
             {
                 return YearMonthDurationValue.FromMonths((int)factor * LengthInMonths);
             }
@@ -134,9 +122,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
         /// Multiply duration by a decimal.
         /// </summary>
         public override DurationValue Multiply(BigDecimal n)
@@ -153,15 +138,6 @@ namespace OutSmart.DAXon.Values
             return FromMonths((int)new BigDecimalValue(product).Round(0).LongValue());
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
         public override DurationValue Divide(double n)
         {
             if (double.IsNaN(n))
@@ -181,15 +157,6 @@ namespace OutSmart.DAXon.Values
             return FromMonths((int)new DoubleValue(product).Round(0).LongValue());
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
         public override BigDecimalValue Divide(DurationValue other)
         {
             if (other is YearMonthDurationValue)
@@ -209,29 +176,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
         private BigDecimal DivideBigDecimal(BigDecimal v1, BigDecimal v2)
         {
             return v1.Divide(v2, 20, RoundingMode.HALF_EVEN);
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
         /// <summary>
         /// Add two year-month-durations
         /// </summary>
@@ -248,15 +197,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
-        /// <summary>
         /// Subtract two year-month-durations
         /// </summary>
         public override DurationValue Subtract(DurationValue other)
@@ -271,35 +211,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Negate a duration (same as subtracting from zero, but it preserves the type of the original duration)
-        /// </summary>
         public override DurationValue Negate()
         {
             return FromMonths(-LengthInMonths);
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Negate a duration (same as subtracting from zero, but it preserves the type of the original duration)
-        /// </summary>
         public int CompareTo(IXPathComparable other)
         {
             if (other is YearMonthDurationValue)
@@ -312,35 +228,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Negate a duration (same as subtracting from zero, but it preserves the type of the original duration)
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             return this;
         }
 
-        /// <summary>
-        /// Multiply duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Multiply duration by a decimal.
-        /// </summary>
-        /// <summary>
-        /// Divide duration by a number.
-        /// </summary>
-        /// <summary>
-        /// Negate a duration (same as subtracting from zero, but it preserves the type of the original duration)
-        /// </summary>
         public override IAtomicMatchKey GetXPathMatchKey(IStringCollator collator, int implicitTimezone)
         {
             return this;

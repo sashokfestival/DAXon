@@ -21,9 +21,6 @@ namespace OutSmart.DAXon.Events
     {
         private IList<IItem> list;
 
-        /// <summary>
-        /// Method to be supplied by subclasses: output one item in the sequence.
-        /// </summary>
         public IGroundedValue Sequence
         {
             get
@@ -43,19 +40,13 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Method to be supplied by subclasses: output one item in the sequence.
-        /// </summary>
         public IList<IItem> List => list;
 
-        /// <summary>
-        /// Method to be supplied by subclasses: output one item in the sequence.
-        /// </summary>
         public IItem FirstItem
         {
             get
             {
-                if (list.IsEmpty())
+                if (list.Count == 0)
                 {
                     return null;
                 }
@@ -79,23 +70,17 @@ namespace OutSmart.DAXon.Events
         /// </summary>
         public void Reset()
         {
-            list = new List<IItem>(System.Math.Min(list.Count + 10, 50));
+            list = new List<IItem>(Math.Min(list.Count + 10, 50));
         }
 
-        /// <summary>
-        /// Method to be supplied by subclasses: output one item in the sequence.
-        /// </summary>
         public override void Write(IItem item)
         {
             list.Add(item);
         }
 
-        /// <summary>
-        /// Method to be supplied by subclasses: output one item in the sequence.
-        /// </summary>
         public ISequenceIterator Iterate()
         {
-            if (list.IsEmpty())
+            if (list.Count == 0)
             {
                 return EmptyIterator.GetInstance();
             }

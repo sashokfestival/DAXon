@@ -55,8 +55,6 @@ namespace OutSmart.DAXon.Expressions
             //            // slot numbers have not yet been allocated. This is messy. For the time being, the safest
             //            // thing is to reuse the existing variable reference, which usually works, rather than copying
             //            // it, which will almost certainly fail. See XSLT streaming test case si-attribute-053
-            //            return this;
-            //        }
             LocalVariableReference @ref = new LocalVariableReference(VariableName);
             @ref.CopyFrom(this);
             @ref.slotNumber = slotNumber;

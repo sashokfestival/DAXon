@@ -20,6 +20,7 @@ namespace OutSmart.DAXon.Trees.Tiny
     /// </summary>
     public class Statistics
     {
+        private readonly object syncLock = new object();
         // We maintain statistics, recording how large the trees created under this Java VM
         // turned out to be. These figures are then used when allocating space for new trees, on the assumption
         // that there is likely to be some uniformity. The statistics are initialized to an arbitrary value
@@ -67,7 +68,7 @@ namespace OutSmart.DAXon.Trees.Tiny
 
         public virtual void UpdateStatistics(int numberOfNodes, int numberOfAttributes, int numberOfNamespaces, LargeTextBuffer textBuffer)
         {
-            lock (this)
+            lock (syncLock)
             {
 
                 int n0 = treesCreated;
@@ -79,7 +80,7 @@ namespace OutSmart.DAXon.Trees.Tiny
                     last10Nodes[n] = numberOfNodes;
                     last10Attributes[n] = numberOfAttributes;
                     last10Namespaces[n] = numberOfNamespaces;
-                    last10Characters[n] = System.Math.Max(textBuffer.Length(), 65536);
+                    last10Characters[n] = Math.Max(textBuffer.Length(), 65536);
                 }
             }
         }

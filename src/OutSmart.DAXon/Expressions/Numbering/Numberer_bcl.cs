@@ -1,0 +1,55 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Copyright (c) 2018-2023 Saxonica Limited
+// This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+// If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using System.Globalization;
+
+namespace OutSmart.DAXon.Expressions.Numbering
+{
+    /// <summary>
+    /// INumberer that takes month / day-of-week names from an OS-known CultureInfo, for languages
+    /// beyond Saxon-HE's built-in English. Number words, ordinal suffixes, half-day and era names
+    /// stay English (inherited) — full localization of those ships only in Saxon-PE/EE.
+    /// </summary>
+    public class Numberer_bcl : Numberer_en
+    {
+        private readonly DateTimeFormatInfo names;
+
+        public Numberer_bcl(CultureInfo culture, string language)
+        {
+            names = culture.DateTimeFormat;
+            SetLanguage(language);
+        }
+
+        public override string MonthName(int month, int minWidth, int maxWidth)
+        {
+            // Same width contract as Numberer_en: no month abbreviation table — truncate, then pad.
+            // GetMonthName, not the MonthNames property: the property CLONES the array per access.
+            return Widen(names.GetMonthName(month), null, minWidth, maxWidth < 3 ? 3 : maxWidth);
+        }
+
+        public override string DayName(int day, int minWidth, int maxWidth)
+        {
+            // day is ISO 1=Monday..7=Sunday; the BCL DayOfWeek is 0=Sunday..6=Saturday.
+            var dow = (System.DayOfWeek)(day % 7);
+            return Widen(names.GetDayName(dow), names.GetAbbreviatedDayName(dow), minWidth, maxWidth < 2 ? 2 : maxWidth);
+        }
+
+        private static string Widen(string name, string abbreviation, int minWidth, int maxWidth)
+        {
+            if (name.Length > maxWidth && abbreviation != null)
+            {
+                name = abbreviation;
+            }
+
+            if (name.Length > maxWidth)
+            {
+                name = name.Substring(0, maxWidth);
+            }
+
+            return name.Length < minWidth ? name.PadRight(minWidth) : name;
+        }
+    }
+}

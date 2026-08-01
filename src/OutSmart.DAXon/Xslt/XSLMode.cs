@@ -68,7 +68,7 @@ namespace OutSmart.DAXon.Xslt
             // see if there is already a named mode with this precedence
             if (!name.Equals(Mode.UNNAMED_MODE_NAME))
             {
-                Component other = componentIndex.Get(sName);
+                Component other = componentIndex.GetOrDefault(sName);
                 if (other != null && other.DeclaringPackage != top.GetStylesheetPackage())
                 {
                     CompileError("Mode " + name.DisplayName + " conflicts with a public named mode in package " + other.DeclaringPackage.PackageName, "XTSE3050");
@@ -303,7 +303,7 @@ namespace OutSmart.DAXon.Xslt
                     }
 
                     mode.ActivePart.SetExplicitProperty(f, normalizedAtt, decl.Precedence);
-                    if (mode.IsMustBeTyped() && ContainingPackage.TargetEdition.Matches("JS\\d?"))
+                    if (mode.IsMustBeTyped() && ContainingPackage.TargetEdition.MatchesRegex("JS\\d?"))
                     {
                         IssueWarning("In SaxonJS, all data is untyped", "XTTE3110");
                     }
@@ -328,7 +328,7 @@ namespace OutSmart.DAXon.Xslt
                         }
                         else
                         {
-                            allNames.Append(" ");
+                            allNames.Append(' ');
                         }
 
                         allNames.Append(name);

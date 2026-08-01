@@ -14,7 +14,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -42,34 +41,10 @@ namespace OutSmart.DAXon.Expressions
         /// </summary>
         protected virtual int RangeVariableCardinality => StaticProperty.EXACTLY_ONE;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override IntegerValue[] IntegerBounds => GetAction().IntegerBounds;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD | PROCESS_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override string StreamerName => "ForExpression";
         /// <summary>
         /// Create a "for" expression (for $x at $p in SEQUENCE return ACTION)
@@ -124,12 +99,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Configuration config = visitor.GetConfiguration();
@@ -240,12 +209,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override Expression Unordered(bool retainAllNodes, bool forStreaming)
         {
             Sequence = Sequence.Unordered(retainAllNodes, forStreaming);
@@ -253,12 +216,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         private Expression PromoteWhereClause()
         {
             if (Choose.IsSingleBranchChoice(GetAction()))
@@ -285,13 +242,13 @@ namespace OutSmart.DAXon.Expressions
                             promotedCondition = new AndExpression(term, promotedCondition);
                         }
 
-                        list.Remove(i);
+                        list.RemoveAt(i);
                     }
                 }
 
                 if (promotedCondition != null)
                 {
-                    if (list.IsEmpty())
+                    if (list.Count == 0)
                     {
 
                         // the whole if() condition has been promoted
@@ -320,12 +277,6 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ForExpression forExp = new ForExpression();
@@ -341,12 +292,6 @@ namespace OutSmart.DAXon.Expressions
             return forExp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override int MarkTailFunctionCalls(StructuredQName qName, int arity)
         {
             if (!Cardinality.AllowsMany(Sequence.GetCardinality()))
@@ -359,37 +304,16 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override bool IsVacuousExpression()
         {
             return GetAction().IsVacuousExpression();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             GetAction().CheckPermittedContents(parentType, false);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
 
@@ -411,60 +335,21 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             DispatchTailCall(MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override ItemType GetItemType()
         {
             return GetAction().GetItemType();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return GetAction().GetStaticUType(contextItemType);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             int c1 = Sequence.GetCardinality();
@@ -472,69 +357,21 @@ namespace OutSmart.DAXon.Expressions
             return Cardinality.Multiply(c1, c2);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override string ToString()
         {
             return "for $" + VariableEQName + AllowingEmptyString() + " in " + (Sequence == null ? "(...)" : Sequence.ToString()) + " return " + (GetAction() == null ? "(...)" : ExpressionTool.Parenthesize(GetAction()));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override string ToShortString()
         {
             return "for $" + GetVariableQName().DisplayName + AllowingEmptyString() + " in " + (Sequence == null ? "(...)" : Sequence.ToShortString()) + " return " + (GetAction() == null ? "(...)" : GetAction().ToShortString());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected virtual string AllowingEmptyString()
         {
             return "";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("for", this);
@@ -554,51 +391,15 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected virtual void ExplainSpecializedAttributes(ExpressionPresenter @out)
         {
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ForExprElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public class MappingAction : IMappingFunction, IItemMappingFunction
         {
             protected IXPathContext context;
@@ -624,18 +425,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public class ForExprElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
@@ -684,7 +473,7 @@ namespace OutSmart.DAXon.Expressions
                     ISequenceIterator @base = selectEval.Iterate(context);
                     for (IItem item; (item = @base.Next()) != null;)
                     {
-                        controller.CheckTimeout();
+                        controller.CheckTimeoutPerStep();
                         context.SetLocalVariable(slot, item);
                         ITailCall tc = actionEval.ProcessLeavingTail(@out, context);
                         DispatchTailCall(tc);

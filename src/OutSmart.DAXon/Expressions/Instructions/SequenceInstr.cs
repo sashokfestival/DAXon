@@ -46,8 +46,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         //    @Override
         //    public Expression simplify() throws XPathException {
-        //        return getBaseExpression();
-        //    }
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);

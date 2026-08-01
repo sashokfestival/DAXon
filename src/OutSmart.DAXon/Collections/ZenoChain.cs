@@ -19,36 +19,24 @@ namespace OutSmart.DAXon.Collections.Zeno
     {
         private readonly List<List<T>> masterList;
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
-        // Phase 7.8: C# indexer alias for Java's get(int).
+        // C# indexer alias for Java's get(int).
         public T this[int n] => Get(n);
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public ZenoChain()
         {
             masterList = new List<List<T>>(8);
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         private ZenoChain(List<List<T>> masterList)
         {
             this.masterList = masterList;
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> Add(T item)
         {
             List<List<T>> masterList2 = new List<List<T>>(masterList);
 
             // If the list is empty, create a new singleton list
-            if (masterList2.IsEmpty())
+            if (masterList2.Count == 0)
             {
                 List<T> newSegment = new List<T>(32);
                 newSegment.Add(item);
@@ -68,7 +56,7 @@ namespace OutSmart.DAXon.Collections.Zeno
                 // add the item to the new copy, and change the master list to
                 // refer to the new segment.
                 List<T> segment2 = new List<T>(32);
-                segment2.AddAll(segment);
+                segment2.AddRange(segment);
                 segment2.Add(item);
                 masterList2[index] = segment2;
                 return new ZenoChain<T>(masterList2);
@@ -99,14 +87,14 @@ namespace OutSmart.DAXon.Collections.Zeno
 
                         // combine two adjacent segments into one
                         List<T> combinedSegment = new List<T>(priorSegment.Count + segment.Count);
-                        combinedSegment.AddAll(priorSegment);
-                        combinedSegment.AddAll(segment);
+                        combinedSegment.AddRange(priorSegment);
+                        combinedSegment.AddRange(segment);
 
                         // add the combined segment to the master list, in place of the first of the pair
                         masterList2[index] = combinedSegment;
 
                         // remove the second of the pair segment
-                        masterList2.Remove(index + 1);
+                        masterList2.RemoveAt(index + 1);
 
                         // create a new final segment containing the new item alone
                         List<T> newFinalSegment = new List<T>();
@@ -126,15 +114,12 @@ namespace OutSmart.DAXon.Collections.Zeno
             }
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> Prepend(T item)
         {
             List<List<T>> masterList2 = new List<List<T>>(masterList);
 
             // If the list is empty, create a new singleton list
-            if (masterList2.IsEmpty())
+            if (masterList2.Count == 0)
             {
                 return Add(item);
             }
@@ -149,7 +134,7 @@ namespace OutSmart.DAXon.Collections.Zeno
             {
                 List<T> segment2 = new List<T>(32);
                 segment2.Add(item);
-                segment2.AddAll(segment);
+                segment2.AddRange(segment);
                 masterList2[index] = segment2;
                 return new ZenoChain<T>(masterList2);
             }
@@ -170,7 +155,7 @@ namespace OutSmart.DAXon.Collections.Zeno
                         // Simply add a new singleton segment at the start.
                         List<T> newInitialSegment = new List<T>();
                         newInitialSegment.Add(item);
-                        masterList2.Add(0, newInitialSegment);
+                        masterList2.Insert(0,newInitialSegment);
                         return new ZenoChain<T>(masterList2);
                     }
 
@@ -180,15 +165,15 @@ namespace OutSmart.DAXon.Collections.Zeno
                     if (nextSegment.Count + segment.Count <= threshold)
                     {
                         List<T> combinedSegment = new List<T>();
-                        combinedSegment.AddAll(segment);
-                        combinedSegment.AddAll(nextSegment);
+                        combinedSegment.AddRange(segment);
+                        combinedSegment.AddRange(nextSegment);
                         masterList2[index] = combinedSegment;
-                        masterList2.Remove(index - 1);
+                        masterList2.RemoveAt(index - 1);
 
                         // Now add a new singleton segment at the start
                         List<T> newInitialSegment = new List<T>();
                         newInitialSegment.Add(item);
-                        masterList2.Add(0, newInitialSegment);
+                        masterList2.Insert(0,newInitialSegment);
                         return new ZenoChain<T>(masterList2);
                     }
 
@@ -199,9 +184,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             }
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> AddAll(IEnumerable<T> items)
         {
             ZenoChain<T> result = this;
@@ -213,20 +195,14 @@ namespace OutSmart.DAXon.Collections.Zeno
             return result;
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> Concat(ZenoChain<T> other)
         {
             List<List<T>> newMaster = new List<List<T>>(masterList.Count + other.masterList.Count);
-            newMaster.AddAll(masterList);
-            newMaster.AddAll(other.masterList);
+            newMaster.AddRange(masterList);
+            newMaster.AddRange(other.masterList);
             return new ZenoChain<T>(newMaster).Reorganize();
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> Replace(int n, T value)
         {
             if (n < 0)
@@ -242,9 +218,9 @@ namespace OutSmart.DAXon.Collections.Zeno
                 if (offset + segment.Count > n && !done)
                 {
                     List<T> replacementSegment = new List<T>(segment.Count);
-                    replacementSegment.AddAll(segment.SubList(0, n - offset));
+                    replacementSegment.AddRange(segment.GetRange(0, (n - offset) - (0)));
                     replacementSegment.Add(value);
-                    replacementSegment.AddAll(segment.SubList(n - offset + 1, segment.Count));
+                    replacementSegment.AddRange(segment.GetRange(n - offset + 1, (segment.Count) - (n - offset + 1)));
                     masterList2.Add(replacementSegment);
                     done = true;
                 }
@@ -264,9 +240,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             return new ZenoChain<T>(masterList2);
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> Remove(int n)
         {
             if (n < 0)
@@ -284,8 +257,8 @@ namespace OutSmart.DAXon.Collections.Zeno
                     if (segment.Count > 1)
                     {
                         List<T> replacementSegment = new List<T>(segment.Count - 1);
-                        replacementSegment.AddAll(segment.SubList(0, n - offset));
-                        replacementSegment.AddAll(segment.SubList(n - offset + 1, segment.Count));
+                        replacementSegment.AddRange(segment.GetRange(0, (n - offset) - (0)));
+                        replacementSegment.AddRange(segment.GetRange(n - offset + 1, (segment.Count) - (n - offset + 1)));
                         masterList2.Add(replacementSegment);
                     }
 
@@ -307,9 +280,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             return new ZenoChain<T>(masterList2);
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> Insert(int n, T value)
         {
             if (n < 0)
@@ -341,9 +311,9 @@ namespace OutSmart.DAXon.Collections.Zeno
                 if (offset + segment.Count > n && !done)
                 {
                     List<T> replacementSegment = new List<T>(segment.Count + 1);
-                    replacementSegment.AddAll(segment.SubList(0, n - offset));
+                    replacementSegment.AddRange(segment.GetRange(0, (n - offset) - (0)));
                     replacementSegment.Add(value);
-                    replacementSegment.AddAll(segment.SubList(n - offset, segment.Count));
+                    replacementSegment.AddRange(segment.GetRange(n - offset, (segment.Count) - (n - offset)));
                     masterList2.Add(replacementSegment);
                     done = true;
                 }
@@ -365,9 +335,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             return new ZenoChain<T>(masterList2);
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         private ZenoChain<T> Reorganize()
         {
 
@@ -382,10 +349,10 @@ namespace OutSmart.DAXon.Collections.Zeno
                 if (segSize <= priorSize && segSize <= nextSize)
                 {
                     List<T> combinedSegment = new List<T>(priorSize + segSize);
-                    combinedSegment.AddAll(masterList[i - 1]);
-                    combinedSegment.AddAll(masterList[i]);
+                    combinedSegment.AddRange(masterList[i - 1]);
+                    combinedSegment.AddRange(masterList[i]);
                     masterList[i - 1] = combinedSegment;
-                    masterList.Remove(i);
+                    masterList.RemoveAt(i);
                 }
             }
 
@@ -413,9 +380,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             throw new IndexOutOfRangeException("Index " + n + " is too large");
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         public virtual ZenoChain<T> SubList(int start, int end)
         {
 
@@ -454,7 +418,7 @@ namespace OutSmart.DAXon.Collections.Zeno
                     {
 
                         // ISegment spans the end position
-                        newMaster.Add(new List<T>(segment.SubList(0, remainingLength)));
+                        newMaster.Add(new List<T>(segment.GetRange(0, (remainingLength) - (0))));
                         return new ZenoChain<T>(newMaster);
                     }
                 }
@@ -472,12 +436,12 @@ namespace OutSmart.DAXon.Collections.Zeno
 
                             // special case for tail() - break a long first segment to reduce the cost next time.
                             // This assumes it's likely tail() will be called again on the sublist
-                            newMaster.Add(new List<T>(segment.SubList(localStart, localStart + 64)));
-                            newMaster.Add(new List<T>(segment.SubList(localStart + 64, segment.Count)));
+                            newMaster.Add(new List<T>(segment.GetRange(localStart, (localStart + 64) - (localStart))));
+                            newMaster.Add(new List<T>(segment.GetRange(localStart + 64, (segment.Count) - (localStart + 64))));
                         }
                         else
                         {
-                            newMaster.Add(new List<T>(segment.SubList(localStart, segment.Count)));
+                            newMaster.Add(new List<T>(segment.GetRange(localStart, (segment.Count) - (localStart))));
                         }
 
                         remainingLength -= (segment.Count - localStart);
@@ -487,7 +451,7 @@ namespace OutSmart.DAXon.Collections.Zeno
                     {
 
                         // segment spans both the start and end positions
-                        newMaster.Add(new List<T>(segment.SubList(localStart, localStart + remainingLength)));
+                        newMaster.Add(new List<T>(segment.GetRange(localStart, (localStart + remainingLength) - (localStart))));
                         return new ZenoChain<T>(newMaster);
                     }
                 }
@@ -507,9 +471,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             return new ZenoChain<T>(newMaster);
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         // copy.
         public virtual int Size()
         {
@@ -522,57 +483,42 @@ namespace OutSmart.DAXon.Collections.Zeno
             return total;
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         // copy.
         public virtual bool IsEmpty()
         {
-            return masterList.IsEmpty() || (masterList.Count == 1 && masterList[0].IsEmpty());
+            return masterList.Count == 0 || (masterList.Count == 1 && masterList[0].Count == 0);
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         // copy.
         public virtual bool IsSingleton()
         {
             return masterList.Count == 1 && masterList[0].Count == 1;
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         // copy.
         public virtual IEnumerator<T> IIterator()
         {
             return new ZenoChainIterator<T>(masterList);
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         // copy.
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             foreach (IList<T> segment in masterList)
             {
-                sb.Append("(");
+                sb.Append('(');
                 foreach (T item in segment)
                 {
-                    sb.Append(item).Append(",");
+                    sb.Append(item).Append(',');
                 }
 
-                sb.SetCharAt(sb.Length - 1, ')');
+                sb[sb.Length - 1] = ')';
             }
 
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Create an empty sequence
-        /// </summary>
         // copy.
         public virtual string ShowMetrics()
         {
@@ -580,10 +526,10 @@ namespace OutSmart.DAXon.Collections.Zeno
             sb.Append('(');
             foreach (IList<T> segment in masterList)
             {
-                sb.Append(segment.Count).Append(",");
+                sb.Append(segment.Count).Append(',');
             }
 
-            sb.SetCharAt(sb.Length - 1, ')');
+            sb[sb.Length - 1] = ')';
             return sb.ToString();
         }
         public IEnumerator<T> GetEnumerator() => new ZenoChainIterator<T>(masterList);

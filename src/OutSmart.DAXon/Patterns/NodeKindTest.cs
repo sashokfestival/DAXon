@@ -33,28 +33,10 @@ namespace OutSmart.DAXon.Patterns
         private readonly int kind;
         private readonly UType uType;
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override double DefaultPriority => -0.5;
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override int PrimitiveType => kind;
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override ISchemaType ContentType
         {
             get
@@ -96,9 +78,6 @@ namespace OutSmart.DAXon.Patterns
             return UType.FromTypeCode(kind); // runtime: live recompute (override of NodeTest virtual); static-init-safe
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
         public static NodeTest MakeNodeKindTest(int kind)
         {
             switch (kind)
@@ -124,25 +103,16 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
         public override bool Matches(IItem item, TypeHierarchy th)
         {
             return item is NodeInfo && kind == ((NodeInfo)item).GetNodeKind();
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
         public override bool Matches(int nodeKind, INodeName name, ISchemaType annotation)
         {
             return kind == nodeKind;
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
         public override IIntPredicateProxy GetMatcher(INodeVectorTree tree)
         {
             byte[] nodeKindArray = tree.NodeKindArray;
@@ -160,20 +130,11 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
         public override bool Test(NodeInfo node)
         {
             return node.GetNodeKind() == kind;
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override IAtomicType GetAtomizedItemType()
         {
             switch (kind)
@@ -197,23 +158,11 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override string ToString()
         {
             return Describe(kind);
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public static string Describe(int kind)
         {
             switch (kind)
@@ -237,12 +186,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public static string NodeKindName(int kind)
         {
             switch (kind)
@@ -267,12 +210,6 @@ namespace OutSmart.DAXon.Patterns
         }
 
         /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
         /// Returns a hash code value for the object.
         /// </summary>
         public override int GetHashCode()
@@ -280,29 +217,11 @@ namespace OutSmart.DAXon.Patterns
             return kind;
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is NodeKindTest && ((NodeKindTest)other).kind == kind;
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             string explanation = base.ExplainMismatch(item, th);
@@ -329,15 +248,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Make a test for a given kind of node
-        /// </summary>
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override string ToShortString()
         {
             switch (GetNodeKind())

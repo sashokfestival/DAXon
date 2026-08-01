@@ -40,14 +40,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override int Dependencies => Child.Dependencies;
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override int NetCost => 0;
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override int InstructionNameCode
         {
             get
@@ -66,7 +60,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         {
             this.component = component;
             baseOp = new Operand(this, component.GetBody(), OperandRole.SAME_FOCUS_ACTION);
-            component.GatherProperties((k, v) => properties.Put(k, v));
+            component.GatherProperties((k, v) => properties.PutAndGetPrevious(k, v));
         }
 
         private ComponentTracer()
@@ -80,7 +74,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public virtual void SetProperty(string name, object value)
         {
-            properties.Put(name, value);
+            properties[name] = value;
         }
 
         public override IEnumerable<Operand> Operands()
@@ -125,33 +119,21 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return Child.GetCardinality();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return !Child.HasSpecialProperty(StaticProperty.NO_NODES_NEWLY_CREATED);
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("componentTracer");
@@ -159,25 +141,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override string ToShortString()
         {
             return Child.ToShortString();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ComponentTracerElaborator();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         private class ComponentTracerElaborator : PullElaborator
         {
             public override IUpdateEvaluator ElaborateForUpdate()

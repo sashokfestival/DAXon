@@ -41,14 +41,8 @@ namespace OutSmart.DAXon.Expressions.Flwor
 
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ExpressionName => "tuple";
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override int IntrinsicDependencies => 0;
         public TupleExpression()
         {
@@ -134,9 +128,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             int h = 77;
@@ -148,9 +139,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return h;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             int n = Operanda.NumberOfOperands;
@@ -166,9 +154,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return t2;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("tuple", this);
@@ -180,9 +165,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             int n = Size;
@@ -201,9 +183,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return new Tuple(tuple);
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public virtual void SetCurrentTuple(IXPathContext context, Tuple tuple)
         {
             ISequence[] members = tuple.GetMembers();
@@ -214,9 +193,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;

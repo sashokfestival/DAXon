@@ -26,32 +26,32 @@ namespace OutSmart.DAXon.Transformation
         private readonly Dictionary<NodeInfo, XsltExecutable> cacheByNode = new Dictionary<NodeInfo, XsltExecutable>();
         public virtual XsltExecutable GetStylesheetByText(string style)
         {
-            return cacheByText.Get(style);
+            return cacheByText.GetOrDefault(style);
         }
 
         public virtual XsltExecutable GetStylesheetByLocation(string style)
         {
-            return cacheByLocation.Get(style);
+            return cacheByLocation.GetOrDefault(style);
         }
 
         public virtual XsltExecutable GetStylesheetByNode(NodeInfo style)
         {
-            return cacheByNode.Get(style);
+            return cacheByNode.GetOrDefault(style);
         }
 
         public virtual void SetStylesheetByText(string style, XsltExecutable xsltExecutable)
         {
-            cacheByText.Put(style, xsltExecutable);
+            cacheByText[style] = xsltExecutable;
         }
 
         public virtual void SetStylesheetByLocation(string style, XsltExecutable xsltExecutable)
         {
-            cacheByLocation.Put(style, xsltExecutable);
+            cacheByLocation[style] = xsltExecutable;
         }
 
         public virtual void SetStylesheetByNode(NodeInfo style, XsltExecutable xsltExecutable)
         {
-            cacheByNode.Put(style, xsltExecutable);
+            cacheByNode[style] = xsltExecutable;
         }
     }
 }

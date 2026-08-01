@@ -21,44 +21,26 @@ namespace OutSmart.DAXon.Expressions
     public class DefaultedArgumentExpression : PseudoExpression
     {
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override string ExpressionName => "defaultValue";
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public DefaultedArgumentExpression()
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             return this;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public class DefaultCollationArgument : DefaultedArgumentExpression
         {
             public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)

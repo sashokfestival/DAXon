@@ -5,7 +5,6 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Core;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Expressions.Elaboration;
 using OutSmart.DAXon.Expressions.Instructions;
@@ -27,14 +26,13 @@ using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.XQuery
 {
     public class XQueryExpression : ILocation, IExpressionOwner, ITraceableComponent
     {
+        private readonly object syncLock = new object();
         protected Expression expression;
         protected SlotManager stackFrameMap;
         protected Executable executable;
@@ -44,14 +42,8 @@ namespace OutSmart.DAXon.XQuery
 
         public virtual string TracingTag => "query";
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual QueryModule MainModule => mainModule;
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual StructuredQName[] ExternalVariableNames
         {
             get
@@ -117,7 +109,6 @@ namespace OutSmart.DAXon.XQuery
             catch (XPathException err)
             {
 
-                //err.printStackTrace();
                 mainModule.ReportStaticError(err);
                 throw err;
             }
@@ -210,16 +201,10 @@ namespace OutSmart.DAXon.XQuery
             return stackFrameMap;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual void ExplainPathMap()
         {
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual IList<object> Evaluate(DynamicQueryContext env)
         {
             if (IsUpdateQuery())
@@ -232,9 +217,6 @@ namespace OutSmart.DAXon.XQuery
             return list;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual object EvaluateSingle(DynamicQueryContext env)
         {
             if (IsUpdateQuery())
@@ -252,9 +234,6 @@ namespace OutSmart.DAXon.XQuery
             return SequenceTool.ConvertToJava(item);
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual ISequenceIterator IIterator(DynamicQueryContext env)
         {
             if (IsUpdateQuery())
@@ -297,10 +276,10 @@ namespace OutSmart.DAXon.XQuery
             }
             catch (XPathException err)
             {
-                TransformerException terr = err;
-                while (terr.GetException() is TransformerException)
+                XPathException terr = err;
+                while (terr.InnerException is XPathException inner)
                 {
-                    terr = (TransformerException)terr.GetException();
+                    terr = inner;
                 }
 
                 XPathException de = XPathException.MakeXPathException(terr);
@@ -309,12 +288,9 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         protected virtual ISequenceIterator GetExpressionIterator(IXPathContext context)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (pullEvaluator == null)
                 {
@@ -325,10 +301,7 @@ namespace OutSmart.DAXon.XQuery
             return pullEvaluator.Iterate(context);
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
-        public virtual void Run(DynamicQueryContext env, Result result, Properties outputProperties)
+        public virtual void Run(DynamicQueryContext env, IResultTarget result, Properties outputProperties)
         {
             if (IsUpdateQuery())
             {
@@ -396,7 +369,7 @@ namespace OutSmart.DAXon.XQuery
                 try
                 {
                     controller.CloseTraceEpisode();
-                    dest.Dispose();
+                    dest.Close();
                 }
                 catch (XPathException e)
                 {
@@ -410,14 +383,11 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         protected virtual void ProcessQuery(Outputter dest, IXPathContext context)
         {
             try
             {
-                lock (this)
+                lock (syncLock)
                 {
                     if (pushEvaluator == null)
                     {
@@ -433,9 +403,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         protected virtual void CloseStreamIfNecessary(StreamResult result, bool mustClose)
         {
             if (mustClose)
@@ -455,17 +422,11 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
-        public virtual void RunStreamed(DynamicQueryContext dynamicEnv, ResolvedResource source, Result result, Properties outputProperties)
+        public virtual void RunStreamed(DynamicQueryContext dynamicEnv, ResolvedResource source, IResultTarget result, Properties outputProperties)
         {
             throw new XPathException("Streaming requires Saxon-EE");
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         protected virtual Properties ValidateOutputProperties(Controller controller, Properties outputProperties)
         {
 
@@ -502,25 +463,16 @@ namespace OutSmart.DAXon.XQuery
             return baseProperties;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual HashSet<IMutableNodeInfo> RunUpdate(DynamicQueryContext dynamicEnv)
         {
             throw new XPathException("Calling runUpdate() on a non-updating query");
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual void RunUpdate(DynamicQueryContext dynamicEnv, IUpdateAgent agent)
         {
             throw new XPathException("Calling runUpdate() on a non-updating query");
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         protected virtual XPathContextMajor InitialContext(DynamicQueryContext dynamicEnv, Controller controller)
         {
             IItem contextItem = controller.GlobalContextItem;
@@ -535,9 +487,6 @@ namespace OutSmart.DAXon.XQuery
             return context;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual Controller NewController(DynamicQueryContext env)
         {
             Controller controller = new Controller(executable.GetConfiguration(), executable);
@@ -553,9 +502,6 @@ namespace OutSmart.DAXon.XQuery
             return controller;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual void Explain(ExpressionPresenter @out)
         {
             @out.StartElement("query");
@@ -569,17 +515,11 @@ namespace OutSmart.DAXon.XQuery
             @out.Dispose();
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual Executable GetExecutable()
         {
             return executable;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual void SetAllowDocumentProjection(bool allowed)
         {
             if (allowed)
@@ -588,76 +528,49 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual bool IsDocumentProjectionAllowed()
         {
             return false;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual string GetPublicId()
         {
             return null;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual string GetSystemId()
         {
             return mainModule.GetSystemId();
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual int GetLineNumber()
         {
             return -1;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual int GetColumnNumber()
         {
             return -1;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual ILocation SaveLocation()
         {
             return this;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual HostLanguage GetHostLanguage()
         {
             return HostLanguage.XQUERY;
         }
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         public virtual void SetChildExpression(Expression expr)
         {
             expression = expr;
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void GatherProperties(Action<string, object> consumer) { throw new NotImplementedException(); }
+        public virtual void GatherProperties(Action<string, object> consumer) { } // upstream Traceable default: no properties
 
-        /// <summary>
-        /// Output the path map of the query for diagnostics
-        /// </summary>
         private class ErrorReportingIterator : ISequenceIterator
         {
             private readonly ISequenceIterator @base;

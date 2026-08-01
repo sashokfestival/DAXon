@@ -13,7 +13,6 @@
 // This file provides extension methods that recreate the Java method semantics
 // for use sites that still call them as `enum.Method()`.
 //
-// Phase 5 — paulirwin conversion drift cleanup.
 
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Lib;
@@ -29,10 +28,10 @@ namespace OutSmart.DAXon.Transformation
         // Java FunctionStreamability.isStreaming() returns true for all values except UNCLASSIFIED.
         public static bool IsStreaming(this FunctionStreamability s)
             => s != FunctionStreamability.UNCLASSIFIED;
-        // Phase B: Java FunctionStreamability.isConsuming() (upstream trans/FunctionStreamability.java:25-27).
+        // Java FunctionStreamability.isConsuming() (upstream trans/FunctionStreamability.java:25-27).
         public static bool IsConsuming(this FunctionStreamability s)
             => s == FunctionStreamability.ABSORBING || s == FunctionStreamability.SHALLOW_DESCENT || s == FunctionStreamability.DEEP_DESCENT;
-        // Phase 7.8: Java's FunctionStreamability.of(String) -- enum static factory.
+        // Java's FunctionStreamability.of(String) -- enum static factory.
         public static FunctionStreamability Of(string name)
         {
             if (string.IsNullOrEmpty(name))

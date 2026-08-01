@@ -27,14 +27,13 @@ namespace OutSmart.DAXon.Expressions.Parsing
         private readonly IList<PathMapRoot> pathMapRoots = new List<PathMapRoot>();
         private readonly Dictionary<IBinding, PathMapNodeSet> pathsForVariables = new Dictionary<IBinding, PathMapNodeSet>(); // a map from a variable IBinding to a PathMapNodeSet
 
-        public virtual PathMapRoot[] PathMapRoots => pathMapRoots.ToArray(new PathMapRoot[pathMapRoots.Count]);
+        public virtual PathMapRoot[] PathMapRoots => pathMapRoots.ToArray();
 
         public virtual PathMapRoot ContextDocumentRoot
         {
             get
             {
 
-                //map.diagnosticDump(System.Console.Error);
                 PathMapRoot[] roots = PathMapRoots;
                 PathMapRoot contextRoot = null;
                 foreach (PathMapRoot root in roots)
@@ -54,7 +53,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 }
 
 
-                //map.diagnosticDump(System.Console.Error);
                 return contextRoot;
             }
         }
@@ -114,12 +112,12 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
         public virtual void RegisterPathForVariable(IBinding binding, PathMapNodeSet nodeset)
         {
-            pathsForVariables.Put(binding, nodeset);
+            pathsForVariables[binding] = nodeset;
         }
 
         public virtual PathMapNodeSet GetPathForVariable(IBinding binding)
         {
-            return pathsForVariables.Get(binding);
+            return pathsForVariables.GetOrDefault(binding);
         }
 
         public virtual PathMapRoot GetRootForDocument(string requiredUri)
@@ -241,7 +239,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 {
                     if (pathMapRoots[i] == root)
                     {
-                        pathMapRoots.Remove(i);
+                        pathMapRoots.RemoveAt(i);
                         break;
                     }
                 }
@@ -300,7 +298,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                         {
 
                             // This is typically an absolute path expression appearing within a predicate
-                            node.arcs.Remove(i);
+                            node.arcs.RemoveAt(i);
                             foreach (PathMapArc arc in thisArc.GetTarget().arcs)
                             {
                                 root.arcs.Add(arc);
@@ -322,7 +320,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                             if (thisArc.GetAxis() != AxisInfo.DESCENDANT_OR_SELF)
                             {
                                 root.CreateArc(AxisInfo.DESCENDANT_OR_SELF, thisArc.GetNodeTest(), thisArc.GetTarget());
-                                node.arcs.Remove(i);
+                                node.arcs.RemoveAt(i);
                             }
 
                             break;
@@ -341,13 +339,13 @@ namespace OutSmart.DAXon.Expressions.Parsing
                             if (grandParent != null)
                             {
                                 grandParent.CreateArc(lastAxis, thisArc.GetNodeTest(), thisArc.GetTarget());
-                                node.arcs.Remove(i);
+                                node.arcs.RemoveAt(i);
                                 break;
                             }
                             else
                             {
                                 root.CreateArc(AxisInfo.CHILD, thisArc.GetNodeTest(), thisArc.GetTarget());
-                                node.arcs.Remove(i);
+                                node.arcs.RemoveAt(i);
                                 break;
                             }
                         }
@@ -372,11 +370,11 @@ namespace OutSmart.DAXon.Expressions.Parsing
                                     grandParent.arcs.Add(target.arcs[a]);
                                 }
 
-                                node.arcs.Remove(i);
+                                node.arcs.RemoveAt(i);
                             }
                             else if (lastAxis == AxisInfo.DESCENDANT)
                             {
-                                if (thisArc.GetTarget().arcs.IsEmpty())
+                                if (thisArc.GetTarget().arcs.Count == 0)
                                 {
                                     grandParent.CreateArc(AxisInfo.DESCENDANT_OR_SELF, thisArc.GetNodeTest());
                                 }
@@ -385,13 +383,13 @@ namespace OutSmart.DAXon.Expressions.Parsing
                                     grandParent.CreateArc(AxisInfo.DESCENDANT_OR_SELF, thisArc.GetNodeTest(), thisArc.GetTarget());
                                 }
 
-                                node.arcs.Remove(i);
+                                node.arcs.RemoveAt(i);
                             }
                             else
                             {
 
                                 // don't try to be precise about a/b/../../c
-                                if (thisArc.GetTarget().arcs.IsEmpty())
+                                if (thisArc.GetTarget().arcs.Count == 0)
                                 {
                                     root.CreateArc(AxisInfo.DESCENDANT_OR_SELF, thisArc.GetNodeTest());
                                 }
@@ -400,7 +398,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                                     root.CreateArc(AxisInfo.DESCENDANT_OR_SELF, thisArc.GetNodeTest(), thisArc.GetTarget());
                                 }
 
-                                node.arcs.Remove(i);
+                                node.arcs.RemoveAt(i);
                             }
 
                             break;
@@ -410,7 +408,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                         {
 
                             // This step can't take us anywhere we haven't been, so delete it
-                            node.arcs.Remove(i);
+                            node.arcs.RemoveAt(i);
                             break;
                         }
                 }
@@ -434,7 +432,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             private bool atomized;
             private bool _hasUnknownDependencies;
 
-            public virtual PathMapArc[] Arcs => arcs.ToArray(new PathMapArc[arcs.Count]);
+            public virtual PathMapArc[] Arcs => arcs.ToArray();
             /// <summary>
             /// Create a node in the PathMap (initially with no arcs)
             /// </summary>
@@ -623,24 +621,15 @@ namespace OutSmart.DAXon.Expressions.Parsing
         /// </summary>
         public class PathMapNodeSet : HashSet<PathMapNode>
         {
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
             public PathMapNodeSet()
             {
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
             public PathMapNodeSet(PathMapNode singleton)
             {
                 this.Add(singleton);
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
             public virtual PathMapNodeSet CreateArc(int axis, NodeTest test)
             {
                 PathMapNodeSet targetSet = new PathMapNodeSet();
@@ -652,9 +641,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 return targetSet;
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
             public virtual void AddNodeSet(PathMapNodeSet nodes)
             {
                 if (nodes != null)
@@ -666,12 +652,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 }
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
-            /// <summary>
-            /// Set the atomized property on all nodes in this nodeset
-            /// </summary>
             public virtual void SetAtomized()
             {
                 foreach (PathMapNode node in this)
@@ -680,12 +660,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 }
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
-            /// <summary>
-            /// Set the atomized property on all nodes in this nodeset
-            /// </summary>
             public virtual void SetReturnable(bool isReturned)
             {
                 foreach (PathMapNode node in this)
@@ -694,12 +668,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 }
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
-            /// <summary>
-            /// Set the atomized property on all nodes in this nodeset
-            /// </summary>
             public virtual bool HasReachableReturnables()
             {
                 foreach (PathMapNode node in this)
@@ -713,12 +681,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 return false;
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
-            /// <summary>
-            /// Set the atomized property on all nodes in this nodeset
-            /// </summary>
             public virtual bool AllPathsAreWithinStreamableSnapshot()
             {
                 foreach (PathMapNode node in this)
@@ -733,9 +695,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             }
 
             /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
-            /// <summary>
             /// Indicate that all the descendants of the nodes in this nodeset are required
             /// </summary>
             public virtual void AddDescendants()
@@ -746,9 +705,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 }
             }
 
-            /// <summary>
-            /// Create an initially-empty set of path map nodes
-            /// </summary>
             /// <summary>
             /// Indicate that all the nodes have unknown dependencies
             /// </summary>

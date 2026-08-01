@@ -119,9 +119,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
         /// Handle an end-of-element event
         /// </summary>
         public override void EndElement()
@@ -130,12 +127,6 @@ namespace OutSmart.DAXon.Events
             top--;
         }
 
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Handle a text node
-        /// </summary>
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
         {
 
@@ -146,23 +137,11 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Handle a text node
-        /// </summary>
         public override bool UsesTypeAnnotations()
         {
             return true;
         }
 
-        /// <summary>
-        /// Callback interface for SAX: not for application use
-        /// </summary>
-        /// <summary>
-        /// Handle a text node
-        /// </summary>
         public class StripRuleTarget : IRuleTarget
         {
             public virtual void Export(ExpressionPresenter presenter)

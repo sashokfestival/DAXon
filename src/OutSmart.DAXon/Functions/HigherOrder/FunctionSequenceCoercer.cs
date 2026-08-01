@@ -14,7 +14,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,39 +35,14 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         private readonly Func<RoleDiagnostic> roleSupplier;
         private readonly bool allow40;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
         /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
         /// <returns>the role locator</returns>
-        public RoleDiagnostic RoleSupplier => roleSupplier.Get();
+        public RoleDiagnostic RoleSupplier => roleSupplier();
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ExpressionName => "fnCoercer";
         public FunctionSequenceCoercer(Expression sequence, SpecificFunctionType requiredItemType, Func<RoleDiagnostic> role, bool allow40) : base(sequence)
         {
@@ -102,9 +76,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);
@@ -119,18 +90,12 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
             return p | StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             FunctionSequenceCoercer fsc2 = new FunctionSequenceCoercer(BaseExpression.Copy(rebindings), requiredItemType, roleSupplier, allow40);
@@ -139,9 +104,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
         /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
@@ -149,43 +111,16 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return (IFunctionItem)MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return requiredItemType;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
         /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
@@ -194,61 +129,22 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             return BaseExpression.GetCardinality();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             return base.Equals(other) && requiredItemType.Equals(((FunctionSequenceCoercer)other).requiredItemType);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return base.ComputeHashCode() ^ requiredItemType.GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("fnCoercer", this);
             Values.SequenceType st = Values.SequenceType.MakeSequenceType(requiredItemType, StaticProperty.EXACTLY_ONE);
             destination.EmitAttribute("to", st.ToAlphaCode());
-            destination.EmitAttribute("diag", roleSupplier.Get().Save());
+            destination.EmitAttribute("diag", roleSupplier().Save());
             if (allow40)
             {
                 destination.EmitAttribute("flags", "4");
@@ -258,37 +154,11 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new FunctionSequenceCoercerElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private static void CheckAnnotations(IFunctionItem item, IFunctionItemType requiredItemType, Configuration config)
         {
             foreach (Annotation ann in requiredItemType.AnnotationAssertions)
@@ -301,19 +171,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public class Coercer : IItemMappingFunction
         {
             private readonly SpecificFunctionType requiredItemType;
@@ -348,19 +205,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             IItem IItemMappingFunction.MapItem(IItem arg0) => MapItem(arg0); // covariant bridge
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of functions, wrapping each one in a CoercedFunction object
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the FunctionSequenceCoercer has cardinality zero-or-one
-        /// </summary>
-        /// <returns>the role locator</returns>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         private class FunctionSequenceCoercerElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

@@ -31,9 +31,6 @@ namespace OutSmart.DAXon.Events
         protected PipelineConfiguration pipelineConfiguration;
         protected string systemId = null;
 
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         protected virtual string ErrorCodeForDecomposingFunctionItems => GetPipelineConfiguration().IsXSLT() ? "XTDE0450" : "XQTY0105";
         public SequenceReceiver(PipelineConfiguration pipe)
         {
@@ -69,37 +66,22 @@ namespace OutSmart.DAXon.Events
         {
         }
 
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         public virtual void Open()
         {
             previousAtomic = false;
         }
 
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         public abstract void Append(IItem item, ILocation locationId, int properties);
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         public virtual void Append(IItem item)
         {
             Append(item, Loc.NONE, ReceiverOption.ALL_NAMESPACES);
         }
 
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         public virtual NamePool GetNamePool()
         {
             return pipelineConfiguration.GetConfiguration().GetNamePool();
         }
 
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         protected virtual void Flatten(ArrayItem array, ILocation locationId, int copyNamespaces)
         {
             foreach (ISequence member in array.Members())
@@ -108,9 +90,6 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         protected virtual void Decompose(IItem item, ILocation locationId, int copyNamespaces)
         {
             if (item != null)
@@ -187,23 +166,24 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        /// <summary>
-        /// Start the output process
-        /// </summary>
         public virtual bool HandlesAppend()
         {
             return true;
         }
-        public virtual void StartDocument(int arg0) => throw new NotImplementedException();
-        public virtual void EndDocument() => throw new NotImplementedException();
-        public virtual void StartElement(INodeName arg0, ISchemaType arg1, IAttributeMap arg2, NamespaceMap arg3, ILocation arg4, int arg5) => throw new NotImplementedException();
-        public virtual void EndElement() => throw new NotImplementedException();
-        public virtual void Characters(UnicodeString arg0, ILocation arg1, int arg2) => throw new NotImplementedException();
-        public virtual void ProcessingInstruction(string arg0, UnicodeString arg1, ILocation arg2, int arg3) => throw new NotImplementedException();
-        public virtual void Comment(UnicodeString arg0, ILocation arg1, int arg2) => throw new NotImplementedException();
-        public virtual void Dispose() => throw new NotImplementedException();
+        public abstract void StartDocument(int arg0);
+        public abstract void EndDocument();
+        public abstract void StartElement(INodeName arg0, ISchemaType arg1, IAttributeMap arg2, NamespaceMap arg3, ILocation arg4, int arg5);
+        public abstract void EndElement();
+        public abstract void Characters(UnicodeString arg0, ILocation arg1, int arg2);
+        public abstract void ProcessingInstruction(string arg0, UnicodeString arg1, ILocation arg2, int arg3);
+        public abstract void Comment(UnicodeString arg0, ILocation arg1, int arg2);
+        public abstract void Close();
+        // Abort-path release (see IReceiver): no events, idempotent. Leaf receivers hold no resources.
+        public virtual void Dispose()
+        {
+        }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual bool UsesTypeAnnotations() => throw new NotImplementedException();
+        public abstract bool UsesTypeAnnotations();
     }
 }

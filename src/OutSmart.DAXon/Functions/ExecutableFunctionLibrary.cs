@@ -31,12 +31,12 @@ namespace OutSmart.DAXon.Functions
 
         public virtual void AddFunction(UserFunction fn)
         {
-            functions.Put(fn.GetSymbolicName(), fn);
+            functions[fn.GetSymbolicName()] = fn;
         }
 
         public virtual Expression Bind(SymbolicName.F functionName, Expression[] staticArgs, Dictionary<StructuredQName, int> keywords, IStaticContext env, IList<string> reasons)
         {
-            UserFunction fn = functions.Get(functionName);
+            UserFunction fn = functions.GetOrDefault(functionName);
             if (fn == null)
             {
                 return null;
@@ -52,7 +52,7 @@ namespace OutSmart.DAXon.Functions
 
         public virtual IFunctionItem GetFunctionItem(SymbolicName.F functionName, IStaticContext staticContext)
         {
-            UserFunction fn = functions.Get(functionName);
+            UserFunction fn = functions.GetOrDefault(functionName);
             if (fn != null && fn.IsUpdating())
             {
                 throw new XPathException("Cannot bind a function item to an updating function");
@@ -63,7 +63,7 @@ namespace OutSmart.DAXon.Functions
 
         public virtual bool IsAvailable(SymbolicName.F functionName, int languageLevel)
         {
-            return functions.Get(functionName) != null;
+            return functions.GetOrDefault(functionName) != null;
         }
 
         public virtual IFunctionLibrary Copy()
@@ -74,6 +74,5 @@ namespace OutSmart.DAXon.Functions
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
     }
 }

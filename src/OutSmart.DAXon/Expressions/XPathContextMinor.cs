@@ -35,12 +35,6 @@ namespace OutSmart.DAXon.Expressions
         public string currentDestination = "";
         public int temporaryOutputState = 0;
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Get the Name Pool
-        /// </summary>
         public XPathContextMajor MajorContext
         {
             get
@@ -55,15 +49,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual int TemporaryOutputState
         {
             get => temporaryOutputState; set
@@ -72,15 +57,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual string CurrentOutputUri
         {
             get => currentDestination; set
@@ -88,24 +64,15 @@ namespace OutSmart.DAXon.Expressions
                 currentDestination = value;
             }
         }
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         protected XPathContextMinor()
         {
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual XPathContextMajor NewContext()
         {
             return XPathContextMajor.NewContext(this);
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         public virtual XPathContextMinor NewMinorContext()
         {
             XPathContextMinor c = new XPathContextMinor();
@@ -121,9 +88,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
         /// Set the calling IXPathContext
         /// </summary>
         public virtual void SetCaller(IXPathContext caller)
@@ -131,12 +95,6 @@ namespace OutSmart.DAXon.Expressions
             this.caller = caller;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Construct a new context without copying (used for the context in a function call)
-        /// </summary>
         public virtual XPathContextMajor NewCleanContext()
         {
             XPathContextMajor c = new XPathContextMajor(GetController());
@@ -144,31 +102,16 @@ namespace OutSmart.DAXon.Expressions
             return c;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Construct a new context without copying (used for the context in a function call)
-        /// </summary>
         public virtual ParameterSet GetLocalParameters()
         {
             return MajorContext.GetLocalParameters();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Construct a new context without copying (used for the context in a function call)
-        /// </summary>
         public virtual ParameterSet GetTunnelParameters()
         {
             return MajorContext.GetTunnelParameters();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
         /// <summary>
         /// Get the Controller. May return null when running outside XSLT or XQuery
         /// </summary>
@@ -178,9 +121,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
         /// Get the Configuration
         /// </summary>
         public Configuration GetConfiguration()
@@ -188,46 +128,22 @@ namespace OutSmart.DAXon.Expressions
             return controller.GetConfiguration();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Get the Name Pool
-        /// </summary>
         public NamePool GetNamePool()
         {
             return controller.GetConfiguration().GetNamePool();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Get the Name Pool
-        /// </summary>
         public IXPathContext GetCaller()
         {
             return caller;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public virtual void SetCurrentIterator(IFocusIterator iter)
         {
             currentIterator = iter;
             last = null;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public virtual IFocusIterator TrackFocus(ISequenceIterator iter)
         {
             IFocusIterator fit = controller.MakeFocusTracker(iter, false);
@@ -235,12 +151,6 @@ namespace OutSmart.DAXon.Expressions
             return fit;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public virtual IFocusIterator TrackFocusMultithreaded(ISequenceIterator iter)
         {
             IFocusIterator fit = controller.MakeFocusTracker(iter, true);
@@ -248,23 +158,11 @@ namespace OutSmart.DAXon.Expressions
             return fit;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public IFocusIterator GetCurrentIterator()
         {
             return currentIterator;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public IItem GetContextItem()
         {
             if (currentIterator == null)
@@ -284,12 +182,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public int GetLast()
         {
             if (currentIterator == null)
@@ -314,12 +206,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public bool IsAtLast()
         {
             if (currentIterator == null)
@@ -342,87 +228,36 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public virtual IResourceResolver GetResourceResolver()
         {
             return caller.GetResourceResolver();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public virtual IErrorReporter GetErrorReporter()
         {
             return caller.GetErrorReporter();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public virtual XPathException GetCurrentException()
         {
             return caller.GetCurrentException();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
         public virtual XPathContextMajor.ThreadManager GetThreadManager()
         {
             return caller.GetThreadManager();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Get the current component
-        /// </summary>
         public virtual Component GetCurrentComponent()
         {
             return caller.GetCurrentComponent();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Get the current component
-        /// </summary>
         public virtual StackFrame GetStackFrame()
         {
             return stackFrame;
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Get the current component
-        /// </summary>
         public virtual void MakeStackFrameMutable()
         {
             if (stackFrame == StackFrame.EMPTY)
@@ -432,12 +267,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
         /// Get the value of a local variable, identified by its slot number
         /// </summary>
         public ISequence EvaluateLocalVariable(int slot)
@@ -445,15 +274,6 @@ namespace OutSmart.DAXon.Expressions
             return stackFrame.slots[slot];
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public void SetLocalVariable(int slotNumber, ISequence value)
         {
 
@@ -479,15 +299,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual void WaitForChildThreads()
         {
             lock (this)
@@ -496,43 +307,16 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual int UseLocalParameter(StructuredQName parameterId, int slotNumber, bool isTunnel)
         {
             return MajorContext.UseLocalParameter(parameterId, slotNumber, isTunnel);
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual Component.M GetCurrentMode()
         {
             return MajorContext.GetCurrentMode();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual Rule GetCurrentTemplateRule()
         {
 
@@ -541,113 +325,41 @@ namespace OutSmart.DAXon.Expressions
             return null; //return getCaller().getCurrentTemplateRule();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IGroupIterator GetCurrentGroupIterator()
         {
             return MajorContext.GetCurrentGroupIterator();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IGroupIterator GetCurrentMergeGroupIterator()
         {
             return MajorContext.GetCurrentMergeGroupIterator();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IRegexIterator GetCurrentRegexIterator()
         {
             return MajorContext.GetCurrentRegexIterator();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual DateTimeValue GetCurrentDateTime()
         {
             return controller.GetCurrentDateTime();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public int GetImplicitTimezone()
         {
             return controller.GetImplicitTimezone();
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IEnumerator<ContextStackFrame> IterateStackFrames()
         {
             return (IEnumerator<ContextStackFrame>)(new ContextStackIterator(this));
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual Component GetTargetComponent(int bindingSlot)
         {
             return MajorContext.GetTargetComponent(bindingSlot);
         }
 
-        /// <summary>
-        /// Private Constructor
-        /// </summary>
-        /// <summary>
-        /// Set a new sequence iterator.
-        /// </summary>
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         // Note: consider eliminating this class. A new XPathContextMinor is created under two circumstances,
         // (a) when the focus changes (i.e., a new current iterator), and (b) when the current
         // receiver changes. We could handle these by maintaining a stack of iterators and a stack of

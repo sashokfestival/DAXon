@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Collections
 {
-    // Phase 5: IntPredicateLambda now implements IIntPredicateProxy (20 callsites assign to IIntPredicateProxy field).
+    // IntPredicateLambda now implements IIntPredicateProxy (20 callsites assign to IIntPredicateProxy field).
     public class IntPredicateLambda : IIntPredicateProxy
     {
         private readonly Func<int, bool> _f;

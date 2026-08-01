@@ -14,7 +14,7 @@ using OutSmart.DAXon.Text;
 namespace OutSmart.DAXon.Types
 {
 
-    // Phase B: xs:anySimpleType is the root of all simple types, so AnySimpleType genuinely IS an
+    // Xs:anySimpleType is the root of all simple types, so AnySimpleType genuinely IS an
     // ISimpleType; the stub only declared ISchemaTypeStubBase, so (ISimpleType)AnySimpleType.INSTANCE
     // (CastInjector-injected at BuiltInAtomicType) failed CS0030. Declare ISimpleType and stub its
     // members (ISchemaType + IsAtomicType come from the base; ISimpleType adds the rest + IHyperType).
@@ -43,8 +43,9 @@ namespace OutSmart.DAXon.Types
         public bool IsListType() => false;
         public bool IsUnionType() => false;
         public bool IsBuiltInType() => true;
-        public IAtomicSequence GetTypedValue(UnicodeString value, INamespaceResolver resolver, ConversionRules rules) => throw new NotImplementedException("STUB: AnySimpleType.GetTypedValue not ported (excluded stub)");
-        public ValidationFailure ValidateContent(UnicodeString value, INamespaceResolver nsResolver, ConversionRules rules) => throw new NotImplementedException("STUB: AnySimpleType.ValidateContent not ported (excluded stub)");
+        // Upstream: xs:anySimpleType content is always valid and types as untypedAtomic.
+        public IAtomicSequence GetTypedValue(UnicodeString value, INamespaceResolver resolver, ConversionRules rules) => OutSmart.DAXon.Values.StringValue.MakeUntypedAtomic(value);
+        public ValidationFailure ValidateContent(UnicodeString value, INamespaceResolver nsResolver, ConversionRules rules) => null;
         public UnicodeString Preprocess(UnicodeString input) => input;
         public UnicodeString Postprocess(UnicodeString input) => input;
         public bool IsNamespaceSensitive() => false;

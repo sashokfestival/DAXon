@@ -27,7 +27,6 @@ using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Lib;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 
 namespace OutSmart.DAXon.Functions
 {
@@ -36,7 +35,7 @@ namespace OutSmart.DAXon.Functions
         private static readonly VendorFunctionSetHE_Inner _instance = new VendorFunctionSetHE_Inner();
         public static VendorFunctionSetHE_Inner GetInstance() => _instance;
 
-        // Phase 5: implements IFunctionLibrary via BuiltInFunctionSet for AddFunctionLibrary call sites.
+        // Implements IFunctionLibrary via BuiltInFunctionSet for AddFunctionLibrary call sites.
         public class VendorFunctionSetHE_Inner : BuiltInFunctionSet
         {
             public VendorFunctionSetHE_Inner()
@@ -80,10 +79,10 @@ namespace OutSmart.DAXon.Functions
 
                         return new QNameValue(errorCodeQName, BuiltInAtomicType.QNAME);
                     case "description":
-                        string s = error.GetMessage();
-                        if (error.GetCause() != null)
+                        string s = error.Message;
+                        if (error.InnerException != null)
                         {
-                            s += "(" + error.GetCause().Message + ")"; // GetCause() -> BCL System.Exception (.Message, not .GetMessage())
+                            s += "(" + error.InnerException.Message + ")"; // GetCause() -> BCL System.Exception (.Message, not .GetMessage())
                         }
 
                         return new StringValue(s);

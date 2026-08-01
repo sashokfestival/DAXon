@@ -29,9 +29,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private ParseOptions validationOptions = null;
         protected bool preservingTypes = true;
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public virtual ParseOptions ValidationOptions
         {
             get => validationOptions; set
@@ -40,28 +37,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public virtual Operand ContentOperand => contentOp;
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public ParentNodeConstructor()
         {
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public ISchemaType GetSchemaType()
         {
             return validationOptions == null ? null : validationOptions.TopLevelType;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public virtual void SetValidationAction(int mode, ISchemaType schemaType)
         {
             preservingTypes = mode == Validation.PRESERVE && schemaType == null;
@@ -83,25 +68,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public int GetValidationAction()
         {
             return validationOptions == null ? Validation.PRESERVE : validationOptions.GetSchemaValidationMode();
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public virtual void SetNoNeedToStrip()
         {
             preservingTypes = true;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public virtual void SetContentExpression(Expression content)
         {
             if (contentOp == null)
@@ -114,25 +90,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public Expression GetContentExpression()
         {
             return contentOp == null ? null : contentOp.GetChildExpression();
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeCheckChildren(visitor, contextInfo);
@@ -140,21 +107,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public override bool AllowExtractingCommonSubexpressions()
         {
             return false;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         protected abstract void CheckContentSequence(IStaticContext env);
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             OptimizeChildren(visitor, contextItemType);
@@ -197,33 +155,21 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return true;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public override bool AlwaysCreatesNewNodes()
         {
             return true;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             PathMap.PathMapNodeSet result = base.AddToPathMap(pathMap, pathMapNodeSet);
@@ -238,17 +184,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new PathMap.PathMapNodeSet(pathMap.MakeNewRoot(this));
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public virtual bool IsPreservingTypes()
         {
             return preservingTypes;
         }
 
-        /// <summary>
-        /// Create a document or element node constructor instruction
-        /// </summary>
         public virtual bool IsLocal()
         {
             return ExpressionTool.IsLocalConstructor(this);

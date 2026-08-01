@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Api
 {
-    // Phase 5: XdmFunctionItem and XdmArray stubs (excluded from compile but referenced from JPConverter).
+    // XdmFunctionItem and XdmArray stubs (excluded from compile but referenced from JPConverter).
     public class XdmFunctionItem : XdmItem
     {
         public XdmFunctionItem() : base(null) { }

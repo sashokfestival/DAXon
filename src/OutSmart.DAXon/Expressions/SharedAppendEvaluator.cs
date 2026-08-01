@@ -14,12 +14,9 @@ using OutSmart.DAXon.Collections.Zeno;
 
 namespace OutSmart.DAXon.Expressions
 {
-    // Runtime 2026-06-07: the real OutSmart.DAXon.Expressions.Elaboration.SharedAppendEvaluator is excluded because it assigns
-    // lambdas to the Block.IChainAction *interface* (`actions[i] = (chain,context) => ...`), which is invalid C#.
-    // The hollow stub here did NOT implement ISequenceEvaluator, so the cast in Block.BlockElaborator.Lazily /
-    // UserFunctionCall (`(ISequenceEvaluator)new SharedAppendEvaluator((Block)expr)`) threw InvalidCastException at
-    // runtime (Invoice execution, argument-evaluator allocation). Faithful port: implement ISequenceEvaluator with
-    // named IChainAction classes (EagerAction/PullAction) capturing the per-child evaluator instead of lambdas.
+    // The transpiled upstream SharedAppendEvaluator assigns lambdas to the Block.IChainAction *interface* —
+    // invalid C#. Faithful port with named IChainAction classes (EagerAction/PullAction) capturing the
+    // per-child evaluator instead of lambdas.
     public class SharedAppendEvaluator : ISequenceEvaluator
     {
         private readonly Block.IChainAction[] actions;
@@ -43,7 +40,10 @@ namespace OutSmart.DAXon.Expressions
         public ISequence Evaluate(IXPathContext context)
         {
             var chain = new ZenoSequence();
-            foreach (var action in actions) { chain = action.Perform(chain, context); }
+            foreach (var action in actions)
+            {
+                chain = action.Perform(chain, context);
+            }
             return chain;
         }
         private sealed class EagerAction : Block.IChainAction
@@ -63,7 +63,10 @@ namespace OutSmart.DAXon.Expressions
                 var iter = pull == null ? null : pull(context);
                 if (iter != null)
                 {
-                    for (IItem item; (item = iter.Next()) != null;) { chain = chain.Append(item); }
+                    for (IItem item; (item = iter.Next()) != null;)
+                    {
+                        chain = chain.Append(item);
+                    }
                 }
                 return chain;
             }

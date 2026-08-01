@@ -27,9 +27,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public static Func<Average> New() => () => new Average();
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override int GetCardinality(Expression[] arguments)
         {
             if (!Cardinality.AllowsZero(arguments[0].GetCardinality()))
@@ -42,17 +39,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override IFold GetFold(IXPathContext context, params ISequence[] additionalArguments)
         {
             return new AverageFold(context);
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         private class AverageFold : IFold
         {
             private readonly IXPathContext context;

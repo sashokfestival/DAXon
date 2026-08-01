@@ -30,22 +30,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
     public class ApplyImports : ApplyNextMatchingTemplate, IITemplateCall
     {
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_APPLY_IMPORTS;
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override string StreamerName => "ApplyImports";
         public ApplyImports()
         {
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             ApplyImports ai2 = new ApplyImports();
@@ -55,9 +46,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return ai2;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("applyImports", this);
@@ -75,17 +63,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ApplyImportsElaborator();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private class ApplyImportsElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

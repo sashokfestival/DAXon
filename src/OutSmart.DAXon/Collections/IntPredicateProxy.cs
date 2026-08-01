@@ -17,8 +17,7 @@ namespace OutSmart.DAXon.Collections
     public interface IIntPredicateProxy
     {
         bool Test(int value);
-        IIntPredicateProxy Union(IIntPredicateProxy other)
-;
+        IIntPredicateProxy Union(IIntPredicateProxy other);
 
 
     }

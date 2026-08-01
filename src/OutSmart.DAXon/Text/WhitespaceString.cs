@@ -4,7 +4,6 @@
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,53 +36,32 @@ namespace OutSmart.DAXon.Text
             return Uncompress().IndexWhere(predicate, from);
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override string ToString()
         {
             return Uncompress().ToString();
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public abstract void Write(IUnicodeWriter writer);
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override void Copy8bit(byte[] target, int offset)
         {
             Uncompress().Copy8bit(target, offset);
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override void Copy16bit(char[] target, int offset)
         {
             Uncompress().Copy16bit(target, offset);
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override void Copy24bit(byte[] target, int offset)
         {
             Uncompress().Copy24bit(target, offset);
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public override void Copy32bit(int[] target, int offset)
         {
             Uncompress().Copy32bit(target, offset);
         }
 
-        /// <summary>
-        /// Returns a string representation of the object.
-        /// </summary>
         public abstract void WriteEscape(bool[] specialChars, IUnicodeWriter writer);
     }
 }

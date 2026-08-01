@@ -20,8 +20,7 @@ namespace OutSmart.DAXon.Model
     {
         IItem Head();
         ISequenceIterator Iterate();
-        IGroundedValue Materialize()
-;
+        IGroundedValue Materialize();
 
 
 
@@ -32,8 +31,7 @@ namespace OutSmart.DAXon.Model
 
 
 
-        ISequence MakeRepeatable()
-;
+        ISequence MakeRepeatable();
 
 
     }

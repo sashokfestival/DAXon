@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Types
     {
         public static string FromItemType(ItemType t) => "";
         public static ItemType ToItemType(string s) => throw new NotImplementedException("STUB: AlphaCode.ToItemType not ported (excluded stub)");
-        // Phase 7.8: AlphaCode.FromSequenceType used by export visitors.
+        // AlphaCode.FromSequenceType used by export visitors.
         public static string FromSequenceType(object t) => "";
     }
 }

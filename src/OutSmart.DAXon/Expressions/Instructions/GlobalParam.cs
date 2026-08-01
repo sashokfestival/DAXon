@@ -24,12 +24,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override string TracingTag => "xsl:param";
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         protected override string Flags
         {
             get
@@ -57,9 +51,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this.implicitlyRequired;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override IGroundedValue EvaluateVariable(IXPathContext context, Component target)
         {
             Controller controller = context.GetController();
@@ -95,12 +86,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return ActuallyEvaluate(context, target);
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override IGroundedValue EvaluateVariable(IXPathContext context)
         {
             Component target = context.GetCurrentComponent(); // Bug #6236

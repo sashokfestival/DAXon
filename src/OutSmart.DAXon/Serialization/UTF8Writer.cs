@@ -494,7 +494,7 @@ namespace OutSmart.DAXon.Serialization
                 }
 
                 int available = outBufLast - outPtr;
-                int count = System.Math.Min(len, available);
+                int count = Math.Min(len, available);
                 Array.Copy(chars, off, outBuf, outPtr, count);
                 outPtr += count;
                 off += count;
@@ -547,7 +547,7 @@ namespace OutSmart.DAXon.Serialization
                 }
 
                 int available = outBufLast - outPtr;
-                int count = System.Math.Min(repeat, available);
+                int count = Math.Min(repeat, available);
                 ArrayTools.Fill(outBuf, outPtr, outPtr + count, ch);
                 outPtr += count;
                 repeat -= count;

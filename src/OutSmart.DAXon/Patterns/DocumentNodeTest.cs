@@ -30,24 +30,12 @@ namespace OutSmart.DAXon.Patterns
     {
         private readonly NodeTest elementTest;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override double DefaultPriority => elementTest.DefaultPriority;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override int PrimitiveType => Types.Type.DOCUMENT;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public virtual NodeTest ElementTest => elementTest;
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public string FullAlphaCode => BasicAlphaCode + " e[" + elementTest.GetFullAlphaCode() + "]";
         public DocumentNodeTest(NodeTest elementTest)
         {
@@ -110,33 +98,21 @@ namespace OutSmart.DAXon.Patterns
             return found;
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override string ToString()
         {
             return "document-node(" + elementTest + ')';
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             return elementTest.GetHashCode() ^ 12345;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is DocumentNodeTest && ((DocumentNodeTest)other).elementTest.Equals(elementTest);
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             string explanation = base.ExplainMismatch(item, th);

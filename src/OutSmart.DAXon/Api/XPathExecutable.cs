@@ -60,7 +60,7 @@ namespace OutSmart.DAXon.Api
             Dictionary<StructuredQName, XPathVariable> declaredVariables = new Dictionary<StructuredQName, XPathVariable>();
             foreach (XPathVariable var in env.ExternalVariables)
             {
-                declaredVariables.Put(var.GetVariableQName(), var);
+                declaredVariables[var.GetVariableQName()] = var;
             }
 
             return new XPathSelector(exp, declaredVariables);
@@ -79,7 +79,7 @@ namespace OutSmart.DAXon.Api
                 list.Add(new QName(var.GetVariableQName()));
             }
 
-            return list.IIterator();
+            return list.GetEnumerator();
         }
 
         public virtual ItemType GetRequiredItemTypeForVariable(QName variableName)
@@ -116,14 +116,14 @@ namespace OutSmart.DAXon.Api
             {
                 this.parent = parent;
             }
-            public Stream<XdmItem> Apply(XdmItem item)
+            public XdmStream<XdmItem> Apply(XdmItem item)
             {
                 try
                 {
                     XPathSelector selector = parent.Load();
                     selector.SetContextItem(item);
                     XdmSequenceIterator<XdmItem> result = selector.IIterator();
-                    return (Stream<XdmItem>)(result.Stream());
+                    return result.Stream();
                 }
                 catch (DAXonApiException e)
                 {

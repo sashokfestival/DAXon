@@ -23,11 +23,8 @@ namespace OutSmart.DAXon.Transformation
         DO_NOT_RECOVER /*2*/
 
         // --------------------
-        // TODO enum body members
         // /*2*/
         // public static RecoveryPolicy fromString(String s) {
-        //     switch(s) {
-        //         case "recoverSilently":
         //             return RECOVER_SILENTLY;
         //         case "recoverWithWarnings":
         //             return RECOVER_WITH_WARNINGS;
@@ -35,8 +32,6 @@ namespace OutSmart.DAXon.Transformation
         //             return DO_NOT_RECOVER;
         //         default:
         //             throw new global::System.ArgumentException("Unrecognized value of RECOVERY_POLICY_NAME = '" + s + "'");
-        //     }
-        // }
         // --------------------
     }
 }

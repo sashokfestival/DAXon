@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Functions
     public class Count
     {
         public Count() { }
-        // Phase 7.8: Java's static Count.count(iter) -> static method (same name as class).
+        // Java's static Count.count(iter) -> static method (same name as class).
         public static int CountFn(ISequenceIterator iter) { int n = 0; if (iter != null) { while (iter.Next() != null) n++; } return n; }
         public static int CountLocal(ISequenceIterator iter)
         {

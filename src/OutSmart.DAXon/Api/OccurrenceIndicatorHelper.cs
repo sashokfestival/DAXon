@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Api
 {
-    // Phase 7.1: helper for OccurrenceIndicator (enum) — Java had this as a
+    // Helper for OccurrenceIndicator (enum) — Java had this as a
     // static method on the enum, but C# enums can't have static methods.
     public static class OccurrenceIndicatorHelper
     {

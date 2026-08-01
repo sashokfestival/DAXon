@@ -20,8 +20,6 @@ using System.Text;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Functions
@@ -124,12 +122,12 @@ namespace OutSmart.DAXon.Functions
         public static XPathException HandleIOError(URI absoluteURI, IOException ioErr)
         {
             string message = "Failed to read input file";
-            if (absoluteURI != null && !ioErr.GetMessage().Equals(absoluteURI.ToString()))
+            if (absoluteURI != null && !ioErr.Message.Equals(absoluteURI.ToString()))
             {
                 message += ' ' + absoluteURI.ToString();
             }
 
-            message += " (" + ioErr.GetType().GetName() + ')';
+            message += " (" + ioErr.GetType().FullName + ')';
             return new XPathException(message, ioErr).WithErrorCode(GetErrorCode(ioErr));
         }
 
@@ -187,7 +185,7 @@ namespace OutSmart.DAXon.Functions
                 catch (InvalidOperationException e)
                 {
                     // Proxy for a decode failure (System.Text.DecoderFallbackException), as in ReadFile
-                    throw new IOException(e.GetMessage(), e);
+                    throw new IOException(e.Message, e);
                 }
 
                 if (IsEndOfFile(actual))
@@ -231,7 +229,7 @@ namespace OutSmart.DAXon.Functions
                 {
 
                     // Proxy for C# System.Text.DecoderFallbackException
-                    throw new IOException(e.GetMessage(), e);
+                    throw new IOException(e.Message, e);
                 }
 
                 if (IsEndOfFile(actual))
@@ -279,6 +277,14 @@ namespace OutSmart.DAXon.Functions
                             // The path of least resistance is to extend the buffer.
                             char[] buffer2 = new char[2048];
                             int actual2 = reader.Read(buffer2, 0, 2048);
+                            if (actual2 <= 0)
+                            {
+                                // The resource ENDS with the high surrogate: the low-surrogate fetch
+                                // below used to read past the array. (Only a custom resolver's reader
+                                // can deliver a lone surrogate - the platform decoders emit U+FFFD.)
+                                throw new XPathException("The text file contains an unpaired surrogate (line=" + line + " column=" + column + " value=hex " + (ch32).ToString("x") + ')').WithErrorCode("FOUT1190");
+                            }
+
                             char[] buffer3 = new char[actual + actual2];
                             Array.Copy(buffer, 0, buffer3, 0, actual);
                             Array.Copy(buffer2, 0, buffer3, actual, actual2);
@@ -287,6 +293,13 @@ namespace OutSmart.DAXon.Functions
                         }
 
                         char low = buffer[c++];
+                        if (!UTF16CharacterSet.IsLowSurrogate(low))
+                        {
+                            // Unpaired high surrogate mid-stream: CombinePair would swallow the next
+                            // character into a garbage astral codepoint and the checker would pass it.
+                            throw new XPathException("The text file contains an unpaired surrogate (line=" + line + " column=" + column + " value=hex " + (ch32).ToString("x") + ')').WithErrorCode("FOUT1190");
+                        }
+
                         ch32 = UTF16CharacterSet.CombinePair((char)ch32, low);
                         mask |= ch32;
                     }

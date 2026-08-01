@@ -10,7 +10,6 @@ using OutSmart.DAXon.Values.Maps;
 using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using static OutSmart.DAXon.Types.Affinity;
 using System;
 using System.Collections.Generic;
@@ -130,7 +129,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                                 shortItemType = suppliedItemType.ToString();
                             }
 
-                            RoleDiagnostic role = roleSupplier.Get();
+                            RoleDiagnostic role = roleSupplier();
                             throw new XPathException("An atomic value is required for the " + role.GetMessage() + ", but the supplied type is " + shortItemType + ", which cannot be atomized").WithErrorCode("FOTY0013").WithLocation(supplied.GetLocation()).AsTypeError().WithFailingExpression(supplied);
                         }
 
@@ -166,7 +165,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                     {
 
                         // Promotion cannot succeed: raise a static type error
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         throw new XPathException("An item of type " + suppliedItemType + " cannot be converted to " + reqItemType + " as required for the " + role.GetMessage()).WithErrorCode(role.ErrorCode).WithLocation(supplied.GetLocation()).WithFailingExpression(supplied);
                     }
 
@@ -212,7 +211,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                         {
 
                             // See spec bug 11964
-                            RoleDiagnostic role = roleSupplier.Get();
+                            RoleDiagnostic role = roleSupplier();
                             throw new XPathException("An untyped atomic value cannot be converted to a QName or NOTATION as required for the " + role.GetMessage()).WithErrorCode("XPTY0117").WithLocation(supplied.GetLocation()).WithFailingExpression(supplied);
                         }
 
@@ -240,7 +239,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                         }
                         catch (XPathException err)
                         {
-                            throw err.MaybeWithLocation(exp.GetLocation()).WithFailingExpression(supplied).MaybeWithErrorCode(roleSupplier.Get().ErrorCode).AsStaticError();
+                            throw err.MaybeWithLocation(exp.GetLocation()).WithFailingExpression(supplied).MaybeWithErrorCode(roleSupplier().ErrorCode).AsStaticError();
                         }
 
                         itemTypeOK = true;
@@ -389,7 +388,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             // If the supplied value is () and () isn't allowed, fail now
             if (suppliedCard == StaticProperty.EMPTY && ((reqCard & StaticProperty.ALLOWS_ZERO) == 0))
             {
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 throw new XPathException("An empty sequence is not allowed as the " + role.GetMessage()).WithErrorCode(role.ErrorCode).WithLocation(supplied.GetLocation()).AsTypeErrorIf(role.IsTypeError()).WithFailingExpression(supplied);
             }
 
@@ -409,7 +408,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
                 // The item types may be disjoint, but if both the supplied and required types permit
                 // an empty sequence, we can't raise a static error. Raise a warning instead.
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 if (Cardinality.AllowsZero(suppliedCard) && Cardinality.AllowsZero(reqCard))
                 {
                     if (suppliedCard != StaticProperty.EMPTY)
@@ -441,7 +440,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                         return exp;
                     }
 
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     string msg = role.ComposeErrorMessage(reqItemType, supplied, th);
                     throw new XPathException(msg).WithErrorCode(role.ErrorCode).WithLocation(supplied.GetLocation()).AsTypeErrorIf(role.IsTypeError()).WithFailingExpression(supplied);
                 }
@@ -457,7 +456,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             {
                 if (exp is Literal)
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     throw new XPathException("Required cardinality of " + role.GetMessage() + " is " + Cardinality.Describe(reqCard) + "; supplied value has cardinality " + Cardinality.Describe(suppliedCard)).WithErrorCode(role.ErrorCode).WithLocation(supplied.GetLocation()).WithFailingExpression(supplied).AsTypeErrorIf(role.IsTypeError());
                 }
                 else
@@ -605,7 +604,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
             if (suppliedCard == StaticProperty.EMPTY && ((reqCard & StaticProperty.ALLOWS_ZERO) == 0))
             {
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 XPathException err = new XPathException("An empty sequence is not allowed as the " + role.GetMessage(), role.ErrorCode, supplied.GetLocation());
                 err.SetIsTypeError(role.IsTypeError());
                 throw err;
@@ -621,14 +620,14 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 {
                     if (suppliedCard != StaticProperty.EMPTY)
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
+                        RoleDiagnostic role = roleSupplier();
                         string msg = "Required item type of " + role.GetMessage() + " is " + reqItemType + "; supplied value (" + supplied.ToShortString() + ") has item type " + suppliedItemType + ". The expression can succeed only if the supplied value is an empty sequence.";
                         env.IssueWarning(msg, DAXonErrorCode.SXWN9026, supplied.GetLocation());
                     }
                 }
                 else
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     string msg = role.ComposeErrorMessage(reqItemType, supplied, th);
                     XPathException err = new XPathException(msg, role.ErrorCode, supplied.GetLocation());
                     err.SetIsTypeError(role.IsTypeError());
@@ -648,7 +647,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             {
                 if (exp is Literal)
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     XPathException err = new XPathException("Required cardinality of " + role.GetMessage() + " is " + Cardinality.Describe(reqCard) + "; supplied value has cardinality " + Cardinality.Describe(suppliedCard), role.ErrorCode, supplied.GetLocation());
                     err.SetIsTypeError(role.IsTypeError());
                     throw err;

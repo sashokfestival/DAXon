@@ -8,16 +8,15 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Serialization
 {
     // Runtime: functional — Serialize wraps a UnicodeBuilder in this and SerializerFactory.GetReceiver
     // (SerializerFactory.cs:145/147) does `result is UnicodeWriterResult` -> GetUnicodeWriter() to obtain the
-    // output sink. Implements OutSmart.DAXon.Internal.Jaxp.Transform.Result (GetSystemId/SetSystemId only). Mirrors the excluded
+    // output sink. Implements IResultTarget (GetSystemId/SetSystemId only). Mirrors the excluded
     // real UnicodeWriterResult.cs (kept excluded to avoid the dual-type CS0101 with this stub).
-    public class UnicodeWriterResult : Result
+    public class UnicodeWriterResult : IResultTarget
     {
         private readonly IUnicodeWriter _writer;
         private string _systemId;

@@ -37,17 +37,11 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected override bool IsPermittedChild(StyleElement child)
         {
             return (child is XSLSort);
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override void PrepareAttributes()
         {
             string selectAtt = null;
@@ -68,9 +62,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             CheckSortComesFirst(true);
@@ -99,9 +90,6 @@ namespace OutSmart.DAXon.Xslt
             select = TypeCheck("select", select);
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         // no action
         public override Expression Compile(Compilation compilation, ComponentDeclaration decl)
         {

@@ -293,7 +293,7 @@ namespace OutSmart.DAXon.Values
         public string ToExportString() => string.Empty;
         public string ToString(object config) => string.Empty;
         public bool IsStreaming() => false;
-        // Phase 7.35: Value.SequenceType methods used by RecordTest etc.
+        // Value.SequenceType methods used by RecordTest etc.
         public string ExplainMismatch(object value, object th) => null;
         public bool IsSameType(SequenceType other) => this == other;
         // Upstream isSameType(SequenceType, TypeHierarchy). Was `this == other` (reference equality) —

@@ -15,7 +15,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,19 +38,10 @@ namespace OutSmart.DAXon.Expressions
 
         public override string ExpressionName => "GeneralComparison";
 
-        /// <summary>
-        /// Get the IAtomicComparer used to compare atomic values. This encapsulates any collation that is used
-        /// </summary>
         public IStringCollator StringCollator => comparer.Collator;
 
-        /// <summary>
-        /// Get the IAtomicComparer used to compare atomic values. This encapsulates any collation that is used
-        /// </summary>
         public int SingletonOperator => singletonOperator;
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override int IntrinsicDependencies
@@ -73,9 +63,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         protected virtual GeneralComparison InverseComparison
@@ -88,9 +75,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override string StreamerName => "GeneralComparison";
@@ -129,33 +113,21 @@ namespace OutSmart.DAXon.Expressions
             return GetRetainedStaticContext();
         }
 
-        /// <summary>
-        /// Get the IAtomicComparer used to compare atomic values. This encapsulates any collation that is used
-        /// </summary>
         public IAtomicComparer GetAtomicComparer()
         {
             return comparer;
         }
 
-        /// <summary>
-        /// Get the IAtomicComparer used to compare atomic values. This encapsulates any collation that is used
-        /// </summary>
         public bool ConvertsUntypedToOther()
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Configuration config = visitor.GetConfiguration();
@@ -319,9 +291,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         private static Expression MakeMinOrMax(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, Expression exp, string function)
@@ -344,9 +313,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         private bool MayInvolveCastToQName(TypeHierarchy th, Expression e1, Expression e2)
@@ -359,9 +325,6 @@ namespace OutSmart.DAXon.Expressions
             return nsSensitive && th.Relationship(e2.GetItemType().GetAtomizedItemType(), BuiltInAtomicType.UNTYPED_ATOMIC) != Affinity.DISJOINT && (e2.GetSpecialProperties() & StaticProperty.NOT_UNTYPED_ATOMIC) == 0;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override bool Equals(object other)
@@ -369,9 +332,6 @@ namespace OutSmart.DAXon.Expressions
             return other is GeneralComparison && base.Equals(other) && comparer.Equals(((GeneralComparison)other).comparer);
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         protected override int ComputeHashCode()
@@ -379,9 +339,6 @@ namespace OutSmart.DAXon.Expressions
             return base.ComputeHashCode();
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
@@ -543,9 +500,6 @@ namespace OutSmart.DAXon.Expressions
             return visitor.ObtainOptimizer().OptimizeGeneralComparison(visitor, this, false, contextInfo);
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         private bool ManyOperandIsLiftable()
@@ -569,9 +523,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         private bool ManyOperandIsRangeExpression()
@@ -588,9 +539,6 @@ namespace OutSmart.DAXon.Expressions
             return false; // shouldn't reach here.
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override IItem EvaluateItem(IXPathContext context)
@@ -598,9 +546,6 @@ namespace OutSmart.DAXon.Expressions
             return BooleanValue.Get(MakeElaborator().ElaborateForBoolean().Eval(context));
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override bool EffectiveBooleanValue(IXPathContext context)
@@ -608,9 +553,6 @@ namespace OutSmart.DAXon.Expressions
             return MakeElaborator().ElaborateForBoolean().Eval(context);
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public static bool Compare(AtomicValue a0, int @operator, AtomicValue a1, IAtomicComparer comparer, bool checkTypes, IXPathContext context, INamespaceResolver nsResolver)
@@ -675,9 +617,6 @@ namespace OutSmart.DAXon.Expressions
             return ValueComparison.Compare(a0, @operator, a1, comparer, checkTypes);
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override Types.ItemType GetItemType()
@@ -685,9 +624,6 @@ namespace OutSmart.DAXon.Expressions
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override UType GetStaticUType(UType contextItemType)
@@ -695,9 +631,6 @@ namespace OutSmart.DAXon.Expressions
             return UType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public static int GetCorrespondingSingletonOperator(int op)
@@ -721,9 +654,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         protected override string Tag()
@@ -731,9 +661,6 @@ namespace OutSmart.DAXon.Expressions
             return "gc";
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         protected override void ExplainExtraAttributes(ExpressionPresenter @out)
@@ -756,9 +683,6 @@ namespace OutSmart.DAXon.Expressions
             @out.EmitAttribute("comp", comparer.Save());
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         public override Elaborator GetElaborator()
@@ -772,9 +696,6 @@ namespace OutSmart.DAXon.Expressions
             MANY_TO_MANY
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /*c0 == StaticProperty.EXACTLY_ONE*/
         /*c1 == StaticProperty.EXACTLY_ONE */
         /// <summary>

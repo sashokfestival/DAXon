@@ -57,25 +57,16 @@ namespace OutSmart.DAXon.Xslt
             return compilation;
         }
 
-        /// <summary>
-        /// Issue a compile-time warning
-        /// </summary>
         public override void IssueWarning(string s, string errorCode, ILocation locator)
         {
             compilation.GetCompilerInfo().ErrorReporter.Report(new XmlProcessingIncident(s, errorCode, locator).AsWarning());
         }
 
-        /// <summary>
-        /// Issue a compile-time warning
-        /// </summary>
         public override string GetSystemId()
         {
             return StaticBaseURI;
         }
 
-        /// <summary>
-        /// Issue a compile-time warning
-        /// </summary>
         public override Expression BindVariable(StructuredQName qName)
         {
             IGroundedValue val = compilation.GetStaticVariable(qName);
@@ -89,17 +80,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Issue a compile-time warning
-        /// </summary>
         public override IFunctionLibrary GetFunctionLibrary()
         {
             return functionLibrary;
         }
 
-        /// <summary>
-        /// Issue a compile-time warning
-        /// </summary>
         public override string GetDefaultCollationName()
         {
             return NamespaceConstant.CODEPOINT_COLLATION_URI;
@@ -113,73 +98,46 @@ namespace OutSmart.DAXon.Xslt
             return NamespaceUri.FN;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public override bool IsInBackwardsCompatibleMode()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public override bool IsImportedSchema(NamespaceUri @namespace)
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public override HashSet<NamespaceUri> GetImportedSchemaNamespaces()
         {
             return new HashSet<NamespaceUri>();
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public override INamespaceResolver GetNamespaceResolver()
         {
             return namespaceContext;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public override DecimalFormatManager GetDecimalFormatManager()
         {
             return null;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public virtual int GetColumnNumber()
         {
             return 0;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public virtual string GetPublicId()
         {
             return null;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public virtual int GetLineNumber()
         {
             return -1;
         }
 
-        /// <summary>
-        /// Determine whether Backwards Compatible Mode is used
-        /// </summary>
         public override Types.ItemType ResolveTypeAlias(StructuredQName typeName)
         {
             return null;

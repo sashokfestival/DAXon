@@ -10,7 +10,6 @@ using OutSmart.DAXon.Values.Arrays;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -30,25 +29,10 @@ namespace OutSmart.DAXon.Expressions
     {
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Optimize the expression
         /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override string ExpressionName => "castable";
         public CastableExpression(Expression source, IAtomicType target, bool allowEmpty) : base(source, target, allowEmpty)
         {
@@ -101,9 +85,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Optimize the expression
         /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
@@ -118,12 +99,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
         /// Is this expression the same as another expression?
         /// </summary>
         public override bool Equals(object other)
@@ -132,12 +107,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
         /// Is this expression the same as another expression?
         /// </summary>
         protected override int ComputeHashCode()
@@ -145,57 +114,21 @@ namespace OutSmart.DAXon.Expressions
             return base.ComputeHashCode() ^ 0x5555;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
         public override ItemType GetItemType()
         {
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return UType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             CastableExpression ce = new CastableExpression(BaseExpression.Copy(rebindings), TargetType, AllowsEmpty());
@@ -205,52 +138,16 @@ namespace OutSmart.DAXon.Expressions
             return ce;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return BooleanValue.Get(EffectiveBooleanValue(context));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             return MakeElaborator().ElaborateForBoolean().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         private bool IsCastable(AtomicValue value, IAtomicType targetType, IXPathContext context)
         {
             Converter converter = this.converter;
@@ -276,69 +173,21 @@ namespace OutSmart.DAXon.Expressions
             return !(converter.Convert(value) is ValidationFailure);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override string ToString()
         {
             return BaseExpression.ToString() + " castable as " + TargetType.EQName;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             Export(@out, "castable");
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CastableExpressionElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Optimize the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the result of the Castable expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         private class CastableExpressionElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()

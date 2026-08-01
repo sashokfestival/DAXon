@@ -15,7 +15,6 @@ using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,9 +39,6 @@ namespace OutSmart.DAXon.XPath
         private UnprefixedElementMatchingPolicy unprefixedElementPolicy = UnprefixedElementMatchingPolicy.DEFAULT_NAMESPACE;
         private IWarningHandler warningHandler;
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual string StaticBaseURI => baseURI == null ? "" : baseURI;
         protected virtual void SetConfiguration(Configuration config)
         {
@@ -55,49 +51,31 @@ namespace OutSmart.DAXon.XPath
             };
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual Configuration GetConfiguration()
         {
             return config;
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual void SetPackageData(PackageData packageData)
         {
             this.packageData = packageData;
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual PackageData GetPackageData()
         {
             return packageData;
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual void SetSchemaAware(bool aware)
         {
             GetPackageData().SetSchemaAware(aware);
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public virtual RetainedStaticContext MakeRetainedStaticContext()
         {
             return new RetainedStaticContext(this);
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         protected void SetDefaultFunctionLibrary()
         {
             FunctionLibraryList lib = new FunctionLibraryList();
@@ -109,9 +87,6 @@ namespace OutSmart.DAXon.XPath
             SetFunctionLibrary(lib);
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         public void SetDefaultFunctionLibrary(int version)
         {
             FunctionLibraryList lib = new FunctionLibraryList();
@@ -123,153 +98,96 @@ namespace OutSmart.DAXon.XPath
             SetFunctionLibrary(lib);
         }
 
-        /// <summary>
-        /// Get the system configuration
-        /// </summary>
         protected void AddFunctionLibrary(IFunctionLibrary library)
         {
             libraryList.AddFunctionLibrary(library);
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual IXPathContext MakeEarlyEvaluationContext()
         {
             return new EarlyEvaluationContext(GetConfiguration());
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual ILocation GetContainingLocation()
         {
             return containingLocation;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetContainingLocation(ILocation location)
         {
             containingLocation = location;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetBaseURI(string baseURI)
         {
             this.baseURI = baseURI;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual IFunctionLibrary GetFunctionLibrary()
         {
             return libraryList;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetFunctionLibrary(FunctionLibraryList lib)
         {
             libraryList = lib;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetDefaultCollationName(string collationName)
         {
             defaultCollationName = collationName;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual string GetDefaultCollationName()
         {
             return defaultCollationName;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetWarningHandler(Action<string, ILocation> handler)
         {
-            warningHandler = (message, code, loc) => handler.Accept(message, loc);
+            warningHandler = (message, code, loc) => handler(message,loc);
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetWarningHandler(IWarningHandler handler)
         {
             warningHandler = handler;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual IWarningHandler GetWarningHandler()
         {
             return warningHandler;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void IssueWarning(string s, string errorCode, ILocation locator)
         {
             GetWarningHandler().Invoke(s, errorCode, locator);
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual string GetSystemId()
         {
             return "";
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual NamespaceUri GetDefaultElementNamespace()
         {
             return defaultElementNamespace;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetDefaultElementNamespace(NamespaceUri uri)
         {
             defaultElementNamespace = uri;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetDefaultFunctionNamespace(NamespaceUri uri)
         {
             defaultFunctionNamespace = uri;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual NamespaceUri GetDefaultFunctionNamespace()
         {
             return defaultFunctionNamespace;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetXPathLanguageLevel(int level)
         {
             if (level == 40)
@@ -284,49 +202,31 @@ namespace OutSmart.DAXon.XPath
             }
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual int GetXPathVersion()
         {
             return xpathLanguageLevel;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetBackwardsCompatibilityMode(bool option)
         {
             backwardsCompatible = option;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual bool IsInBackwardsCompatibleMode()
         {
             return backwardsCompatible;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetDecimalFormatManager(DecimalFormatManager manager)
         {
             GetPackageData().SetDecimalFormatManager(manager);
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual Types.ItemType GetRequiredContextItemType()
         {
             return AnyItemType.GetInstance();
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual DecimalFormatManager GetDecimalFormatManager()
         {
             DecimalFormatManager manager = GetPackageData().GetDecimalFormatManager();
@@ -339,49 +239,34 @@ namespace OutSmart.DAXon.XPath
             return manager;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual KeyManager GetKeyManager()
         {
             return GetPackageData().GetKeyManager();
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetTypeAlias(StructuredQName name, Types.ItemType type)
         {
-            typeAliases.Put(name, type);
+            typeAliases[name] = type;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual Types.ItemType ResolveTypeAlias(StructuredQName typeName)
         {
-            return typeAliases.Get(typeName);
+            return typeAliases.GetOrDefault(typeName);
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual void SetUnprefixedElementMatchingPolicy(UnprefixedElementMatchingPolicy policy)
         {
             this.unprefixedElementPolicy = policy;
         }
 
-        /// <summary>
-        /// Construct a dynamic context for early evaluation of constant subexpressions
-        /// </summary>
         public virtual UnprefixedElementMatchingPolicy GetUnprefixedElementMatchingPolicy()
         {
             return unprefixedElementPolicy;
         }
-        public virtual Expression BindVariable(StructuredQName arg0) => throw new NotImplementedException();
-        public virtual bool IsImportedSchema(NamespaceUri arg0) => throw new NotImplementedException();
-        public virtual HashSet<NamespaceUri> GetImportedSchemaNamespaces() => throw new NotImplementedException();
-        public virtual INamespaceResolver GetNamespaceResolver() => throw new NotImplementedException();
+        public abstract Expression BindVariable(StructuredQName arg0);
+        public abstract bool IsImportedSchema(NamespaceUri arg0);
+        public abstract HashSet<NamespaceUri> GetImportedSchemaNamespaces();
+        public abstract INamespaceResolver GetNamespaceResolver();
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         // Upstream returns getConfiguration().getOptimizerOptions(); the NIE stub broke static-parameter
@@ -391,7 +276,7 @@ namespace OutSmart.DAXon.XPath
         /// <summary>
         /// Interface defining a callback for handling warnings
         /// </summary>
-        // Phase 5: IWarningHandler interface->delegate.
+        // IWarningHandler interface->delegate.
         public delegate void IWarningHandler(string message, string errorCode, ILocation location);
     }
 }

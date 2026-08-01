@@ -13,12 +13,8 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Expressions
 {
     using global::OutSmart.DAXon.Model;
-    // Runtime 2026-06-03: Expr.MappingIterator stub REMOVED — real poc/output/full/MappingIterator.cs re-included.
-    // The hollow stub's Next()=>null made the XSLT focus iterator yield nothing -> EMPTY transform output.
-    public class FilterIterator : ISequenceIterator
+    public static class FilterIterator
     {
-        public FilterIterator() { }
-        public FilterIterator(object src, object filter) { }
 
         // Ported from Saxon FilterIterator.testPredicateValue: evaluate a predicate value against the
         // current position. A node-set predicate is an EBV existence test (non-empty => keep). A numeric
@@ -64,9 +60,5 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        public IItem Next() => throw new NotImplementedException("STUB: FilterIterator.Next not ported (excluded stub)");
-        public void Close() { }
-        public void Discharge() { }
-        public void Dispose() { }
     }
 }

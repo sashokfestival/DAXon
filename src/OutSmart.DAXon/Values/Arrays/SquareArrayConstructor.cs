@@ -36,16 +36,10 @@ namespace OutSmart.DAXon.Values.Arrays
 
         public override string StreamerName => "ArrayBlock";
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
         public SquareArrayConstructor(IList<Expression> children)
         {
-            Expression[] kids = children.ToArray(new Expression[0]);
+            Expression[] kids = children.ToArray();
             foreach (Expression e in children)
             {
                 AdoptChildExpression(e);
@@ -105,9 +99,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             int h = 0x778b92a0;
@@ -119,9 +110,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return h;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression e = base.TypeCheck(visitor, contextInfo);
@@ -133,9 +121,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return PreEvaluate(visitor);
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression e = base.Optimize(visitor, contextInfo);
@@ -147,9 +132,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return PreEvaluate(visitor);
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         private Expression PreEvaluate(ExpressionVisitor visitor)
         {
             foreach (Operand o in Operands())
@@ -170,9 +152,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             IList<Expression> m2 = new List<Expression>(GetOperanda().NumberOfOperands);
@@ -186,9 +165,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return b2;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override ItemType GetItemType()
         {
             ItemType contentType = null;
@@ -216,20 +192,11 @@ namespace OutSmart.DAXon.Values.Arrays
             return new ArrayItemType(SequenceType.MakeSequenceType(contentType, contentCardinality));
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return UType.FUNCTION;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
 
@@ -237,12 +204,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("arrayBlock", this);
@@ -254,12 +215,6 @@ namespace OutSmart.DAXon.Values.Arrays
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override string ToShortString()
         {
             int n = GetOperanda().NumberOfOperands;
@@ -276,12 +231,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override string ToString()
         {
             int n = GetOperanda().NumberOfOperands;
@@ -298,23 +247,11 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public void Ping()
         {
             numberOfConversions++;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         protected virtual ArrayItem MakeArray(IList<IGroundedValue> members)
         {
             if (numberOfConversions > numberOfCalls * 0.5)
@@ -332,12 +269,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             IList<IGroundedValue> value = new List<IGroundedValue>(GetOperanda().NumberOfOperands);
@@ -350,23 +281,11 @@ namespace OutSmart.DAXon.Values.Arrays
             return MakeArray(value);
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new SquareArrayConstructorElaborator();
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         private class SquareArrayConstructorElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()

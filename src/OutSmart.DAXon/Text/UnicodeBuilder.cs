@@ -30,9 +30,6 @@ namespace OutSmart.DAXon.Text
         private int bits;
         private ZenoString archive = ZenoString.EMPTY;
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         private UnicodeString ActivePart
         {
             get
@@ -67,33 +64,23 @@ namespace OutSmart.DAXon.Text
                 }
             }
         }
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder() : this(256)
         {
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder(int allocate)
         {
-            codepoints = new int[allocate];
+            // Floor of 16: EnsureCapacity grows by doubling, so a zero-length array could
+            // never grow (0 * 2 == 0) and the first Append spun forever.
+            codepoints = new int[allocate < 16 ? 16 : allocate];
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder Append(char ch)
         {
             Append((int)ch);
             return this;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder Append(int codePoint)
         {
             EnsureCapacity(1);
@@ -102,9 +89,6 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder Append(IIntIterator codePoints)
         {
             while (codePoints.MoveNext())
@@ -115,17 +99,11 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder AppendLatin(string str)
         {
             return Append(new BMPString(str));
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder AppendAll(ISequenceIterator iter)
         {
 
@@ -138,17 +116,11 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder Append(string str)
         {
             return Append(StringTool.FromCharSequence(str));
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeBuilder Append(UnicodeString str)
         {
             int len = str.Length32();
@@ -176,25 +148,16 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public long Length()
         {
             return archive.Length() + used;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public bool IsEmpty()
         {
             return archive.IsEmpty() && used == 0;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         private void EnsureCapacity(int required)
         {
 
@@ -212,9 +175,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public UnicodeString ToUnicodeString()
         {
             if (archive.IsEmpty())
@@ -227,28 +187,16 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public StringValue ToStringItem(IAtomicType type)
         {
             return new StringValue(ToUnicodeString(), type);
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
         public override string ToString()
         {
             return ToUnicodeString().ToString();
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public void Clear()
         {
             archive = ZenoString.EMPTY;
@@ -256,12 +204,6 @@ namespace OutSmart.DAXon.Text
             bits = 0;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public static byte[] Expand1to2(byte[] @in, int start, int used, int allocate)
         {
             byte[] result = new byte[allocate * 2];
@@ -274,12 +216,6 @@ namespace OutSmart.DAXon.Text
             return result;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public static char[] ExpandBytesToChars(byte[] @in, int start, int end)
         {
             char[] result = new char[end - start];
@@ -291,12 +227,6 @@ namespace OutSmart.DAXon.Text
             return result;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public static byte[] Expand1to3(byte[] @in, int start, int used, int allocate)
         {
             byte[] result = new byte[allocate * 3];
@@ -310,12 +240,6 @@ namespace OutSmart.DAXon.Text
             return result;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public static byte[] Expand2to3(byte[] @in, int start, int used, int allocate)
         {
             byte[] result = new byte[allocate * 3];
@@ -329,12 +253,6 @@ namespace OutSmart.DAXon.Text
             return result;
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public static byte[] Expand(byte[] @in, int start, int end, int oldWidth, int newWidth, int allocate)
         {
             if (allocate <= (end - start) / oldWidth)
@@ -369,56 +287,26 @@ namespace OutSmart.DAXon.Text
             throw new ArgumentException();
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public UnicodeBuilder Accept(UnicodeString chars)
         {
             return Append(chars);
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public void Write(UnicodeString chars)
         {
             Append(chars);
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public void WriteAscii(byte[] content)
         {
             Accept(new Twine8(content));
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public void Write(string chars)
         {
             Append(chars);
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public void TrimToSize()
         {
 
@@ -426,13 +314,11 @@ namespace OutSmart.DAXon.Text
             Array.Resize(ref codepoints, used);
         }
 
-        /// <summary>
-        /// Create a Unicode builder with an initial allocation of 256 codepoints
-        /// </summary>
-        /// <summary>
-        /// Reset the contents of this builder to be empty
-        /// </summary>
         public void Dispose()
+        {
+        }
+        // IUniStringConsumer end-of-stream event (distinct from IDisposable.Dispose above).
+        public void Close()
         {
         }
         IUniStringConsumer IUniStringConsumer.Accept(UnicodeString arg0) => Append(arg0);

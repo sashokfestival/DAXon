@@ -33,7 +33,7 @@ namespace OutSmart.DAXon.Expressions
         public override int ImplementationMethod => EVALUATE_METHOD;
 
         public int SingletonOperator => @operator;
-        public virtual IStringCollator StringCollator => throw new NotImplementedException();
+        public abstract IStringCollator StringCollator { get; }
         public CompareToConstant(Expression p0) : base(p0)
         {
         }
@@ -101,7 +101,7 @@ namespace OutSmart.DAXon.Expressions
                     throw new NotSupportedException("Unknown operator " + @operator);
             }
         }
-        public virtual IAtomicComparer GetAtomicComparer() => throw new NotImplementedException();
+        public abstract IAtomicComparer GetAtomicComparer();
     }
 }
 

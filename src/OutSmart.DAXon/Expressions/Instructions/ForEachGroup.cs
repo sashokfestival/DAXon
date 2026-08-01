@@ -15,7 +15,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -553,7 +552,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         private void MakeSortKeyEvaluators()
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (sortKeyEvaluators == null && SortKeyDefinitions != null)
                 {
@@ -797,6 +796,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         IItem item;
                         while ((item = focusIterator.Next()) != null)
                         {
+                            context.GetController().CheckTimeoutPerStep();
                             listener.StartCurrentItem(item);
                             ITailCall tc = action.ProcessLeavingTail(output, c2);
                             Expression.DispatchTailCall(tc);
@@ -807,6 +807,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     {
                         while (focusIterator.Next() != null)
                         {
+                            context.GetController().CheckTimeoutPerStep();
                             ITailCall tc = action.ProcessLeavingTail(output, c2);
                             Expression.DispatchTailCall(tc);
                         }

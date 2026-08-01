@@ -11,7 +11,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,37 +40,22 @@ namespace OutSmart.DAXon.Types
                     builder.Append(", ");
                 }
 
-                builder.SetLength(builder.Length - 2);
-                builder.Append(")");
+                builder.Length = builder.Length - 2;
+                builder.Append(')');
                 return builder.ToString();
             }
         }
 
         public virtual IList<IAtomicType> MemberTypes => memberTypes;
 
-        /// <summary>
-        /// Ask whether this union type includes any list types among its members
-        /// </summary>
         public virtual SequenceType ResultTypeOfCast => SequenceType.MakeSequenceType(this, StaticProperty.ALLOWS_ZERO_OR_ONE);
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual string BasicAlphaCode => "A";
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual int PrimitiveType => StandardNames.XS_ANY_ATOMIC_TYPE;
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual IList<IPlainType> PlainMemberTypes => new List<IPlainType>(memberTypes);
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual double DefaultPriority
         {
             get
@@ -94,7 +78,7 @@ namespace OutSmart.DAXon.Types
         public LocalUnionType(params IAtomicType[] memberTypes)
         {
             this.memberTypes = new List<IAtomicType>();
-            this.memberTypes.AddAll(memberTypes.ToList());
+            this.memberTypes.AddRange(memberTypes.ToList());
         }
         public virtual Genre GetGenre()
         {
@@ -150,25 +134,16 @@ namespace OutSmart.DAXon.Types
             return false;
         }
 
-        /// <summary>
-        /// Ask whether this union type includes any list types among its members
-        /// </summary>
         public virtual bool ContainsListType()
         {
             return false;
         }
 
-        /// <summary>
-        /// Ask whether this union type includes any list types among its members
-        /// </summary>
         public virtual bool IsPlainType()
         {
             return true;
         }
 
-        /// <summary>
-        /// Ask whether this union type includes any list types among its members
-        /// </summary>
         private bool SomeMemberTypeSatisfies(Func<IAtomicType, bool> condition)
         {
             foreach (IAtomicType member in memberTypes)
@@ -182,17 +157,11 @@ namespace OutSmart.DAXon.Types
             return false;
         }
 
-        /// <summary>
-        /// Ask whether this union type includes any list types among its members
-        /// </summary>
         public virtual bool IsIdType()
         {
             return SomeMemberTypeSatisfies((t) => t.IsIdType());
         }
 
-        /// <summary>
-        /// Ask whether this union type includes any list types among its members
-        /// </summary>
         public virtual bool IsIdRefType()
         {
             return SomeMemberTypeSatisfies((t) => t.IsIdRefType());
@@ -206,25 +175,16 @@ namespace OutSmart.DAXon.Types
             return false;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual bool IsListType()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual bool IsUnionType()
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual UType GetUType()
         {
             UType u = UType.VOID;
@@ -236,17 +196,11 @@ namespace OutSmart.DAXon.Types
             return u;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual bool IsNamespaceSensitive()
         {
             return SomeMemberTypeSatisfies((t) => t.IsNamespaceSensitive());
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual ValidationFailure ValidateContent(UnicodeString value, INamespaceResolver nsResolver, ConversionRules rules)
         {
             foreach (IAtomicType at in memberTypes)
@@ -261,17 +215,11 @@ namespace OutSmart.DAXon.Types
             return new ValidationFailure("Value " + Err.Wrap(value, Err.VALUE) + " does not match any member of union type " + ToString());
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual ValidationFailure CheckAgainstFacets(AtomicValue value, ConversionRules rules)
         {
             return null;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual IAtomicSequence GetTypedValue(UnicodeString value, INamespaceResolver resolver, ConversionRules rules) /*Java covariant AtomicValue widened (C# 7.3)*/
         {
             foreach (IAtomicType type in memberTypes)
@@ -290,9 +238,6 @@ namespace OutSmart.DAXon.Types
             throw ve.MakeException();
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual bool Matches(IItem item, TypeHierarchy th)
         {
             if (item is AtomicValue)
@@ -305,33 +250,21 @@ namespace OutSmart.DAXon.Types
             }
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual IAtomicType GetPrimitiveItemType()
         {
             return BuiltInAtomicType.ANY_ATOMIC;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual IPlainType GetAtomizedItemType()
         {
             return this;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual bool IsAtomizable(TypeHierarchy th)
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public override string ToString()
         {
             StringBuilder fsb = new StringBuilder(256);
@@ -343,14 +276,11 @@ namespace OutSmart.DAXon.Types
                 fsb.Append(", ");
             }
 
-            fsb.SetLength(fsb.Length - 2);
-            fsb.Append(")");
+            fsb.Length = fsb.Length - 2;
+            fsb.Append(')');
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Determine whether this is a list type
-        /// </summary>
         public virtual string ToExportString()
         {
             StringBuilder fsb = new StringBuilder(256);
@@ -361,8 +291,8 @@ namespace OutSmart.DAXon.Types
                 fsb.Append(", ");
             }
 
-            fsb.SetLength(fsb.Length - 2);
-            fsb.Append(")");
+            fsb.Length = fsb.Length - 2;
+            fsb.Append(')');
             return fsb.ToString();
         }
         IAtomicSequence IUnionType.GetTypedValue(UnicodeString arg0, INamespaceResolver arg1, ConversionRules arg2) => GetTypedValue(arg0, arg1, arg2); // covariant bridge

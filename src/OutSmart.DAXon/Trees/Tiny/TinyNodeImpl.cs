@@ -51,17 +51,8 @@ namespace OutSmart.DAXon.Trees.Tiny
         public readonly int nodeNr;
         protected internal TinyNodeImpl parent = null;
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual long SequenceNumber => (long)nodeNr << 32;
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual int Fingerprint
         {
             get
@@ -76,12 +67,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual string DisplayName
         {
             get
@@ -103,47 +88,14 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual NodeInfo Root => nodeNr == 0 ? this : tree.GetRootNode();
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual NamespaceMap AllNamespaces => null;
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual TinyTree Tree => tree;
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual int NodeNumber => nodeNr;
-        public virtual UnicodeString UnicodeStringValue => throw new NotImplementedException();
+        public abstract UnicodeString UnicodeStringValue { get; }
         protected TinyNodeImpl(TinyTree tree, int nodeNr)
         {
             this.tree = tree;
@@ -215,25 +167,16 @@ namespace OutSmart.DAXon.Trees.Tiny
             return GetParent().GetBaseURI();
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual int GetLineNumber()
         {
             return tree.GetLineNumber(nodeNr);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual ILocation SaveLocation()
         {
             return this;
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public int CompareOrder(NodeInfo other)
         {
             long a = SequenceNumber;
@@ -250,20 +193,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public bool HasFingerprint()
         {
             return true;
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual string GetPrefix()
         {
             int code = tree.nameCode[nodeNr];
@@ -280,12 +214,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return tree.prefixPool.GetPrefix(code >> 20);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual NamespaceUri GetNamespaceUri()
         {
             int code = tree.nameCode[nodeNr];
@@ -297,12 +225,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return tree.GetNamePool().GetURI(code & NamePool.FP_MASK);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual bool HasURI(NamespaceUri ns)
         {
             int code = tree.nameCode[nodeNr];
@@ -314,12 +236,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return GetNamePool().GetStructuredQName(code).HasURI(ns);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual string GetLocalPart()
         {
             int code = tree.nameCode[nodeNr];
@@ -331,12 +247,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return tree.GetNamePool().GetLocalName(code);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual IAxisIterator IterateAxis(int axisNumber)
         {
 
@@ -358,12 +268,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual IAxisIterator IterateAxis(int axisNumber, INodePredicate predicate)
         {
             NodeTest nodeTest = Navigator.NodeTestFromPredicate(predicate);
@@ -403,12 +307,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorANCESTOR(NodeTest nodeTest)
         {
             IAxisIterator ancestors = new AncestorIterator(this, nodeTest);
@@ -422,12 +320,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorATTRIBUTE(int type, NodeTest nodeTest)
         {
             if (type != Types.Type.ELEMENT)
@@ -443,12 +335,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return new AttributeIterator(tree, nodeNr, nodeTest);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorCHILD(NodeTest nodeTest)
         {
             if (HasChildNodes())
@@ -470,12 +356,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorDESCENDANT(int type, NodeTest nodeTest)
         {
             if (type == Types.Type.DOCUMENT && nodeTest is NameTest && nodeTest.PrimitiveType == Types.Type.ELEMENT)
@@ -499,12 +379,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorDESCENDANT_OR_SELF(NodeTest nodeTest)
         {
             IAxisIterator descendants = IterateAxis(AxisInfo.DESCENDANT, nodeTest);
@@ -518,12 +392,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorFOLLOWING(int type, NodeTest nodeTest)
         {
             if (type == Types.Type.ATTRIBUTE || type == Types.Type.NAMESPACE)
@@ -540,12 +408,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorFOLLOWING_SIBLING(int type, NodeTest nodeTest)
         {
             if (type == Types.Type.ATTRIBUTE || type == Types.Type.NAMESPACE || tree.depth[nodeNr] == 0)
@@ -558,12 +420,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorNAMESPACE(int type, NodeTest nodeTest)
         {
             if (type != Types.Type.ELEMENT)
@@ -574,24 +430,12 @@ namespace OutSmart.DAXon.Trees.Tiny
             return NamespaceNode.MakeIterator(this, nodeTest);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorPARENT(NodeTest nodeTest)
         {
             NodeInfo parent = GetParent();
             return Navigator.FilteredSingleton(parent, nodeTest);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorPRECEDING(int type, int axisNumber, NodeTest nodeTest)
         {
             if (type == Types.Type.ATTRIBUTE || type == Types.Type.NAMESPACE)
@@ -608,12 +452,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorPRECEDING_SIBLING(int type, NodeTest nodeTest)
         {
             if (type == Types.Type.ATTRIBUTE || type == Types.Type.NAMESPACE || tree.depth[nodeNr] == 0)
@@ -626,12 +464,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         private IAxisIterator IteratorPRECEDING_OR_ANCESTOR(int type, NodeTest nodeTest)
         {
             if (type == Types.Type.DOCUMENT)
@@ -651,12 +483,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual TinyNodeImpl GetParent()
         {
             if (parent != null)
@@ -685,12 +511,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         protected static int GetParentNodeNr(TinyTree tree, int nodeNr)
         {
             if (tree.depth[nodeNr] == 0)
@@ -715,12 +535,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return p;
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual bool HasChildNodes()
         {
 
@@ -728,68 +542,26 @@ namespace OutSmart.DAXon.Trees.Tiny
             return false;
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
         public virtual string GetAttributeValue(NamespaceUri uri, string local)
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual Configuration GetConfiguration()
         {
             return tree.GetConfiguration();
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual NamePool GetNamePool()
         {
             return tree.GetNamePool();
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual NamespaceBinding[] GetDeclaredNamespaces(NamespaceBinding[] buffer)
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual void GenerateId(StringBuilder buffer)
         {
             buffer.Append('d');
@@ -816,15 +588,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             buffer.Append((char)('0' + (int)(value % 10)));
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual bool IsAncestorOrSelf(TinyNodeImpl d)
         {
 
@@ -916,57 +679,21 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual bool IsId()
         {
             return false; // overridden for element and attribute nodes
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual bool IsIdref()
         {
             return false; // overridden for element and attribute nodes
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual bool IsNilled()
         {
             return tree.IsNilled(nodeNr);
         }
 
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Get the fingerprint of the node, used for matching names
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual bool IsStreamed()
         {
             return false;
@@ -974,7 +701,7 @@ namespace OutSmart.DAXon.Trees.Tiny
         NodeInfo NodeInfo.GetParent() => GetParent();
         IItem IGroundedValue.Head() => this;
         IItem ISequence.Head() => this;
-        public virtual int GetNodeKind() => throw new NotImplementedException();
+        public abstract int GetNodeKind();
         public virtual IAtomicSequence Atomize() => StringValue.MakeUntypedAtomic(UnicodeStringValue);
         public virtual ISequenceIterator Iterate() => SingletonIterator.MakeIterator(this);
         // A node is a singleton grounded value: item 0 is the node itself, every other index is absent.
@@ -983,18 +710,21 @@ namespace OutSmart.DAXon.Trees.Tiny
         public virtual IGroundedValue Subsequence(int arg0, int arg1) => (arg0 <= 0 && (long)arg0 + arg1 > 0) ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance();
         public virtual int GetLength() => 1;
         public virtual string GetStringValue() => UnicodeStringValue.ToString(); // upstream NodeInfo default method
-        public virtual string GetPublicId() => throw new NotImplementedException();
-        public virtual void Deliver(IReceiver arg0, ParseOptions arg1) => throw new NotImplementedException();
+        public virtual string GetPublicId() => null;
+        public virtual void Deliver(IReceiver @out, ParseOptions options) => Events.Sender.SendDocumentInfo(this, @out, new Expressions.Parsing.Loc(GetSystemId(), -1, -1));
         IItem IItem.Head() => this;
         SingletonIterator IItem.Iterate() => new SingletonIterator(this);
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual string GetURI() => throw new NotImplementedException();
+        public virtual string GetURI() => GetNamespaceUri() == null ? "" : GetNamespaceUri().ToString();
         public virtual IEnumerable<NodeInfo> Children() { var __it = IterateAxis(AxisInfo.CHILD); for (var __n = __it.Next(); __n != null; __n = __it.Next()) { yield return __n; } }
         public virtual IEnumerable<NodeInfo> Children(INodePredicate filter) { var __it = IterateAxis(AxisInfo.CHILD, filter); for (var __n = __it.Next(); __n != null; __n = __it.Next()) { yield return __n; } }
         public virtual IAttributeMap Attributes() // upstream NodeInfo default method
         {
-            if (GetNodeKind() != Types.Type.ELEMENT) { return EmptyAttributeMap.GetInstance(); }
+            if (GetNodeKind() != Types.Type.ELEMENT)
+            {
+                return EmptyAttributeMap.GetInstance();
+            }
             IAttributeMap atts = EmptyAttributeMap.GetInstance();
             IAxisIterator iter = IterateAxis(AxisInfo.ATTRIBUTE);
             NodeInfo attr;

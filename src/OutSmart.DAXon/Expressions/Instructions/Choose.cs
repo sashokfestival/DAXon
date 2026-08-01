@@ -12,7 +12,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,14 +34,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public int Count { get { return Size(); } }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override int InstructionNameCode => Size() == 1 ? StandardNames.XSL_IF : StandardNames.XSL_CHOOSE;
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override int ImplementationMethod
         {
             get
@@ -57,19 +50,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override string ExpressionName => "choose";
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override string StreamerName => "Choose";
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public virtual IBooleanEvaluator[] ConditionEvaluators => ((ChooseExprElaborator)MakeElaborator()).MakeConditionEvaluators(this);
         public Choose(Expression[] conditions, Expression[] actions)
         {
@@ -206,9 +190,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public virtual void AtomizeActions()
         {
             for (int i = 0; i < Size(); i++)
@@ -217,9 +198,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override Expression Simplify()
         {
             for (int i = 0; i < Size(); i++)
@@ -247,9 +225,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         private Expression RemoveRedundantBranches(ExpressionVisitor visitor)
         {
             Expression result = RemoveRedundantBranches0(visitor);
@@ -261,9 +236,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return result;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         private Expression RemoveRedundantBranches0(ExpressionVisitor visitor)
         {
 
@@ -299,7 +271,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                 }
 
-                if (conditions.IsEmpty())
+                if (conditions.Count == 0)
                 {
                     Literal lit = Literal.MakeEmptySequence();
                     ExpressionTool.CopyLocationInfo(this, lit);
@@ -311,8 +283,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 }
                 else if (conditions.Count != count)
                 {
-                    Expression[] c = conditions.ToArray(new Expression[0]);
-                    Expression[] a = actions.ToArray(new Expression[0]);
+                    Expression[] c = conditions.ToArray();
+                    Expression[] a = actions.ToArray();
                     Choose result = new Choose(c, a);
                     result.SetRetainedStaticContext(GetRetainedStaticContext());
                     return result;
@@ -391,9 +363,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeHierarchy th = visitor.GetConfiguration().GetTypeHierarchy();
@@ -478,17 +447,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override bool ImplementsStaticTypeCheck()
         {
             return true;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override Expression StaticTypeCheck(SequenceType req, bool backwardsCompatible, Func<RoleDiagnostic> roleSupplier, ExpressionVisitor visitor)
         {
             int count = Size();
@@ -527,7 +490,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
                 c[count] = Literal.MakeLiteral(BooleanValue.TRUE, this);
                 string cond = count == 1 ? "The condition is not" : "None of the conditions is";
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 string message = "Conditional expression: " + cond + " satisfied, so an empty sequence is returned, " + "but this is not allowed as the " + role.GetMessage();
                 ErrorExpression errExp = new ErrorExpression(message, role.ErrorCode, true);
                 ExpressionTool.CopyLocationInfo(this, errExp);
@@ -538,9 +501,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             int count = Size();
@@ -635,9 +595,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             int count = Size();
@@ -655,9 +612,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return ch2;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override void CheckForUpdatingSubexpressions()
         {
             foreach (Operand o in Conditions())
@@ -704,9 +658,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override bool IsUpdatingExpression()
         {
             foreach (Operand o in Actions())
@@ -720,9 +671,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override bool IsVacuousExpression()
         {
 
@@ -738,23 +686,17 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return true;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override int MarkTailFunctionCalls(StructuredQName qName, int arity)
         {
             int result = UserFunctionCall.NOT_TAIL_CALL;
             foreach (Operand action in Actions())
             {
-                result = System.Math.Max(result, action.GetChildExpression().MarkTailFunctionCalls(qName, arity));
+                result = Math.Max(result, action.GetChildExpression().MarkTailFunctionCalls(qName, arity));
             }
 
             return result;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override ItemType GetItemType()
         {
             TypeHierarchy th = GetConfiguration().GetTypeHierarchy();
@@ -767,9 +709,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return type;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             if (IsInstruction())
@@ -788,9 +727,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         protected override int ComputeCardinality()
         {
             int card = 0;
@@ -814,9 +750,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return card;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
 
@@ -830,9 +763,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return props;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             foreach (Operand action in Actions())
@@ -847,9 +777,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override Expression Unordered(bool retainAllNodes, bool forStreaming)
         {
             for (int i = 0; i < Size(); i++)
@@ -860,9 +787,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             foreach (Operand action in Actions())
@@ -871,9 +795,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
 
@@ -893,9 +814,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return result;
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(64);
@@ -907,7 +825,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 sb.Append(GetAction(i).ToString());
                 if (i == Size() - 1)
                 {
-                    sb.Append(")");
+                    sb.Append(')');
                 }
                 else
                 {
@@ -918,17 +836,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override string ToShortString()
         {
             return "if(" + GetCondition(0).ToShortString() + ") then ... else ...";
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("choose", this);
@@ -941,41 +853,30 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ChooseExprElaborator();
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         public class ChooseExprElaborator : PullElaborator
         {
             private IBooleanEvaluator[] conditions;
+            private readonly object conditionsLock = new object();
             public virtual IBooleanEvaluator[] ConditionEvaluators => conditions;
 
             public virtual IBooleanEvaluator[] MakeConditionEvaluators(Choose expr)
             {
-                lock (this)
+                lock (conditionsLock)
                 {
                     if (conditions == null)
                     {
@@ -1236,9 +1137,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Atomize all the action expressions
-        /// </summary>
         private class EagerChooseEvaluator : ISequenceEvaluator
         {
             private readonly IBooleanEvaluator[] conditions;

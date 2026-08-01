@@ -44,9 +44,6 @@ namespace OutSmart.DAXon.Xslt
         private bool explaining;
         private bool updating = false;
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual SequenceType ResultType
         {
             get
@@ -72,9 +69,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual int NumberOfParameters
         {
             get
@@ -99,9 +93,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual int NumberOfOptionalParameters
         {
             get
@@ -130,9 +121,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual SequenceType[] ArgumentTypes
         {
             get
@@ -437,17 +425,11 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         protected override bool IsPermittedChild(StyleElement child)
         {
             return child is XSLLocalParam;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override Visibility GetVisibility()
         {
             if (visibility == Visibility.UNDEFINED)
@@ -459,17 +441,11 @@ namespace OutSmart.DAXon.Xslt
             return visibility;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public SymbolicName.F GetSymbolicName()
         {
             return new SymbolicName.F(GetObjectName(), NumberOfParameters);
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public void CheckCompatibility(Component component)
         {
             if (compiledFunction == null)
@@ -510,9 +486,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual bool IsOverrideExtensionFunction()
         {
             if (overrideExtensionFunctionAtt == null)
@@ -525,28 +498,18 @@ namespace OutSmart.DAXon.Xslt
             return overrideExtensionFunction;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual bool IsUpdating()
         {
             return updating;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override void Index(ComponentDeclaration decl, PrincipalStylesheetModule top)
         {
 
-            //getSkeletonCompiledFunction();
             GetCompiledFunction();
             top.IndexFunction(decl);
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             stackFrameMap = GetConfiguration().MakeSlotManager();
@@ -571,9 +534,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override void CompileDeclaration(Compilation compilation, ComponentDeclaration decl)
         {
             Expression exp = CompileSequenceConstructor(compilation, decl, false);
@@ -612,9 +572,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public void Optimize(ComponentDeclaration declaration)
         {
             Expression exp = compiledFunction.GetBody();
@@ -656,7 +613,6 @@ namespace OutSmart.DAXon.Xslt
             }
 
 
-            //compiledFunction.computeEvaluationMode();
             if (streamability.IsStreaming())
             {
                 compiledFunction.PrepareForStreaming();
@@ -668,17 +624,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public SlotManager GetSlotManager()
         {
             return stackFrameMap;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual void SetParameterDefinitions(UserFunction fn)
         {
             UserFunctionParameter[] @params = new UserFunctionParameter[NumberOfParameters];
@@ -716,9 +666,6 @@ namespace OutSmart.DAXon.Xslt
             fn.SetMinimumArity(count - optional);
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         private void BindParameterDefinitions(UserFunction fn)
         {
             UserFunctionParameter[] @params = fn.GetParameterDefinitions();
@@ -733,9 +680,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual UserFunction GetCompiledFunction()
         {
             if (compiledFunction == null)

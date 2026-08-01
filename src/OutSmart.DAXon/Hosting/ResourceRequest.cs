@@ -16,7 +16,6 @@ using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Lib
 {
@@ -109,13 +108,13 @@ namespace OutSmart.DAXon.Lib
                     }
                     catch (XPathException e)
                     {
-                        Exception cause = e.GetCause() as Exception;
+                        Exception cause = e.InnerException as Exception;
                         if (cause is ArgumentException)
                         {
                             ArgumentException iae = (ArgumentException)(object)cause;
-                            if (iae.GetCause() is URISyntaxException)
+                            if (iae.InnerException is URISyntaxException)
                             {
-                                throw new XPathException("Invalid URI " + uri, (Exception)(iae.GetCause()));
+                                throw new XPathException("Invalid URI " + uri, (Exception)(iae.InnerException));
                             }
 
                             throw e;

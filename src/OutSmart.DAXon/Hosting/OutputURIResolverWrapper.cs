@@ -17,7 +17,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Lib
@@ -35,14 +34,14 @@ namespace OutSmart.DAXon.Lib
             IOutputURIResolver r2 = outputURIResolver.NewInstance();
             try
             {
-                Result result = r2.Resolve(href, baseUri);
+                IResultTarget result = r2.Resolve(href, baseUri);
                 IAction onClose = () =>
                 {
                     try
                     {
                         r2.Dispose(result);
                     }
-                    catch (TransformerException te)
+                    catch (XPathException te)
                     {
                         throw new UncheckedXPathException(XPathException.MakeXPathException(te));
                     }
@@ -64,7 +63,7 @@ namespace OutSmart.DAXon.Lib
                 actions.Add(onClose);
                 return new CloseNotifier(@out, actions);
             }
-            catch (TransformerException e)
+            catch (XPathException e)
             {
                 throw XPathException.MakeXPathException(e);
             }

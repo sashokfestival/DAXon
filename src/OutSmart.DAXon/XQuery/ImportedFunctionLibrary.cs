@@ -110,6 +110,5 @@ namespace OutSmart.DAXon.XQuery
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
     }
 }

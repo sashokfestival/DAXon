@@ -71,9 +71,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /// <summary>
-        /// Character data
-        /// </summary>
-        /// <summary>
         /// End of element
         /// </summary>
         public override void EndElement()
@@ -82,9 +79,6 @@ namespace OutSmart.DAXon.Events
             nextReceiver.EndElement();
         }
 
-        /// <summary>
-        /// Character data
-        /// </summary>
         /// <summary>
         /// Notify the end of a document node
         /// </summary>

@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Collections;using OutSmart.DAXon.Functions;
 
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,7 +25,7 @@ namespace OutSmart.DAXon.Regex.CharClass
 
         public virtual bool Test(int value)
         {
-            return predicate.Test(value);
+            return predicate(value);
         }
 
         public virtual bool IsDisjoint(ICharacterClass other)
@@ -39,7 +38,7 @@ namespace OutSmart.DAXon.Regex.CharClass
             return null; // Not known
         }
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual IIntPredicateProxy Union(IIntPredicateProxy other) => throw new NotImplementedException();
+        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
+        public virtual IIntPredicateProxy Union(IIntPredicateProxy other) => OutSmart.DAXon.Collections.IntUnionPredicate.MakeUnion(this, other); // upstream IntPredicateProxy default
     }
 }

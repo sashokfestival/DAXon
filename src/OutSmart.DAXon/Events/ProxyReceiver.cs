@@ -81,7 +81,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Start of event stream
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
 
             // Note: It's wrong to assume that because we've finished writing to this
@@ -89,12 +89,16 @@ namespace OutSmart.DAXon.Events
             // In the case where the rest of the pipe is to stay open, the caller should
             // either avoid doing the close(), or should first set the underlying receiver
             // to null.
-            nextReceiver.Dispose();
+            nextReceiver.Close();
         }
 
-        /// <summary>
-        /// Start of event stream
-        /// </summary>
+        // Abort-path release: propagate down the pipe so the tail's resources (e.g. an
+        // emitter's output file) are freed without emitting close events.
+        public override void Dispose()
+        {
+            nextReceiver?.Dispose();
+        }
+
         /// <summary>
         /// Start of a document node.
         /// </summary>
@@ -104,9 +108,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /// <summary>
-        /// Start of event stream
-        /// </summary>
-        /// <summary>
         /// Notify the end of a document node
         /// </summary>
         public override void EndDocument()
@@ -114,9 +115,6 @@ namespace OutSmart.DAXon.Events
             nextReceiver.EndDocument();
         }
 
-        /// <summary>
-        /// Start of event stream
-        /// </summary>
         /// <summary>
         /// Notify the end of a document node
         /// </summary>
@@ -126,9 +124,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /// <summary>
-        /// Start of event stream
-        /// </summary>
-        /// <summary>
         /// End of element
         /// </summary>
         public override void EndElement()
@@ -136,9 +131,6 @@ namespace OutSmart.DAXon.Events
             nextReceiver.EndElement();
         }
 
-        /// <summary>
-        /// Start of event stream
-        /// </summary>
         /// <summary>
         /// Character data
         /// </summary>
@@ -148,9 +140,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /// <summary>
-        /// Start of event stream
-        /// </summary>
-        /// <summary>
         /// Processing Instruction
         /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
@@ -159,9 +148,6 @@ namespace OutSmart.DAXon.Events
         }
 
         /// <summary>
-        /// Start of event stream
-        /// </summary>
-        /// <summary>
         /// Output a comment
         /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
@@ -169,34 +155,16 @@ namespace OutSmart.DAXon.Events
             nextReceiver.Comment(chars, locationId, properties);
         }
 
-        /// <summary>
-        /// Start of event stream
-        /// </summary>
-        /// <summary>
-        /// Set the URI for an unparsed entity in the document.
-        /// </summary>
         public override void SetUnparsedEntity(string name, string uri, string publicId)
         {
             nextReceiver.SetUnparsedEntity(name, uri, publicId);
         }
 
-        /// <summary>
-        /// Start of event stream
-        /// </summary>
-        /// <summary>
-        /// Set the URI for an unparsed entity in the document.
-        /// </summary>
         public override void Append(IItem item, ILocation locationId, int properties)
         {
             nextReceiver.Append(item, locationId, properties);
         }
 
-        /// <summary>
-        /// Start of event stream
-        /// </summary>
-        /// <summary>
-        /// Set the URI for an unparsed entity in the document.
-        /// </summary>
         public override bool UsesTypeAnnotations()
         {
             return nextReceiver.UsesTypeAnnotations();

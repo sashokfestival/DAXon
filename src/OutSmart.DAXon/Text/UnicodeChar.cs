@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Serialization.CharCodes;
 using OutSmart.DAXon.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -95,7 +94,7 @@ namespace OutSmart.DAXon.Text
 
         public override long IndexWhere(Func<int, bool> predicate, long from)
         {
-            return (from == 0 && predicate.Test(codepoint)) ? 0 : -1;
+            return (from == 0 && predicate(codepoint)) ? 0 : -1;
         }
 
         public override string ToString()

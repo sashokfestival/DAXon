@@ -72,7 +72,7 @@ namespace OutSmart.DAXon.Expressions
                     long startVal = start.LongValue();
                     long stepVal = step.LongValue();
                     long endVal = end.LongValue();
-                    if ((endVal - startVal) / stepVal > int.MaxValue)
+                    if (IntegerRange.CountExceedsLimit(startVal, stepVal, endVal))
                     {
                         throw new XPathException("Saxon limit on sequence length exceeded (2^31)", "XPDY0130");
                     }

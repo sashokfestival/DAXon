@@ -4,7 +4,6 @@
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Expressions.Accumulators;
 using OutSmart.DAXon.Expressions.Compatibility;
@@ -13,7 +12,6 @@ using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Expressions.Numbering;
 using OutSmart.DAXon.Expressions.Sorting;
 using OutSmart.DAXon.Functions;
-using OutSmart.DAXon.Core.PlatformImpl;
 using OutSmart.DAXon.Values.Arrays;
 using OutSmart.DAXon.Values.Maps;
 using OutSmart.DAXon.Patterns;
@@ -50,8 +48,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 
@@ -64,6 +60,7 @@ namespace OutSmart.DAXon.Core
     //})
     public class Configuration : INotationSet, Configuration.IApiProvider
     {
+        internal readonly object syncLock = new object();
         /// <summary>
         /// Constant indicating the XML Version 1.0
         /// </summary>
@@ -72,27 +69,11 @@ namespace OutSmart.DAXon.Core
         /// Constant indicating the XML Version 1.1
         /// </summary>
         public const int XML11 = 11;
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public const int XSD10 = 10;
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public const int XSD11 = 11;
         protected static IntSet booleanFeatures = new IntHashSet(40);
         protected static IntSet stringFeatures = new IntHashSet(40);
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         // Process-wide compiled-regex memo cache (Goal 6 / Appendix B). fn:matches/replace/tokenize/
         // analyze-string + xsl:analyze-string with a NON-literal pattern recompile the regex on every
         // call (RegexFunction pre-binds only literals), and a fresh Processor/Configuration per request
@@ -127,7 +108,10 @@ namespace OutSmart.DAXon.Core
         private string defaultCountry = Version.platform.DefaultCountry;
         private Properties defaultOutputProperties = new Properties();
         private IIDynamicLoader dynamicLoader = Version.platform.DefaultDynamicLoader;
-        private readonly IntSet enabledProperties = new IntHashSet(64);
+        // Flag array indexed by FeatureCode, not a hash set: a bool element reads and writes
+        // atomically and there is nothing to resize, so a host toggling a feature while another
+        // thread transforms (contract-violating, but survivable) cannot tear the structure.
+        private readonly bool[] enabledProperties = new bool[FeatureCode.MAX + 1];
         private readonly IntHashMap<string> stringProperties = new IntHashMap<string>(); // TODO: not yet widely used
         private IList<IExternalObjectModel> externalObjectModels = new List<IExternalObjectModel>(4);
         private readonly DocumentPool globalDocumentPool = new DocumentPool();
@@ -163,38 +147,18 @@ namespace OutSmart.DAXon.Core
         private readonly Dictionary<NamespaceUri, IFunctionAnnotationHandler> functionAnnotationHandlers = new Dictionary<NamespaceUri, IFunctionAnnotationHandler>();
         private int regexBacktrackingLimit = 10000000;
         private readonly TreeStatistics treeStatistics = new TreeStatistics();
-        private CleanerProxy cleaner = null; // created on demand
 
         // XSLT document() retrieval failure is a RECOVERABLE dynamic error (the recovery action is to return an
         // empty sequence). Off by default so fn:doc / document() raise FODC0002/FODC0005 (error-FODC0002a); the
         // QT3 driver turns it on for test-cases declaring <ignore_doc_failure satisfied="true"/>.
         private bool recoverFromDocFailures = false;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual string EditionCode => "HE";
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual string ProductTitle => Version.ProductName + " " + Version.DistributionVersion + " (Saxon" + Version.platform.PlatformSuffix + "-" + EditionCode + " " + Version.ProductVersion + " base © Saxonica, MPL 2.0)";
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual Properties LicenseFeatures => null;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual IIDynamicLoader DynamicLoader
         {
             get => dynamicLoader; set
@@ -203,13 +167,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual Logger Logger
         {
             get => traceOutput; set
@@ -218,13 +175,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual int XMLVersion
         {
             get => xmlVersion; set
@@ -234,16 +184,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IComparer<string> MediaQueryEvaluator
         {
             get => mediaQueryEvaluator; set
@@ -252,16 +192,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual int XsdVersion
         {
             get => xsdVersion; set
@@ -270,16 +200,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IXPathContext ConversionContext
         {
             get
@@ -293,16 +213,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IIntPredicateProxy ValidCharacterChecker
         {
             get
@@ -318,16 +228,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string TraceListenerClass
         {
             get => traceListenerClass; set
@@ -345,7 +245,7 @@ namespace OutSmart.DAXon.Core
                     }
                     catch (XPathException err)
                     {
-                        throw new ArgumentException(value + ": " + err.GetMessage());
+                        throw new ArgumentException(value + ": " + err.Message);
                     }
 
                     this.traceListenerClass = value;
@@ -354,16 +254,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string TraceListenerOutputFile
         {
             get => traceListenerOutput; set
@@ -372,40 +262,10 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual BuiltInFunctionSet XQueryUpdateFunctionSet => null;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual BuiltInFunctionSet VendorFunctionSet => VendorFunctionSetHE.GetInstance();
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ICollationURIResolver CollationURIResolver
         {
             get => collationResolver; set
@@ -414,16 +274,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string DefaultCollection
         {
             get => defaultCollection; set
@@ -432,16 +282,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ICollectionFinder CollectionFinder
         {
             get => collectionFinder; set
@@ -450,16 +290,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual LocalizerFactory LocalizerFactory
         {
             get => localizerFactory; set
@@ -468,16 +298,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string DefaultCountry
         {
             get => defaultCountry; set
@@ -486,16 +306,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string DefaultRegexEngine
         {
             get => defaultRegexEngine; set
@@ -509,16 +319,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IUnparsedTextURIResolver UnparsedTextURIResolver
         {
             get => unparsedTextURIResolver; set
@@ -527,28 +327,8 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual CompilerInfo DefaultXsltCompilerInfo => defaultXsltCompilerInfo;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual StaticQueryContext DefaultStaticQueryContext
         {
             get
@@ -562,16 +342,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string SourceParserClass
         {
             get => sourceParserClass; set
@@ -580,16 +350,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string StyleParserClass
         {
             get => styleParserClass; set
@@ -598,16 +358,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual SerializerFactory SerializerFactory
         {
             get => serializerFactory; set
@@ -616,16 +366,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Properties DefaultSerializationProperties
         {
             get => defaultOutputProperties; set
@@ -634,24 +374,11 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual int SchemaValidationMode
         {
             get => defaultParseOptions.GetSchemaValidationMode(); set
             {
 
-                //        switch (validationMode) {
-                //            case Validation.STRIP:
-                //            case Validation.PRESERVE:
                 //                break;
                 //            case Validation.LAX:
                 //                if (!isLicensedFeature(LicenseFeature.SCHEMA_VALIDATION)) {
@@ -669,16 +396,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual DocumentNumberAllocator DocumentNumberAllocator
         {
             get => documentNumberAllocator; set
@@ -687,52 +404,12 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual DocumentPool GlobalDocumentPool => globalDocumentPool;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual HashSet<NamespaceUri> ImportedNamespaces => new HashSet<NamespaceUri>();
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Collection<GlobalParam> DeclaredSchemaParameters => null;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IDebugger Debugger
         {
             get => debugger; set
@@ -741,58 +418,12 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual OptimizerOptions PermittedOptimizerOptions => OptimizerOptions.FULL_HE_OPTIMIZATION;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ContextItemStaticInfo DefaultContextItemStaticInfo => ContextItemStaticInfo.DEFAULT;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual IList<IExternalObjectModel> ExternalObjectModels => externalObjectModels;
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual string Label
         {
             get => label; set
@@ -801,19 +432,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         static Configuration()
         {
             booleanFeatures.Add(FeatureCode.ALLOW_EXTERNAL_FUNCTIONS);
@@ -836,7 +454,6 @@ namespace OutSmart.DAXon.Core
             booleanFeatures.Add(FeatureCode.MULTIPLE_SCHEMA_IMPORTS);
             booleanFeatures.Add(FeatureCode.PRE_EVALUATE_DOC_FUNCTION);
 
-            //booleanFeatures.add(FeatureCode.PREFER_JAXP_PARSER);
             booleanFeatures.Add(FeatureCode.RECOGNIZE_URI_QUERY_PARAMETERS);
             booleanFeatures.Add(FeatureCode.RETAIN_DTD_ATTRIBUTE_TYPES);
             booleanFeatures.Add(FeatureCode.STABLE_COLLECTION_URI);
@@ -855,98 +472,47 @@ namespace OutSmart.DAXon.Core
             booleanFeatures.Add(FeatureCode.ALLOW_UNRESOLVED_SCHEMA_COMPONENTS);
             stringFeatures.Add(FeatureCode.ZIP_URI_PATTERN);
         }
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public Configuration()
         {
             Init();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public static Configuration NewConfiguration()
         {
             System.Type configurationClass = typeof(Configuration);
             try
             {
-                return (Configuration)configurationClass.NewInstance();
+                return (Configuration)global::System.Activator.CreateInstance(configurationClass);
             }
             catch (Exception e)
             {
-                e.ToString();
-                throw new Exception("Cannot instantiate a Configuration", e);
+                throw new InvalidOperationException("Cannot instantiate a Configuration", e);
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public static Configuration NewLicensedConfiguration()
         {
             return new Configuration();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public static Configuration ReadConfiguration(ResolvedResource source)
         {
             Configuration tempConfig = NewConfiguration();
             return tempConfig.ReadConfigurationFile(source);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public static Configuration ReadConfiguration(ResolvedResource source, Configuration baseConfiguration)
         {
             Configuration tempConfig = NewConfiguration();
             return tempConfig.ReadConfigurationFile(source, baseConfiguration);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        public static Configuration InstantiateConfiguration(string className, ClassLoader classLoader)
+        public static Configuration InstantiateConfiguration(string className)
         {
-            System.Type theClass;
-            ClassLoader loader = classLoader;
-            if (loader == null)
-            {
-                try
-                {
-                    loader = null;
-                }
-                catch (Exception err)
-                {
-                    Console.Error.WriteLine("Failed to getContextClassLoader() - continuing");
-                }
-            }
-
-            if (loader != null)
-            {
-                try
-                {
-                    theClass = loader.LoadClass(className);
-                }
-                catch (Exception ex)
-                {
-                    theClass = System.Type.GetType(className);
-                }
-            }
-            else
-            {
-                theClass = System.Type.GetType(className);
-            }
-
-            return (Configuration)theClass.NewInstance();
+            System.Type theClass = System.Type.GetType(className);
+            return (Configuration)global::System.Activator.CreateInstance(theClass);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         public static bool IsAssertionsEnabled()
         {
 
@@ -957,17 +523,11 @@ namespace OutSmart.DAXon.Core
             return assertsEnabled;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         protected virtual Configuration ReadConfigurationFile(ResolvedResource source)
         {
             return MakeConfigurationReader().MakeConfiguration(source);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         protected virtual Configuration ReadConfigurationFile(ResolvedResource source, Configuration baseConfiguration)
         {
             ConfigurationReader reader = MakeConfigurationReader();
@@ -975,17 +535,11 @@ namespace OutSmart.DAXon.Core
             return reader.MakeConfiguration(source);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         protected virtual ConfigurationReader MakeConfigurationReader()
         {
             return new ConfigurationReader();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
         protected virtual void Init()
         {
 
@@ -1012,12 +566,9 @@ namespace OutSmart.DAXon.Core
             }
 
 
-            //internalSetBooleanProperty(FeatureCode.PREFER_JAXP_PARSER, FeatureKeys.PREFER_JAXP_PARSER, true);
             InternalSetBooleanProperty(FeatureCode.ALLOW_EXTERNAL_FUNCTIONS, FeatureKeys.ALLOW_EXTERNAL_FUNCTIONS, true);
             InternalSetBooleanProperty(FeatureCode.DISABLE_XSL_EVALUATE, FeatureKeys.DISABLE_XSL_EVALUATE, false);
 
-            //internalSetBooleanProperty(FeatureKeys.STABLE_COLLECTION_URI, true);
-            //@if CSHARP==false
             string initializationClass = Environment.GetEnvironmentVariable("SAXON_INITIALIZER");
             if (initializationClass != null)
             {
@@ -1026,14 +577,13 @@ namespace OutSmart.DAXon.Core
                     IInitializer initializer = (IInitializer)GetInstance(initializationClass);
                     initializer.Initialize(this);
                 }
-                catch (TransformerException e)
+                catch (XPathException e)
                 {
-                    Console.Error.WriteLine("Warning: Failed to invoke Saxon IInitializer " + initializationClass + ": " + e.GetMessage());
+                    Console.Error.WriteLine("Warning: Failed to invoke Saxon IInitializer " + initializationClass + ": " + e.Message);
                 }
             }
 
 
-            //@endif
             RegisterFileExtension("xml", "application/xml");
             RegisterFileExtension("html", "application/html");
             RegisterFileExtension("atom", "application/atom");
@@ -1061,11 +611,7 @@ namespace OutSmart.DAXon.Core
             RegisterFunctionAnnotationHandler(new XQueryFunctionAnnotationHandler());
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        public static Configuration MakeLicensedConfiguration(ClassLoader classLoader, string className)
+        public static Configuration MakeLicensedConfiguration(string className)
         {
             if (className == null)
             {
@@ -1074,52 +620,36 @@ namespace OutSmart.DAXon.Core
 
             try
             {
-                return InstantiateConfiguration(className, classLoader);
+                return InstantiateConfiguration(className);
             }
             catch (TypeLoadException e)
             {
-                throw new Exception(e?.Message, e);
+                throw new InvalidOperationException(e?.Message, e);
             }
             catch (MissingMethodException e)
             {
-                throw new Exception(e?.Message, e);
+                throw new InvalidOperationException(e?.Message, e);
             }
             catch (UnauthorizedAccessException e)
             {
-                throw new Exception(e?.Message, e);
+                throw new InvalidOperationException(e?.Message, e);
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual void ImportLicenseDetails(Configuration config)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual void SetProcessor(IApiProvider processor)
         {
             this.apiProcessor = processor;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual IApiProvider GetProcessor()
         {
             return apiProcessor;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual void CheckLicensedFeature(int feature, string name, int localLicenseId)
         {
             string require = feature == LicenseFeature.PROFESSIONAL_EDITION ? "PE" : "EE";
@@ -1133,27 +663,15 @@ namespace OutSmart.DAXon.Core
             throw new LicenseException(message, LicenseException.WRONG_CONFIGURATION);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual void DisableLicensing()
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual bool IsFeatureAllowedBySecondaryLicense(int localLicenseId, int feature)
         {
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual bool IsLicensedFeature(int feature)
         {
 
@@ -1162,10 +680,6 @@ namespace OutSmart.DAXon.Core
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual void RequireProfessionalLicense(string featureName)
         {
             if (!IsLicensedFeature(LicenseFeature.PROFESSIONAL_EDITION))
@@ -1174,69 +688,30 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public virtual string GetLicenseFeature(string name)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual void DisplayLicenseMessage()
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual int RegisterLocalLicense(string dmk)
         {
             return -1;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual System.Type GetType(string className, bool tracing)
         {
-            return dynamicLoader.GetType(className, tracing ? traceOutput : null, null);
+            return dynamicLoader.GetType(className, tracing ? traceOutput : null);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual object GetInstance(string className)
         {
-            return dynamicLoader.GetInstance(className, IsTiming() ? traceOutput : null, null);
+            return dynamicLoader.GetInstance(className, IsTiming() ? traceOutput : null);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual IResourceResolver GetResourceResolver()
         {
             if (commonResolver == null)
@@ -1247,58 +722,24 @@ namespace OutSmart.DAXon.Core
             return commonResolver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual void SetResourceResolver(IResourceResolver resolver)
         {
             commonResolver = resolver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual void SetParameterizedURIResolver()
         {
             SetBooleanProperty(Feature<bool>.RECOGNIZE_URI_QUERY_PARAMETERS, true);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual ProtocolRestrictor GetProtocolRestrictor()
         {
             return protocolRestrictor;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual IResourceResolver MakeResourceResolver(string className)
         {
             object obj = dynamicLoader.GetInstance(className, null);
-            if (obj is URIResolver)
-            {
-                Logger.Warning("From Saxon 11.1, the value of the -r option should be a IResourceResolver, not a URIResolver");
-                obj = new ResourceResolverWrappingURIResolver((URIResolver)obj);
-            }
-
             if (obj is IResourceResolver)
             {
                 return (IResourceResolver)obj;
@@ -1307,25 +748,11 @@ namespace OutSmart.DAXon.Core
             throw new XPathException("Class " + className + " is not a IResourceResolver");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual void SetErrorReporterFactory(Func<Configuration, IErrorReporter> factory)
         {
             errorReporterFactory = factory;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual IErrorReporter MakeErrorReporter()
         {
             if (errorReporterFactory == null)
@@ -1338,16 +765,9 @@ namespace OutSmart.DAXon.Core
                 };
             }
 
-            return errorReporterFactory.Apply(this);
+            return errorReporterFactory(this);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual void ReportFatalError(XPathException err)
         {
             if (!err.HasBeenReported())
@@ -1357,13 +777,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual void SetStandardErrorOutput(TextWriter @out)
         {
             if (traceOutput is StandardLogger)
@@ -1372,63 +785,26 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
         public virtual ParseOptions GetParseOptions()
         {
             return defaultParseOptions;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetParseOptions(ParseOptions options)
         {
             defaultParseOptions = options;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetConversionRules(ConversionRules rules)
         {
             this.theConversionRules = rules;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ConversionRules GetConversionRules()
         {
             if (theConversionRules == null)
             {
-                lock (this)
+                lock (syncLock)
                 {
                     ConversionRules cv = new ConversionRules();
                     cv.SetTypeHierarchy(GetTypeHierarchy());
@@ -1453,46 +829,16 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual int GetTreeModel()
         {
             return defaultParseOptions.Model.SymbolicValue;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetTreeModel(int treeModel)
         {
             defaultParseOptions = defaultParseOptions.WithModel(TreeModel.GetTreeModel(treeModel));
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsLineNumbering()
         {
             return defaultParseOptions.IsLineNumbering();
@@ -1507,76 +853,26 @@ namespace OutSmart.DAXon.Core
             recoverFromDocFailures = value;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetLineNumbering(bool lineNumbering)
         {
             defaultParseOptions = defaultParseOptions.WithLineNumbering(lineNumbering);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetXIncludeAware(bool state)
         {
             defaultParseOptions = defaultParseOptions.WithXIncludeAware(state);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsXIncludeAware()
         {
             return defaultParseOptions.IsXIncludeAware();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ITraceListener GetTraceListener()
         {
             return traceListener;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ITraceListener MakeTraceListener()
         {
             if (traceListener != null)
@@ -1600,16 +896,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetTraceListener(ITraceListener traceListener)
         {
             this.traceListener = traceListener;
@@ -1617,31 +903,11 @@ namespace OutSmart.DAXon.Core
             InternalSetBooleanProperty(FeatureCode.ALLOW_MULTITHREADING, FeatureKeys.ALLOW_MULTITHREADING, false);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsCompileWithTracing()
         {
             return GetBooleanProperty(Feature<bool>.COMPILE_WITH_TRACING);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetCompileWithTracing(bool trace)
         {
             InternalSetBooleanProperty(FeatureCode.COMPILE_WITH_TRACING, FeatureKeys.COMPILE_WITH_TRACING, trace);
@@ -1660,16 +926,6 @@ namespace OutSmart.DAXon.Core
             DefaultStaticQueryContext.CodeInjector = trace ? new XQueryTraceCodeInjector() : null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ITraceListener MakeTraceListener(string className)
         {
             object obj = dynamicLoader.GetInstance(className, null);
@@ -1694,16 +950,6 @@ namespace OutSmart.DAXon.Core
             throw new XPathException("Class " + className + " is not a ITraceListener");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual BuiltInFunctionSet GetXSLTFunctionSet(int version)
         {
             if (version == 20)
@@ -1724,16 +970,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual BuiltInFunctionSet GetXPathFunctionSet(int version)
         {
             switch (version)
@@ -1752,16 +988,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual SystemFunction MakeSystemFunction(string localName, int arity, int xpathVersion)
         {
             try
@@ -1774,64 +1000,24 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual SystemFunction MakeSystemFunction40(string localName, int arity)
         {
             return MakeSystemFunction(localName, arity, 40);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void RegisterExtensionFunction(ExtensionFunctionDefinition function)
         {
             integratedFunctionLibrary.RegisterFunction(function);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IntegratedFunctionLibrary GetIntegratedFunctionLibrary()
         {
             return integratedFunctionLibrary;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual FunctionLibraryList GetBuiltInExtensionLibraryList(int version)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (version != 40)
                 {
@@ -1849,34 +1035,14 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual UseWhen30FunctionSet GetUseWhenFunctionLibrary(int version)
         {
-            lock (this)
+            lock (syncLock)
             {
                 return UseWhen30FunctionSet.GetInstance(version);
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         protected virtual FunctionLibraryList MakeBuiltInExtensionLibraryList(int version)
         {
             FunctionLibraryList result = new FunctionLibraryList();
@@ -1888,60 +1054,20 @@ namespace OutSmart.DAXon.Core
             return result;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual SystemFunction BindSaxonExtensionFunction(string localName, int arity)
         {
             throw new NotSupportedException("The extension function saxon:" + localName + "#" + arity + " requires Saxon-PE or higher");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void AddExtensionBinders(FunctionLibraryList list)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IFunctionLibrary LoadStubFunctionLibrary(ResolvedResource jsonSignatures)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IFunctionItem GetSystemFunction(StructuredQName name, int arity)
         {
             try
@@ -1992,16 +1118,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual UserFunction NewUserFunction(bool memoFunction, FunctionStreamability streamability)
         {
             if (memoFunction)
@@ -2014,31 +1130,11 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void RegisterCollation(string collationURI, IStringCollator collator)
         {
-            collationMap.Put(collationURI, collator);
+            collationMap[collationURI] = collator;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IStringCollator GetCollation(string collationName)
         {
             if (collationName == null || collationName.Equals(NamespaceConstant.CODEPOINT_COLLATION_URI))
@@ -2056,7 +1152,7 @@ namespace OutSmart.DAXon.Core
                 return new AlphanumericCollator(GetCollation(collationName.Substring(AlphanumericCollator.PREFIX.Length)));
             }
 
-            IStringCollator collator = collationMap.Get(collationName);
+            IStringCollator collator = collationMap.GetOrDefault(collationName);
             if (collator == null)
             {
                 collator = CollationURIResolver.Resolve(collationName, this);
@@ -2065,16 +1161,6 @@ namespace OutSmart.DAXon.Core
             return collator;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IStringCollator GetCollation(string collationURI, string baseURI)
         {
             if (collationURI.Equals(NamespaceConstant.CODEPOINT_COLLATION_URI))
@@ -2093,16 +1179,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IStringCollator GetCollation(string collationURI, string baseURI, string errorCode)
         {
             if (collationURI.Equals(NamespaceConstant.CODEPOINT_COLLATION_URI))
@@ -2132,127 +1208,47 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string GetDefaultCollationName()
         {
             return defaultCollationName;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void RegisterCollection(string collectionURI, IResourceCollection collection)
         {
-            registeredCollections.Put(collectionURI, collection);
+            registeredCollections[collectionURI] = collection;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IResourceCollection GetRegisteredCollection(string uri)
         {
-            return registeredCollections.Get(uri);
+            return registeredCollections.GetOrDefault(uri);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void RegisterFileExtension(string extension, string mediaType)
         {
-            fileExtensions.Put(extension, mediaType);
+            fileExtensions[extension] = mediaType;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void RegisterMediaType(string contentType, IResourceFactory factory)
         {
-            resourceFactoryMapping.Put(contentType, factory);
+            resourceFactoryMapping[contentType] = factory;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string GetMediaTypeForFileExtension(string extension)
         {
-            string mediaType = fileExtensions.Get(extension);
+            string mediaType = fileExtensions.GetOrDefault(extension);
             if (mediaType == null)
             {
-                mediaType = fileExtensions.Get("");
+                mediaType = fileExtensions.GetOrDefault("");
             }
 
             return mediaType;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IResourceFactory GetResourceFactoryForMediaType(string mediaType)
         {
-            return resourceFactoryMapping.Get(mediaType);
+            return resourceFactoryMapping.GetOrDefault(mediaType);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetDefaultLanguage(string language)
         {
             ValidationFailure vf = StringConverter.StringToLanguage.INSTANCE.Validate(StringView.Of(language).Tidy());
@@ -2264,16 +1260,6 @@ namespace OutSmart.DAXon.Core
             defaultLanguage = language;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual string GetDefaultLanguage()
         {
             return defaultLanguage;
@@ -2303,20 +1289,28 @@ namespace OutSmart.DAXon.Core
             return entry.Regex;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual INumberer MakeNumberer(string language, string country)
         {
             if (localizerFactory == null)
             {
+                // Non-English month/day names come from the OS culture when it knows the tag
+                // (format-date lang='de' etc.); unknown tags keep the English fallback, which
+                // FormatDate marks with the [Language: en] prefix.
+                if (language != null && !language.StartsWith("en", StringComparison.Ordinal))
+                {
+                    global::System.Globalization.CultureInfo culture = DotNetPlatform.TryGetKnownCulture(language);
+                    if (culture != null)
+                    {
+                        Numberer_bcl bcl = new Numberer_bcl(culture, language);
+                        if (country != null)
+                        {
+                            bcl.Country = country;
+                        }
+
+                        return bcl;
+                    }
+                }
+
                 Numberer_en numberer = new Numberer_en();
                 if (language != null)
                 {
@@ -2342,31 +1336,11 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetModuleURIResolver(IModuleURIResolver resolver)
         {
             DefaultStaticQueryContext.ModuleURIResolver = resolver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetModuleURIResolver(string className)
         {
             object obj = dynamicLoader.GetInstance(className, null);
@@ -2385,136 +1359,46 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IModuleURIResolver GetModuleURIResolver()
         {
             return DefaultStaticQueryContext.ModuleURIResolver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IModuleURIResolver GetStandardModuleURIResolver()
         {
             return standardModuleURIResolver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         protected virtual StaticQueryContext MakeStaticQueryContext(bool copyFromDefault)
         {
             return staticQueryContextFactory.NewStaticQueryContext(this, copyFromDefault);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void RegisterFunctionAnnotationHandler(IFunctionAnnotationHandler handler)
         {
-            functionAnnotationHandlers.Put(handler.AssertionNamespace, handler);
+            functionAnnotationHandlers[handler.AssertionNamespace] = handler;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IFunctionAnnotationHandler GetFunctionAnnotationHandler(NamespaceUri @namespace)
         {
-            return functionAnnotationHandlers.Get(@namespace);
+            return functionAnnotationHandlers.GetOrDefault(@namespace);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsStreamabilityEnabled()
         {
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IOutputURIResolver GetOutputURIResolver()
         {
             return defaultXsltCompilerInfo.OutputURIResolver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetOutputURIResolver(IOutputURIResolver outputURIResolver)
         {
             defaultXsltCompilerInfo.OutputURIResolver = outputURIResolver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual CharacterSetFactory GetCharacterSetFactory()
         {
             if (characterSetFactory == null)
@@ -2525,277 +1409,90 @@ namespace OutSmart.DAXon.Core
             return characterSetFactory;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual SerializationProperties ObtainDefaultSerializationProperties()
         {
             return new SerializationProperties(defaultOutputProperties);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void ProcessResultDocument(ResultDocument instruction, IPushEvaluator content, IXPathContext context)
         {
             instruction.ProcessInstruction(content, context);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ISequenceIterator GetMultithreadedItemMappingIterator(ISequenceIterator @base, IItemMappingFunction action)
         {
             return new ItemMappingIterator(@base, action);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsTiming()
         {
-            return enabledProperties.Contains(FeatureCode.TIMING);
+            return enabledProperties[FeatureCode.TIMING];
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetTiming(bool timing)
         {
-            if (timing)
-            {
-                enabledProperties.Add(FeatureCode.TIMING);
-            }
-            else
-            {
-                enabledProperties.Remove(FeatureCode.TIMING);
-            }
+            enabledProperties[FeatureCode.TIMING] = timing;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsVersionWarning()
         {
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetVersionWarning(bool warn)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsValidation()
         {
             return defaultParseOptions.DTDValidationMode == Validation.STRICT || defaultParseOptions.DTDValidationMode == Validation.LAX;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetValidation(bool validation)
         {
             defaultParseOptions = defaultParseOptions.WithDTDValidationMode(validation ? Validation.STRICT : Validation.STRIP);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IFilterFactory MakeDocumentProjector(PathMap.PathMapRoot map)
         {
             throw new NotSupportedException("Document projection requires Saxon-EE");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IFilterFactory MakeDocumentProjector(XQueryExpression exp)
         {
             throw new NotSupportedException("Document projection requires Saxon-EE");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetValidationWarnings(bool warn)
         {
             defaultParseOptions = defaultParseOptions.WithContinueAfterValidationErrors(warn);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsValidationWarnings()
         {
             return defaultParseOptions.IsContinueAfterValidationErrors();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetExpandAttributeDefaults(bool expand)
         {
             defaultParseOptions = defaultParseOptions.WithExpandAttributeDefaults(expand);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsExpandAttributeDefaults()
         {
             return defaultParseOptions.IsExpandAttributeDefaults();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual NamePool GetNamePool()
         {
             return namePool;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SetNamePool(NamePool targetNamePool)
         {
             namePool = targetNamePool;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual TypeHierarchy GetTypeHierarchy()
         {
             if (typeHierarchy == null)
@@ -2806,16 +1503,6 @@ namespace OutSmart.DAXon.Core
             return typeHierarchy;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual TypeChecker GetTypeChecker(bool backwardsCompatible)
         {
             if (backwardsCompatible)
@@ -2828,409 +1515,119 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual TypeAliasManager MakeTypeAliasManager()
         {
             return new TypeAliasManager();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsCompatible(Configuration other)
         {
             return namePool == other.namePool && documentNumberAllocator == other.documentNumberAllocator;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsStripsAllWhiteSpace()
         {
             return defaultParseOptions.SpaceStrippingRule == AllElementsSpaceStrippingRule.GetInstance();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         // GetSourceParser/ReuseSourceParser/GetStyleParser/ReuseStyleParser + MakeParser/LoadParser retired
         // (R4.1b): document/stylesheet parsing pumps directly through XmlReaderToReceiver (ActiveStreamSource);
         // the SAX XMLReader they fabricated was never read by the delivery path.
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void LoadSchema(string absoluteURI)
         {
             ReadSchema(MakePipelineConfiguration(), "", absoluteURI, null);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual NamespaceUri ReadSchema(PipelineConfiguration pipe, string baseURI, string schemaLocation, NamespaceUri expected)
         {
             NeedEnterpriseEdition();
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void ReadMultipleSchemas(PipelineConfiguration pipe, string baseURI, IList<string> schemaLocations, NamespaceUri expected)
         {
             NeedEnterpriseEdition();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual NamespaceUri ReadInlineSchema(NodeInfo root, NamespaceUri expected, IErrorReporter errorReporter)
         {
             NeedEnterpriseEdition();
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         protected virtual void NeedEnterpriseEdition()
         {
             throw new NotSupportedException("You need the Enterprise Edition of Saxon (with an EnterpriseConfiguration) for this operation");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void AddSchemaSource(ResolvedResource schemaSource)
         {
             AddSchemaSource(schemaSource, MakeErrorReporter());
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void AddSchemaSource(ResolvedResource schemaSource, IErrorReporter errorReporter)
         {
             NeedEnterpriseEdition();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void AddSchemaForBuiltInNamespace(NamespaceUri @namespace)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsSchemaAvailable(NamespaceUri targetNamespace)
         {
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void ClearSchemaCache()
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void SealNamespace(NamespaceUri @namespace)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IEnumerable<ISchemaType> GetExtensionsOfType(ISchemaType type)
         {
             return new List<ISchemaType>();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void ImportComponents(ResolvedResource source)
         {
             NeedEnterpriseEdition();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void ExportComponents(IReceiver @out)
         {
             NeedEnterpriseEdition();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ISchemaDeclaration GetElementDeclaration(int fingerprint)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ISchemaDeclaration GetElementDeclaration(StructuredQName qName)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ISchemaDeclaration GetAttributeDeclaration(int fingerprint)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ISchemaDeclaration GetAttributeDeclaration(StructuredQName attributeName)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ISchemaType GetSchemaType(StructuredQName name)
         {
             if (name.HasURI(NamespaceUri.SCHEMA))
@@ -3241,74 +1638,24 @@ namespace OutSmart.DAXon.Core
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Types.ItemType MakeUserUnionType(IList<IAtomicType> memberTypes)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsDeclaredNotation(NamespaceUri uri, string local)
         {
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void CheckTypeDerivationIsOK(ISchemaType derived, ISchemaType @base, int block)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void PrepareValidationReporting(IXPathContext context, ParseOptions options)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IReceiver GetDocumentValidator(IReceiver receiver, string systemId, ParseOptions validationOptions, ILocation initiatingLocation)
         {
 
@@ -3316,72 +1663,22 @@ namespace OutSmart.DAXon.Core
             return receiver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IReceiver GetElementValidator(IReceiver receiver, ParseOptions validationOptions, ILocation locationId)
         {
             return receiver;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ISimpleType ValidateAttribute(StructuredQName nodeName, UnicodeString value, int validation)
         {
             return BuiltInAtomicType.UNTYPED_ATOMIC;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IReceiver GetAnnotationStripper(IReceiver destination)
         {
             return destination;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual XPathParser NewExpressionParser(string language, bool updating, IStaticContext env)
         {
             if ("XQ".Equals(language))
@@ -3409,31 +1706,11 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ExpressionPresenter NewExpressionExporter(string target, System.IO.Stream destination, StylesheetPackage rootPackage)
         {
             throw new XPathException("Exporting a stylesheet requires Saxon-EE");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual SlotManager MakeSlotManager()
         {
             if (debugger == null)
@@ -3446,31 +1723,11 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IReceiver MakeStreamingTransformer(Mode mode, ParameterSet ordinaryParams, ParameterSet tunnelParams, Outputter output, IXPathContext context)
         {
             throw new XPathException("Streaming is only available in Saxon-EE");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Expression MakeStreamInstruction(Expression hrefExp, Expression body, bool streaming, ParseOptions options, PackageData packageData, ILocation location, RetainedStaticContext rsc)
         {
             SourceDocument si = new SourceDocument(hrefExp, body, options);
@@ -3479,76 +1736,26 @@ namespace OutSmart.DAXon.Core
             return si;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Func<ISequenceIterator, FocusTrackingIterator> GetFocusTrackerFactory(Executable exec, bool multithreaded)
         {
             return (iter => new FocusTrackingIterator(iter));
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void CheckStrictStreamability(XSLTemplate template, Expression body)
         {
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual bool IsStreamedNode(NodeInfo node)
         {
             return false; // streaming needs Saxon-EE
             // TODO: make this a property of a node (or of a ITreeInfo)
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual OptimizerOptions GetOptimizerOptions()
         {
             return optimizerOptions.Intersect(OptimizerOptions.FULL_HE_OPTIMIZATION);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Optimizer ObtainOptimizer()
         {
             if (optimizer == null)
@@ -3563,16 +1770,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Optimizer ObtainOptimizer(OptimizerOptions options)
         {
             Optimizer optimizer = new Optimizer(this);
@@ -3580,31 +1777,11 @@ namespace OutSmart.DAXon.Core
             return optimizer;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual ContextItemStaticInfo MakeContextItemStaticInfo(Types.ItemType itemType, bool maybeUndefined)
         {
             return new ContextItemStaticInfo(itemType, maybeUndefined);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual XQueryExpression MakeXQueryExpression(Expression exp, QueryModule mainModule, bool streaming)
         {
             XQueryExpression xqe = new XQueryExpression(exp, mainModule, false);
@@ -3616,16 +1793,6 @@ namespace OutSmart.DAXon.Core
             return xqe;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual IGroundedValue MakeSequenceExtent(Expression expression, int @ref, IXPathContext context)
         {
             try
@@ -3638,31 +1805,11 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual StyleNodeFactory MakeStyleNodeFactory(Compilation compilation)
         {
             return new StyleNodeFactory(this, compilation);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual Expression MakeEvaluateInstruction(XSLEvaluate source, ComponentDeclaration decl)
         {
             Expression xpath = source.TargetExpression;
@@ -3681,46 +1828,16 @@ namespace OutSmart.DAXon.Core
             return inst;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual StylesheetPackage MakeStylesheetPackage()
         {
             return new StylesheetPackage(this);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual AccumulatorRegistry MakeAccumulatorRegistry()
         {
             return new AccumulatorRegistry();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void RegisterExternalObjectModel(IExternalObjectModel model)
         {
 
@@ -3728,8 +1845,6 @@ namespace OutSmart.DAXon.Core
             //        try {
             //        } catch (XPathException e) {
             //            // If the model can't be loaded, do nothing
-            //            return;
-            //        }
             if (externalObjectModels == null)
             {
                 externalObjectModels = new List<IExternalObjectModel>(4);
@@ -3741,16 +1856,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
         public virtual void DeregisterExternalObjectModel(IExternalObjectModel model)
         {
 
@@ -3767,37 +1872,11 @@ namespace OutSmart.DAXon.Core
             externalObjectModels = newList;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual void ClearExternalObjectModels()
         {
             externalObjectModels = new List<IExternalObjectModel>();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual IExternalObjectModel GetExternalObjectModel(string uri)
         {
             foreach (IExternalObjectModel model in externalObjectModels)
@@ -3811,19 +1890,6 @@ namespace OutSmart.DAXon.Core
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual IExternalObjectModel GetExternalObjectModel(System.Type nodeClass)
         {
             foreach (IExternalObjectModel model in externalObjectModels)
@@ -3838,159 +1904,42 @@ namespace OutSmart.DAXon.Core
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual Dictionary<string, IFunctionItem> MakeMethodMap(System.Type externalClass, string required)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual MapItem ExternalObjectAsMap(ObjectValue<object> value, string required)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual Expression MakeObjectLookupExpression(Expression lhs, Expression rhs)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual bool IsExtensionElementAvailable(StructuredQName qName)
         {
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual void SetStaticQueryContextFactory(StaticQueryContextFactory factory)
         {
             staticQueryContextFactory = factory;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual StaticQueryContext NewStaticQueryContext()
         {
             return MakeStaticQueryContext(true);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual IPendingUpdateList NewPendingUpdateList()
         {
             throw new NotSupportedException("XQuery update is supported only in Saxon-EE");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual PipelineConfiguration MakePipelineConfiguration()
         {
             PipelineConfiguration pipe = new PipelineConfiguration(this, defaultParseOptions);
@@ -3998,115 +1947,24 @@ namespace OutSmart.DAXon.Core
             return pipe;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual ISchemaURIResolver MakeSchemaURIResolver(IResourceResolver resolver)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public static Configuration GetConfiguration(IXPathContext context)
         {
             return context.GetConfiguration();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual ITreeInfo BuildDocumentTree(ResolvedResource resource)
         {
             return BuildDocumentTree(resource, defaultParseOptions);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         // P5: build a tree from a native resolved resource (Stream/TextReader/NodeInfo carrier). Its filters
         // are folded into the parse options, then it is delivered as an IActiveSource.
         public virtual ITreeInfo BuildDocumentTree(ResolvedResource resource, ParseOptions parseOptions)
@@ -4194,37 +2052,11 @@ namespace OutSmart.DAXon.Core
             return newdoc.GetTreeInfo();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual TreeStatistics GetTreeStatistics()
         {
             return treeStatistics;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual IReceiver MakeEmitter(string eqName, Properties props)
         {
             StructuredQName sqName = StructuredQName.FromEQName(eqName);
@@ -4236,7 +2068,7 @@ namespace OutSmart.DAXon.Core
             }
             catch (XPathException e)
             {
-                throw new XPathException("Cannot create user-supplied output method. " + e.GetMessage(), DAXonErrorCode.SXCH0004);
+                throw new XPathException("Cannot create user-supplied output method. " + e.Message, DAXonErrorCode.SXCH0004);
             }
 
             if (handler is IReceiver)
@@ -4249,19 +2081,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual void SetConfigurationProperty(string name, object value)
         {
             if (FeatureIndex.Exists(name))
@@ -4271,29 +2090,13 @@ namespace OutSmart.DAXon.Core
             else if (name.StartsWith(FeatureKeys.XML_PARSER_FEATURE, StringComparison.Ordinal))
             {
                 string uri = name.Substring(FeatureKeys.XML_PARSER_FEATURE.Length);
-                try
-                {
-                    uri = URLDecoder.Decode(uri, "utf-8");
-                }
-                catch (ArgumentException e)
-                {
-                    throw new ArgumentException(e?.Message, e);
-                }
-
+                uri = Uri.UnescapeDataString(uri);
                 defaultParseOptions = defaultParseOptions.WithParserFeature(uri, RequireBoolean(name, value));
             }
             else if (name.StartsWith(FeatureKeys.XML_PARSER_PROPERTY, StringComparison.Ordinal))
             {
                 string uri = name.Substring(FeatureKeys.XML_PARSER_PROPERTY.Length);
-                try
-                {
-                    uri = URLDecoder.Decode(uri, "utf-8");
-                }
-                catch (ArgumentException e)
-                {
-                    throw new ArgumentException(e?.Message, e);
-                }
-
+                uri = Uri.UnescapeDataString(uri);
                 defaultParseOptions = defaultParseOptions.WithParserProperty(uri, value);
             }
             else
@@ -4302,37 +2105,11 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual void SetConfigurationProperty<T>(Feature<T> feature, T value)
         {
             SetFeature(FeatureIndex.GetData(feature.code), value);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         protected virtual void SetFeature(FeatureData feature, object value)
         {
             string name = feature.uri;
@@ -4507,7 +2284,7 @@ namespace OutSmart.DAXon.Core
                         else
                         {
                             string s = RequireString(name, value);
-                            if (s.Matches("[0-9]+"))
+                            if (s.MatchesRegex("[0-9]+"))
                             {
 
                                 // For backwards compatibility
@@ -4659,9 +2436,7 @@ namespace OutSmart.DAXon.Core
                         UnparsedTextURIResolver = (IUnparsedTextURIResolver)InstantiateClassName(name, value, typeof(IUnparsedTextURIResolver));
                         break;
                     case FeatureCode.URI_RESOLVER_CLASS:
-                        URIResolver u = (URIResolver)InstantiateClassName(name, value, typeof(URIResolver));
-                        SetResourceResolver(new ResourceResolverWrappingURIResolver(u));
-                        break;
+                        throw new ArgumentException(name + ": the JAXP URIResolver interface is not supported by this port; use SetResourceResolver(IResourceResolver)");
                     case FeatureCode.USE_XSI_SCHEMA_LOCATION:
                         defaultParseOptions = defaultParseOptions.WithUseXsiSchemaLocation(RequireBoolean(name, value));
                         break;
@@ -4750,8 +2525,7 @@ namespace OutSmart.DAXon.Core
                         DefaultStaticQueryContext.SetSchemaAware(RequireBoolean(name, value));
                         break;
                     case FeatureCode.XQUERY_STATIC_ERROR_LISTENER_CLASS:
-                        DefaultStaticQueryContext.SetErrorListener((ErrorListener)InstantiateClassName(name, value, typeof(ErrorListener)));
-                        break;
+                        throw new ArgumentException(name + ": the JAXP ErrorListener interface is not supported by this port; use SetErrorReporter(IErrorReporter)");
                     case FeatureCode.XQUERY_VERSION:
                         {
                             int qvn;
@@ -4816,11 +2590,9 @@ namespace OutSmart.DAXon.Core
                         DefaultXsltCompilerInfo.SetSchemaAware(RequireBoolean(name, value));
                         break;
                     case FeatureCode.XSLT_STATIC_ERROR_LISTENER_CLASS:
-                        DefaultXsltCompilerInfo.SetErrorListener((ErrorListener)InstantiateClassName(name, value, typeof(ErrorListener)));
-                        break;
+                        throw new ArgumentException(name + ": the JAXP ErrorListener interface is not supported by this port; use SetErrorReporter(IErrorReporter)");
                     case FeatureCode.XSLT_STATIC_URI_RESOLVER_CLASS:
-                        DefaultXsltCompilerInfo.SetURIResolver((URIResolver)InstantiateClassName(name, value, typeof(URIResolver)));
-                        break;
+                        throw new ArgumentException(name + ": the JAXP URIResolver interface is not supported by this port; use SetResourceResolver(IResourceResolver)");
                     case FeatureCode.XSLT_VERSION:
                         {
                             int xsltVersion;
@@ -4860,19 +2632,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public static bool RequireBoolean(string propertyName, object value)
         {
             if (value is bool)
@@ -4901,19 +2660,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         protected virtual int RequireInteger(string propertyName, object value)
         {
             if (value is int)
@@ -4937,99 +2683,32 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         protected virtual void InternalSetBooleanProperty(int code, string name, object value)
         {
             bool b = RequireBoolean(name, value);
-            if (b)
+            if ((uint)code >= (uint)enabledProperties.Length)
             {
-                enabledProperties.Add(code);
+                throw new ArgumentException("Unknown feature code " + code + " for " + name);
             }
-            else
-            {
-                enabledProperties.Remove(code);
-            }
+
+            enabledProperties[code] = b;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual bool GetBooleanProperty(Feature<bool> feature)
         {
-            return enabledProperties.Contains(feature.code);
+            return enabledProperties[feature.code];
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual void SetBooleanProperty(string propertyName, bool value)
         {
             SetConfigurationProperty(propertyName, value);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual void SetBooleanProperty(Feature<bool> feature, bool value)
         {
             SetConfigurationProperty(feature, value);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         protected virtual string RequireString(string propertyName, object value)
         {
             if (value is string)
@@ -5042,19 +2721,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         protected virtual object InstantiateClassName(string propertyName, object value, System.Type requiredClass)
         {
             if (!(value is string))
@@ -5067,30 +2733,17 @@ namespace OutSmart.DAXon.Core
                 object obj = GetInstance((string)value);
                 if (!requiredClass.IsAssignableFrom(obj.GetType()))
                 {
-                    throw new ArgumentException("Error in " + propertyName + ": Class " + value + " does not implement " + requiredClass.GetName());
+                    throw new ArgumentException("Error in " + propertyName + ": Class " + value + " does not implement " + requiredClass.FullName);
                 }
 
                 return obj;
             }
             catch (XPathException err)
             {
-                throw new ArgumentException("Cannot use " + value + " as the value of " + propertyName + ". " + err.GetMessage());
+                throw new ArgumentException("Cannot use " + value + " as the value of " + propertyName + ". " + err.Message);
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual object GetConfigurationProperty(string name)
         {
             if (FeatureIndex.Exists(name))
@@ -5103,44 +2756,18 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual T GetConfigurationProperty<T>(Feature<T> feature)
         {
             FeatureData data = FeatureIndex.GetData(feature.code);
             return (T)GetFeature(data);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         protected virtual object GetFeature(FeatureData feature)
         {
             int code = feature.code;
             if (booleanFeatures.Contains(code))
             {
-                return enabledProperties.Contains(code);
+                return enabledProperties[code];
             }
 
             if (stringFeatures.Contains(code))
@@ -5163,7 +2790,7 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.COLLATION_URI_RESOLVER:
                     return CollationURIResolver;
                 case FeatureCode.COLLATION_URI_RESOLVER_CLASS:
-                    return CollationURIResolver.GetType().GetName();
+                    return CollationURIResolver.GetType().FullName;
                 case FeatureCode.CONFIGURATION:
                     return this;
                 case FeatureCode.DEFAULT_COLLATION:
@@ -5188,7 +2815,7 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.ENVIRONMENT_VARIABLE_RESOLVER:
                     return environmentVariableResolver;
                 case FeatureCode.ENVIRONMENT_VARIABLE_RESOLVER_CLASS:
-                    return environmentVariableResolver.GetType().GetName();
+                    return environmentVariableResolver.GetType().FullName;
                 case FeatureCode.EXPAND_ATTRIBUTE_DEFAULTS:
                     return IsExpandAttributeDefaults();
                 case FeatureCode.LINE_NUMBERING:
@@ -5198,7 +2825,7 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.MODULE_URI_RESOLVER:
                     return GetModuleURIResolver();
                 case FeatureCode.MODULE_URI_RESOLVER_CLASS:
-                    return GetModuleURIResolver().GetType().GetName();
+                    return GetModuleURIResolver().GetType().FullName;
                 case FeatureCode.NAME_POOL:
                     return GetNamePool();
                 case FeatureCode.OPTIMIZATION_LEVEL:
@@ -5206,7 +2833,7 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.OUTPUT_URI_RESOLVER:
                     return GetOutputURIResolver();
                 case FeatureCode.OUTPUT_URI_RESOLVER_CLASS:
-                    return GetOutputURIResolver().GetType().GetName();
+                    return GetOutputURIResolver().GetType().FullName;
                 case FeatureCode.RECOVERY_POLICY:
                     return 0;
                 case FeatureCode.RECOVERY_POLICY_NAME:
@@ -5218,7 +2845,7 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.SCHEMA_VALIDATION_MODE:
                     return Validation.Describe(SchemaValidationMode);
                 case FeatureCode.SERIALIZER_FACTORY_CLASS:
-                    return SerializerFactory.GetType().GetName();
+                    return SerializerFactory.GetType().FullName;
                 case FeatureCode.SOURCE_PARSER_CLASS:
                     return SourceParserClass;
                 case FeatureCode.STRIP_WHITESPACE:
@@ -5263,16 +2890,9 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.UNPARSED_TEXT_URI_RESOLVER:
                     return UnparsedTextURIResolver;
                 case FeatureCode.UNPARSED_TEXT_URI_RESOLVER_CLASS:
-                    return UnparsedTextURIResolver.GetType().GetName();
+                    return UnparsedTextURIResolver.GetType().FullName;
                 case FeatureCode.URI_RESOLVER_CLASS:
-                    if (GetResourceResolver() is ResourceResolverWrappingURIResolver)
-                    {
-                        return ((ResourceResolverWrappingURIResolver)GetResourceResolver()).GetType().GetName();
-                    }
-                    else
-                    {
-                        return null;
-                    }
+                    return null;
 
                 case FeatureCode.USE_XSI_SCHEMA_LOCATION:
                     return defaultParseOptions.IsUseXsiSchemaLocation();
@@ -5307,7 +2927,7 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.XQUERY_SCHEMA_AWARE:
                     return DefaultStaticQueryContext.IsSchemaAware();
                 case FeatureCode.XQUERY_STATIC_ERROR_LISTENER_CLASS:
-                    return DefaultStaticQueryContext.GetErrorListener().GetType().GetName();
+                    return null;
                 case FeatureCode.XQUERY_VERSION:
                     return DefaultStaticQueryContext.LanguageVersion == 40 ? "4.0" : "3.1";
                 case FeatureCode.XPATH_VERSION_FOR_XSD:
@@ -5325,7 +2945,7 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.XSLT_SCHEMA_AWARE:
                     return DefaultXsltCompilerInfo.IsSchemaAware();
                 case FeatureCode.XSLT_STATIC_ERROR_LISTENER_CLASS:
-                    return DefaultXsltCompilerInfo.GetErrorListener().GetType().GetName();
+                    return null;
                 case FeatureCode.XSLT_STATIC_URI_RESOLVER_CLASS:
                     return null; // TODO: drop this
                 case FeatureCode.XSLT_VERSION:
@@ -5337,224 +2957,60 @@ namespace OutSmart.DAXon.Core
                 case FeatureCode.RESOURCE_RESOLVER:
                     return GetResourceResolver();
                 case FeatureCode.RESOURCE_RESOLVER_CLASS:
-                    return GetResourceResolver().GetType().GetName();
+                    return GetResourceResolver().GetType().FullName;
             }
 
             throw new ArgumentException("Unknown configuration property ");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual bool IsJITEnabled()
         {
             return false;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual void Dispose()
         {
             if (traceOutput != null)
             {
                 traceOutput.Dispose();
             }
-
-            cleaner = null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual IIPackageLoader MakePackageLoader()
         {
             return (IIPackageLoader)new PackageLoaderHE(this);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual InvalidityReportGenerator CreateValidityReporter()
         {
             throw new NotSupportedException("Schema validation requires Saxon-EE");
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual SimpleMode MakeMode(StructuredQName modeName, CompilerInfo compilerInfo)
         {
             return new SimpleMode(modeName);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual TemplateRule MakeTemplateRule()
         {
             return new TemplateRule();
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual XPathContextMajor.ThreadManager MakeThreadManager()
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual CompilerInfo MakeCompilerInfo()
         {
             return new CompilerInfo(this);
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public virtual IICompilerService MakeCompilerService(HostLanguage hostLanguage)
         {
             return null;
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
-        private CleanerProxy GetCleaner()
-        {
-            if (cleaner == null)
-            {
-                cleaner = CleanerProxy.MakeCleanerProxy(this);
-            }
-
-            return cleaner;
-        }
-
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
-        public virtual CleanerProxy.CleanableProxy RegisterCleanupAction(object obj, Action action)
-        {
-            return GetCleaner().RegisterCleanupAction(obj, action);
-        }
-
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
         public interface IApiProvider
         {
         }
@@ -5598,19 +3054,6 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        /// <summary>
-        /// Language versions for XML Schema
-        /// </summary>
-        //@endif
-        /// <summary>
-        /// Display a message about the license status
-        /// </summary>
-        /// <summary>
-        /// Set the parsing and document building options to be used in this configuration.
-        /// </summary>
-        /// <summary>
-        /// Clear all the registered external object models
-        /// </summary>
         public class LicenseFeature
         {
             public const int SCHEMA_VALIDATION = 1;

@@ -108,7 +108,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     List<QueryModule> modules = new List<QueryModule>();
                     foreach (IList<QueryModule> queryModules in queryLibraryModules.Values)
                     {
-                        modules.AddAll(queryModules);
+                        modules.AddRange(queryModules);
                     }
 
                     return modules;
@@ -182,7 +182,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 outputDeclarations = new Dictionary<StructuredQName, Properties>(5);
             }
 
-            outputDeclarations.Put(qName, properties);
+            outputDeclarations[qName] = properties;
         }
 
         public virtual Properties GetOutputProperties()
@@ -198,7 +198,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
             else
             {
-                return outputDeclarations.Get(qName);
+                return outputDeclarations.GetOrDefault(qName);
             }
         }
 
@@ -210,12 +210,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
 
             NamespaceUri uri = module.ModuleNamespace;
-            IList<QueryModule> existing = queryLibraryModules.Get(uri);
+            IList<QueryModule> existing = queryLibraryModules.GetOrDefault(uri);
             if (existing == null)
             {
                 existing = new List<QueryModule>(5);
                 existing.Add(module);
-                queryLibraryModules.Put(uri, existing);
+                queryLibraryModules[uri] = existing;
             }
             else if (!existing.Contains(module))
             {
@@ -230,7 +230,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 return null;
             }
 
-            return queryLibraryModules.Get(@namespace);
+            return queryLibraryModules.GetOrDefault(@namespace);
         }
 
         public virtual QueryModule GetQueryModuleWithSystemId(string systemId, QueryModule topModule)
@@ -303,12 +303,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
             main.CheckForCircularities(varDefinitions, main.GlobalFunctionLibrary);
             main.FixupGlobalFunctions();
 
-            //        if (checkForCycles) {
-            //            IIterator miter = getQueryLibraryModules();
             //                QueryModule module = (QueryModule) miter.next();
             //                module.lookForModuleCycles(new Stack<QueryModule>(), 1);
-            //            }
-            //        }
             main.TypeCheckGlobalVariables(varDefinitions);
             main.OptimizeGlobalFunctions();
         }
@@ -329,12 +325,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public virtual void RegisterGlobalParameter(GlobalParam param)
         {
-            globalParams.Put(param.GetVariableQName(), param);
+            globalParams[param.GetVariableQName()] = param;
         }
 
         public virtual GlobalParam GetGlobalParameter(StructuredQName name)
         {
-            return globalParams.Get(name);
+            return globalParams.GetOrDefault(name);
         }
 
         public virtual void CheckSuppliedParameters(GlobalParameterSet @params)
@@ -388,7 +384,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         // of the context item depends on the context item: a circularity.
                         if (e.HasErrorCode("XPDY0002"))
                         {
-                            if (e.GetMessage().Contains("last()") || e.GetMessage().Contains("position()"))
+                            if (e.Message.Contains("last()") || e.Message.Contains("position()"))
                             {
                             }
                             else

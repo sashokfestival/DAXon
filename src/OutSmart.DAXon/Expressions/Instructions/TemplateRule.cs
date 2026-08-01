@@ -18,7 +18,6 @@ using OutSmart.DAXon.Transformation.Rules;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -46,19 +45,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private int columnNumber;
         private readonly IList<Rule> rules = new List<Rule>();
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         private IPushEvaluator atomicBodyEvaluator = null;
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual int ComponentKind => StandardNames.XSL_TEMPLATE;
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual Patterns.Pattern MatchPattern
         {
             get => matchPattern; set
@@ -75,9 +65,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual SlotManager StackFrameMap
         {
             get => stackFrameMap; set
@@ -86,9 +73,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual Values.SequenceType RequiredType
         {
             get
@@ -108,19 +92,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual IList<Rule> Rules => rules;
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual int ContainerGranularity => 0;
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual IList<LocalParam> LocalParams
         {
             get
@@ -131,192 +106,117 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual string TracingTag => "xsl:template";
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public TemplateRule()
         {
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void SetMode(Mode m)
         {
             this.mode = m;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual Mode GetMode()
         {
             return mode;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual Expression GetBody()
         {
             return body;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual Expression GetChildExpression()
         {
             return body;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual ILocation GetLocation()
         {
             return this;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void GatherProperties(Action<string, object> consumer)
         {
-            consumer.Accept("match", MatchPattern.ToShortString());
+            consumer("match",MatchPattern.ToShortString());
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void SetContextItemRequirements(Types.ItemType type, bool absentFocus)
         {
             requiredContextItemType = type;
             this.absentFocus = absentFocus;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void SetBody(Expression body)
         {
             this.body = body;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void RegisterRule(Rule rule)
         {
             rules.Add(rule);
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual PackageData GetPackageData()
         {
             return packageData;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void SetPackageData(PackageData data)
         {
             this.packageData = data;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual string GetPublicId()
         {
             return null;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual string GetSystemId()
         {
             return systemId;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void SetSystemId(string id)
         {
             this.systemId = id;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual int GetLineNumber()
         {
             return lineNumber;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void SetLineNumber(int line)
         {
             this.lineNumber = line;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void SetColumnNumber(int col)
         {
             this.columnNumber = col;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual int GetColumnNumber()
         {
             return columnNumber;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual ILocation SaveLocation()
         {
             return this;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual Types.ItemType GetRequiredContextItemType()
         {
             return requiredContextItemType;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual bool IsAbsentFocus()
         {
             return absentFocus;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         private static void GatherLocalParams(Expression exp, IList<LocalParam> result)
         {
             if (exp is LocalParam)
@@ -332,23 +232,14 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void PrepareInitializer(Compilation compilation, ComponentDeclaration decl)
         {
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void Initialize()
         {
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual void Apply(Outputter output, XPathContextMajor context)
         {
             ITailCall tc = ApplyLeavingTail(output, context);
@@ -358,13 +249,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         public virtual ITailCall ApplyLeavingTail(Outputter output, IXPathContext context)
         {
 
-            //initialize();
             // Only the templates that declare a required context item type pay for the type-hierarchy
             // lookup + the Matches check; the common case (no declared type) skips both, per template
             // instantiation (millions on a dispatch pass).
@@ -390,10 +277,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 EnsureBodyEvaluatorExists();
                 return bodyEvaluator.ProcessLeavingTail(output, context);
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
                 // A deeper recursion level tripped the stack guard (see StackGuard.Probe).
-                throw new XPathException.StackOverflow("Too many nested apply-templates calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, this);
+                // Filtered: one such catch per recursion level.
+                throw e.Describe("Too many nested apply-templates calls. The stylesheet may be looping.", DAXonErrorCode.SXLM0001, this);
             }
             catch (UncheckedXPathException e)
             {
@@ -405,16 +293,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 // DocumentInstr elaborator note (deep-unwind stack discipline, round AQ).
                 throw e.MaybeWithLocation(this).MaybeWithContext(context);
             }
-            catch (Exception e2) when (!(e2 is XPathException))
+            catch (Exception e2) when (!(e2 is XPathException) && !(e2 is RecursionDepthError))
             {
+                // RecursionDepthError excluded: it is not an internal error, and wrapping it here
+                // would re-enter dispatch once per recursion level - the very cost the guard exists
+                // to avoid.
                 string message = "Internal error evaluating template rule " + (GetLineNumber() > 0 ? " at line " + GetLineNumber() : "") + (GetSystemId() != null ? " in module " + GetSystemId() : "");
-                throw new Exception(message, e2);
+                throw new InvalidOperationException(message, e2);
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
         private void EnsureBodyEvaluatorExists()
         {
             if (bodyEvaluator == null)
@@ -422,12 +310,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 bodyEvaluator = atomicBodyEvaluator = (atomicBodyEvaluator == null ? body.MakeElaborator().ElaborateForPush() : atomicBodyEvaluator);
             }
         }
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual void Export(ExpressionPresenter presenter)
         {
 
@@ -435,22 +317,10 @@ namespace OutSmart.DAXon.Expressions.Instructions
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual void SetDeclaredStreamable(bool streamable)
         {
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual bool IsDeclaredStreamable()
         {
 
@@ -458,12 +328,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual void ExplainProperties(ExpressionPresenter presenter)
         {
             if (GetRequiredContextItemType() != AnyItemType.GetInstance())
@@ -492,12 +356,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         protected virtual void CopyTo(TemplateRule tr)
         {
             if (body != null)
@@ -520,23 +378,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             tr.lineNumber = lineNumber;
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual void SetChildExpression(Expression expr)
         {
             SetBody(expr);
         }
 
-        /// <summary>
-        /// Create a template
-        /// </summary>
-        /// <summary>
-        /// Output diagnostic explanation to an ExpressionPresenter
-        /// </summary>
         public virtual StructuredQName GetObjectName()
         {
             return null;

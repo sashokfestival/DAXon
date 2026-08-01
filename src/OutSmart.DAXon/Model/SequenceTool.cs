@@ -275,9 +275,9 @@ namespace OutSmart.DAXon.Model
                         case StandardNames.XS_FLOAT:
                             return ((FloatValue)value).GetFloatValue();
                         case StandardNames.XS_DATE_TIME:
-                            return ((DateTimeValue)value).GetCalendar().GetTime();
+                            return ((DateTimeValue)value).ToSystemDateTimeUtc();
                         case StandardNames.XS_DATE:
-                            return ((DateValue)value).GetCalendar().GetTime();
+                            return ((DateValue)value).ToSystemDateTimeUtc();
                         case StandardNames.XS_BASE64_BINARY:
                             return ((Base64BinaryValue)value).BinaryValue;
                         case StandardNames.XS_HEX_BINARY:

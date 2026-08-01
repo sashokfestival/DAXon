@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Collections;
 
 
-// Phase 5: IGroundedValue.CodePoints() extension (paulirwin emits .CodePoints on IGroundedValue
+// IGroundedValue.CodePoints() extension (paulirwin emits .CodePoints on IGroundedValue
 // but the interface doesn't declare it). Returns IIntIterator over string-value code points.
 namespace OutSmart.DAXon.Model
 {
@@ -28,7 +28,8 @@ namespace OutSmart.DAXon.Model
         }
         private sealed class _IGVStringCodePointIterator : AbstractIntIterator
         {
-            private readonly string _s; private int _i;
+            private readonly string _s;
+            private int _i;
             public _IGVStringCodePointIterator(string s) { _s = s ?? ""; }
             public override bool HasNext() => _i < _s.Length;
             public override int Next() => _i < _s.Length ? _s[_i++] : -1;

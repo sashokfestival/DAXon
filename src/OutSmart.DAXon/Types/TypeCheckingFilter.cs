@@ -211,11 +211,10 @@ namespace OutSmart.DAXon.Types
             NextOutputter.EndElement();
         }
 
-        // upstream close() — the port maps Receiver.close() to Dispose()
-        public override void Dispose()
+        public override void Close()
         {
             FinalCheck();
-            base.Dispose();
+            base.Close();
         }
 
         public void FinalCheck()

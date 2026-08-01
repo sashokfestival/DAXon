@@ -10,7 +10,6 @@ using OutSmart.DAXon.Xslt;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -91,7 +90,7 @@ namespace OutSmart.DAXon.Api
             }
             public int IsSpacePreserving(INodeName nodeName, ISchemaType schemaType)
             {
-                return elementTest.Test(new QName(nodeName.GetStructuredQName())) ? Stripper.ALWAYS_STRIP : Stripper.ALWAYS_PRESERVE;
+                return elementTest(new QName(nodeName.GetStructuredQName())) ? Stripper.ALWAYS_STRIP : Stripper.ALWAYS_PRESERVE;
             }
 
             public ProxyReceiver MakeStripper(IReceiver next)

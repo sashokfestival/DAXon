@@ -23,18 +23,18 @@ namespace OutSmart.DAXon.Functions
         private Dictionary<StructuredQName, ExtensionFunctionDefinition> functions = new Dictionary<StructuredQName, ExtensionFunctionDefinition>();
         public virtual void RegisterFunction(ExtensionFunctionDefinition function)
         {
-            functions.Put(function.FunctionQName, function);
+            functions[function.FunctionQName] = function;
         }
 
         public virtual Expression Bind(SymbolicName.F functionName, Expression[] staticArgs, Dictionary<StructuredQName, int> keywords, IStaticContext env, IList<string> reasons)
         {
-            ExtensionFunctionDefinition defn = functions.Get(functionName.ComponentName);
+            ExtensionFunctionDefinition defn = functions.GetOrDefault(functionName.ComponentName);
             if (defn == null)
             {
                 return null;
             }
 
-            if (keywords != null && !keywords.IsEmpty())
+            if (keywords != null && keywords.Count > 0)
             {
                 reasons.Add("Calls to external Java functions cannot use keyword arguments");
                 return null;
@@ -54,7 +54,7 @@ namespace OutSmart.DAXon.Functions
 
         public virtual IFunctionItem GetFunctionItem(SymbolicName.F functionName, IStaticContext staticContext)
         {
-            ExtensionFunctionDefinition defn = functions.Get(functionName.ComponentName);
+            ExtensionFunctionDefinition defn = functions.GetOrDefault(functionName.ComponentName);
             if (defn == null)
             {
                 return null;
@@ -72,7 +72,7 @@ namespace OutSmart.DAXon.Functions
 
         public virtual bool IsAvailable(SymbolicName.F functionName, int languageLevel)
         {
-            ExtensionFunctionDefinition defn = functions.Get(functionName.ComponentName);
+            ExtensionFunctionDefinition defn = functions.GetOrDefault(functionName.ComponentName);
             int arity = functionName.GetArity();
             return defn != null && defn.MaximumNumberOfArguments >= arity && defn.MinimumNumberOfArguments <= arity;
         }
@@ -94,6 +94,5 @@ namespace OutSmart.DAXon.Functions
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
     }
 }

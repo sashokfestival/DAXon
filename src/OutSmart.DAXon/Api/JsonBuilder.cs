@@ -50,14 +50,18 @@ namespace OutSmart.DAXon.Api
                 IIntPredicateProxy checker = IntSetPredicate.ALWAYS_TRUE;
                 UnicodeString content = UnparsedTextFunction.ReadFile(checker, jsonReader);
                 Dictionary<string, IGroundedValue> options = new Dictionary<string, IGroundedValue>();
-                options.Put("liberal", BooleanValue.Get(liberal));
-                options.Put("escape", BooleanValue.TRUE);
+                options["liberal"] = BooleanValue.Get(liberal);
+                options["escape"] = BooleanValue.TRUE;
                 IItem result = ParseJsonFn.Parse(content.ToString(), options, context);
                 return XdmValue.Wrap(result);
             }
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
             catch (IOException e)
             {
@@ -69,10 +73,11 @@ namespace OutSmart.DAXon.Api
         {
             IXPathContext context = new Controller(config).NewXPathContext();
             Dictionary<string, IGroundedValue> options = new Dictionary<string, IGroundedValue>();
-            options.Put("liberal", BooleanValue.Get(liberal));
-            options.Put("escape", BooleanValue.TRUE);
+            options["liberal"] = BooleanValue.Get(liberal);
+            options["escape"] = BooleanValue.TRUE;
             try { return XdmValue.Wrap(ParseJsonFn.Parse(json, options, context)); }
             catch (XPathException e) { throw new DAXonApiException(e); }
+            catch (RecursionDepthError e) { throw new DAXonApiException(e.ToXPathException()); }
         }
 
         // Consumer-compat alias: a JSON document is always one item (map/array/atomic).

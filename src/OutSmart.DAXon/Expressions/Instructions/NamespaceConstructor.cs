@@ -15,7 +15,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Utilities;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -45,9 +44,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_NAMESPACE;
         public NamespaceConstructor(Expression name)
         {
@@ -59,25 +55,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return OperandList(selectOp, nameOp);
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return NodeKindTest.NAMESPACE;
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override void LocalTypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             IStaticContext env = visitor.StaticContext;
@@ -97,9 +84,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             NamespaceConstructor exp = new NamespaceConstructor(NameExp.Copy(rebindings));
@@ -108,18 +92,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return exp;
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override INodeName EvaluateNodeName(IXPathContext context)
         {
             string prefix = EvaluatePrefix(context);
             return new NoNamespaceName(prefix);
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private string EvaluatePrefix(IXPathContext context)
         {
             AtomicValue value = (AtomicValue)NameExp.EvaluateItem(context);
@@ -141,9 +119,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return CheckPrefix(prefix, context);
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public virtual string CheckPrefix(string prefix, IXPathContext context)
         {
             prefix = Whitespace.Trim(prefix);
@@ -164,9 +139,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return prefix;
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override void ProcessValue(UnicodeString value, Outputter output, IXPathContext context)
         {
             string prefix = EvaluatePrefix(context);
@@ -175,9 +147,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             output.Namespace(prefix, NamespaceUri.Of(uri), ReceiverOption.REJECT_DUPLICATES);
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             NodeInfo node = (NodeInfo)base.EvaluateItem(context);
@@ -187,9 +156,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return node;
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private void CheckPrefixAndUri(string prefix, string uri, IXPathContext context)
         {
             if (prefix.Equals("xml") != uri.Equals(NamespaceConstant.XML))
@@ -220,9 +186,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         //W3C bug 30180
         public override void Export(ExpressionPresenter @out)
         {
@@ -245,17 +208,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new NamespaceConstructorElaborator();
         }
 
-        /// <summary>
-        /// Set the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private class NamespaceConstructorElaborator : SimpleNodePushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

@@ -11,7 +11,6 @@ using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation.Rules;
 using OutSmart.DAXon.Transformation;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -108,10 +107,10 @@ namespace OutSmart.DAXon.Expressions.Accumulators
         {
             if (accumulatorName != null)
             {
-                consumer.Accept("name", accumulatorName.DisplayName);
+                consumer("name",accumulatorName.DisplayName);
             }
 
-            consumer.Accept("phase", IsPostDescent() ? "end" : "start");
+            consumer("phase",IsPostDescent() ? "end" : "start");
         }
     }
 }

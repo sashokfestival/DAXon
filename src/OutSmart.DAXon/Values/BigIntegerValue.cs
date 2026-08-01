@@ -194,14 +194,48 @@ namespace OutSmart.DAXon.Values
             {
                 bool negative = value.Sign < 0;
 
-                // factor is 1 for scale=0, 10 for scale=-1, 100 for scale=-2, etc
-                long factor = 1;
-                for (long i = 1; i <= -scale; i++)
+                // factor is 1 for scale=0, 10 for scale=-1, 100 for scale=-2, etc. It has to be
+                // exact: accumulated in a long, 10^19 already wraps to a wrong value and 10^64
+                // wraps to exactly zero, which made the division below throw DivideByZeroException.
+                long k = -(long)scale;
+
+                // Once the factor has more digits than the value, zero is nearer than any other
+                // multiple of it, so every rule that picks a nearest value (or truncates) answers
+                // zero without building a power that can run to two billion digits. Log10 is used
+                // only as an upper bound on the digit count, so fp slack can delay this
+                // short-circuit but never take it early.
+                if (k > (long)BigInteger.Log10(BigInteger.Abs(value)) + 2)
                 {
-                    factor *= 10;
+                    switch (roundingRule)
+                    {
+                        case Functions.Round.RoundingRule.FLOOR:
+                            if (!negative)
+                            {
+                                return IntegerValue.MakeIntegerValue(BigInteger.Zero);
+                            }
+
+                            break;
+                        case Functions.Round.RoundingRule.CEILING:
+                            if (negative)
+                            {
+                                return IntegerValue.MakeIntegerValue(BigInteger.Zero);
+                            }
+
+                            break;
+                        case Functions.Round.RoundingRule.AWAY_FROM_ZERO:
+                            break;
+                        default:
+                            return IntegerValue.MakeIntegerValue(BigInteger.Zero);
+                    }
                 }
 
-                BigInteger factorB = new BigInteger(factor);
+                if (k > int.MaxValue)
+                {
+                    throw new XPathException(
+                        "Rounding away from zero at a precision of 10^" + k + " overflows", "FOAR0002");
+                }
+
+                BigInteger factorB = BigInteger.Pow(10, (int)k);
                 BigInteger towardsZero = value / factorB * factorB;
                 if (towardsZero.Equals(value))
                 {
@@ -290,9 +324,6 @@ namespace OutSmart.DAXon.Values
         }
 
         /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
         /// Subtract another integer
         /// </summary>
         public override IntegerValue Minus(IntegerValue other)
@@ -308,15 +339,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
         public override IntegerValue Times(IntegerValue other)
         {
             if (other is BigIntegerValue)
@@ -330,15 +352,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
         public override NumericValue Div(IntegerValue other)
         {
             BigInteger oi;
@@ -356,15 +369,6 @@ namespace OutSmart.DAXon.Values
             return Calculator.DecimalDivide(a, b);
         }
 
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
         public override IntegerValue Mod(IntegerValue other)
         {
             if (other.Signum() == 0)
@@ -382,15 +386,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
         public override IntegerValue Idiv(IntegerValue other)
         {
             if (other.Signum() == 0)
@@ -411,15 +406,6 @@ namespace OutSmart.DAXon.Values
             return MakeIntegerValue(value / oi);
         }
 
-        /// <summary>
-        /// Add another integer
-        /// </summary>
-        /// <summary>
-        /// Subtract another integer
-        /// </summary>
-        /// <summary>
-        /// Multiply by another integer
-        /// </summary>
         /// <summary>
         /// Reduce a value to its simplest form.
         /// </summary>

@@ -87,9 +87,6 @@ namespace OutSmart.DAXon.Expressions
             return GetRetainedStaticContext();
         }
 
-        /// <summary>
-        /// Simplify the expression
-        /// </summary>
         public override Expression Simplify()
         {
             if (targetType is BuiltInAtomicType)
@@ -110,18 +107,12 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Simplify the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
             return p | StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Simplify the expression
-        /// </summary>
         protected virtual void Export(ExpressionPresenter @out, string elemName)
         {
             @out.StartElement(elemName, this);

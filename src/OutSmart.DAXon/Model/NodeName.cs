@@ -18,8 +18,7 @@ namespace OutSmart.DAXon.Model
     {
         string GetPrefix();
         NamespaceUri GetNamespaceUri();
-        string GetURI()
-;
+        string GetURI();
 
 
 

@@ -31,73 +31,43 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public bool bequeathNamespacesToChildren = true;
         public bool inheritNamespacesFromParent = true;
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public override int ImplementationMethod => Expression.PROCESS_METHOD;
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public override string StreamerName => "ElementCreator";
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public ElementCreator()
         {
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public override ItemType GetItemType()
         {
             return NodeKindTest.ELEMENT;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public virtual void SetBequeathNamespacesToChildren(bool inherit)
         {
             bequeathNamespacesToChildren = inherit;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public virtual bool IsBequeathNamespacesToChildren()
         {
             return bequeathNamespacesToChildren;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public virtual void SetInheritNamespacesFromParent(bool inherit)
         {
             inheritNamespacesFromParent = inherit;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public virtual bool IsInheritNamespacesFromParent()
         {
             return inheritNamespacesFromParent;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties() | StaticProperty.SINGLE_DOCUMENT_NODESET;
@@ -109,9 +79,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return p;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public override void SuppressValidation(int parentValidationMode)
         {
             if (GetValidationAction() == parentValidationMode && GetSchemaType() == null)
@@ -122,9 +89,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         protected override void CheckContentSequence(IStaticContext env)
         {
             Operand[] components;
@@ -223,14 +187,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public abstract void OutputNamespaceNodes(Outputter receiver, INodeName nodeName, ElementCreationDetails details);
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         protected virtual void ExportValidationAndType(ExpressionPresenter @out)
         {
             if (GetValidationAction() != Validation.SKIP && GetValidationAction() != Validation.BY_TYPE)
@@ -248,9 +206,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         protected virtual string GetInheritanceFlags()
         {
             string flags = "";
@@ -272,9 +227,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return flags;
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public virtual void SetInheritanceFlags(string flags)
         {
             inheritNamespacesFromParent = !flags.Contains("P");
@@ -285,9 +237,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Construct an ElementCreator. Exists for the benefit of subclasses.
-        /// </summary>
         public virtual ElementCreationDetails MakeElementCreationDetails()
         {
             throw new NotSupportedException();

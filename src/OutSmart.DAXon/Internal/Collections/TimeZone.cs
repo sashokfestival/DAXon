@@ -47,16 +47,12 @@ namespace OutSmart.DAXon.Internal.Collections
         // TimeZoneInfo gives DST-aware offsets — needed by format-date/time with an Olson place.
         private readonly global::System.TimeZoneInfo _tzi;
 
-        public static TimeZone Default => new TimeZone();
-
-        public virtual string ID => _tzi == null ? "UTC" : _tzi.Id;
-        public virtual int RawOffset => _tzi == null ? 0 : (int)_tzi.BaseUtcOffset.TotalMilliseconds;
-        public TimeZone() { }
-        internal TimeZone(global::System.TimeZoneInfo tzi) { _tzi = tzi; }
+        private TimeZone() { }
+        private TimeZone(global::System.TimeZoneInfo tzi) { _tzi = tzi; }
 
         // Offset in milliseconds at the given instant (millis since epoch), DST-aware. Mirrors
         // java.util.TimeZone.getOffset(long).
-        public virtual int GetOffset(long date)
+        public int GetOffset(long date)
         {
             if (_tzi == null)
             {
@@ -102,11 +98,5 @@ namespace OutSmart.DAXon.Internal.Collections
             }
             return null;
         }
-        // Phase 7.12: implicit conversion from BCL TimeZoneInfo. Saxon code uses
-        // both interchangeably in some Date/DateTime conversions.
-        public static implicit operator TimeZone(global::System.TimeZoneInfo tzi) =>
-            tzi == null ? null : new TimeZone(tzi);
-        public static implicit operator global::System.TimeZoneInfo(TimeZone tz) =>
-            tz == null ? null : global::System.TimeZoneInfo.Utc;
     }
 }

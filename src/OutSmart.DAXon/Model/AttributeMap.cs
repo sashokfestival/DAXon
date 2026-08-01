@@ -17,8 +17,7 @@ namespace OutSmart.DAXon.Model
     public interface IAttributeMap : IEnumerable<AttributeInfo>
     {
         int Size();
-        AttributeInfo Get(INodeName name)
-;
+        AttributeInfo Get(INodeName name);
 
 
 
@@ -30,8 +29,7 @@ namespace OutSmart.DAXon.Model
 
 
 
-        AttributeInfo Get(NamespaceUri uri, string local)
-;
+        AttributeInfo Get(NamespaceUri uri, string local);
 
 
 
@@ -44,8 +42,7 @@ namespace OutSmart.DAXon.Model
 
 
 
-        AttributeInfo GetByFingerprint(int fingerprint, NamePool namePool)
-;
+        AttributeInfo GetByFingerprint(int fingerprint, NamePool namePool);
 
 
 
@@ -58,20 +55,17 @@ namespace OutSmart.DAXon.Model
 
 
 
-        string GetValue(NamespaceUri uri, string local)
-;
+        string GetValue(NamespaceUri uri, string local);
 
 
 
 
-        string GetValue(string local)
-;
+        string GetValue(string local);
 
 
 
 
-        IAttributeMap Put(AttributeInfo att)
-;
+        IAttributeMap Put(AttributeInfo att);
 
 
 
@@ -85,8 +79,7 @@ namespace OutSmart.DAXon.Model
 
 
 
-        IAttributeMap Remove(INodeName name)
-;
+        IAttributeMap Remove(INodeName name);
 
 
 
@@ -99,12 +92,10 @@ namespace OutSmart.DAXon.Model
 
 
 
-        void Verify()
-;
+        void Verify();
 
 
-        IAttributeMap Apply(Func<AttributeInfo, AttributeInfo> mapper)
-;
+        IAttributeMap Apply(Func<AttributeInfo, AttributeInfo> mapper);
 
 
 
@@ -114,8 +105,7 @@ namespace OutSmart.DAXon.Model
 
 
 
-        List<AttributeInfo> AsList()
-;
+        List<AttributeInfo> AsList();
 
 
 
@@ -125,8 +115,7 @@ namespace OutSmart.DAXon.Model
 
 
 
-        AttributeInfo ItemAt(int index)
-;
+        AttributeInfo ItemAt(int index);
 
 
     }

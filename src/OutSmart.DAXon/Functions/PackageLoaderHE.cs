@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
 
-// Phase 7.8: UnicodeChar.cs re-included into project. Stub removed to avoid CS0101.
 // namespace OutSmart.DAXon.Text
 // {
 //     public class UnicodeChar { public UnicodeChar() {} public UnicodeChar(int cp) {} }

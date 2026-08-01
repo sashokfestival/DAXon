@@ -212,17 +212,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Get details of stack frame
-        /// </summary>
         public SlotManager GetSlotManager()
         {
             return stackFrameMap;
         }
 
-        /// <summary>
-        /// Get details of stack frame
-        /// </summary>
         public override void CompileDeclaration(Compilation compilation, ComponentDeclaration decl)
         {
             if (IsActionCompleted(ACTION_COMPILE))
@@ -235,7 +229,7 @@ namespace OutSmart.DAXon.Xslt
 
                 // identify any attribute sets that this one refers to
                 IList<UseAttributeSet> invocations = UseAttributeSet.MakeUseAttributeSetInstructions(useAttributeSetNames, this);
-                if (!invocations.IsEmpty())
+                if (invocations.Count > 0)
                 {
                     containedInstructions.Add(UseAttributeSet.MakeCompositeExpression(invocations));
                 }
@@ -280,9 +274,6 @@ namespace OutSmart.DAXon.Xslt
             SetActionCompleted(ACTION_COMPILE);
         }
 
-        /// <summary>
-        /// Get details of stack frame
-        /// </summary>
         public void Optimize(ComponentDeclaration declaration)
         {
         }

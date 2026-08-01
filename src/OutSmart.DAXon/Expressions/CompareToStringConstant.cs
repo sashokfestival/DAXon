@@ -30,14 +30,8 @@ namespace OutSmart.DAXon.Expressions
 
         public virtual UnicodeString Comparand => comparand;
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ExpressionName => "compareToString";
 
-        /// <summary>
-        /// Get the IAtomicComparer used to compare atomic values. This encapsulates any collation that is used
-        /// </summary>
         public override IStringCollator StringCollator => CodepointCollator.GetInstance();
         public CompareToStringConstant(Expression operand, int @operator, UnicodeString comparand) : base(operand)
         {
@@ -62,18 +56,12 @@ namespace OutSmart.DAXon.Expressions
             return other is CompareToStringConstant && ((CompareToStringConstant)other).GetLhsExpression().IsEqual(GetLhsExpression()) && ((CompareToStringConstant)other).comparand.Equals(comparand) && ((CompareToStringConstant)other).@operator == @operator;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             int h = 0x484b12a0;
             return h + GetLhsExpression().GetHashCode() ^ comparand.GetHashCode();
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             UnicodeString s = GetLhsExpression().EvaluateItem(context).UnicodeStringValue;
@@ -81,17 +69,11 @@ namespace OutSmart.DAXon.Expressions
             return InterpretComparisonResult(@operator, c);
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("compareToString", this);
@@ -101,33 +83,21 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ToString()
         {
             return ExpressionTool.Parenthesize(GetLhsExpression()) + " " + Token.tokens[@operator] + " " + comparand.ToString();
         }
 
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override string ToShortString()
         {
             return GetLhsExpression().ToShortString() + " " + Token.tokens[@operator] + " \"" + comparand + "\"";
         }
 
-        /// <summary>
-        /// Get the IAtomicComparer used to compare atomic values. This encapsulates any collation that is used
-        /// </summary>
         public override IAtomicComparer GetAtomicComparer()
         {
             return CodepointCollatingComparer.GetInstance();
         }
 
-        /// <summary>
-        /// Get the IAtomicComparer used to compare atomic values. This encapsulates any collation that is used
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CompareToStringConstantElaborator();

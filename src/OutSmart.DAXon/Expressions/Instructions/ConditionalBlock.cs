@@ -34,14 +34,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override string ExpressionName => "condSeq";
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override int ImplementationMethod => PROCESS_METHOD;
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override string StreamerName => "ConditionalBlock";
         public ConditionalBlock(Expression[] children)
         {
@@ -56,7 +50,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public ConditionalBlock(IList<Expression> children) : this(children.ToArray(new Expression[children.Count]))
+        public ConditionalBlock(IList<Expression> children) : this(children.ToArray())
         {
         }
 
@@ -184,9 +178,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return t1;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override int GetCardinality()
         {
             if (Size() == 0)
@@ -207,17 +198,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return c1;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return SomeOperandCreatesNewNodes();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeCheckChildren(visitor, contextInfo);
@@ -230,9 +215,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression e = base.Optimize(visitor, contextInfo);
@@ -338,9 +320,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             foreach (Operand o in Operands())
@@ -350,9 +329,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("condSeq", this);
@@ -365,25 +341,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override string ToShortString()
         {
             return "(" + GetChildExpression(0).ToShortString() + ", ...)";
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new ConditionalBlockElaborator();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the expression
-        /// </summary>
         private class ConditionalBlockElaborator : PushElaborator
         {
             private const int ON_EMPTY = 0;

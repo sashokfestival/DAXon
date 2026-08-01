@@ -25,7 +25,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Collections.Trie;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.XQuery
@@ -37,6 +36,7 @@ namespace OutSmart.DAXon.XQuery
     //})
     public class StaticQueryContext
     {
+        private readonly object syncLock = new object();
         private Configuration config;
         private NamePool namePool;
         private string baseURI;
@@ -341,7 +341,7 @@ namespace OutSmart.DAXon.XQuery
         {
             // Compile under the Processor's deadline: constant folding of hostile query text is
             // otherwise unbounded work before any run-time deadline exists (see ArmThreadDeadline).
-            Controller prevDeadline = Controller.ArmThreadDeadline(config);
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(config);
             try
             {
                 QueryModule mainModule = new QueryModule(this);
@@ -366,7 +366,7 @@ namespace OutSmart.DAXon.XQuery
 
         public virtual XQueryExpression CompileQuery(TextReader source)
         {
-            lock (this)
+            lock (syncLock)
             {
                 char[] buffer = new char[4096];
                 StringBuilder sb = new StringBuilder(4096);
@@ -389,7 +389,7 @@ namespace OutSmart.DAXon.XQuery
 
         public virtual XQueryExpression CompileQuery(System.IO.Stream source, string encoding)
         {
-            lock (this)
+            lock (syncLock)
             {
                 try
                 {
@@ -456,7 +456,7 @@ namespace OutSmart.DAXon.XQuery
             }
             else
             {
-                userDeclaredNamespaces.Put(prefix, uri);
+                userDeclaredNamespaces[prefix] = uri;
             }
         }
 
@@ -478,12 +478,12 @@ namespace OutSmart.DAXon.XQuery
 
         public virtual IEnumerator<string> IterateDeclaredPrefixes()
         {
-            return userDeclaredNamespaces.KeySet().IIterator();
+            return userDeclaredNamespaces.Keys.GetEnumerator();
         }
 
         public virtual NamespaceUri GetNamespaceForPrefix(string prefix)
         {
-            return userDeclaredNamespaces.Get(prefix);
+            return userDeclaredNamespaces.GetOrDefault(prefix);
         }
 
         public virtual UnprefixedElementMatchingPolicy GetUnprefixedElementMatchingPolicy()
@@ -599,23 +599,6 @@ namespace OutSmart.DAXon.XQuery
         public virtual bool IsEmptyLeast()
         {
             return defaultEmptyLeast;
-        }
-
-        public virtual void SetErrorListener(ErrorListener listener)
-        {
-            ErrorReporter = new ErrorReporterToListener(listener);
-        }
-
-        public virtual ErrorListener GetErrorListener()
-        {
-            if (errorReporter is ErrorReporterToListener)
-            {
-                return ((ErrorReporterToListener)errorReporter).GetErrorListener();
-            }
-            else
-            {
-                return null;
-            }
         }
 
         public virtual void SetUpdatingEnabled(bool updating)

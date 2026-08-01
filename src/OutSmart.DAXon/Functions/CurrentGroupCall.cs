@@ -48,19 +48,10 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the dependencies
-        /// </summary>
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_CURRENT_GROUP;
 
-        /// <summary>
-        /// Determine the dependencies
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Return an iteration over the result sequence
-        /// </summary>
         public override string StreamerName => "CurrentGroup";
 
         public virtual void SetControllingInstruction(ForEachGroup instruction, ItemType itemType, bool isHigherOrder)
@@ -114,26 +105,17 @@ namespace OutSmart.DAXon.Functions
             return itemType;
         }
 
-        /// <summary>
-        /// Determine the dependencies
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Determine the dependencies
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("currentGroup");
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Determine the dependencies
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             if (ControllingInstruction == null)
@@ -146,9 +128,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the dependencies
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             CurrentGroupCall cg = new CurrentGroupCall();
@@ -158,17 +137,11 @@ namespace OutSmart.DAXon.Functions
             return cg;
         }
 
-        /// <summary>
-        /// Return an iteration over the result sequence
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Return an iteration over the result sequence
-        /// </summary>
         public ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             IGroupIterator gi = context.GetCurrentGroupIterator();
@@ -180,33 +153,21 @@ namespace OutSmart.DAXon.Functions
             return gi.CurrentGroup();
         }
 
-        /// <summary>
-        /// Return an iteration over the result sequence
-        /// </summary>
         public override string ToString()
         {
             return "current-group()";
         }
 
-        /// <summary>
-        /// Return an iteration over the result sequence
-        /// </summary>
         public override string ToShortString()
         {
             return ToString();
         }
 
-        /// <summary>
-        /// Return an iteration over the result sequence
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CurrentGroupCallElaborator();
         }
 
-        /// <summary>
-        /// Return an iteration over the result sequence
-        /// </summary>
         private class CurrentGroupCallElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

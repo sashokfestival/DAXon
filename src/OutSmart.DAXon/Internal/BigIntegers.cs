@@ -136,7 +136,10 @@ namespace OutSmart.DAXon.Internal
                 return 0;
             SysBigInteger m = v.Sign < 0 ? -v : v;
             int bits = -1;
-            for (SysBigInteger t = m; !t.IsZero; t >>= 1) bits++; // floor(log2 m)
+            for (SysBigInteger t = m; !t.IsZero; t >>= 1) // floor(log2 m)
+            {
+                bits++;
+            }
             bool powerOfTwo = (m & (m - SysBigInteger.One)).IsZero;
             return v.Sign > 0 ? bits + 1 : (powerOfTwo ? bits : bits + 1);
         }
@@ -201,7 +204,10 @@ namespace OutSmart.DAXon.Internal
         // overloads take string/IFormatProvider, never int.)
         public static string ToString(this SysBigInteger v, int radix)
         {
-            if (radix < 2 || radix > 36) radix = 10; // Java falls back to base 10
+            if (radix < 2 || radix > 36) // Java falls back to base 10
+            {
+                radix = 10;
+            }
             if (v.IsZero)
                 return "0";
             bool negative = v.Sign < 0;

@@ -15,7 +15,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,13 +32,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
     public class FLWORExpression : Expression
     {
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private static readonly OperandRole SINGLE_RETURN = new OperandRole(0, OperandUsage.TRANSMISSION, SequenceType.ANY_SEQUENCE);
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private static readonly OperandRole REPEATED_RETURN = new OperandRole(OperandRole.HIGHER_ORDER, OperandUsage.TRANSMISSION, SequenceType.ANY_SEQUENCE);
         public IList<Clause> clauses;
         public Operand returnClauseOp;
@@ -49,14 +42,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
 
         public virtual Expression ReturnClause => returnClauseOp.GetChildExpression();
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public virtual IPushEvaluator ReturnPushEvaluator
         {
             get
             {
-                lock (this)
+                lock (syncLock)
                 {
                     if (returnPushEvaluator == null)
                     {
@@ -68,14 +58,8 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD | PROCESS_METHOD;
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override string ExpressionName => "FLWOR";
         public FLWORExpression()
         {
@@ -102,9 +86,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return c.ClauseKey == Clause.ClauseName.FOR || c.ClauseKey == Clause.ClauseName.GROUP_BY || c.ClauseKey == Clause.ClauseName.WINDOW;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override bool HasVariableBinding(IBinding binding)
         {
             foreach (Clause c in clauses)
@@ -118,9 +99,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return false;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private bool ClauseHasBinding(Clause c, IBinding binding)
         {
             foreach (IBinding b in c.RangeVariables)
@@ -134,17 +112,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return false;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override bool AllowExtractingCommonSubexpressions()
         {
             return false;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override Expression Simplify()
         {
             IOperandProcessor simplifier = (op) => op.SetChildExpression(op.GetChildExpression().Simplify());
@@ -157,9 +129,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return this;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             IOperandProcessor typeChecker = (op) => op.TypeCheck(visitor, contextInfo);
@@ -185,9 +154,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return this;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override bool ImplementsStaticTypeCheck()
         {
             foreach (Clause c in clauses)
@@ -205,9 +171,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return true;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override Expression StaticTypeCheck(SequenceType req, bool backwardsCompatible, Func<RoleDiagnostic> roleSupplier, ExpressionVisitor visitor)
         {
 
@@ -217,17 +180,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return this;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override ItemType GetItemType()
         {
             return ReturnClause.GetItemType();
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         protected override int ComputeCardinality()
         {
 
@@ -235,17 +192,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override int ComputeDependencies()
         {
             return base.ComputeDependencies() | StaticProperty.DEPENDS_ON_OWN_RANGE_VARIABLES;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             IList<Operand> list = new List<Operand>(5);
@@ -265,9 +216,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             list.Add(returnClauseOp);
             return list;
         }
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override void CheckForUpdatingSubexpressions()
         {
             IOperandProcessor processor = (op) =>
@@ -286,17 +234,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
             ReturnClause.CheckForUpdatingSubexpressions();
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override bool IsUpdatingExpression()
         {
             return ReturnClause.IsUpdatingExpression();
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             foreach (Clause c in clauses)
@@ -307,23 +249,13 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return ReturnClause.AddToPathMap(pathMap, pathMapNodeSet);
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public virtual void InjectCode(ICodeInjector injector)
         {
             if (injector != null)
             {
-                foreach (Clause clause in clauses)
-                {
-
-                    // if there are already trace clauses present, do nothing
-                    if (clause is TraceClause)
-                    {
-                        return;
-                    }
-                }
-
+                // Upstream guards against double-injection by looking for existing TraceClauses;
+                // this port's injector traces clause OPERANDS in place and returns no extra
+                // clause (the TraceClause wrapper is not ported), so there is nothing to detect.
                 IList<Clause> expandedList = new List<Clause>(clauses.Count * 2);
                 expandedList.Add(clauses[0]);
                 for (int i = 1; i < clauses.Count; i++)
@@ -348,9 +280,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("FLWOR", this);
@@ -365,13 +294,9 @@ namespace OutSmart.DAXon.Expressions.Flwor
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
 
-            //verifyParentPointers();
             IList<Clause> newClauses = new List<Clause>();
             FLWORExpression f2 = new FLWORExpression();
             foreach (Clause c in clauses)
@@ -394,9 +319,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return f2;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override Expression Unordered(bool retainAllNodes, bool forStreaming)
         {
             foreach (Clause c in clauses)
@@ -411,9 +333,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return this;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private IBinding[] ExtendBindingList(IBinding[] bindings, LocalVariableBinding[] moreBindings)
         {
             if (bindings == null)
@@ -434,23 +353,16 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override int GetEvaluationMethod()
         {
             return Expression.PROCESS_METHOD;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Optimizer opt = visitor.ObtainOptimizer();
             OptimizerOptions options = opt.GetOptimizerOptions();
 
-            //verifyParentPointers();
             // Optimize all the subexpressions
             foreach (Clause c in clauses)
             {
@@ -514,7 +426,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                                     ExpressionTool.ReplaceVariableReferences(this, lc.RangeVariable, lc.Sequence, true);
                                     clauses.Remove(c);
                                     opt.Trace("Inlined variable " + lc.RangeVariable.GetVariableQName().DisplayName, this);
-                                    if (clauses.IsEmpty())
+                                    if (clauses.Count == 0)
                                     {
                                         return ReturnClause;
                                     }
@@ -537,7 +449,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                     {
                         if (clauses[i].ClauseKey == Clause.ClauseName.TRACE && clauses[i - 1].ClauseKey == Clause.ClauseName.TRACE)
                         {
-                            clauses.Remove(i);
+                            clauses.RemoveAt(i);
                         }
                     }
                 }
@@ -611,9 +523,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return this;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private Expression RewriteWhereClause(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             WhereClause whereClause;
@@ -641,7 +550,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                 return null;
             }
 
-            while (!whereList.IsEmpty())
+            while (whereList.Count > 0)
             {
                 whereClause = whereList[0].whereClause;
                 whereIndex = whereList[0].whereIndex;
@@ -662,12 +571,12 @@ namespace OutSmart.DAXon.Expressions.Flwor
                         {
 
                             // remove this term from the where clause
-                            Expression removedExpr = list.Remove(i);
-                            if (list.IsEmpty())
+                            Expression removedExpr = list.RemoveAtAndGet(i);
+                            if (list.Count == 0)
                             {
 
                                 // the where clause has no terms left, so remove the clause
-                                clauses.Remove(clauses.Count - whereIndex);
+                                clauses.RemoveAt(clauses.Count - whereIndex);
                             }
                             else
                             {
@@ -687,7 +596,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                                 {
                                     WhereClause newWhere = new WhereClause(this, removedExpr);
                                     newWhere.Location = clause.Location;
-                                    clauses.Add(c + 1, newWhere);
+                                    clauses.Insert(c + 1,newWhere);
                                 }
                             }
                             else
@@ -696,7 +605,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                                 // the clause is not a "for" clause, so just move the "where" to this place in the list of clauses
                                 WhereClause newWhere = new WhereClause(this, term);
                                 newWhere.Location = clause.Location;
-                                clauses.Add(c + 1, newWhere);
+                                clauses.Insert(c + 1,newWhere);
                             }
 
 
@@ -707,10 +616,10 @@ namespace OutSmart.DAXon.Expressions.Flwor
 
                     if (list.Count - 1 == i)
                     {
-                        list.Remove(i);
-                        if (list.IsEmpty())
+                        list.RemoveAt(i);
+                        if (list.Count == 0)
                         {
-                            clauses.Remove(clauses.Count - whereIndex);
+                            clauses.RemoveAt(clauses.Count - whereIndex);
                         }
                         else
                         {
@@ -719,19 +628,16 @@ namespace OutSmart.DAXon.Expressions.Flwor
 
                         WhereClause newWhere = new WhereClause(this, term);
                         newWhere.Location = condition.GetLocation();
-                        clauses.Add(0, newWhere);
+                        clauses.Insert(0,newWhere);
                     }
                 }
 
-                whereList.Remove(0);
+                whereList.RemoveAt(0);
             }
 
             return this;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private Expression MakeAndCondition(IList<Expression> list)
         {
             if (list.Count == 1)
@@ -740,13 +646,10 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
             else
             {
-                return new AndExpression(list[0], MakeAndCondition(list.SubList(1, list.Count)));
+                return new AndExpression(list[0], MakeAndCondition(list.GetRange(1, (list.Count) - (1))));
             }
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private Expression RewriteForOrLet(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Expression action = ReturnClause;
@@ -810,26 +713,17 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return action;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             ITailCall tc = MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context);
             Expression.DispatchTailCall(tc);
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         public override string ToShortString()
         {
             StringBuilder sb = new StringBuilder(64);
@@ -839,12 +733,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
-        /// <summary>
-        /// Display the expression as a string
-        /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(64);
@@ -859,12 +747,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
-        /// <summary>
-        /// Display the expression as a string
-        /// </summary>
         public virtual bool HasLoopingVariableReference(IBinding binding)
         {
 
@@ -896,7 +778,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                 IList<bool> response = new List<bool>();
                 IOperandProcessor checker = (op) =>
                 {
-                    if (response.IsEmpty() && ExpressionTool.DependsOnVariable(op.GetChildExpression(), new IBinding[] { binding }))
+                    if (response.Count == 0 && ExpressionTool.DependsOnVariable(op.GetChildExpression(), new IBinding[] { binding }))
                     {
                         response.Add(true);
                     }
@@ -906,7 +788,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
                     try
                     {
                         clauses[i].ProcessOperands(checker);
-                        if (!response.IsEmpty())
+                        if (response.Count > 0)
                         {
                             lastReferencingClause = i;
                             break;
@@ -934,32 +816,17 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return false;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
-        /// <summary>
-        /// Display the expression as a string
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new FLWORElaborator();
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
         private class WhereClauseStruct
         {
             public int whereIndex = 0;
             public WhereClause whereClause;
         }
 
-        /// <summary>
-        /// Get a push-evaluator for the return clause (used from bytecode)
-        /// </summary>
-        /// <summary>
-        /// Display the expression as a string
-        /// </summary>
         private class FLWORElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

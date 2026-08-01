@@ -18,63 +18,42 @@ namespace OutSmart.DAXon.Trees.Utilities
     {
         private readonly List<T> items;
 
-        // Phase 7.1: shadow LINQ Count extension; expose lowercase Java-style alias
+        // Shadow LINQ Count extension; expose lowercase Java-style alias
         public int Count => items.Count;
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         // PHASE7_INDEXER_IS
         public T this[int i] { get { return Get(i); } set { Set(i, value); } }
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public IndexedStack()
         {
             items = new List<T>(20);
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public IndexedStack(int size)
         {
             items = new List<T>(size);
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual int Size()
         {
             return items.Count;
         }
         public int size() => items.Count;
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual bool IsEmpty()
         {
-            return items.IsEmpty();
+            return items.Count == 0;
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual void IPush(T item)
         {
             items.Add(item);
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual T Peek()
         {
-            if (items.IsEmpty())
+            if (items.Count == 0)
             {
-                throw new EmptyStackException();
+                throw new InvalidOperationException("Stack is empty");
             }
             else
             {
@@ -82,18 +61,15 @@ namespace OutSmart.DAXon.Trees.Utilities
             }
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual T Pop()
         {
-            if (items.IsEmpty())
+            if (items.Count == 0)
             {
-                throw new EmptyStackException();
+                throw new InvalidOperationException("Stack is empty");
             }
             else
             {
-                return items.Remove(items.Count - 1);
+                return items.RemoveAtAndGet(items.Count - 1);
             }
         }
         public virtual T Get(int i)
@@ -101,36 +77,24 @@ namespace OutSmart.DAXon.Trees.Utilities
             return items[i];
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual void Set(int i, T value)
         {
             items[i] = value;
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual bool Contains(T value)
         {
             return items.Contains(value);
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual int IndexOf(T value)
         {
             return items.IndexOf(value);
         }
 
-        /// <summary>
-        /// Create an empty stack with a default initial space allocation
-        /// </summary>
         public virtual IEnumerator<T> GetEnumerator()
         {
-            return items.IIterator();
+            return items.GetEnumerator();
         }
         // (r1-injected NIE GetEnumerator removed - the renamed real GetEnumerator above implements IEnumerable<T>)
         System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

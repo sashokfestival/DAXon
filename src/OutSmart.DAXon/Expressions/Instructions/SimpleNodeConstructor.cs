@@ -30,9 +30,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
     {
         protected Operand selectOp;
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public virtual Expression Select
         {
             get => selectOp.GetChildExpression(); set
@@ -41,79 +38,46 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public virtual Operand SelectOp => selectOp;
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public override string StreamerName => "SimpleNodeConstructor";
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public SimpleNodeConstructor()
         {
             Expression select = Literal.MakeEmptySequence();
             selectOp = new Operand(this, select, OperandRole.SINGLE_ATOMIC);
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             return selectOp;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return true;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public override bool AlwaysCreatesNewNodes()
         {
             return true;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return Select.GetCardinality(); // may allow empty sequence
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             return base.ComputeSpecialProperties() | StaticProperty.SINGLE_DOCUMENT_NODESET;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public override bool AllowExtractingCommonSubexpressions()
         {
             return false;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public abstract void LocalTypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType);
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeCheckChildren(visitor, contextInfo);
@@ -152,9 +116,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             OptimizeChildren(visitor, contextItemType);
@@ -171,16 +132,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
         public abstract void ProcessValue(UnicodeString value, Outputter output, IXPathContext context);
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an expression.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             IItem contentItem = Select.MakeElaborator().ElaborateForItem().Eval(context);
@@ -202,45 +154,21 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return o;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an expression.
-        /// </summary>
         public virtual UnicodeString CheckContent(UnicodeString data, IXPathContext context)
         {
             return data;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an expression.
-        /// </summary>
         public virtual INodeName EvaluateNodeName(IXPathContext context)
         {
             return null;
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an expression.
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return SingletonIterator.MakeIterator(EvaluateItem(context));
         }
 
-        /// <summary>
-        /// Default constructor used by subclasses
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an expression.
-        /// </summary>
         public virtual bool IsLocal()
         {
             return ExpressionTool.IsLocalConstructor(this);

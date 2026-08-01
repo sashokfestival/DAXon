@@ -35,10 +35,10 @@ namespace OutSmart.DAXon.Api
             {
                 Dictionary<StructuredQName, GlobalParam> globals = preparedStylesheet.GlobalParameters;
                 Dictionary<QName, ParameterDetails> @params = new Dictionary<QName, ParameterDetails>();
-                foreach (GlobalParam v in globals.Values())
+                foreach (GlobalParam v in globals.Values)
                 {
                     ParameterDetails details = new ParameterDetails(processor, v.GetRequiredType(), v.IsRequiredParam());
-                    @params.Put(new QName(v.GetVariableQName()), details);
+                    @params.PutAndGetPrevious(new QName(v.GetVariableQName()), details);
                 }
 
                 return @params;
@@ -86,6 +86,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual void Export(System.IO.Stream destination)
@@ -117,6 +121,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
 
             try

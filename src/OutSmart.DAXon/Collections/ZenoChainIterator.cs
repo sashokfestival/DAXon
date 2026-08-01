@@ -19,7 +19,8 @@ namespace OutSmart.DAXon.Collections.Zeno
         private int majorIndex = 0;
         private int minorIndex = 0;
         private readonly List<List<U>> masterList;
-        private U __cur; public U Current => __cur;
+        private U __cur;
+        public U Current => __cur;
         object System.Collections.IEnumerator.Current => __cur;
         public ZenoChainIterator(List<List<U>> masterList)
         {

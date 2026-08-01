@@ -40,6 +40,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiUncheckedException(xe);
             }
+            catch (RecursionDepthError xe)
+            {
+                throw new DAXonApiUncheckedException(xe.ToXPathException());
+            }
         }
 
         public static XdmSequenceIterator<XdmNode> OfNodes(IAxisIterator @base)
@@ -95,9 +99,7 @@ namespace OutSmart.DAXon.Api
 
         public virtual XdmStream<T> Stream()
         {
-            Stream<T> @base = StreamSupport.Stream<T>(Spliterators.SpliteratorUnknownSize<T>(this, Spliterator.ORDERED), false);
-            @base = @base.OnClose(() => this.Dispose());
-            return new XdmStream<T>(@base);
+            return new XdmStream<T>(this);
         }
         bool System.Collections.IEnumerator.MoveNext() => false;
         void System.Collections.IEnumerator.Reset() { }

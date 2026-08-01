@@ -26,9 +26,6 @@ namespace OutSmart.DAXon.Trees.Linked
         protected INodePredicate nodeTest;
         protected NodeImpl current = null;
         protected int position = 0;
-        /// <summary>
-        /// Advance along the axis until a node is found that matches the required criteria
-        /// </summary>
         public virtual bool HasNext => nextNode != null;
         public TreeEnumeration(NodeImpl origin, INodePredicate nodeTest)
         {
@@ -42,9 +39,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return node == null || nodeTest == null || nodeTest.Test(node);
         }
 
-        /// <summary>
-        /// Advance along the axis until a node is found that matches the required criteria
-        /// </summary>
         protected void Advance()
         {
             do
@@ -54,9 +48,6 @@ namespace OutSmart.DAXon.Trees.Linked
             while (!Conforms(nextNode));
         }
 
-        /// <summary>
-        /// Advance along the axis until a node is found that matches the required criteria
-        /// </summary>
         protected abstract void Step();
 
         /// <summary>

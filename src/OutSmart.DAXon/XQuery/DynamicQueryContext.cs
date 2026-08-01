@@ -18,7 +18,6 @@ using System.Text;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.XQuery
 {
     //@CSharpInjectMembers(code = {
@@ -160,24 +159,6 @@ namespace OutSmart.DAXon.XQuery
             }
 
             return parameters[expandedName];
-        }
-
-        public virtual void SetErrorListener(ErrorListener listener)
-        {
-            errorReporter = new ErrorReporterToListener(listener);
-        }
-
-        public virtual ErrorListener GetErrorListener()
-        {
-            IErrorReporter uel = ErrorReporter;
-            if (uel is ErrorReporterToListener)
-            {
-                return ((ErrorReporterToListener)uel).GetErrorListener();
-            }
-            else
-            {
-                return null;
-            }
         }
 
         public virtual void SetTraceListener(ITraceListener listener)

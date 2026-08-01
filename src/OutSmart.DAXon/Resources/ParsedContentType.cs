@@ -35,7 +35,7 @@ namespace OutSmart.DAXon.Resources
             mediaType = mediaType.Trim();
             isXmlMediaType = (mediaType.StartsWith("application/", StringComparison.Ordinal) || mediaType.StartsWith("text/", StringComparison.Ordinal)) && (mediaType.EndsWith("/xml", StringComparison.Ordinal) || mediaType.EndsWith("+xml", StringComparison.Ordinal));
             string charset = "";
-            pos = contentType.ToLowerCase().IndexOf("charset", StringComparison.Ordinal);
+            pos = contentType.ToLowerInvariant().IndexOf("charset", StringComparison.Ordinal);
             if (pos >= 0)
             {
                 pos = contentType.IndexOf('=', pos + 7);

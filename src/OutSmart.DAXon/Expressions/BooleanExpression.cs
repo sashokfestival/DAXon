@@ -65,17 +65,11 @@ namespace OutSmart.DAXon.Expressions
             return PreEvaluate();
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             OptimizeChildren(visitor, contextItemType);
@@ -97,13 +91,7 @@ namespace OutSmart.DAXon.Expressions
             return PreEvaluate();
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         protected abstract Expression PreEvaluate();
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         protected virtual Expression ForceToBoolean(Expression @in)
         {
             if (@in.GetItemType() == BuiltInAtomicType.BOOLEAN && @in.GetCardinality() == StaticProperty.ALLOWS_ONE)
@@ -116,21 +104,12 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public bool IsNegatable(TypeHierarchy th)
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public abstract Expression Negate();
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         /// <summary>
         /// Evaluate the expression
         /// </summary>
@@ -139,41 +118,17 @@ namespace OutSmart.DAXon.Expressions
             return BooleanValue.Get(EffectiveBooleanValue(context));
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         public abstract override bool EffectiveBooleanValue(IXPathContext c);
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         public override ItemType GetItemType()
         {
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return UType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         public static void ListAndComponents(Expression exp, IList<Expression> list)
         {
             if (exp is BooleanExpression && ((BooleanExpression)exp).Operator == Token.AND)
@@ -189,12 +144,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
-        /// <summary>
-        /// Evaluate as a boolean.
-        /// </summary>
         protected override OperandRole GetOperandRole(int arg)
         {
             return OperandRole.INSPECT;

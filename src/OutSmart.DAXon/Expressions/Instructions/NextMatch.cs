@@ -31,23 +31,14 @@ namespace OutSmart.DAXon.Expressions.Instructions
     {
         bool useTailRecursion;
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_NEXT_MATCH;
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override string StreamerName => "NextMatch";
         public NextMatch(bool useTailRecursion) : base()
         {
             this.useTailRecursion = useTailRecursion;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             NextMatch nm2 = new NextMatch(useTailRecursion);
@@ -57,9 +48,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return nm2;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("nextMatch", this);
@@ -83,17 +71,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new NextMatchElaborator();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private class NextMatchPackage : ITailCall
         {
             private readonly NextMatch instruction;
@@ -142,9 +124,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private class NextMatchElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

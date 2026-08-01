@@ -24,30 +24,15 @@ namespace OutSmart.DAXon.XPath
         private ISequence defaultValue;
         private int slotNumber;
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public IntegerValue[] IntegerBoundsForVariable => null;
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public int LocalSlotNumber => slotNumber;
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public ISequence DefaultValue { get => defaultValue; set => this.defaultValue = value; }
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         private XPathVariable()
         {
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public static XPathVariable Make(StructuredQName name)
         {
             XPathVariable v = new XPathVariable();
@@ -55,72 +40,45 @@ namespace OutSmart.DAXon.XPath
             return v;
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public bool IsGlobal()
         {
             return false;
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public bool IsAssignable()
         {
             return false;
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public void SetRequiredType(SequenceType requiredType)
         {
             this.requiredType = requiredType;
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public SequenceType GetRequiredType()
         {
             return requiredType;
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public void SetSlotNumber(int slotNumber)
         {
             this.slotNumber = slotNumber;
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public StructuredQName GetVariableQName()
         {
             return name;
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public void AddReference(VariableReference @ref, bool isLoopingReference)
         {
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         public ISequence EvaluateVariable(IXPathContext context)
         {
             return context.EvaluateLocalVariable(slotNumber);
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         /// <summary>
         /// Say that the bound value has the potential to be indexed
         /// </summary>
@@ -128,9 +86,6 @@ namespace OutSmart.DAXon.XPath
         {
         }
 
-        /// <summary>
-        /// Private constructor: for use only by the protected factory method make()
-        /// </summary>
         /// <summary>
         /// Say that the bound value has the potential to be indexed
         /// </summary>

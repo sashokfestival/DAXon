@@ -75,7 +75,7 @@ namespace OutSmart.DAXon.Json
                 keyPool = new Dictionary<string, string>();
             }
 
-            string existing = keyPool.Get(key);
+            string existing = keyPool.GetOrDefault(key);
             if (existing != null)
             {
                 pooled = true;
@@ -84,7 +84,7 @@ namespace OutSmart.DAXon.Json
 
             if (keyPool.Count < KEY_INTERN_CAP)
             {
-                keyPool.Put(key, key);
+                keyPool[key] = key;
                 pooled = true;
             }
             else
@@ -102,7 +102,7 @@ namespace OutSmart.DAXon.Json
                 valuePool = new Dictionary<string, StringValue>();
             }
 
-            StringValue existing = valuePool.Get(val);
+            StringValue existing = valuePool.GetOrDefault(val);
             if (existing != null)
             {
                 return existing;
@@ -111,7 +111,7 @@ namespace OutSmart.DAXon.Json
             StringValue sv = new StringValue(val);
             if (valuePool.Count < VALUE_INTERN_CAP)
             {
-                valuePool.Put(val, sv);
+                valuePool[val] = sv;
             }
 
             return sv;

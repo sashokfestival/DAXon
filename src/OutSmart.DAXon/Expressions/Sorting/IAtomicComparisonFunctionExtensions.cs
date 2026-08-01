@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
 
-    // Phase 5: Extension methods at namespace level (extensions can't live in nested classes).
+    // Extension methods at namespace level (extensions can't live in nested classes).
     public static class IAtomicComparisonFunctionExtensions
     {
         public static bool Compare(this GenericAtomicComparer.IAtomicComparisonFunction f, AtomicValue v0, AtomicValue v1, IXPathContext context)

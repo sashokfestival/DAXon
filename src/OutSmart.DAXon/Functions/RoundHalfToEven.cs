@@ -25,17 +25,11 @@ namespace OutSmart.DAXon.Functions
     {
 
         public static Func<RoundHalfToEven> New() => () => new RoundHalfToEven();
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override int GetCardinality(Expression[] arguments)
         {
             return arguments[0].GetCardinality();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             NumericValue val0 = (NumericValue)arguments[0].Head();
@@ -68,17 +62,11 @@ namespace OutSmart.DAXon.Functions
             return val0.Round(scale, Round.RoundingRule.HALF_TO_EVEN);
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new RoundHalfToEvenElaborator();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public class RoundHalfToEvenElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()

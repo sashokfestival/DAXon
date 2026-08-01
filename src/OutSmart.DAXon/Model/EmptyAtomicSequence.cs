@@ -86,8 +86,8 @@ namespace OutSmart.DAXon.Model
         IGroundedValue IGroundedValue.Subsequence(int arg0, int arg1) => Subsequence(arg0, arg1);
         IItem ISequence.Head() => Head();
         ISequenceIterator ISequence.Iterate() => Iterate();
-        public IEnumerator<AtomicValue> GetEnumerator() => throw new NotImplementedException();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        public IEnumerator<AtomicValue> GetEnumerator() => System.Linq.Enumerable.Empty<AtomicValue>().GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
         IGroundedValue IGroundedValue.Reduce() => Reduce();
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===

@@ -16,7 +16,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Expressions.Elaboration;
 using System;
 
@@ -44,7 +43,7 @@ namespace OutSmart.DAXon.Expressions
         /// Get the RoleLocator (used to construct error messages)
         /// </summary>
         /// <returns>the roleDiagnostic locator</returns>
-        public RoleDiagnostic Role => roleSupplier.Get();
+        public RoleDiagnostic Role => roleSupplier();
 
         /// <summary>
         /// Give a string representation of the expression name for use in diagnostics
@@ -105,7 +104,7 @@ namespace OutSmart.DAXon.Expressions
             {
                 if (!allowEmpty)
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     TypeError("An empty sequence is not allowed as the " + role.GetMessage(), role.ErrorCode, null);
                 }
 
@@ -231,8 +230,8 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else
                     {
-                        RoleDiagnostic role = roleSupplier.Get();
-                        string message = e.GetMessage() + ". Failed while atomizing the " + role.GetMessage();
+                        RoleDiagnostic role = roleSupplier();
+                        string message = e.Message + ". Failed while atomizing the " + role.GetMessage();
                         throw new XPathException(message).WithErrorCode(e.ErrorCodeQName).WithLocation(e.GetLocator()).WithXPathContext(context);
                     }
                 }
@@ -240,7 +239,7 @@ namespace OutSmart.DAXon.Expressions
                 found += seq.GetLength();
                 if (found > 1)
                 {
-                    RoleDiagnostic role = roleSupplier.Get();
+                    RoleDiagnostic role = roleSupplier();
                     TypeError("A sequence of more than one item is not allowed as the " + role.GetMessage() + CardinalityChecker.DepictSequenceStart(BaseExpression.Iterate(context), 3), role.ErrorCode, context);
                 }
 
@@ -252,7 +251,7 @@ namespace OutSmart.DAXon.Expressions
 
             if (found == 0 && !allowEmpty)
             {
-                RoleDiagnostic role = roleSupplier.Get();
+                RoleDiagnostic role = roleSupplier();
                 TypeError("An empty sequence is not allowed as the " + role.GetMessage(), role.ErrorCode, null);
             }
 
@@ -302,8 +301,8 @@ namespace OutSmart.DAXon.Expressions
                             }
                             else
                             {
-                                RoleDiagnostic role = exp.roleSupplier.Get();
-                                string message = e.GetMessage() + ". Failed while atomizing the " + role.GetMessage();
+                                RoleDiagnostic role = exp.roleSupplier();
+                                string message = e.Message + ". Failed while atomizing the " + role.GetMessage();
                                 throw new XPathException(message).WithErrorCode(e.ErrorCodeQName).WithLocation(e.GetLocator()).WithXPathContext(context);
                             }
                         }
@@ -311,7 +310,7 @@ namespace OutSmart.DAXon.Expressions
                         found += seq.GetLength();
                         if (found > 1)
                         {
-                            RoleDiagnostic role = exp.roleSupplier.Get();
+                            RoleDiagnostic role = exp.roleSupplier();
                             exp.TypeError("A sequence of more than one item is not allowed as the " + role.GetMessage() + CardinalityChecker.DepictSequenceStart(exp.BaseExpression.Iterate(context), 3), role.ErrorCode, context);
                         }
 
@@ -323,7 +322,7 @@ namespace OutSmart.DAXon.Expressions
 
                     if (found == 0 && !exp.allowEmpty)
                     {
-                        RoleDiagnostic role = exp.roleSupplier.Get();
+                        RoleDiagnostic role = exp.roleSupplier();
                         exp.TypeError("An empty sequence is not allowed as the " + role.GetMessage(), role.ErrorCode, null);
                     }
 

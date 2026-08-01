@@ -31,9 +31,6 @@ namespace OutSmart.DAXon.Trees.Linked
         private int sequence; // sequence number allocated during original tree creation.
         protected internal override long SequenceNumber => GetRawSequenceNumber() == -1 ? -1 : (long)GetRawSequenceNumber() << 32;
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public int NumberOfChildren
         {
             get
@@ -53,9 +50,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public override NodeInfo LastChild
         {
             get
@@ -75,9 +69,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public override UnicodeString UnicodeStringValue
         {
             get
@@ -123,17 +114,11 @@ namespace OutSmart.DAXon.Trees.Linked
             this._children = children;
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public override bool HasChildNodes()
         {
             return _children != null;
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public IAxisIterator IterateChildren(NodeTest test)
         {
             if (_children == null)
@@ -165,9 +150,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public override NodeImpl GetFirstChild()
         {
             if (_children == null)
@@ -184,9 +166,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public NodeImpl GetNthChild(int n)
         {
             if (_children == null)
@@ -208,9 +187,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return nodes[n];
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public virtual void RemoveChild(NodeImpl child)
         {
             if (_children == null)
@@ -254,9 +230,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         private NodeImpl[] CleanUpChildren(NodeImpl[] children)
         {
             bool prevText = false;
@@ -296,9 +269,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public virtual void AddChild(NodeImpl node, int index)
         {
             lock (this)
@@ -330,9 +300,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public override void InsertChildren(NodeInfo[] source, bool atStart, bool inherit)
         {
             if (atStart)
@@ -345,9 +312,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public virtual void InsertChildrenAt(NodeInfo[] source, int index, bool inherit)
         {
             lock (this)
@@ -415,9 +379,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         private NodeImpl ConvertForeignNode(NodeInfo source)
         {
             if (!(source is NodeImpl))
@@ -438,7 +399,7 @@ namespace OutSmart.DAXon.Trees.Linked
                             builder = new LinkedTreeBuilder(GetConfiguration().MakePipelineConfiguration(), Durability.MUTABLE);
                             builder.Open();
                             source.Copy(builder, CopyOptions.ALL_NAMESPACES, Loc.NONE);
-                            builder.Dispose();
+                            builder.Close();
                         }
                         catch (XPathException e)
                         {
@@ -454,9 +415,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return (NodeImpl)source;
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public virtual void ReplaceChildrenAt(NodeInfo[] source, int index, bool inherit)
         {
             lock (this)
@@ -496,9 +454,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         private NodeImpl[] AdjustSuppliedNodeArray(NodeInfo[] source, bool inherit)
         {
             NodeImpl[] source2 = new NodeImpl[source.Length];
@@ -519,9 +474,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return source2;
         }
 
-        /// <summary>
-        /// Determine if the node has any _children.
-        /// </summary>
         public virtual void Compact(int size)
         {
             lock (this)

@@ -29,9 +29,9 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Expressions
 {
     public class Literal : Expression
@@ -42,9 +42,6 @@ namespace OutSmart.DAXon.Expressions
 
         public override int NetCost => 0;
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override IntegerValue[] IntegerBounds
         {
             get
@@ -72,19 +69,10 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override int Dependencies => 0;
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD | PROCESS_METHOD | EVALUATE_METHOD;
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -101,14 +89,8 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override string ExpressionName => "literal";
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -125,9 +107,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override string StreamerName => "Literal";
         public Literal(IGroundedValue value)
         {
@@ -213,9 +192,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             if (value.GetLength() == 0)
@@ -246,9 +222,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             if (value.GetLength() == 0)
@@ -261,25 +234,16 @@ namespace OutSmart.DAXon.Expressions
             return StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override bool SupportsLazyEvaluation()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override bool IsVacuousExpression()
         {
             return value.GetLength() == 0;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             Literal l2 = new Literal(value);
@@ -287,9 +251,6 @@ namespace OutSmart.DAXon.Expressions
             return l2;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override Patterns.Pattern ToPattern(Configuration config)
         {
             if (IsEmptySequence(this))
@@ -302,41 +263,26 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             return pathMapNodeSet;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return value.Iterate();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public virtual ISequenceIterator Iterate()
         {
             return value.Iterate();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return value.Head();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             if (value is IItem)
@@ -349,9 +295,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -379,9 +322,6 @@ namespace OutSmart.DAXon.Expressions
             return value.UnicodeStringValue;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -403,9 +343,6 @@ namespace OutSmart.DAXon.Expressions
             return value.EffectiveBooleanValue();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -496,9 +433,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -515,9 +449,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         protected override int ComputeHashCode()
         {
             if (value is IAtomicSequence)
@@ -530,9 +461,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -549,17 +477,11 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override string ToString()
         {
             return value.ToString();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -576,17 +498,11 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             ExportValue(value, @out);
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -603,9 +519,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static void ExportValue(ISequence value, ExpressionPresenter @out)
         {
             if (value.Head() == null)
@@ -705,7 +618,7 @@ namespace OutSmart.DAXon.Expressions
                 if (@out.GetOptions().explaining)
                 {
                     @out.StartElement("externalObject");
-                    @out.EmitAttribute("class", ((IAnyExternalObject)value).WrappedObject.GetType().GetName());
+                    @out.EmitAttribute("class", ((IAnyExternalObject)value).WrappedObject.GetType().FullName);
                     @out.EndElement();
                 }
                 else
@@ -726,9 +639,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -745,9 +655,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static void ExportAtomicValue(AtomicValue value, ExpressionPresenter @out)
         {
             if ("JS".Equals(@out.GetOptions().target))
@@ -808,9 +715,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -827,9 +731,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override string ToShortString()
         {
             if (value.GetLength() == 0)
@@ -850,9 +751,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -869,17 +767,11 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static bool IsAtomic(Expression exp)
         {
             return exp is Literal && ((Literal)exp).GroundedValue is AtomicValue;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -896,17 +788,11 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static bool IsEmptySequence(Expression exp)
         {
             return exp is Literal && ((Literal)exp).GroundedValue.GetLength() == 0;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -923,9 +809,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static bool IsConstantBoolean(Expression exp, bool value)
         {
             if (exp is Literal)
@@ -937,9 +820,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -956,9 +836,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static bool HasEffectiveBooleanValue(Expression exp, bool value)
         {
             if (exp is Literal)
@@ -976,9 +853,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -995,9 +869,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static bool IsConstantOne(Expression exp)
         {
             if (exp is Literal)
@@ -1009,9 +880,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -1028,9 +896,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static bool IsConstantZero(Expression exp)
         {
             if (exp is Literal)
@@ -1042,9 +907,6 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -1061,17 +923,11 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override bool IsSubtreeExpression()
         {
             return true;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -1088,17 +944,11 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static Literal MakeEmptySequence()
         {
             return new Literal(EmptySequence.GetInstance());
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -1115,9 +965,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static Literal MakeLiteral(IGroundedValue value)
         {
             value = value.Reduce();
@@ -1135,9 +982,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -1154,9 +998,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public static Literal MakeLiteral(IGroundedValue value, Expression origin)
         {
             Literal lit = MakeLiteral(value);
@@ -1165,9 +1006,6 @@ namespace OutSmart.DAXon.Expressions
             return lit;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -1184,17 +1022,11 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new LiteralElaborator();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         /*
       * Evaluate an expression as a String. This function must only be called in contexts
       * where it is known that the expression will return a single string (or where an empty sequence
@@ -1211,9 +1043,6 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public class LiteralElaborator : PullElaborator
         {
             public override ISequenceEvaluator Eagerly()

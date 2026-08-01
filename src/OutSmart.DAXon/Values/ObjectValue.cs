@@ -61,7 +61,7 @@ namespace OutSmart.DAXon.Values
 
         public static string DisplayTypeName(object value)
         {
-            return "java-type:" + value.GetType().GetName();
+            return "java-type:" + value.GetType().FullName;
         }
 
         public virtual bool EffectiveBooleanValue()
@@ -95,13 +95,13 @@ namespace OutSmart.DAXon.Values
         public virtual string ToShortString()
         {
             string v = value.ToString();
-            if (v.StartsWith(value.GetType().GetName(), StringComparison.Ordinal))
+            if (v.StartsWith(value.GetType().FullName, StringComparison.Ordinal))
             {
                 return v;
             }
             else
             {
-                return "(" + value.GetType().GetSimpleName() + ")" + Err.Truncate30(StringView.Tidy(value.ToString()));
+                return "(" + value.GetType().Name + ")" + Err.Truncate30(StringView.Tidy(value.ToString()));
             }
         }
         IAtomicSequence IItem.Atomize() => Atomize();

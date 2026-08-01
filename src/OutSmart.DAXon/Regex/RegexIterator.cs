@@ -22,17 +22,8 @@ namespace OutSmart.DAXon.Regex
     {
         StringValue Next();
         bool IsMatching();
-        /// <summary>
-        /// Get the number of captured groups in the current matching item
-        /// </summary>
         int NumberOfGroups { get; }
-        /// <summary>
-        /// Get the number of captured groups in the current matching item
-        /// </summary>
         UnicodeString GetRegexGroup(int number);
-        /// <summary>
-        /// Get the number of captured groups in the current matching item
-        /// </summary>
         void ProcessMatchingSubstring(IRegexMatchHandler action);
     }
 }

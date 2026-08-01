@@ -16,15 +16,6 @@ using System.IO;
 
 namespace OutSmart.DAXon.Transformation
 {
-    // Stubs for files we excluded from build (ParameterSet, WithParam) but other files reference.
-    // Runtime 2026-06-10: HOLLOW ParameterSet stub REMOVED (Put no-op, GetIndex=>-1, GetValue=>null -- every
-    // xsl:with-param value for call-template/apply-templates was dropped at the receiving xsl:param; the stub
-    // also drifted NOT_SUPPLIED to -1, real Java is 0). Real class HAND-PORTED at
-    // generated/OutSmart.DAXon/ParameterSetPort.cs (namespace OutSmart.DAXon.Expressions.Instructions).
-    // Runtime 2026-06-10: HOLLOW WithParam stub REMOVED (GetSelectValue=>null, GetSlotNumber=>0, all statics
-    // no-ops) -- it silently dropped every xsl:with-param value and NRE'd xsl:next-iteration. The real class is
-    // now HAND-PORTED at generated/OutSmart.DAXon/WithParamPort.cs (namespace OutSmart.DAXon.Expressions.Instructions,
-    // its true home; the JavaToCSharp converter crashes on WithParam.java).
 }
 
 
@@ -47,7 +38,7 @@ namespace OutSmart.DAXon.Transformation
 
 
 // IApiProvider for s9api ApiProvider interface (referenced by Processor etc).
-// Phase 7.8: removed OutSmart.DAXon.Api.IApiProvider stub -- it shadowed the
+// Removed OutSmart.DAXon.Api.IApiProvider stub -- it shadowed the
 // real OutSmart.DAXon.Core.Configuration.IApiProvider, causing Processor to implement
 // the wrong one. Callers should reference Configuration.IApiProvider directly.
 // namespace OutSmart.DAXon.Api { public interface IApiProvider { } }
@@ -59,7 +50,6 @@ namespace OutSmart.DAXon.Transformation
 
 // Stub for net.sf.saxon.value.SequenceType (transpiler collision with s9api.SequenceType lost the Value one).
 // All 56 static field constants from Saxon's value/SequenceType.java + factory methods.
-// Placeholders for now -- functional behaviour to be wired in Phase 4.10+.
 
 
 // Saxon s9api streaming wrappers — Step<T>, Predicates excluded from build. Provide minimal namespace.

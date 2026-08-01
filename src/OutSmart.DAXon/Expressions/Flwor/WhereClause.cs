@@ -42,15 +42,12 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Dictionary<string, object> TraceInfo
         {
             get
             {
                 Dictionary<string, object> info = new Dictionary<string, object>(1);
-                info.Put("condition", Predicate.ToShortString());
+                info["condition"] = Predicate.ToShortString();
                 return info;
             }
         }
@@ -76,17 +73,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return w2;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             base.TypeCheck(visitor, contextInfo);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override TuplePull GetPullStream(TuplePull @base, IXPathContext context)
         {
             if (predicateEvaluator == null)
@@ -97,17 +88,11 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return new WhereClausePull(@base, predicateEvaluator);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void GatherVariableReferences(ExpressionVisitor visitor, IBinding binding, IList<VariableReference> references)
         {
             ExpressionTool.GatherVariableReferences(Predicate, binding, references);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void RefineVariableType(ExpressionVisitor visitor, IList<VariableReference> references, Expression returnExpr)
         {
             ItemType actualItemType = Predicate.GetItemType();
@@ -118,9 +103,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override TuplePush GetPushStream(TuplePush destination, Outputter output, IXPathContext context)
         {
             if (predicateEvaluator == null)
@@ -131,25 +113,16 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return new WhereClausePush(output, destination, predicateEvaluator);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void ProcessOperands(IOperandProcessor processor)
         {
             processor.ProcessOperand(predicateOp);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             Predicate.AddToPathMap(pathMap, pathMapNodeSet);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void Explain(ExpressionPresenter @out)
         {
             @out.StartElement("where");
@@ -157,9 +130,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string ToShortString()
         {
             StringBuilder fsb = new StringBuilder(64);
@@ -168,9 +138,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string ToString()
         {
             StringBuilder fsb = new StringBuilder(64);

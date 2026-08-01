@@ -28,7 +28,6 @@
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -57,6 +56,13 @@ namespace OutSmart.DAXon.Regex
         public int[] endBackref; // Lazily-allocated array of backref ends
         public Operation operation;
         public bool anchoredMatch;
+        // Shared per-attempt backtracking budget (round BE). The limit used to be counted only
+        // in OpSequence's advance loop, but nested quantifiers ((a)*)* compile to OpRepeat and
+        // OpCapture alone - no OpSequence anywhere - so catastrophic backtracking churned with
+        // no limit and no deadline. Every ambiguous-repeat pull and every sequence backtrack
+        // now funnels through CountBacktrackStep.
+        int backtrackSteps;
+        int backtrackLimit = -1; // cached per attempt: Program.BacktrackingLimit is virtual
 
         public virtual REProgram Program
         {
@@ -160,8 +166,33 @@ namespace OutSmart.DAXon.Regex
             }
         }
 
+        // One backtracking step (round BE): called per pull on an ambiguous repeat and per
+        // sequence backtrack, at every nesting level. The deadline check is unconditional -
+        // with the limit disabled it is the only brake on catastrophic backtracking - and
+        // the active token throttles clock sampling itself.
+        internal void CountBacktrackStep()
+        {
+            if (backtrackLimit >= 0 && ++backtrackSteps > backtrackLimit)
+            {
+                throw new OutSmart.DAXon.Transformation.UncheckedXPathException(new OutSmart.DAXon.Transformation.XPathException("Regex backtracking limit exceeded processing " + operation.Display() + ". Simplify the regular expression, " + "or set Feature<int>.REGEX_BACKTRACKING_LIMIT to -1 to remove this limit."));
+            }
+
+            OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
+        }
+
         protected virtual bool MatchAt(int i, bool anchored)
         {
+            // Cooperative deadline: every regex driver (matches/replace/tokenize/analyze-string,
+            // via Match's position scans) funnels each candidate attempt through here, so a
+            // multi-megabyte subject honours SXTO0001 instead of outrunning the transform limit.
+            // Called per attempt - the active token itself throttles clock sampling (same
+            // pattern as the range iterators); a local stride here would multiply with that
+            // throttle and defer the first sample by stride^2 iterations.
+            OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
+
+            // Fresh step budget per candidate attempt (round BE)
+            backtrackSteps = 0;
+            backtrackLimit = program.BacktrackingLimit;
 
             // Initialize start pointer, paren cache and paren count
             _captureState.parenCount = 1;
@@ -869,7 +900,7 @@ namespace OutSmart.DAXon.Regex
                     }
                 }
 
-                UnicodeString replacement = replacer.Apply(matchingSubstring, groups);
+                UnicodeString replacement = replacer(matchingSubstring,groups);
                 IIntIterator iter = replacement.CodePoints();
                 while (iter.MoveNext())
                 {

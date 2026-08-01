@@ -11,7 +11,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Transformation.Rules;
 using OutSmart.DAXon.Trees.Linked;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -32,6 +31,7 @@ namespace OutSmart.DAXon.Xslt
     /// </summary>
     public sealed class XSLTemplate : StyleElement, IStylesheetComponent
     {
+        private readonly object syncLock = new object();
         private string matchAtt = null;
         private string modeAtt = null;
         private string nameAtt = null;
@@ -56,9 +56,6 @@ namespace OutSmart.DAXon.Xslt
         private bool explaining;
         private IList<Patterns.Pattern> subPatterns;
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public StructuredQName TemplateName
         {
             get
@@ -78,9 +75,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public StructuredQName[] ModeNames
         {
             get
@@ -99,7 +93,7 @@ namespace OutSmart.DAXon.Xslt
                     }
 
                     bool allModes = false;
-                    string[] tokens = Whitespace.Trim(modeAtt).Split("[ \t\n\r]+");
+                    string[] tokens = Whitespace.Trim(modeAtt).SplitRegex("[ \t\n\r]+");
                     int count = tokens.Length;
                     modeNames = new StructuredQName[count];
                     count = 0;
@@ -149,9 +143,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public HashSet<Mode> ApplicableModes
         {
             get
@@ -164,7 +155,7 @@ namespace OutSmart.DAXon.Xslt
                     if (name.Equals(Mode.OMNI_MODE_NAME))
                     {
                         modes.Add(mgr.UnnamedMode);
-                        modes.AddAll(mgr.AllNamedModes);
+                        modes.AddRange(mgr.AllNamedModes);
                     }
                     else
                     {
@@ -180,15 +171,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
-        /// <summary>
-        /// Allocate slot numbers to any local variables declared within a predicate within the match pattern
-        /// </summary>
         public ItemType ContextItemTypeForTemplateRule
         {
             get
@@ -227,32 +209,8 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
-        /// <summary>
-        /// Allocate slot numbers to any local variables declared within a predicate within the match pattern
-        /// </summary>
-        /// <summary>
-        /// Get associated Procedure (for details of stack frame)
-        /// </summary>
         public NamedTemplate CompiledNamedTemplate => compiledNamedTemplate;
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
-        /// <summary>
-        /// Allocate slot numbers to any local variables declared within a predicate within the match pattern
-        /// </summary>
-        /// <summary>
-        /// Get associated Procedure (for details of stack frame)
-        /// </summary>
         public Patterns.Pattern Match => match; //    public IMap<StructuredQName, TemplateRule> getTemplateRulesByMode() {
         public NamedTemplate GetActor()
         {
@@ -311,17 +269,11 @@ namespace OutSmart.DAXon.Xslt
             this.absentFocus = absentFocus;
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         protected override bool IsPermittedChild(StyleElement child)
         {
             return child is XSLLocalParam || child.Fingerprint == StandardNames.XSL_CONTEXT_ITEM;
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public SymbolicName GetSymbolicName()
         {
             if (TemplateName == null)
@@ -334,25 +286,16 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public ItemType GetRequiredContextItemType()
         {
             return requiredContextItemType;
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public bool IsMayOmitContextItem()
         {
             return mayOmitContextItem;
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public void CheckCompatibility(Component component)
         {
             NamedTemplate other = (NamedTemplate)component.GetActor();
@@ -419,9 +362,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public XSLLocalParam GetParam(StructuredQName name)
         {
             foreach (NodeInfo param in Children(new TypeIsInstancePredicate(typeof(XSLLocalParam))))
@@ -435,9 +375,6 @@ namespace OutSmart.DAXon.Xslt
             return null;
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public override void PrepareAttributes()
         {
             IAttributeMap atts = Attributes();
@@ -642,9 +579,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public override void ProcessAllAttributes()
         {
 
@@ -662,9 +596,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public bool AppliesToAllModes()
         {
             foreach (StructuredQName name in ModeNames)
@@ -678,9 +609,6 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             stackFrameMap = GetConfiguration().MakeSlotManager();
@@ -797,9 +725,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         private void GatherSubPatterns(Patterns.Pattern match, IList<Patterns.Pattern> subPatterns)
         {
             if (match is UnionPattern)
@@ -825,9 +750,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public override void ValidateSubtree(ComponentDeclaration decl, bool excludeStylesheet)
         {
             if (!IsDeferredCompilation(GetCompilation()))
@@ -847,9 +769,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
         public override void Index(ComponentDeclaration decl, PrincipalStylesheetModule top)
         {
             if (TemplateName != null)
@@ -864,9 +783,6 @@ namespace OutSmart.DAXon.Xslt
         }
 
         /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
         /// Mark tail-recursive calls on templates and functions.
         /// </summary>
         public override bool MarkTailCalls()
@@ -875,12 +791,6 @@ namespace OutSmart.DAXon.Xslt
             return last != null && last.MarkTailCalls();
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         public override void CompileDeclaration(Compilation compilation, ComponentDeclaration decl)
         {
             if (IsDeferredCompilation(compilation))
@@ -920,23 +830,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         private void CheckStrictStreamability(Expression body)
         {
             GetConfiguration().CheckStrictStreamability(this, body);
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         private void CompileNamedTemplate(Expression body)
         {
             RetainedStaticContext rsc = body.GetRetainedStaticContext();
@@ -965,12 +863,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         private Expression RefineTemplateBody(Expression body, ContextItemStaticInfo cisi)
         {
             Expression old = body;
@@ -1027,12 +919,6 @@ namespace OutSmart.DAXon.Xslt
             return body;
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         public void CompileTemplateRule(Compilation compilation, Expression body)
         {
             Configuration config = GetConfiguration();
@@ -1092,12 +978,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         private void CreateSkeletonTemplate(Compilation compilation, ComponentDeclaration decl)
         {
             foreach (TemplateRule templateRule in compiledTemplateRules)
@@ -1109,12 +989,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         private void SetCompiledTemplateRuleProperties(TemplateRule templateRule, Expression body)
         {
 
@@ -1127,15 +1001,9 @@ namespace OutSmart.DAXon.Xslt
             templateRule.SetContextItemRequirements(requiredContextItemType, absentFocus);
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         public void JitCompile(Compilation compilation, ComponentDeclaration decl)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (!jitCompilationDone)
                 {
@@ -1151,12 +1019,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         private void CheckForJitCompilationErrors(Compilation compilation)
         {
             if (compilation.ErrorCount > 0)
@@ -1167,12 +1029,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
         public void Register(ComponentDeclaration declaration)
         {
             if (match != null)
@@ -1319,15 +1175,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
-        /// <summary>
-        /// Allocate slot numbers to any local variables declared within a predicate within the match pattern
-        /// </summary>
         public void AllocatePatternSlotNumbers()
         {
             if (match != null)
@@ -1363,15 +1210,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
-        /// <summary>
-        /// Allocate slot numbers to any local variables declared within a predicate within the match pattern
-        /// </summary>
         public void Optimize(ComponentDeclaration declaration)
         {
             Configuration config = GetConfiguration();
@@ -1455,24 +1293,10 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param and xsl:context-item are permitted children
-        /// </summary>
-        /// <summary>
-        /// Compile: creates the executable form of the template
-        /// </summary>
-        /// <summary>
-        /// Allocate slot numbers to any local variables declared within a predicate within the match pattern
-        /// </summary>
-        /// <summary>
-        /// Get associated Procedure (for details of stack frame)
-        /// </summary>
         public SlotManager GetSlotManager()
         {
             return stackFrameMap;
         }
-        //        return compiledTemplateRules;
-        //    }
         Actor IStylesheetComponent.GetActor() => GetActor();
     }
 }

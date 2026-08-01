@@ -69,10 +69,9 @@ namespace OutSmart.DAXon.Resources
                     XmlReaderToReceiver.Send(xr, receiver);
                 }
             }
-            catch (XPathException)
-            {
-                throw;
-            }
+            // No XPathException clause: it is not one of the types below, so catching it here only
+            // to rethrow was pure cost - and this method sits on every nested include level, where
+            // a catch-and-rethrow re-enters exception dispatch and eats stack on the unwind (AW).
             catch (UncheckedXPathException uxpe)
             {
                 throw uxpe.GetXPathException();

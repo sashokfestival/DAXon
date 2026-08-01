@@ -6,10 +6,8 @@
 // Top-level OutSmart.DAXon.Types.TwoPhaseConverter — this is the one ConversionRules.GetConverter actually
 // instantiates (the sibling nested Converter.TwoPhaseConverter requires qualification and is unused there).
 //
-// Runtime 2026-07-06: was a HOLLOW stub (discarded its phases; inherited Convert=>null) -> subtype-via-primitive
-// casts routed through it (e.g. xs:integer -> xs:positiveInteger = upcast to xs:decimal + downcast) NRE-d at
-// CastExpression.PreEvaluate via Literal.MakeLiteral(null). Faithful Java (net.sf.saxon.type.Converter.
-// TwoPhaseConverter): run phaseOne, then phaseTwo on the intermediate result.
+// Subtype-via-primitive casts route through here (e.g. xs:integer -> xs:positiveInteger = upcast to xs:decimal
+// + downcast). Faithful Java (Converter.TwoPhaseConverter): run phaseOne, then phaseTwo on the intermediate result.
 
 using OutSmart.DAXon.Values;
 

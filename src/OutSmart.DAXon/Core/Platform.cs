@@ -22,7 +22,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 
@@ -46,8 +45,7 @@ namespace OutSmart.DAXon.Core
         /// <summary>
         /// Diagnostic method to list the embedded resources contained in the loaded software
         /// </summary>
-        void ShowEmbeddedResources()
-;
+        void ShowEmbeddedResources();
 
 
         IStringCollator MakeCollation(Configuration config, Properties props, string uri);

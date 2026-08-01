@@ -28,16 +28,10 @@ namespace OutSmart.DAXon.XQuery
         private IList<QueryModule> correspondingQueryModule = new List<QueryModule>(20);
         private readonly IList<IList<string>> correspondingReasons = new List<IList<string>>();
         private bool resolving = false;
-        /// <summary>
-        /// Create an UnboundFunctionLibrary
-        /// </summary>
         public UnboundFunctionLibrary()
         {
         }
 
-        /// <summary>
-        /// Create an UnboundFunctionLibrary
-        /// </summary>
         public virtual Expression Bind(SymbolicName.F functionName, Expression[] arguments, Dictionary<StructuredQName, int> keywords, IStaticContext env, IList<string> reasons)
         {
             if (resolving)
@@ -45,7 +39,7 @@ namespace OutSmart.DAXon.XQuery
                 return null;
             }
 
-            if (!reasons.IsEmpty() && reasons[0].StartsWith("Cannot call the private XQuery function", StringComparison.Ordinal))
+            if (reasons.Count > 0 && reasons[0].StartsWith("Cannot call the private XQuery function", StringComparison.Ordinal))
             {
 
                 // The function call matched a private function in another module; don't attempt a late binding
@@ -60,9 +54,6 @@ namespace OutSmart.DAXon.XQuery
             return ufc;
         }
 
-        /// <summary>
-        /// Create an UnboundFunctionLibrary
-        /// </summary>
         public virtual IFunctionItem GetFunctionItem(SymbolicName.F functionName, IStaticContext staticContext)
         {
             if (resolving)
@@ -79,17 +70,11 @@ namespace OutSmart.DAXon.XQuery
             return fi;
         }
 
-        /// <summary>
-        /// Create an UnboundFunctionLibrary
-        /// </summary>
         public virtual bool IsAvailable(SymbolicName.F functionName, int languageLevel)
         {
             return false; // function-available() is not used in XQuery
         }
 
-        /// <summary>
-        /// Create an UnboundFunctionLibrary
-        /// </summary>
         public virtual void BindUnboundFunctionReferences(IXQueryFunctionBinder lib, Configuration config)
         {
             resolving = true;
@@ -137,7 +122,7 @@ namespace OutSmart.DAXon.XQuery
                             sb.Append(". ").Append(reason);
                         }
 
-                        if (reasons.IsEmpty())
+                        if (reasons.Count == 0)
                         {
                             string supplementary = XPathParser.GetMissingFunctionExplanation(details.functionName.ComponentName, config);
                             if (supplementary != null)
@@ -200,9 +185,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an UnboundFunctionLibrary
-        /// </summary>
         // all done
         public virtual IFunctionLibrary Copy()
         {
@@ -214,11 +196,7 @@ namespace OutSmart.DAXon.XQuery
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
 
-        /// <summary>
-        /// Create an UnboundFunctionLibrary
-        /// </summary>
         public class UnboundFunctionCallDetails
         {
             public SymbolicName.F functionName;

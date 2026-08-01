@@ -66,7 +66,7 @@ namespace OutSmart.DAXon.XQuery
                 }
             }
 
-            functions.Put(keyObj, function);
+            functions[keyObj] = function;
             existingFunctions.Add(function);
         }
 
@@ -132,7 +132,7 @@ namespace OutSmart.DAXon.XQuery
 
         public virtual bool IsAvailable(SymbolicName.F functionName, int languageLevel)
         {
-            return functions.Get(functionName) != null;
+            return functions.GetOrDefault(functionName) != null;
         }
 
         //}
@@ -150,7 +150,7 @@ namespace OutSmart.DAXon.XQuery
                 UserFunctionCall ufc = new UserFunctionCall();
                 ufc.SetFunctionName(fd.GetFunctionName());
                 int maxArity = fd.NumberOfParameters;
-                if (arguments.Length == maxArity && (keywords == null || keywords.IsEmpty()))
+                if (arguments.Length == maxArity && (keywords == null || keywords.Count == 0))
                 {
                     ufc.Arguments = arguments;
                 }
@@ -188,7 +188,7 @@ namespace OutSmart.DAXon.XQuery
         //}
         public virtual XQueryFunction GetDeclaration(StructuredQName functionName, int staticArgs)
         {
-            IList<XQueryFunction> homonyms = functionsByName.Get(functionName);
+            IList<XQueryFunction> homonyms = functionsByName.GetOrDefault(functionName);
             if (homonyms != null)
             {
                 foreach (XQueryFunction f in homonyms)
@@ -220,7 +220,7 @@ namespace OutSmart.DAXon.XQuery
 
                 ufc.SetFunctionName(fd.GetFunctionName());
                 int maxArity = fd.NumberOfParameters;
-                if (arguments.Length == maxArity && (details.keywords == null || details.keywords.IsEmpty()))
+                if (arguments.Length == maxArity && (details.keywords == null || details.keywords.Count == 0))
                 {
                     ufc.Arguments = arguments;
                 }
@@ -234,7 +234,7 @@ namespace OutSmart.DAXon.XQuery
                     if (keywords != null)
                     {
                         int positionalArgs = arguments.Length - keywords.Count;
-                        foreach (KeyValuePair<StructuredQName, int> entry in keywords.EntrySet())
+                        foreach (KeyValuePair<StructuredQName, int> entry in keywords)
                         {
                             StructuredQName key = entry.Key;
                             int argPos = entry.Value;
@@ -291,7 +291,7 @@ namespace OutSmart.DAXon.XQuery
         //}
         public virtual XQueryFunction GetDeclarationByKey(SymbolicName functionKey)
         {
-            return functions.Get(functionKey);
+            return functions.GetOrDefault(functionKey);
         }
 
         public virtual void FixupGlobalFunctions(QueryModule env)
@@ -330,7 +330,7 @@ namespace OutSmart.DAXon.XQuery
         public virtual UserFunction GetUserDefinedFunction(NamespaceUri uri, string localName, int arity)
         {
             SymbolicName functionKey = new SymbolicName.F(new StructuredQName("", uri, localName), arity);
-            XQueryFunction fd = functions.Get(functionKey);
+            XQueryFunction fd = functions.GetOrDefault(functionKey);
             if (fd == null)
             {
                 return null;

@@ -14,7 +14,7 @@ using OutSmart.DAXon.Collections;
 namespace OutSmart.DAXon.Types
 {
 
-    // Phase B (FinDim Bug A root cause, 2026-06-05): xs:anyType IS the root complex type
+    // Xs:anyType IS the root complex type
     // (upstream is `enum AnyType implements ComplexType`). This stub previously declared only
     // ISchemaTypeStubBase, so `contentType is IComplexType` was FALSE in
     // AxisExpression.ComputeCardinality's CHILD branch -> it returned StaticProperty.EMPTY for every
@@ -37,7 +37,7 @@ namespace OutSmart.DAXon.Types
         public override NamespaceUri TargetNamespace => NamespaceUri.SCHEMA;
         public override int Fingerprint => StandardNames.XS_ANY_TYPE;
         public ComplexVariety Variety => ComplexVariety.MIXED;
-        public ISimpleType SimpleContentType => throw new NotImplementedException("STUB: AnyType.GetSimpleContentType not ported (excluded stub)");
+        public ISimpleType SimpleContentType => AnySimpleType.GetInstance(); // upstream AnyType.getSimpleContentType()
         public string PreferredJsonLayout => "mixed";
         public static AnyType GetInstance() => _instance;
         public override bool IsComplexType() => true;

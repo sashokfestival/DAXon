@@ -12,7 +12,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,37 +37,10 @@ namespace OutSmart.DAXon.Expressions
 
         public virtual Func<RoleDiagnostic> RoleSupplier => this.roleSupplier;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
         public override string StreamerName => "AtomicSequenceConverter";
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ExpressionName => "convert";
         public AtomicSequenceConverter(Expression sequence, IPlainType requiredItemType) : base(sequence)
         {
@@ -214,12 +186,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression e = base.Optimize(visitor, contextInfo);
@@ -262,12 +228,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties() | StaticProperty.NO_NODES_NEWLY_CREATED;
@@ -283,12 +243,6 @@ namespace OutSmart.DAXon.Expressions
             return p;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             AtomicSequenceConverter atomicConverter = new AtomicSequenceConverter(BaseExpression.Copy(rebindings), requiredItemType);
@@ -298,12 +252,6 @@ namespace OutSmart.DAXon.Expressions
             return atomicConverter;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
         /// <summary>
         /// Iterate over the sequence of values
         /// </summary>
@@ -332,12 +280,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
         /// Iterate over the sequence of values
         /// </summary>
         public virtual ItemMappingIterator GetConvertingIterator(IXPathContext context, ISequenceIterator @base)
@@ -353,7 +295,7 @@ namespace OutSmart.DAXon.Expressions
                 mapper.SetConverter(conv);
                 if (roleSupplier != null)
                 {
-                    string errorCode = roleSupplier.Get().ErrorCode;
+                    string errorCode = roleSupplier().ErrorCode;
                     if (!"XPTY0004".Equals(errorCode))
                     {
                         mapper.SetErrorCode(errorCode);
@@ -364,35 +306,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return (AtomicValue)MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
         public virtual AtomicValue ConvertItem(AtomicValue item, IXPathContext context)
         {
             if (item == null)
@@ -406,41 +324,17 @@ namespace OutSmart.DAXon.Expressions
             {
 
                 // TODO: use more of the information in the roleDiagnostic to form the error message
-                ((ValidationFailure)result).SetErrorCode(roleSupplier.Get().ErrorCode);
+                ((ValidationFailure)result).SetErrorCode(roleSupplier().ErrorCode);
             }
 
             return result.AsAtomic();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
         public override ItemType GetItemType()
         {
             return requiredItemType;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
         /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
@@ -450,18 +344,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
         public override string ToString()
@@ -469,81 +351,21 @@ namespace OutSmart.DAXon.Expressions
             return "convertTo_" + RequiredItemType.ToString() + "(" + BaseExpression.ToString() + ")";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             return base.Equals(other) && requiredItemType.Equals(((AtomicSequenceConverter)other).requiredItemType);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return base.ComputeHashCode() ^ requiredItemType.GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override string DisplayOperator(Configuration config)
         {
             return "convert";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("convert", this);
@@ -567,7 +389,7 @@ namespace OutSmart.DAXon.Expressions
 
             if (RoleSupplier != null)
             {
-                destination.EmitAttribute("diag", RoleSupplier.Get().Save());
+                destination.EmitAttribute("diag", RoleSupplier().Save());
             }
 
             if (converter.IsPromoter() && "JS".Equals(destination.GetOptions().target) && destination.GetOptions().targetVersion >= 2)
@@ -579,7 +401,7 @@ namespace OutSmart.DAXon.Expressions
                 destination.EmitAttribute("to", AlphaCode.FromItemType(requiredItemType));
                 if (RoleSupplier != null)
                 {
-                    destination.EmitAttribute("diag", RoleSupplier.Get().Save());
+                    destination.EmitAttribute("diag", RoleSupplier().Save());
                 }
 
                 BaseExpression.Export(destination);
@@ -593,21 +415,6 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new AtomicSequenceConverterElaborator();
@@ -639,15 +446,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
         /// Mapping function wrapped around a converter
         /// </summary>
         public class AtomicSequenceMappingFunction : IItemMappingFunction
@@ -672,21 +470,15 @@ namespace OutSmart.DAXon.Expressions
                     ((ValidationFailure)result).SetErrorCode(errorCode);
                 }
 
-                if (result == null) { return item; }
+                if (result == null)
+                {
+                    return item;
+                }
                 return result.AsAtomic();
             }
             IItem IItemMappingFunction.MapItem(IItem arg0) => MapItem(arg0);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
         /// <summary>
         /// Mapping function that converts every item in a sequence to a string
         /// </summary>
@@ -699,21 +491,6 @@ namespace OutSmart.DAXon.Expressions
             IItem IItemMappingFunction.MapItem(IItem arg0) => MapItem(arg0);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Perform optimisation of an expression and its subexpressions.
-        /// </summary>
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem. This should only be called if the AtomicSequenceConverter has cardinality zero-or-one
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public class AtomicSequenceConverterElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

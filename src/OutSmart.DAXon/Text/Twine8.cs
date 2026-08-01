@@ -16,7 +16,6 @@ using OutSmart.DAXon.Internal.Charsets;
 
 using OutSmart.DAXon.Internal.Collections;
 
-using OutSmart.DAXon.Internal.Functional;
 
 using System;
 
@@ -67,9 +66,22 @@ namespace OutSmart.DAXon.Text
             bytes = FromString(str);
         }
 
+        // Latin-1 narrowing, one byte per char (UTF-8 would double-encode 0x80-0xFF and corrupt the twine).
         private static byte[] FromString(string str)
         {
-            return str.GetBytes(StandardCharsets.ISO_8859_1);
+            byte[] result = new byte[str.Length];
+            for (int i = 0; i < str.Length; i++)
+            {
+                char c = str[i];
+                if (CHECKING && c > 255)
+                {
+                    throw new ArgumentException();
+                }
+
+                result[i] = (byte)(c & 0xff);
+            }
+
+            return result;
         }
 
         public override long Length()
@@ -355,17 +367,11 @@ namespace OutSmart.DAXon.Text
             return a.Length.CompareTo(be - bs);
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         public override string ToString()
         {
             return new string(Array.ConvertAll(bytes, (b) => (char)b));
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         private void Write(TextWriter writer, long start, long len)
         {
             if (writer is UTF8Writer)
@@ -378,14 +384,11 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         public override long IndexWhere(Func<int, bool> predicate, long from)
         {
             for (int i = requireNonNegativeInt(from); i < Length(); i++)
             {
-                if (predicate.Test(bytes[i] & 0xff))
+                if (predicate(bytes[i] & 0xff))
                 {
                     return i;
                 }
@@ -394,9 +397,6 @@ namespace OutSmart.DAXon.Text
             return -1;
         }
 
-        /// <summary>
-        /// Display as a string.
-        /// </summary>
         public virtual string Details()
         {
             return "Twine8 bytes.length = " + bytes.Length;

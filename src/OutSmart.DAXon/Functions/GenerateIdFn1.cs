@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Values;
 using System.Text;
@@ -16,7 +15,7 @@ using System.Text;
 namespace OutSmart.DAXon.Functions
 {
 
-    // Runtime 2026-06-10: fn:generate-id#1 - real GenerateId_1.cs drags StringElaborator; Call-only impl.
+    // fn:generate-id#1: Call-only impl — the full GenerateId_1 port would drag the StringElaborator cluster.
     public class GenerateIdFn1 : ScalarSystemFunction
     {
         public GenerateIdFn1() { }

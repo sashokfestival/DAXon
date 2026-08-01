@@ -86,7 +86,7 @@ namespace OutSmart.DAXon.Functions
                 try
                 {
                     ReadFile(absoluteURI, encoding, consumer, context);
-                    consumer.Dispose();
+                    consumer.Close();
                 }
                 catch (XPathException e)
                 {
@@ -117,12 +117,12 @@ namespace OutSmart.DAXon.Functions
                 {
                     Controller controller = context.GetController();
 
-                    lock (controller)
+                    lock (controller.syncLock)
                     {
                         Dictionary<URI, UnicodeString> cache = (Dictionary<URI, UnicodeString>)controller.GetUserData("unparsed-text-cache", "");
                         if (cache != null)
                         {
-                            UnicodeString existing = cache.Get(absoluteURI);
+                            UnicodeString existing = cache.GetOrDefault(absoluteURI);
                             if (existing != null)
                             {
                                 if (existing.Length() > 0 && existing.CodePointAt(0) == errorValue)
@@ -144,14 +144,14 @@ namespace OutSmart.DAXon.Functions
                         catch (XPathException e)
                         {
                             error = e;
-                            content = StringView.Tidy((char)errorValue + e.GetMessage());
+                            content = StringView.Tidy((char)errorValue + e.Message);
                         }
 
                         if (cache == null)
                         {
                             cache = new Dictionary<URI, UnicodeString>();
                             controller.SetUserData("unparsed-text-cache", "", cache);
-                            cache.Put(absoluteURI, content);
+                            cache[absoluteURI] = content;
                         }
 
                         if (error != null)

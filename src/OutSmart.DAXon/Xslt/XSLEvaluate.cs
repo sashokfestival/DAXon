@@ -14,7 +14,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,65 +40,35 @@ namespace OutSmart.DAXon.Xslt
         Expression options = null;
         bool hasFallbackChildren;
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected virtual ItemType ReturnedItemType => AnyItemType.GetInstance();
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         // OK
         public virtual Expression TargetExpression => xpath;
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public virtual Expression BaseUriExpression => baseUri;
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public virtual Expression NamespaceContextExpression => namespaceContext;
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public virtual Expression SchemaAwareExpression => schemaAware;
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public virtual Expression WithParamsExpression => withParams;
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public virtual Expression OptionsExpression => options;
         public override bool IsInstruction()
         {
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected override bool IsPermittedChild(StyleElement child)
         {
             return child is XSLLocalParam;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected override bool MayContainSequenceConstructor()
         {
             return false;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override void PrepareAttributes()
         {
             IAttributeMap atts = Attributes();
@@ -203,9 +172,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             ContainingPackage.SetRetainUnusedFunctions();
@@ -270,25 +236,16 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public virtual Expression GetContextItemExpression()
         {
             return contextItem;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public virtual SequenceType GetRequiredType()
         {
             return requiredType;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
             if (GetConfiguration().GetBooleanProperty(Feature<bool>.DISABLE_XSL_EVALUATE))
@@ -324,7 +281,7 @@ namespace OutSmart.DAXon.Xslt
                         fallbackExpressions.Add(((XSLFallback)child).CompileSequenceConstructor(exec, decl, false));
                     }
 
-                    actions[0] = new Block(fallbackExpressions.ToArray(new Expression[0]));
+                    actions[0] = new Block(fallbackExpressions.ToArray());
                     actions[1] = evaluateExpr;
                     return new Choose(conditions, actions);
                 }

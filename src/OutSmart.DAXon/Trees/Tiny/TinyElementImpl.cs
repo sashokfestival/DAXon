@@ -5,7 +5,6 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //import com.saxonica.ee.validate.SkipValidator;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Expressions.Parsing;
@@ -47,7 +46,7 @@ namespace OutSmart.DAXon.Trees.Tiny
                 return tree.UniformBaseUri;
             }
 
-            lock (tree)
+            lock (tree.syncLock)
             {
                 if (tree.knownBaseUris == null)
                 {
@@ -90,23 +89,15 @@ namespace OutSmart.DAXon.Trees.Tiny
 
         public virtual bool HasUniformNamespaces()
         {
-            return false; // TODO: temporarily
-            //        int nr = nodeNr;
-            //        int ns = tree.beta[nr];
-            //        TinyElementImpl anc = this;
-            //        while (ns == -1) {
-            //            if (parent instanceof TinyDocumentImpl) {
+            // Conservative always-false (callers fall back to a full namespace walk).
+            // Upstream answers !tree.usesNamespaces; enabling that fast path is a perf-phase item.
+            return false;
             //                return !tree.usesNamespaces;
             //            } else {
             //                nr = parent.nodeNr;
             //                ns = tree.beta[nr];
             //                anc = (TinyElementImpl)parent;
-            //            }
-            //        }
             //        // Find the first namespace binding with a different parent
-            //        while (ns < tree.numberOfNamespaces && tree.namespaceParent[ns] == nr) {
-            //            ns++;
-            //        }
             //        // Return true if none is found, or if the element owning this namespace binding
             //        // is outside the subtree
         }
@@ -246,7 +237,7 @@ namespace OutSmart.DAXon.Trees.Tiny
 
                             if (informee != null)
                             {
-                                ILocation loc = (ILocation)informee.Apply(tree.GetNode(next));
+                                ILocation loc = (ILocation)informee(tree.GetNode(next));
                                 if (loc != null)
                                 {
                                     location = loc;
@@ -521,8 +512,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         //
         //
         //
-        //    }
-        //    }
         public override bool IsId()
         {
 
@@ -537,8 +526,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         //
         //
         //
-        //    }
-        //    }
         public override bool IsIdref()
         {
             return tree.IsIdrefElement(nodeNr);

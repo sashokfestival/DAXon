@@ -12,7 +12,6 @@ using OutSmart.DAXon.Values.Maps;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -39,14 +38,8 @@ namespace OutSmart.DAXon.Expressions
 
         public override string ExpressionName => "lookupExp";
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override double Cost => GetLhsExpression().Cost * GetRhsExpression().Cost;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
         public LookupExpression(Expression start, Expression step) : base(start, Token.QMARK, step)
         {
@@ -107,9 +100,6 @@ namespace OutSmart.DAXon.Expressions
             return GetItemType().GetUType();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Configuration config = visitor.GetConfiguration();
@@ -190,9 +180,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Lhs.Optimize(visitor, contextInfo);
@@ -200,9 +187,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             LookupExpression exp = new LookupExpression(GetLhsExpression().Copy(rebindings), GetRhsExpression().Copy(rebindings));
@@ -214,9 +198,6 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
@@ -259,9 +240,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Is this expression the same as another expression?
         /// </summary>
         public override bool Equals(object other)
@@ -275,34 +253,16 @@ namespace OutSmart.DAXon.Expressions
             return GetLhsExpression().IsEqual(p.GetLhsExpression()) && GetRhsExpression().IsEqual(p.GetRhsExpression());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return "LookupExpression".GetHashCode() ^ GetLhsExpression().GetHashCode() ^ GetRhsExpression().GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         //
@@ -320,12 +280,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         //
@@ -336,12 +290,6 @@ namespace OutSmart.DAXon.Expressions
             throw new XPathException("The items on the LHS of the '?' operator must be maps or arrays; but value (" + baseItem.ToShortString() + ") was supplied", "XPTY0004").AsTypeError().WithLocation(exp.GetLocation()).WithFailingExpression(exp);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         //
@@ -355,12 +303,6 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         //
@@ -393,12 +335,6 @@ namespace OutSmart.DAXon.Expressions
             return ExpressionTool.Parenthesize(GetLhsExpression()) + "?" + rhs;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         //
@@ -409,12 +345,6 @@ namespace OutSmart.DAXon.Expressions
             return new LookupElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         //
@@ -592,7 +522,7 @@ namespace OutSmart.DAXon.Expressions
                                         IGroundedValue entry = context.GetConfiguration().ExternalObjectAsMap((ObjectValue<object>)baseItem, key)[(StringValue)rhsVal];
                                         if (entry == null)
                                         {
-                                            throw new XPathException("There is no unique method named " + key + " in the external object of type " + ((ObjectValue<object>)baseItem).GetObject().GetType().GetName(), "XPTY0004");
+                                            throw new XPathException("There is no unique method named " + key + " in the external object of type " + ((ObjectValue<object>)baseItem).GetObject().GetType().FullName, "XPTY0004");
                                         }
 
                                         return entry.Iterate();

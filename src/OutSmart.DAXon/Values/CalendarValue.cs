@@ -20,7 +20,6 @@ using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Datatype;
 namespace OutSmart.DAXon.Values
 {
     /// <summary>
@@ -96,10 +95,19 @@ namespace OutSmart.DAXon.Values
 
         public abstract DateTimeValue ToDateTime();
 
-        public abstract GregorianCalendar GetCalendar();
-        public virtual XMLGregorianCalendar GetXMLGregorianCalendar()
+        // .NET-idiomatic instant conversions -- replacement for the dissolved java.util.Calendar
+        // interop surface (GetCalendar()). No-timezone values are treated as UTC.
+        public global::System.DateTime ToSystemDateTimeUtc()
         {
-            return new DAXonXMLGregorianCalendar(this);
+            DateTimeValue dt = ToDateTime();
+            long millis = (long)(dt.SecondsSinceEpoch().DoubleValue() * 1000);
+            return new global::System.DateTime(1970, 1, 1, 0, 0, 0, global::System.DateTimeKind.Utc).AddMilliseconds(millis);
+        }
+
+        public global::System.DateTimeOffset ToSystemDateTimeOffset()
+        {
+            int tzMin = HasTimezone() ? TimezoneInMinutes : 0;
+            return new global::System.DateTimeOffset(ToSystemDateTimeUtc()).ToOffset(global::System.TimeSpan.FromMinutes(tzMin));
         }
 
         public abstract CalendarValue Add(DurationValue duration);
@@ -140,7 +148,7 @@ namespace OutSmart.DAXon.Values
             }
 
             int tzminutes = (int)(microseconds / 60000000);
-            if (System.Math.Abs(tzminutes) > 14 * 60)
+            if (Math.Abs(tzminutes) > 14 * 60)
             {
                 throw new XPathException("Timezone out of range (-14:00 to +14:00)", "FODT0003");
             }
@@ -201,7 +209,7 @@ namespace OutSmart.DAXon.Values
             else
             {
                 sb.Append(tz > 0 ? "+" : "-");
-                tz = System.Math.Abs(tz);
+                tz = Math.Abs(tz);
                 AppendTwoDigits(sb, tz / 60);
                 sb.Append(':');
                 AppendTwoDigits(sb, tz % 60);

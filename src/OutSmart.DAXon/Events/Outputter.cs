@@ -135,6 +135,11 @@ namespace OutSmart.DAXon.Events
             }
         }
 
+        public virtual void Close()
+        {
+        }
+
+        // Abort-path release (see IReceiver): no events, idempotent.
         public virtual void Dispose()
         {
         }
@@ -145,7 +150,7 @@ namespace OutSmart.DAXon.Events
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual bool HandlesAppend() => throw new NotImplementedException();
+        public virtual bool HandlesAppend() => false; // upstream Receiver default: callers must decompose items
 
         private sealed class AnonymousAbstractUniStringConsumer : AbstractUniStringConsumer
         {
@@ -164,7 +169,7 @@ namespace OutSmart.DAXon.Events
                 return this;
             }
 
-            public override void Dispose()
+            public override void Close()
             {
                 parent.Characters(buffer.ToUnicodeString(), loc, ReceiverOption.NONE);
             }
@@ -185,7 +190,7 @@ namespace OutSmart.DAXon.Events
                 return this;
             }
 
-            public override void Dispose()
+            public override void Close()
             {
                 parent.Append(new StringValue(buffer.ToUnicodeString()));
             }

@@ -8,14 +8,13 @@ using System;
 namespace OutSmart.DAXon.Internal.Net
 {
 
-    // Phase 5: URLConnection -- Java's URLConnection wrapper.
-    // Runtime 2026-06-10: was hollow (GetInputStream=>null killed fn:doc for EVERY scheme incl. file:).
-    // Real semantics: file: opens the local file; other schemes go through WebRequest/WebResponse.
+    // Resource connection: file: opens the local file; other schemes go through WebRequest/WebResponse.
     public class URLConnection
     {
-        protected readonly URL _url;
+        protected readonly global::System.Uri _url;
         protected global::System.Net.WebResponse _resp;
-        // Runtime 2026-06-10 (2): translate native I/O failures to the OutSmart.DAXon.Internal.IO family — transpiled callers
+        private bool IsFile => _url != null && _url.IsAbsoluteUri && _url.Scheme == global::System.Uri.UriSchemeFile;
+        // Translate native I/O failures to the OutSmart.DAXon.Internal.IO family — transpiled callers
         // catch IOException per the Java contract (DirectResourceResolver "carry on", UnparsedTextFunction
         // HandleIOError -> FOUT1170); a native System.IO exception flies past those catches and kills the transform.
         public virtual global::System.IO.Stream InputStream
@@ -24,35 +23,40 @@ namespace OutSmart.DAXon.Internal.Net
             {
                 if (_url == null)
                     return null;
-                string u = _url.ToString();
                 try
                 {
-                    if (u.StartsWith("file:", global::System.StringComparison.OrdinalIgnoreCase))
+                    if (IsFile)
                     {
-                        return (global::System.IO.Stream)(global::System.IO.Stream)global::System.IO.File.OpenRead(new global::System.Uri(u).LocalPath);
+                        return global::System.IO.File.OpenRead(_url.LocalPath);
                     }
-                    return (global::System.IO.Stream)Response().GetResponseStream();
+                    // Guarded: the deadline is cooperative, so a server that trickles bytes would
+                    // otherwise hold this thread long past the run's time limit (round AW).
+                    return NetworkDeadline.Guard(Response().GetResponseStream());
                 }
                 catch (global::System.IO.IOException) { throw; }
-                // IO-removal: compat IO.IOException eliminated -> System.IO.IOException. Native I/O failures
-                // (System.IO.FileNotFoundException/DirectoryNotFoundException) ARE subtypes of System.IO.IOException, so
-                // the catch above now propagates them as IOExceptions to the resource-resolution consumers
-                // (ResourceLoader/DirectResourceResolver) which "carry on" per the Java IOException contract
-                // (unparsed-text-available false / FOUT1170). Non-IO failures still wrap into System.IO.IOException.
+                // Native I/O failures (FileNotFoundException/DirectoryNotFoundException) ARE subtypes of
+                // System.IO.IOException, so the catch above propagates them to the resource-resolution
+                // consumers (ResourceLoader/DirectResourceResolver) which "carry on" per the Java IOException
+                // contract (unparsed-text-available false / FOUT1170). Non-IO failures wrap into IOException.
                 catch (global::System.Exception e) { throw new global::System.IO.IOException(e.Message); }
             }
         }
-        public virtual string ContentType { get { try { return _url == null || _url.ToString().StartsWith("file:", global::System.StringComparison.Ordinal) ? null : Response().ContentType; } catch { return null; } } }
+        public virtual string ContentType { get { try { return _url == null || IsFile ? null : Response().ContentType; } catch { return null; } } }
         public virtual long ContentLength { get { try { return Response()?.ContentLength ?? 0; } catch { return 0; } } }
         public virtual long LastModified => 0;
-        public virtual string ContentEncoding { get { try { if (_url != null && _url.ToString().StartsWith("file:", global::System.StringComparison.OrdinalIgnoreCase)) return null; return (Response() as global::System.Net.HttpWebResponse)?.ContentEncoding; } catch { return null; } } }
+        public virtual string ContentEncoding { get { try { if (IsFile) return null; return (Response() as global::System.Net.HttpWebResponse)?.ContentEncoding; } catch { return null; } } }
         public URLConnection() { }
-        public URLConnection(URL url) { _url = url; }
+        public URLConnection(global::System.Uri url) { _url = url; }
         protected global::System.Net.WebResponse Response()
         {
             if (_resp == null && _url != null)
             {
-                try { _resp = global::System.Net.WebRequest.Create(_url.ToString()).GetResponse(); }
+                try
+                {
+                    global::System.Net.WebRequest req = global::System.Net.WebRequest.Create(_url);
+                    NetworkDeadline.Apply(req);   // a stalled connect must not outlive the run
+                    _resp = req.GetResponse();
+                }
                 catch (global::System.Net.WebException we)
                 {
                     // Java's URLConnection surfaces HTTP retrieval failures (including 4xx/5xx, which .NET raises
@@ -66,7 +70,21 @@ namespace OutSmart.DAXon.Internal.Net
             return _resp;
         }
         public virtual void Connect() { Response(); }
-        // Phase 7.8: static helpers used by AbstractResourceCollection.
+        // java.net.HttpURLConnection.disconnect(): release a response this connection opened but whose
+        // body nobody will read. Needed because a redirect hop and a content-type probe each open a
+        // response and abandon it - without this the socket stays checked out of the ServicePoint pool
+        // until finalization, and DefaultConnectionLimit is 2, so a long-lived process starves on
+        // connections long before any memory curve moves.
+        public virtual void Disconnect()
+        {
+            global::System.Net.WebResponse r = _resp;
+            _resp = null;
+            if (r != null)
+            {
+                try { r.Close(); } catch (global::System.Exception) { }
+            }
+        }
+        // Static helpers used by AbstractResourceCollection.
         public static string GuessContentTypeFromName(string name) => null;
         public static string GuessContentTypeFromStream(global::System.IO.Stream stream) => null;
     }

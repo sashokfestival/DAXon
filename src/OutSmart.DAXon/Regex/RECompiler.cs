@@ -243,7 +243,7 @@ namespace OutSmart.DAXon.Regex
 
 
             // Get max number
-            number.SetLength(0);
+            number.Length = 0;
             while (idx < len && IsAsciiDigit(pattern.CodePointAt(idx)))
             {
                 number.AppendCodePoint(pattern.CodePointAt(idx++));
@@ -518,7 +518,7 @@ namespace OutSmart.DAXon.Regex
             int rangeStart = -1;
             int rangeEnd;
             IntRangeSet range = new IntRangeSet();
-            ICharacterClass addend = null;
+            IList<ICharacterClass> addends = null;
             ICharacterClass subtrahend = null;
             if (ThereFollows('^'))
             {
@@ -566,13 +566,17 @@ namespace OutSmart.DAXon.Regex
                                 {
                                     SyntaxError("Multi-character escape cannot follow '-'");
                                 }
-                                else if (addend == null)
-                                {
-                                    addend = cc;
-                                }
                                 else
                                 {
-                                    addend = MakeUnion(addend, cc);
+                                    // collected, not folded pairwise: the n-ary union below
+                                    // tests escapes without an extent by a loop, where the
+                                    // pairwise fold nested a closure per escape
+                                    if (addends == null)
+                                    {
+                                        addends = new List<ICharacterClass>();
+                                    }
+
+                                    addends.Add(cc);
                                 }
 
                                 continue;
@@ -583,6 +587,10 @@ namespace OutSmart.DAXon.Regex
                         if (ThereFollows('-', '['))
                         {
                             idx++;
+                            // One frame of class subtraction per '-[', and a dynamic pattern
+                            // chooses its own nesting depth. ParseExpr's probe never sees this
+                            // cycle: subtraction recurses here without leaving the class body.
+                            StackGuard.Probe();
                             subtrahend = ParseCharacterClass();
                             if (!ThereFollows(']'))
                             {
@@ -732,10 +740,15 @@ namespace OutSmart.DAXon.Regex
 
             // Absorb the ']' end of class marker
             idx++;
-            ICharacterClass result = new IntSetCharacterClass(range);
-            if (addend != null)
+            ICharacterClass result;
+            if (addends == null)
             {
-                result = MakeUnion(result, addend);
+                result = new IntSetCharacterClass(range);
+            }
+            else
+            {
+                addends.Insert(0, new IntSetCharacterClass(range));
+                result = MakeUnion(addends);
             }
 
             if (!positive)
@@ -785,12 +798,76 @@ namespace OutSmart.DAXon.Regex
             IntSet is2 = p2.GetIntSet();
             if (is1 == null || is2 == null)
             {
-                return new PredicateCharacterClass((ch) => p1.Test(ch) || p2.Test(ch));
+                return new UnionCharacterClass(new ICharacterClass[] { p1, p2 });
             }
             else
             {
                 return new IntSetCharacterClass(is1.Union(is2));
             }
+        }
+
+        /// <summary>
+        /// n-ary union. Members with a known extent merge into one set; the rest are tested by
+        /// a loop in UnionCharacterClass. Accumulation loops (a class body of escapes, the
+        /// initial character classes of an alternation) must combine through here: folding
+        /// them through the binary overload nested one class per member, and the member count
+        /// is the pattern's - which for a dynamic pattern means the input's.
+        /// </summary>
+        public static ICharacterClass MakeUnion(IList<ICharacterClass> members)
+        {
+            // a lone survivor is returned as-is, exactly as the binary fold left it
+            ICharacterClass single = null;
+            int survivors = 0;
+            foreach (ICharacterClass cc in members)
+            {
+                if (cc != EmptyCharacterClass.GetInstance())
+                {
+                    single = cc;
+                    survivors++;
+                }
+            }
+
+            if (survivors <= 1)
+            {
+                return survivors == 0 ? EmptyCharacterClass.GetInstance() : single;
+            }
+
+            IntSet extent = null;
+            List<ICharacterClass> opaque = null;
+            foreach (ICharacterClass cc in members)
+            {
+                if (cc == EmptyCharacterClass.GetInstance())
+                {
+                    continue;
+                }
+
+                IntSet s = cc.GetIntSet();
+                if (s != null)
+                {
+                    extent = extent == null ? s : extent.Union(s);
+                }
+                else
+                {
+                    if (opaque == null)
+                    {
+                        opaque = new List<ICharacterClass>();
+                    }
+
+                    opaque.Add(cc);
+                }
+            }
+
+            if (opaque == null)
+            {
+                return extent == null ? (ICharacterClass)EmptyCharacterClass.GetInstance() : new IntSetCharacterClass(extent);
+            }
+
+            if (extent != null && !extent.IsEmpty())
+            {
+                opaque.Insert(0, new IntSetCharacterClass(extent));
+            }
+
+            return opaque.Count == 1 ? opaque[0] : new UnionCharacterClass(opaque.ToArray());
         }
 
         public static ICharacterClass MakeDifference(ICharacterClass p1, ICharacterClass p2)
@@ -809,7 +886,7 @@ namespace OutSmart.DAXon.Regex
             IntSet is2 = p2.GetIntSet();
             if (is1 == null || is2 == null)
             {
-                return new PredicateCharacterClass((ch) => IntExceptPredicate.MakeDifference(p1, p2).Test(ch));
+                return new DifferenceCharacterClass(p1, p2);
             }
             else
             {
@@ -1359,7 +1436,7 @@ namespace OutSmart.DAXon.Regex
                 {
                     IList<Operation> list1 = ((OpSequence)o1).Operations;
                     IList<Operation> list2 = ((OpSequence)o2).Operations;
-                    list1.AddAll(list2);
+                    list1.AddRange(list2);
                     return o1;
                 }
 
@@ -1370,7 +1447,7 @@ namespace OutSmart.DAXon.Regex
             else if (o2 is OpSequence)
             {
                 IList<Operation> l2 = ((OpSequence)o2).Operations;
-                l2.Add(0, o1);
+                l2.Insert(0,o1);
                 return o2;
             }
             else
@@ -1458,9 +1535,11 @@ namespace OutSmart.DAXon.Regex
                 {
                     exp = ParseExpr(compilerFlags);
                 }
-                catch (RecursionDepthError)
+                catch (RecursionDepthError e) when (!e.Described)
                 {
-                    throw new RESyntaxException("Regular expression is too deeply nested", idx);
+                    // Described, not turned into an RESyntaxException: a dynamic pattern is compiled
+                    // at evaluation time, so this can run with the whole engine stack above it.
+                    throw e.Describe("Regular expression is too deeply nested", "FORX0002", null);
                 }
 
                 // Should be at end of input

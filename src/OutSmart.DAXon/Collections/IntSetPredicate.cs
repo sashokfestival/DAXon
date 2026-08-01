@@ -55,6 +55,6 @@ namespace OutSmart.DAXon.Collections
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual IIntPredicateProxy Union(IIntPredicateProxy other) => throw new NotImplementedException();
+        public virtual IIntPredicateProxy Union(IIntPredicateProxy other) => IntUnionPredicate.MakeUnion(this, other);
     }
 }

@@ -34,17 +34,11 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected override bool IsPermittedChild(StyleElement child)
         {
             return (child is XSLSort);
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override bool MarkTailCalls()
         {
             if (Cardinality.AllowsMany(select.GetCardinality()))
@@ -59,17 +53,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         protected override bool MayContainSequenceConstructor()
         {
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override void PrepareAttributes()
         {
             foreach (AttributeInfo att in Attributes())
@@ -115,9 +103,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
             CheckSortComesFirst(false);
@@ -138,9 +123,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:sort is a permitted child
-        /// </summary>
         public override Expression Compile(Compilation compilation, ComponentDeclaration decl)
         {
             SortKeyDefinitionList sortKeys = MakeSortKeys(compilation, decl);

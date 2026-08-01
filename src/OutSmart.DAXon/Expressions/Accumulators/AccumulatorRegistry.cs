@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Expressions.Accumulators
     {
         protected Dictionary<StructuredQName, Accumulator> accumulatorsByName = new Dictionary<StructuredQName, Accumulator>();
 
-        public virtual IEnumerable<Accumulator> AllAccumulators => accumulatorsByName.Values();
+        public virtual IEnumerable<Accumulator> AllAccumulators => accumulatorsByName.Values;
         public AccumulatorRegistry()
         {
         }
@@ -31,7 +31,7 @@ namespace OutSmart.DAXon.Expressions.Accumulators
         {
             HashSet<Accumulator> accumulators = new HashSet<Accumulator>();
             string attNames = Whitespace.Trim(useAccumulatorsAtt);
-            string[] tokens = attNames.Split("[ \t\r\n]+");
+            string[] tokens = attNames.SplitRegex("[ \t\r\n]+");
             if (tokens.Length == 1 && tokens[0].Equals("#all"))
             {
                 foreach (Accumulator acc in AllAccumulators)
@@ -79,13 +79,13 @@ namespace OutSmart.DAXon.Expressions.Accumulators
         {
             if (acc.AccumulatorName != null)
             {
-                accumulatorsByName.Put(acc.AccumulatorName, acc);
+                accumulatorsByName[acc.AccumulatorName] = acc;
             }
         }
 
         public virtual Accumulator GetAccumulator(StructuredQName name)
         {
-            return accumulatorsByName.Get(name);
+            return accumulatorsByName.GetOrDefault(name);
         }
 
         public virtual ISequence GetStreamingAccumulatorValue(NodeInfo node, Accumulator accumulator, AccumulatorFn.Phase phase)

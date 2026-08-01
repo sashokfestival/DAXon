@@ -30,14 +30,8 @@ namespace OutSmart.DAXon.Values
 
         public virtual long End => end;
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual UnicodeString CanonicalLexicalRepresentation => UnicodeStringValue;
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual UnicodeString UnicodeStringValue
         {
             get
@@ -64,9 +58,9 @@ namespace OutSmart.DAXon.Values
                 throw new ArgumentException("end before start in IntegerRange");
             }
 
-            if (System.Math.Abs((end - start) / step) > int.MaxValue)
+            if (CountExceedsLimit(start, step, end))
             {
-                throw new ArgumentException("Maximum length of sequence in Saxon is " + int.MaxValue);
+                throw new XPathException("Maximum length of sequence in Saxon is " + int.MaxValue, "XPDY0130");
             }
 
             this.start = start;
@@ -77,6 +71,21 @@ namespace OutSmart.DAXon.Values
         public virtual long GetStep()
         {
             return step;
+        }
+
+        // True if the range start..end by step holds more than int.MaxValue items (the Saxon
+        // sequence-length limit, XPDY0130). The item count is |end-start|/|step| + 1, and both
+        // magnitudes can reach 2^63, which no long holds — so they are computed unsigned, where
+        // the subtraction of the larger from the smaller is exact for every input.
+        // The old guards computed Math.Abs(end-start) or a signed (end-start)/step and compared
+        // with '>': the first threw a raw OverflowException from Math.Abs(long.MinValue) instead
+        // of a clean XPDY0130, the second wrapped negative and let a 2^63-item range through.
+        internal static bool CountExceedsLimit(long start, long step, long end)
+        {
+            ulong span = end >= start ? (ulong)end - (ulong)start : (ulong)start - (ulong)end;
+            ulong absStep = step < 0 ? (ulong)(-(step + 1)) + 1 : (ulong)step;
+            // count = span/absStep + 1 > int.MaxValue  <=>  span/absStep >= int.MaxValue
+            return span / absStep >= int.MaxValue;
         }
 
         // Closed-form total of the arithmetic series start, start+step, ..., last (inclusive),
@@ -133,7 +142,7 @@ namespace OutSmart.DAXon.Values
                 return EmptySequence.GetInstance();
             }
 
-            long newStart = this.start + System.Math.Max(start, 0);
+            long newStart = this.start + Math.Max(start, 0);
             long newEnd = newStart + ((long)length * step) - 1;
             if (newEnd > end)
             {
@@ -150,25 +159,16 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual int GetLength()
         {
             return (int)((end - start) / step) + 1;
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual IntegerValue Head()
         {
             return new Int64Value(start);
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual string GetStringValue()
         {
             try
@@ -181,17 +181,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual bool EffectiveBooleanValue()
         {
             return ExpressionTool.EffectiveBooleanValue(Iterate());
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public virtual IGroundedValue Reduce()
         {
             if (start == end)
@@ -204,21 +198,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
         public override string ToString()
         {
             return "(" + start + (step == 1 ? "" : (" by " + step)) + " to " + end + ")";
         }
 
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
-        public virtual IEnumerator<AtomicValue> IIterator()
-        {
-            return new IntegerRangeIterator(this);
-        }
         AtomicValue IAtomicSequence.Head() => Head(); // redirect StubGen hollow to the real typed member; default = silent null
         AtomicValue IAtomicSequence.ItemAt(int arg0) => ItemAt(arg0);
         ISequenceIterator IGroundedValue.Iterate() => Iterate();
@@ -226,8 +210,21 @@ namespace OutSmart.DAXon.Values
         IItem IGroundedValue.Head() => Head();
         IItem ISequence.Head() => Head();
         ISequenceIterator ISequence.Iterate() => Iterate();
-        public IEnumerator<AtomicValue> GetEnumerator() => throw new NotImplementedException();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        public IEnumerator<AtomicValue> GetEnumerator()
+        {
+            // Count-bounded: a value-bounded loop (v <= end) would spin forever when end
+            // sits at the long boundary and v += step wraps.
+            long v = start;
+            for (int i = GetLength(); i > 0; i--)
+            {
+                yield return new Int64Value(v);
+                if (i > 1)
+                {
+                    v += step;
+                }
+            }
+        }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         // IntegerRange is already an in-memory grounded value, so materialize/makeRepeatable return itself,
@@ -257,39 +254,5 @@ namespace OutSmart.DAXon.Values
             return new OutSmart.DAXon.Collections.Zeno.ZenoSequence(__chain);
         }
         public virtual ISequence MakeRepeatable() => this;
-
-        /// <summary>
-        /// Get the length of the sequence
-        /// </summary>
-        private class IntegerRangeIterator : IEnumerator<AtomicValue>
-        {
-            private IntegerRange range;
-            private long current;
-            public AtomicValue Current => default;
-            object System.Collections.IEnumerator.Current => null;
-            public IntegerRangeIterator(IntegerRange range)
-            {
-                this.range = range;
-                current = range.start;
-            }
-
-            public virtual bool HasNext()
-            {
-                return current <= range.end;
-            }
-
-            public virtual void Remove()
-            {
-                throw new NotSupportedException();
-            }
-
-            public virtual AtomicValue Next()
-            {
-                return new Int64Value(current++);
-            }
-            void IDisposable.Dispose() { }
-            bool System.Collections.IEnumerator.MoveNext() => false;
-            void System.Collections.IEnumerator.Reset() { }
-        }
     }
 }

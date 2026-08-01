@@ -26,33 +26,18 @@ namespace OutSmart.DAXon.Expressions.Instructions
     public class BreakInstr : Instruction, TailCallLoop.ITailCallInfo
     {
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_BREAK;
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override string ExpressionName => "xsl:break";
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public BreakInstr()
         {
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             return new List<Operand>();
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             BreakInstr b2 = new BreakInstr();
@@ -60,9 +45,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return b2;
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
 
@@ -71,42 +53,27 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return true;
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override bool IsLiftable(bool forStreaming)
         {
             return false;
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public virtual void MarkContext(IXPathContext context)
         {
             context.MajorContext.RequestTailCall(this, null);
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("break", this);
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new BreakElaborator();
         }
 
-        /// <summary>
-        /// Create the instruction
-        /// </summary>
         public class BreakElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

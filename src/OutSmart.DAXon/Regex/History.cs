@@ -20,12 +20,12 @@ namespace OutSmart.DAXon.Regex
         private readonly Dictionary<Operation, IntSet> zeroLengthMatches = new Dictionary<Operation, IntSet>();
         public virtual bool IsDuplicateZeroLengthMatch(Operation op, int position)
         {
-            IntSet positions = zeroLengthMatches.Get(op);
+            IntSet positions = zeroLengthMatches.GetOrDefault(op);
             if (positions == null)
             {
                 positions = new IntHashSet(position);
                 positions.Add(position);
-                zeroLengthMatches.Put(op, positions);
+                zeroLengthMatches[op] = positions;
                 return false;
             }
             else

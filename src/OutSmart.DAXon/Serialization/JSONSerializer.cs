@@ -15,7 +15,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,14 +24,16 @@ using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
 {
     public class JSONSerializer : SequenceWriter, IReceiverWithOutputProperties
     {
+        // Nesting depth below which WriteSequence skips its stack probe (see there). No real JSON
+        // is anywhere near this deep; a bomb is thousands of levels, so it loses nothing.
+        private const int ProbeFreeDepth = 32;
+
         private bool allowDuplicateKeys = false;
         private string nodeOutputMethod = "xml";
         private int level = 0;
@@ -58,7 +59,7 @@ namespace OutSmart.DAXon.Serialization
                 allowDuplicateKeys = true;
             }
 
-            if ("yes".Equals(details.GetProperty(OutputKeys.INDENT)))
+            if ("yes".Equals(details.GetProperty(DAXonOutputKeys.INDENT)))
             {
                 isIndenting = true;
             }
@@ -98,7 +99,7 @@ namespace OutSmart.DAXon.Serialization
             return outputProperties;
         }
 
-        public virtual void SetNormalizationForm(Normalizer.Form form)
+        public virtual void SetNormalizationForm(NormalizationForm form)
         {
             emitter.SetNormalizationForm(form);
         }
@@ -267,12 +268,22 @@ namespace OutSmart.DAXon.Serialization
             IReceiver r = p.GetConfiguration().SerializerFactory.GetReceiver(uwr, new SerializationProperties(props), p);
             r.Open();
             r.Append(node);
-            r.Dispose();
+            r.Close();
             return ub.ToString().Trim();
         }
 
         private void WriteSequence(IGroundedValue seq)
         {
+            // The recursive edge: every member of a map or array descends through here, so the
+            // depth is the serialized value's, not the stylesheet's. This also runs once per
+            // output value, and probing unconditionally cost 4% on serialize-heavy work - hence
+            // the depth gate. Skipping the first ProbeFreeDepth levels costs tens of KB of stack,
+            // far inside StackGuard's own margin.
+            if (level > ProbeFreeDepth)
+            {
+                StackGuard.Probe();
+            }
+
             if (seq is IItem single)
             {
                 // an item IS a singleton sequence: skip GetLength/Head dispatch
@@ -302,7 +313,7 @@ namespace OutSmart.DAXon.Serialization
         /// <summary>
         /// End of the document.
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
             if (topLevelCount == 0)
             {
@@ -310,7 +321,7 @@ namespace OutSmart.DAXon.Serialization
             }
 
             emitter.Dispose();
-            base.Dispose();
+            base.Close();
         }
     }
 }

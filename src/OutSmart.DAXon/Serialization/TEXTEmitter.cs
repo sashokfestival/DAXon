@@ -22,7 +22,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
 {
@@ -49,8 +48,8 @@ namespace OutSmart.DAXon.Serialization
 
 
             // Write a BOM if requested
-            string encoding = outputProperties.GetProperty(OutputKeys.ENCODING);
-            if (encoding == null || encoding.EqualsIgnoreCase("utf8"))
+            string encoding = outputProperties.GetProperty(DAXonOutputKeys.ENCODING);
+            if (encoding == null || encoding.Equals("utf8", global::System.StringComparison.OrdinalIgnoreCase))
             {
                 encoding = "UTF-8";
             }
@@ -63,7 +62,7 @@ namespace OutSmart.DAXon.Serialization
                 newlineMatcher = OutSmart.DAXon.Internal.Regex.Pattern.Compile("\\n");
             }
 
-            if ("yes".Equals(byteOrderMark) && ("UTF-8".EqualsIgnoreCase(encoding) || "UTF-16LE".EqualsIgnoreCase(encoding) || "UTF-16BE".EqualsIgnoreCase(encoding)))
+            if ("yes".Equals(byteOrderMark) && ("UTF-8".Equals(encoding, global::System.StringComparison.OrdinalIgnoreCase) || "UTF-16LE".Equals(encoding, global::System.StringComparison.OrdinalIgnoreCase) || "UTF-16BE".Equals(encoding, global::System.StringComparison.OrdinalIgnoreCase)))
             {
                 try
                 {
@@ -77,22 +76,10 @@ namespace OutSmart.DAXon.Serialization
             started = true;
         }
 
-        /// <summary>
-        /// Start of the document.
-        /// </summary>
-        /// <summary>
-        /// Output the XML declaration. This implementation does nothing.
-        /// </summary>
         public override void WriteDeclaration()
         {
         }
 
-        /// <summary>
-        /// Start of the document.
-        /// </summary>
-        /// <summary>
-        /// Output the XML declaration. This implementation does nothing.
-        /// </summary>
         public override void Characters(UnicodeString chars, ILocation locationId, int properties)
         {
             if (!started)
@@ -124,44 +111,20 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// Start of the document.
-        /// </summary>
-        /// <summary>
-        /// Output the XML declaration. This implementation does nothing.
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             previousAtomic = false;
         }
 
-        /// <summary>
-        /// Start of the document.
-        /// </summary>
-        /// <summary>
-        /// Output the XML declaration. This implementation does nothing.
-        /// </summary>
         public override void EndElement()
         {
         }
 
-        /// <summary>
-        /// Start of the document.
-        /// </summary>
-        /// <summary>
-        /// Output the XML declaration. This implementation does nothing.
-        /// </summary>
         // no-op
         public override void ProcessingInstruction(string name, UnicodeString value, ILocation locationId, int properties)
         {
         }
 
-        /// <summary>
-        /// Start of the document.
-        /// </summary>
-        /// <summary>
-        /// Output the XML declaration. This implementation does nothing.
-        /// </summary>
         // no-op
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {

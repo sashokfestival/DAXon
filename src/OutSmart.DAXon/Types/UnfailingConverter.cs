@@ -15,10 +15,10 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Types
 {
-    // Phase 7.8d r28: top-level DownCastingConverter removed; nested Converter.DownCastingConverter
+    // Top-level DownCastingConverter removed; nested Converter.DownCastingConverter
     // serves all sites (both bare `DownCastingConverter` (with using-static) and `Converter.DownCastingConverter`).
 
-    // Phase 7.7: UnfailingConverter sibling stub. In real Saxon this is a nested abstract
+    // UnfailingConverter sibling stub. In real Saxon this is a nested abstract
     // class inside Converter. (Its Promoter* nested copies were dead duplicates — the live
     // promoters TypeChecker instantiates are the top-level Values.PromoterTo* classes.)
     public abstract class UnfailingConverter : Converter

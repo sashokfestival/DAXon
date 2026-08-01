@@ -43,9 +43,6 @@ namespace OutSmart.DAXon.Transformation
             return kind << 16 ^ name.GetHashCode();
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object obj)
         {
             return obj is SymbolicName && ((SymbolicName)obj).kind == this.kind && ((SymbolicName)obj).name.Equals(this.name);
@@ -64,9 +61,6 @@ namespace OutSmart.DAXon.Transformation
         {
             int arity;
 
-            /// <summary>
-            /// Indicates whether some other object is "equal to" this one.
-            /// </summary>
             /// <summary>
             /// Get a short name suitable for use in messages
             /// </summary>
@@ -89,17 +83,11 @@ namespace OutSmart.DAXon.Transformation
                 return base.GetHashCode() ^ arity;
             }
 
-            /// <summary>
-            /// Indicates whether some other object is "equal to" this one.
-            /// </summary>
             public override bool Equals(object obj)
             {
                 return obj is F && base.Equals(obj) && ((F)obj).arity == this.arity;
             }
 
-            /// <summary>
-            /// Indicates whether some other object is "equal to" this one.
-            /// </summary>
             public override string ToString()
             {
 

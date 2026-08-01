@@ -15,10 +15,10 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Lib
 {
     public class StandardLogger : Logger
@@ -27,9 +27,6 @@ namespace OutSmart.DAXon.Lib
         private int threshold = Logger.INFO;
         private bool mustClose = false;
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public virtual TextWriter PrintWriter
         {
             get => writer; set
@@ -38,9 +35,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public virtual int Threshold
         {
             get => threshold; set
@@ -48,54 +42,33 @@ namespace OutSmart.DAXon.Lib
                 this.threshold = value;
             }
         }
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public StandardLogger()
         {
         }
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         // IO-removal: StandardLogger(global::System.IO.TextWriter) dropped -- global::System.IO.TextWriter maps to System.IO.TextWriter, handled by StandardLogger(TextWriter).
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public StandardLogger(TextWriter writer)
         {
             PrintWriter = (TextWriter)writer;
         }
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public StandardLogger(string fileName)
         {
             PrintWriter = new StreamWriter(fileName) { AutoFlush = true };
             mustClose = true;
         }
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public virtual void SetPrintStream(TextWriter stream)
         {
             this.writer = stream;
         }
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public override StreamResult AsStreamResult()
         {
             return new StreamResult(writer);
         }
 
-        /// <summary>
-        /// Create a Logger that wraps the System.Console.Error output stream
-        /// </summary>
         public override void Println(string message, int severity)
         {
             if (severity >= threshold)

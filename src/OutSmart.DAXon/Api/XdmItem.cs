@@ -91,7 +91,7 @@ namespace OutSmart.DAXon.Api
 
         public XdmStream<XdmItem> Stream()
         {
-            return new XdmStream<XdmItem>(OutSmart.DAXon.Internal.Streams.Stream.Of(this));
+            return new XdmStream<XdmItem>(this);
         }
 
         public virtual bool Matches(ItemType type)

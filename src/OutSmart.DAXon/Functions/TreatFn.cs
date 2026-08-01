@@ -19,22 +19,10 @@ namespace OutSmart.DAXon.Functions
 {
     public abstract class TreatFn : SystemFunction, ICallable
     {
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public abstract override string ErrorCodeForTypeErrors { get; }
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public abstract int RequiredCardinality { get; }
 
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public override string StreamerName => "TreatFn";
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             ISequenceIterator iterator = arguments[0].Iterate();
@@ -44,17 +32,11 @@ namespace OutSmart.DAXon.Functions
             return new LazySequence(iterator);
         }
 
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public virtual RoleDiagnostic MakeRoleDiagnostic()
         {
             return new RoleDiagnostic(RoleDiagnostic.FUNCTION, GetFunctionName().DisplayName, 0, ErrorCodeForTypeErrors);
         }
 
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public class ExactlyOne : TreatFn
         {
             public override int RequiredCardinality => StaticProperty.EXACTLY_ONE;
@@ -62,9 +44,6 @@ namespace OutSmart.DAXon.Functions
             public override string ErrorCodeForTypeErrors => "FORG0005";
         }
 
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public class OneOrMore : TreatFn
         {
             public override int RequiredCardinality => StaticProperty.ALLOWS_ONE_OR_MORE;
@@ -72,9 +51,6 @@ namespace OutSmart.DAXon.Functions
             public override string ErrorCodeForTypeErrors => "FORG0004";
         }
 
-        /// <summary>
-        /// Return the error code to be used for type errors
-        /// </summary>
         public class ZeroOrOne : TreatFn
         {
             public override int RequiredCardinality => StaticProperty.ALLOWS_ZERO_OR_ONE;

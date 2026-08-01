@@ -19,7 +19,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Transformation
 {
@@ -72,10 +71,10 @@ namespace OutSmart.DAXon.Transformation
             SetErrorCodeAsEQName(errorCode);
         }
 
-        public XmlProcessingIncident(TransformerException err, bool isWarning)
+        public XmlProcessingIncident(XPathException err, bool isWarning)
         {
             XPathException exception = XPathException.MakeXPathException(err);
-            message = exception.GetMessage();
+            message = exception.Message;
             errorCode = exception.ErrorCodeQName.EQName;
             locator = exception.GetLocator();
             this._isWarning = isWarning;

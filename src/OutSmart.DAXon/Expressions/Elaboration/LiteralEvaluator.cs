@@ -8,10 +8,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    // Runtime 2026-06-07: real OutSmart.DAXon.Expressions.Elaboration.LiteralEvaluator.cs is excluded; this stub had
-    // `Evaluate(context) => null` and discarded the ctor value -> EVERY eagerly-evaluated literal returned null
-    // (e.g. map:entry's StringLiteral key 'doc_id' -> null -> MapEntry.Call NRE). Faithful: store the grounded
-    // value and return it (matches the real LiteralEvaluator: readonly value; Evaluate => value).
+    // Faithful to upstream LiteralEvaluator: store the grounded ctor value; Evaluate => value.
     public class LiteralEvaluator : ISequenceEvaluator
     {
         private readonly IGroundedValue value;

@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Transformation;using OutSmart.DAXon.Functions;
 
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,7 +13,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Lib
 {
@@ -30,7 +28,7 @@ namespace OutSmart.DAXon.Lib
         {
             try
             {
-                return lambda.Apply(request);
+                return lambda(request);
             }
             catch (UncheckedXPathException err)
             {

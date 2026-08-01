@@ -25,9 +25,6 @@ namespace OutSmart.DAXon.Expressions
 
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override string ExpressionName => "lastOf";
         public LastItemExpression(Expression @base) : base(@base)
         {
@@ -40,9 +37,6 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             ISequenceIterator forwards = BaseExpression.Iterate(context);
@@ -66,17 +60,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new LastItemExprElaborator();
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         /// <summary>
         /// Elaborator for a "last item expression" (typically {@code SEQ[last()]})
         /// </summary>
@@ -106,9 +94,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         /// <summary>
         /// Elaborator for a "last item expression" (typically {@code SEQ[last()]})
         /// </summary>

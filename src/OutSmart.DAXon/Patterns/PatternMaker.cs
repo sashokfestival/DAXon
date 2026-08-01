@@ -27,8 +27,7 @@ namespace OutSmart.DAXon.Patterns
             OutSmart.DAXon.Expressions.Parsing.ExpressionTool.CopyLocationInfo((Expression)expr, result);
             return result;
         }
-        public static object Make(object pattern) => throw new NotImplementedException("STUB: PatternMaker.Make not ported (excluded stub)");
-        // Phase 7.8: SystemFunctionCall callers reference GetAxisForPathStep.
+        // SystemFunctionCall callers reference GetAxisForPathStep.
         // Faithful: the upwards axis qualifying a path step is the INVERSE of the step's axis
         // (child -> parent), recursing into the first step of a sub-path. The prior `=> 0` returned
         // AxisInfo.ANCESTOR for every step, which made A/B match like A//B (too loose).

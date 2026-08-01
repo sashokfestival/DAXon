@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,9 +23,6 @@ namespace OutSmart.DAXon.Trees.Iterators
         private int _position;
         private Func<int> lengthFinder;
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual bool HasNext => Position() != GetLength();
         public ManualIterator()
         {
@@ -57,65 +53,41 @@ namespace OutSmart.DAXon.Trees.Iterators
             this.lengthFinder = finder;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual void IncrementPosition()
         {
             _position++;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual void SetPosition(int position)
         {
             this._position = position;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual bool SupportsHasNext()
         {
             return true;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual IItem Next()
         {
             return null;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual IItem Current()
         {
             return item;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual int Position()
         {
             return _position;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual bool SupportsGetLength()
         {
             return true;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual int GetLength()
         {
             if (lengthFinder == null)
@@ -124,37 +96,25 @@ namespace OutSmart.DAXon.Trees.Iterators
             }
             else
             {
-                return lengthFinder.Get();
+                return lengthFinder();
             }
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual bool IsActuallyGrounded()
         {
             return true;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual ManualIterator GetReverseIterator()
         {
             return new ManualIterator(item);
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual IGroundedValue Materialize()
         {
             return item;
         }
 
-        /// <summary>
-        /// Advance the current position by one.
-        /// </summary>
         public virtual IGroundedValue GetResidue()
         {
             return item;

@@ -33,19 +33,10 @@ namespace OutSmart.DAXon.Patterns
 
         public string FullAlphaCode => BasicAlphaCode + " nQ{" + uri + "}*";
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override double DefaultPriority => -0.25;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override int PrimitiveType => nodeKind;
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public NamespaceUri NamespaceURI => uri;
         public NamespaceTest(NamePool pool, int nodeKind, NamespaceUri uri)
         {
@@ -91,9 +82,6 @@ namespace OutSmart.DAXon.Patterns
             return namePool.GetURI(fp).Equals(uri);
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
         public override string ToString()
         {
             switch (nodeKind)
@@ -110,9 +98,6 @@ namespace OutSmart.DAXon.Patterns
         }
 
         /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
         /// Returns a hash code value for the object.
         /// </summary>
         public override int GetHashCode()
@@ -120,34 +105,16 @@ namespace OutSmart.DAXon.Patterns
             return uri.GetHashCode() << 5 + nodeKind;
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is NamespaceTest && ((NamespaceTest)other).namePool == namePool && ((NamespaceTest)other).nodeKind == nodeKind && ((NamespaceTest)other).uri.Equals(uri);
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public string ExportQNameTest()
         {
             return "Q{" + uri + "}*";
         }
 
-        /// <summary>
-        /// Determine the default priority of this node test when used on its own as a Pattern
-        /// </summary>
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             string explanation = base.ExplainMismatch(item, th);

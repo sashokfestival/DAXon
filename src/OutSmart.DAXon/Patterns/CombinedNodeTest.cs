@@ -187,9 +187,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override double DefaultPriority
         {
             get
@@ -207,18 +204,12 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public virtual NodeTest[] ComponentNodeTests => new NodeTest[]
             {
                 nodetest1,
                 nodetest2
             };
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public virtual int Operator => @operator;
         public CombinedNodeTest(NodeTest nt1, int @operator, NodeTest nt2)
         {
@@ -435,25 +426,16 @@ namespace OutSmart.DAXon.Patterns
             return nodetest1.GetHashCode() ^ nodetest2.GetHashCode();
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is CombinedNodeTest && ((CombinedNodeTest)other).nodetest1.Equals(nodetest1) && ((CombinedNodeTest)other).nodetest2.Equals(nodetest2) && ((CombinedNodeTest)other).@operator == @operator;
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public virtual NodeTest GetOperand(int which)
         {
             return which == 0 ? nodetest1 : nodetest2;
         }
 
-        /// <summary>
-        /// Indicates whether some other object is "equal to" this one.
-        /// </summary>
         public override string ExplainMismatch(IItem item, TypeHierarchy th)
         {
             string explanation = base.ExplainMismatch(item, th);

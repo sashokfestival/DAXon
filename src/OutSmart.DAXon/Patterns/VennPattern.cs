@@ -26,19 +26,10 @@ namespace OutSmart.DAXon.Patterns
     {
         public Pattern p1, p2;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override int Dependencies => p1.Dependencies | p2.Dependencies;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual Pattern LHS => p1;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual Pattern RHS => p2;
 
         /// <summary>
@@ -88,26 +79,17 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override void BindCurrent(ILocalBinding binding)
         {
             p1.BindCurrent(binding);
             p2.BindCurrent(binding);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool IsMotionless()
         {
             return p1.IsMotionless() && p2.IsMotionless();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override int AllocateSlots(SlotManager slotManager, int nextFree)
         {
             nextFree = p1.AllocateSlots(slotManager, nextFree);
@@ -115,9 +97,6 @@ namespace OutSmart.DAXon.Patterns
             return nextFree;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual void GatherComponentPatterns(HashSet<Pattern> set)
         {
             if (p1 is VennPattern)
@@ -139,17 +118,11 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool MatchesCurrentGroup()
         {
             return p1.MatchesCurrentGroup() || p2.MatchesCurrentGroup();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool Equals(object other)
         {
             if (other is VennPattern)

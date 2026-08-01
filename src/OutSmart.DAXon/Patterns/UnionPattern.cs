@@ -26,12 +26,6 @@ namespace OutSmart.DAXon.Patterns
     public class UnionPattern : VennPattern
     {
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override string OperatorName => "union";
         public UnionPattern(Pattern p1, Pattern p2) : base(p1, p2)
         {
@@ -40,9 +34,6 @@ namespace OutSmart.DAXon.Patterns
             SetPriority(double.NaN);
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
         public override ItemType GetItemType()
         {
             ItemType t1 = p1.GetItemType();
@@ -50,33 +41,21 @@ namespace OutSmart.DAXon.Patterns
             return Types.Type.GetCommonSuperType(t1, t2);
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
         public override UType GetUType()
         {
             return p1.GetUType().Union(p2.GetUType());
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
         public override bool Matches(IItem item, IXPathContext context)
         {
             return p1.Matches(item, context) || p2.Matches(item, context);
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
         public override bool MatchesBeneathAnchor(NodeInfo node, NodeInfo anchor, IXPathContext context)
         {
             return p1.MatchesBeneathAnchor(node, anchor, context) || p2.MatchesBeneathAnchor(node, anchor, context);
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
         public override Pattern ConvertToTypedPattern(string val)
         {
             Pattern np1 = p1.ConvertToTypedPattern(val);
@@ -91,9 +70,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
         public override bool Equals(object other)
         {
             if (other is UnionPattern)
@@ -110,23 +86,11 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return 0x3bd723a6 ^ p1.GetHashCode() ^ p2.GetHashCode();
         }
 
-        /// <summary>
-        /// Get an ItemType that all the items matching this pattern must satisfy
-        /// </summary>
-        /// <summary>
-        /// Hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             UnionPattern n = new UnionPattern((Pattern)p1.Copy(rebindings), (Pattern)p2.Copy(rebindings));

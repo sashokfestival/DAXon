@@ -25,12 +25,10 @@ namespace OutSmart.DAXon.Model
         void SetAttributes(IAttributeMap attributes);
         void RemoveAttribute(NodeInfo attribute);
         void AddAttribute(INodeName name, ISimpleType attType, string value, int properties, bool inheritNamespaces);
-        void RemoveNamespace(string prefix)
-;
+        void RemoveNamespace(string prefix);
 
 
-        void AddNamespace(string prefix, NamespaceUri uri)
-;
+        void AddNamespace(string prefix, NamespaceUri uri);
 
 
         void Delete();

@@ -14,7 +14,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,8 +22,6 @@ using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Api
 {
@@ -38,6 +35,7 @@ namespace OutSmart.DAXon.Api
     //})
     public abstract class AbstractXsltTransformer
     {
+        protected readonly object syncLock = new object();
         protected Processor processor;
         protected XsltController controller;
         protected bool baseOutputUriWasSet = false;
@@ -69,6 +67,10 @@ namespace OutSmart.DAXon.Api
                 {
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
             }
         }
 
@@ -81,7 +83,7 @@ namespace OutSmart.DAXon.Api
 
         public virtual void SetBaseOutputURI(string uri)
         {
-            lock (this)
+            lock (syncLock)
             {
                 controller.BaseOutputURI = uri;
                 baseOutputUriWasSet = uri != null;
@@ -91,11 +93,6 @@ namespace OutSmart.DAXon.Api
         public virtual string GetBaseOutputURI()
         {
             return controller.BaseOutputURI;
-        }
-
-        public virtual void SetURIResolver(URIResolver resolver)
-        {
-            controller.ResourceResolver = new ResourceResolverWrappingURIResolver(resolver);
         }
 
         public virtual void SetResourceResolver(IResourceResolver resolver)
@@ -108,17 +105,6 @@ namespace OutSmart.DAXon.Api
             return controller.ResourceResolver;
         }
 
-        public virtual URIResolver GetURIResolver()
-        {
-            IResourceResolver resolver = controller.ResourceResolver;
-            if (resolver is ResourceResolverWrappingURIResolver)
-            {
-                return ((ResourceResolverWrappingURIResolver)resolver).WrappedURIResolver;
-            }
-
-            return null;
-        }
-
         public virtual void SetUnparsedTextResolver(IUnparsedTextURIResolver resolver)
         {
             controller.UnparsedTextURIResolver = resolver;
@@ -127,24 +113,6 @@ namespace OutSmart.DAXon.Api
         public virtual IUnparsedTextURIResolver GetUnparsedTextURIResolver()
         {
             return controller.UnparsedTextURIResolver;
-        }
-
-        public virtual void SetErrorListener(ErrorListener listener)
-        {
-            controller.ErrorReporter = new ErrorReporterToListener(listener);
-        }
-
-        public virtual ErrorListener GetErrorListener()
-        {
-            IErrorReporter uel = controller.ErrorReporter;
-            if (uel is ErrorReporterToListener)
-            {
-                return ((ErrorReporterToListener)uel).GetErrorListener();
-            }
-            else
-            {
-                return null;
-            }
         }
 
         public virtual void SetErrorReporter(IErrorReporter reporter)
@@ -164,7 +132,7 @@ namespace OutSmart.DAXon.Api
 
         public virtual void SetMessageListener(IMessageListener2 listener)
         {
-            lock (this)
+            lock (syncLock)
             {
                 messageListener2 = listener;
                 SetMessageHandler((message) => listener.Message(message.Content, message.GetErrorCode(), message.IsTerminate(), message.GetLocation()));
@@ -247,10 +215,8 @@ namespace OutSmart.DAXon.Api
 
         public virtual void SetSchemaValidationMode(ValidationMode mode)
         {
-            if (mode != null)
-            {
-                controller.SchemaValidationMode = mode.GetNumber();
-            }
+            // ValidationMode is an enum: the Java null-check was always true here.
+            controller.SchemaValidationMode = mode.GetNumber();
         }
 
         public virtual ValidationMode GetSchemaValidationMode()
@@ -307,13 +273,18 @@ namespace OutSmart.DAXon.Api
                     controller.SetTimeout(processor.TransformTimeout);
                     return controller.GetStreamingReceiver(controller.GetInitialMode(), sOut);
                 }
-                catch (TransformerException e)
+                catch (XPathException e)
                 {
                     throw new DAXonApiException(e);
                 }
             }
             else
             {
+                // The caller streams the source into the returned receiver BEFORE Dispose() arms
+                // the run's deadline - arm now so that parse runs under this run's fresh budget,
+                // not a spent token left on the thread by an earlier run. Dispose() re-arms for
+                // the transform phase itself.
+                controller.SetTimeout(processor.TransformTimeout);
                 Builder sourceTreeBuilder = controller.MakeBuilder();
                 sourceTreeBuilder.SetDurability(Durability.LASTING);
                 if (sourceTreeBuilder is TinyBuilder)
@@ -354,7 +325,7 @@ namespace OutSmart.DAXon.Api
                     IDestination destination;
                     try
                     {
-                        destination = handler.Apply(abs);
+                        destination = handler(abs);
                     }
                     catch (DAXonApiUncheckedException e)
                     {
@@ -397,7 +368,7 @@ namespace OutSmart.DAXon.Api
                 this.finalDestination = finalDestination;
                 this.sourceTreeBuilder = sourceTreeBuilder;
             }
-            public override void Dispose()
+            public override void Close()
             {
                 if (!closed)
                 {
@@ -415,7 +386,7 @@ namespace OutSmart.DAXon.Api
                                 controller.SetTimeout(parent.processor.TransformTimeout);
                                 controller.ApplyTemplates(doc, result);
                             }
-                            catch (TransformerException e)
+                            catch (XPathException e)
                             {
                                 throw new DAXonApiException(e);
                             }

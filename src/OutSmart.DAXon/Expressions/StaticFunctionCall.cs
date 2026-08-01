@@ -110,7 +110,7 @@ namespace OutSmart.DAXon.Expressions
                 OriginalFunction pf = (OriginalFunction)target;
                 @out.StartElement("origFC", this);
                 @out.EmitAttribute("name", pf.GetFunctionName());
-                @out.EmitAttribute("pack", options.packageMap.Get(pf.GetComponent().ContainingPackage) + "");
+                @out.EmitAttribute("pack", options.packageMap.GetOrDefault(pf.GetComponent().ContainingPackage) + "");
                 foreach (Operand o in Operands())
                 {
                     o.GetChildExpression().Export(@out);

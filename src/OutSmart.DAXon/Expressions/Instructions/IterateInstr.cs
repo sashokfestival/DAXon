@@ -53,14 +53,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override int InstructionNameCode => StandardNames.XSL_ITERATE;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string StreamerName => "Iterate";
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => PROCESS_METHOD;
         public IterateInstr(Expression select, LocalParamBlock initiallyExp, Expression action, Expression onCompletion)
         {
@@ -100,9 +94,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return actionOp.GetChildExpression();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             selectOp.TypeCheck(visitor, contextInfo);
@@ -128,9 +119,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             selectOp.Optimize(visitor, contextInfo);
@@ -150,17 +138,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public bool IsCompilable()
         {
             return !ContainsBreakOrNextIterationWithinTryCatch(this, false);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private static bool ContainsBreakOrNextIterationWithinTryCatch(Expression exp, bool withinTryCatch)
         {
             if (exp is BreakInstr || exp is NextIteration)
@@ -184,9 +166,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override ItemType GetItemType()
         {
             if (Literal.IsEmptySequence(OnCompletion))
@@ -200,17 +179,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return (GetActionExpression().GetSpecialProperties() & OnCompletion.GetSpecialProperties() & StaticProperty.NO_NODES_NEWLY_CREATED) == 0;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override bool HasVariableBinding(IBinding binding)
         {
             LocalParamBlock paramBlock = InitiallyExp;
@@ -226,18 +199,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             GetActionExpression().CheckPermittedContents(parentType, false);
             OnCompletion.CheckPermittedContents(parentType, false);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             IterateInstr exp = new IterateInstr(GetSelectExpression().Copy(rebindings), (LocalParamBlock)InitiallyExp.Copy(rebindings), GetActionExpression().Copy(rebindings), OnCompletion.Copy(rebindings));
@@ -245,9 +212,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("iterate", this);
@@ -266,17 +230,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new IterateElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public class IterateElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
@@ -303,6 +261,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                         IItem item = iter.Next();
                         if (item != null)
                         {
+                            context.GetController().CheckTimeoutPerStep();
                             if (tracing)
                             {
                                 listener.StartCurrentItem(item);

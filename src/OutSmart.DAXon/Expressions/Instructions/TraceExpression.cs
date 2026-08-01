@@ -42,14 +42,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override int Dependencies => Child.Dependencies;
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override int NetCost => 0;
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override int InstructionNameCode
         {
             get
@@ -68,7 +62,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         {
             baseOp = new Operand(this, child, OperandRole.SAME_FOCUS_ACTION);
             AdoptChildExpression(child);
-            child.GatherProperties((k, v) => properties.Put(k, v));
+            child.GatherProperties((k, v) => properties.PutAndGetPrevious(k, v));
         }
 
         public virtual Expression GetBody()
@@ -83,17 +77,17 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public virtual void SetProperty(string name, object value)
         {
-            properties.Put(name, value);
+            properties[name] = value;
         }
 
         public override object GetProperty(string name)
         {
-            return properties.Get(name);
+            return properties.GetOrDefault(name);
         }
 
         public override IEnumerator<string> GetProperties()
         {
-            return properties.KeySet().IIterator();
+            return properties.Keys.GetEnumerator();
         }
 
         public override Expression Copy(RebindingMap rebindings)
@@ -129,49 +123,31 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return Child.GetCardinality();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return !Child.HasSpecialProperty(StaticProperty.NO_NODES_NEWLY_CREATED);
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is TraceExpression && Child.Equals(((TraceExpression)other).Child);
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return 0x64646464 ^ Child.GetHashCode();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
 
@@ -190,38 +166,23 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             Child.Export(@out); // Following code was written for diagnostics, to show the tree with the trace instructions
             //        @out.startElement("traceExp");
-            //        for (KeyValuePair<String, Object> prop : properties.entrySet()) {
-            //        }
-            //        getChild().export(@out);
             //        @out.endElement();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override string ToShortString()
         {
             return Child.ToShortString();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new TraceExpressionElaborator();
         }
 
-        /// <summary>
-        /// Determine whether this instruction potentially creates new nodes.
-        /// </summary>
         private class TraceExpressionElaborator : FallbackElaborator
         {
             public override IStringEvaluator ElaborateForString(bool zeroLengthWhenAbsent)

@@ -217,7 +217,7 @@ namespace OutSmart.DAXon.Types
         public override string ToString()
         {
             HashSet<PrimitiveUType> components = Decompose();
-            if (components.IsEmpty())
+            if (components.Count == 0)
             {
                 return "U{}";
             }
@@ -228,7 +228,7 @@ namespace OutSmart.DAXon.Types
             {
                 if (started)
                 {
-                    sb.Append("|");
+                    sb.Append('|');
                 }
 
                 started = true;
@@ -256,7 +256,7 @@ namespace OutSmart.DAXon.Types
         public virtual ItemType ToItemType()
         {
             HashSet<PrimitiveUType> p = Decompose();
-            if (p.IsEmpty())
+            if (p.Count == 0)
             {
                 return ErrorType.GetInstance();
             }

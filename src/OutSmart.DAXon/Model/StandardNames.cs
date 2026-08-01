@@ -442,7 +442,6 @@ namespace OutSmart.DAXon.Model
             BindXSName(XS_ANY_TYPE, "anyType");
             BindXSName(XS_ANY_SIMPLE_TYPE, "anySimpleType");
 
-            //bindXSName(XS_INVALID_NAME, "invalidName");
             BindXSName(XS_ERROR, "error");
             BindXSName(XS_ALL, "all");
             BindXSName(XS_ALTERNATIVE, "alternative");
@@ -515,31 +514,31 @@ namespace OutSmart.DAXon.Model
         private static void BindXSLTName(int constant, string localName)
         {
             localNames[constant] = localName;
-            lookup.Put('{' + NamespaceConstant.XSLT + '}' + localName, constant);
+            lookup['{' + NamespaceConstant.XSLT + '}' + localName] = constant;
         }
 
         private static void BindSaxonName(int constant, string localName)
         {
             localNames[constant] = localName;
-            lookup.Put('{' + NamespaceConstant.SAXON + '}' + localName, constant);
+            lookup['{' + NamespaceConstant.SAXON + '}' + localName] = constant;
         }
 
         private static void BindXMLName(int constant, string localName)
         {
             localNames[constant] = localName;
-            lookup.Put('{' + NamespaceConstant.XML + '}' + localName, constant);
+            lookup['{' + NamespaceConstant.XML + '}' + localName] = constant;
         }
 
         private static void BindXSName(int constant, string localName)
         {
             localNames[constant] = localName;
-            lookup.Put('{' + NamespaceConstant.SCHEMA + '}' + localName, constant);
+            lookup['{' + NamespaceConstant.SCHEMA + '}' + localName] = constant;
         }
 
         private static void BindXSIName(int constant, string localName)
         {
             localNames[constant] = localName;
-            lookup.Put('{' + NamespaceConstant.SCHEMA_INSTANCE + '}' + localName, constant);
+            lookup['{' + NamespaceConstant.SCHEMA_INSTANCE + '}' + localName] = constant;
         }
 
         public static int GetFingerprint(NamespaceUri uri, string localName)

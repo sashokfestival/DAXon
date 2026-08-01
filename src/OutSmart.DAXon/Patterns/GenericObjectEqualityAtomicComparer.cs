@@ -16,11 +16,11 @@ using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Patterns
 {
 
-    // Phase 7.8f: stub IAtomicComparer that wraps generic equality (compile-only).
+    // Stub IAtomicComparer that wraps generic equality (compile-only).
     public sealed class GenericObjectEqualityAtomicComparer : IAtomicComparer
     {
         public static readonly GenericObjectEqualityAtomicComparer Instance = new GenericObjectEqualityAtomicComparer();
-        public IStringCollator Collator => throw new NotImplementedException("STUB: GenericObjectEqualityAtomicComparer.GetCollator not ported (excluded stub)");
+        public IStringCollator Collator => null; // object-equality comparer uses no collation (sibling comparers expose their collator or null)
         public IAtomicComparer ProvideContext(IXPathContext context) => this;
         public int CompareAtomicValues(AtomicValue a, AtomicValue b) => EqualityComparer<object>.Default.Equals(a, b) ? 0 : 1;
         public bool ComparesEqual(AtomicValue a, AtomicValue b) => EqualityComparer<object>.Default.Equals(a, b);

@@ -18,14 +18,14 @@ namespace OutSmart.DAXon.Expressions.Sorting
     public class ComparisonException : InvalidCastException
     {
         XPathException reason;
-        public ComparisonException(XPathException reason) : base(reason.GetMessage())
+        public ComparisonException(XPathException reason) : base(reason.Message)
         {
             this.reason = reason;
         }
 
         public string GetMessage()
         {
-            return reason.GetMessage();
+            return reason.Message;
         }
 
         public virtual XPathException GetReason()

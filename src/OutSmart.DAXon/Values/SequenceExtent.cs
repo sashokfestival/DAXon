@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Values
 {
     public abstract class SequenceExtent : IGroundedValue
     {
-        public virtual UnicodeString UnicodeStringValue => throw new NotImplementedException();
+        public abstract UnicodeString UnicodeStringValue { get; }
         public static Of<IItem> From(ISequenceIterator iter)
         {
             IList<IItem> list = new List<IItem>(!SequenceTool.SupportsGetLength(iter) ? 20 : ((ILastPositionFinder)iter).GetLength());
@@ -68,12 +68,12 @@ namespace OutSmart.DAXon.Values
         }
 
         public abstract ISequenceIterator ReverseIterate();
-        public virtual ISequenceIterator Iterate() => throw new NotImplementedException();
-        public virtual IItem ItemAt(int arg0) => throw new NotImplementedException();
-        public virtual IItem Head() => throw new NotImplementedException();
-        public virtual IGroundedValue Subsequence(int arg0, int arg1) => throw new NotImplementedException();
-        public virtual int GetLength() => throw new NotImplementedException();
-        public virtual string GetStringValue() => throw new NotImplementedException();
+        public abstract ISequenceIterator Iterate();
+        public abstract IItem ItemAt(int arg0);
+        public abstract IItem Head();
+        public abstract IGroundedValue Subsequence(int arg0, int arg1);
+        public abstract int GetLength();
+        public abstract string GetStringValue();
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public virtual bool EffectiveBooleanValue() => ExpressionTool.EffectiveBooleanValue(Iterate()); // upstream GroundedValue default method
@@ -96,9 +96,6 @@ namespace OutSmart.DAXon.Values
         {
             private IList<T> items;
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override UnicodeString UnicodeStringValue
             {
                 get
@@ -135,7 +132,7 @@ namespace OutSmart.DAXon.Values
 
             public Of(Of<T> ext, int start, int length)
             {
-                items = ext.items.SubList(start, start + length);
+                items = ext.items.GetRange(start, (start + length) - (start));
             }
 
             public override ISequenceIterator Iterate()
@@ -148,9 +145,6 @@ namespace OutSmart.DAXon.Values
                 return Reverse.ReverseIterator(items);
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override bool EffectiveBooleanValue()
             {
                 int len = GetLength();
@@ -178,9 +172,6 @@ namespace OutSmart.DAXon.Values
                 }
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override IItem ItemAt(int n)
             {
                 if (n >= 0 && n < items.Count)
@@ -193,12 +184,9 @@ namespace OutSmart.DAXon.Values
                 }
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override IItem Head()
             {
-                if (items.IsEmpty())
+                if (items.Count == 0)
                 {
                     return null;
                 }
@@ -208,17 +196,11 @@ namespace OutSmart.DAXon.Values
                 }
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override int GetLength()
             {
                 return items.Count;
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override string GetStringValue()
             {
                 switch (GetLength())
@@ -241,9 +223,6 @@ namespace OutSmart.DAXon.Values
                 }
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override IGroundedValue Subsequence(int start, int length)
             {
                 if (start < 0)
@@ -258,12 +237,9 @@ namespace OutSmart.DAXon.Values
                 }
 
                 int limit = ((long)start + (long)length > size) ? size : start + length;
-                return new Of<T>(items.SubList(start, limit)).Reduce();
+                return new Of<T>(items.GetRange(start, (limit) - (start))).Reduce();
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override string ToString()
             {
                 StringBuilder fsb = new StringBuilder(64);
@@ -278,9 +254,6 @@ namespace OutSmart.DAXon.Values
                 return fsb.ToString();
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             public override IGroundedValue Reduce()
             {
                 int len = GetLength();
@@ -298,13 +271,10 @@ namespace OutSmart.DAXon.Values
                 }
             }
 
-            /// <summary>
-            /// Get the effective boolean value
-            /// </summary>
             //@Override
             public virtual IEnumerator<T> IIterator()
             {
-                return items.IIterator();
+                return items.GetEnumerator();
             }
             public IEnumerator<T> GetEnumerator() => items.GetEnumerator();
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

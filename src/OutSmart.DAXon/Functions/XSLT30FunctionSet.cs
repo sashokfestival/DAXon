@@ -32,7 +32,6 @@ namespace OutSmart.DAXon.Functions
             Register("string", 1, (e) => e.Populate(String_1.New(), BuiltInAtomicType.STRING, ONE, 0).Arg(0, Types.Type.ITEM_TYPE, OPT | ABS, StringValue.EMPTY_STRING));
             Register("tokenize", 1, (e) => e.Populate(Tokenize_1.New(), BuiltInAtomicType.STRING, STAR, 0).Arg(0, BuiltInAtomicType.STRING, OPT, EMPTY));
             // string-to-codepoints#1 — exact signature from XPath20FunctionSet:485 (integer*, arg string? default EMPTY).
-            // Runtime 2026-06-10: real StringToCodepoints.cs re-included (was excluded -> XPST0017 unknown function).
             Register("string-to-codepoints", 1, (e) => e.Populate(() => new StringToCodepoints(), BuiltInAtomicType.INTEGER, STAR, 0).Arg(0, BuiltInAtomicType.STRING, OPT, EMPTY)); // runtime: lambda form (not .New()) so Fix-Phase7-CtorRef-To-Lambda doesn't botch the global:: prefix
             // QName family - exact signatures from XPath20FunctionSet:289/360/398/401 (lambda form, same CtorRef trap).
             Register("QName", 2, (e) => e.Populate(() => new QNameFn(), BuiltInAtomicType.QNAME, ONE, 0).Arg(0, BuiltInAtomicType.STRING, OPT, null).Arg(1, BuiltInAtomicType.STRING, ONE, null));
@@ -141,10 +140,10 @@ namespace OutSmart.DAXon.Functions
             Register("round", 1, (e) => e.Populate(() => new Round(), NumericType.GetInstance(), OPT, AS_PRIM_ARG0).Arg(0, NumericType.GetInstance(), OPT, EMPTY));
             // fn:round#2 (value, precision) - XPath 3.0 F&O 4.4.3; Round already reads arguments[1]. Was unregistered.
             Register("round", 2, (e) => e.Populate(() => new Round(), NumericType.GetInstance(), OPT, AS_PRIM_ARG0).Arg(0, NumericType.GetInstance(), OPT, EMPTY).Arg(1, BuiltInAtomicType.INTEGER, ONE, null));
-            // Runtime 2026-06-11: fn:format-number (Tier-1) — mirrors upstream XPath30FunctionSet:158 (arity 2 = LATE, arity 3 = NS|LATE for the decimal-format QName resolution).
+            // fn:format-number (Tier-1) — mirrors upstream XPath30FunctionSet:158 (arity 2 = LATE, arity 3 = NS|LATE for the decimal-format QName resolution).
             Register("format-number", 2, (e) => e.Populate(() => new FormatNumber(), BuiltInAtomicType.STRING, ONE, LATE).Arg(0, NumericType.GetInstance(), OPT, null).Arg(1, BuiltInAtomicType.STRING, ONE, null));
             Register("format-number", 3, (e) => e.Populate(() => new FormatNumber(), BuiltInAtomicType.STRING, ONE, NS | LATE).Arg(0, NumericType.GetInstance(), OPT, null).Arg(1, BuiltInAtomicType.STRING, ONE, null).Arg(2, BuiltInAtomicType.STRING, OPT, null));
-            // Runtime 2026-06-11 batch2: date/time cluster — mirrors upstream XPath20FunctionSet:119-253 (dynamic context accessors)
+            // date/time cluster — mirrors upstream XPath20FunctionSet:119-253 (dynamic context accessors)
             // and XPath30FunctionSet:123-178 (format-date family + format-integer).
             Register("current-date", 0, (e) => e.Populate(() => new DynamicContextAccessor.CurrentDate(), BuiltInAtomicType.DATE, ONE, LATE));
             Register("current-dateTime", 0, (e) => e.Populate(() => new DynamicContextAccessor.CurrentDateTime(), BuiltInAtomicType.DATE_TIME_STAMP, ONE, LATE));
@@ -158,10 +157,10 @@ namespace OutSmart.DAXon.Functions
             Register("format-time", 5, (e) => e.Populate(() => new FormatDate(), BuiltInAtomicType.STRING, OPT, CARD0).Arg(0, BuiltInAtomicType.TIME, OPT, null).Arg(1, BuiltInAtomicType.STRING, ONE, null).Arg(2, BuiltInAtomicType.STRING, OPT, null).Arg(3, BuiltInAtomicType.STRING, OPT, null).Arg(4, BuiltInAtomicType.STRING, OPT, null));
             Register("format-integer", 2, (e) => e.Populate(() => new FormatInteger(), BuiltInAtomicType.STRING, ONE, 0).Arg(0, BuiltInAtomicType.INTEGER, OPT, null).Arg(1, BuiltInAtomicType.STRING, ONE, null));
             Register("format-integer", 3, (e) => e.Populate(() => new FormatInteger(), BuiltInAtomicType.STRING, ONE, 0).Arg(0, BuiltInAtomicType.INTEGER, OPT, null).Arg(1, BuiltInAtomicType.STRING, ONE, null).Arg(2, BuiltInAtomicType.STRING, OPT, null));
-            // Runtime 2026-06-11 batch3: fn:concat - upstream XPath20FunctionSet registerVariadic("concat",1,...,SEQV)
+            // fn:concat - upstream XPath20FunctionSet registerVariadic("concat",1,...,SEQV)
             // (the || operator compiles to fn:concat; Concat31 = the 3.1 sequence-variadic implementation).
             RegisterVariadic("concat", 1, (e) => e.Populate(() => new Concat31(), BuiltInAtomicType.STRING, ONE, SEQV).Arg(0, BuiltInAtomicType.ANY_ATOMIC, STAR, null));
-            // Runtime 2026-06-11 batch4: fn:key (XSLT30FunctionSet:88) + fn:id (XPath20FunctionSet:239).
+            // fn:key (XSLT30FunctionSet:88) + fn:id (XPath20FunctionSet:239).
             Register("key", 2, (e) => e.Populate(() => new KeyFn(), Types.Type.NODE_TYPE, STAR, CDOC | NS | LATE).Arg(0, BuiltInAtomicType.STRING, ONE, null).Arg(1, BuiltInAtomicType.ANY_ATOMIC, STAR, EMPTY));
             Register("key", 3, (e) => e.Populate(() => new KeyFn(), Types.Type.NODE_TYPE, STAR, NS | LATE).Arg(0, BuiltInAtomicType.STRING, ONE, null).Arg(1, BuiltInAtomicType.ANY_ATOMIC, STAR, EMPTY).Arg(2, Types.Type.NODE_TYPE, ONE, null));
             Register("id", 1, (e) => e.Populate(() => new SuperId.Id(), NodeKindTest.ELEMENT, STAR, CDOC | LATE | UO).Arg(0, BuiltInAtomicType.STRING, STAR, EMPTY));
@@ -173,17 +172,17 @@ namespace OutSmart.DAXon.Functions
             Register("element-with-id", 1, (e) => e.Populate(() => new SuperId.ElementWithId(), NodeKindTest.ELEMENT, STAR, CDOC | LATE | UO).Arg(0, BuiltInAtomicType.STRING, STAR, EMPTY));
             Register("element-with-id", 2, (e) => e.Populate(() => new SuperId.ElementWithId(), NodeKindTest.ELEMENT, STAR, UO).Arg(0, BuiltInAtomicType.STRING, STAR, EMPTY).Arg(1, Types.Type.NODE_TYPE, ONE, null));
             Register("data", 0, (e) => e.Populate(() => new ContextItemAccessorFunction(), BuiltInAtomicType.ANY_ATOMIC, STAR, CITEM | LATE));
-            // Runtime 2026-06-11 batch6: fn:parse-xml + fn:parse-xml-fragment (XPath30FunctionSet:221/224).
+            // fn:parse-xml + fn:parse-xml-fragment (XPath30FunctionSet:221/224).
             Register("parse-xml", 1, (e) => e.Populate(() => new ParseXml(), new DocumentNodeTest(NodeKindTest.ELEMENT), OPT, LATE | NEW).Arg(0, BuiltInAtomicType.STRING, OPT, EMPTY));
             Register("parse-xml-fragment", 1, (e) => e.Populate(() => new ParseXmlFragment(), NodeKindTest.DOCUMENT, OPT, LATE | NEW).Arg(0, BuiltInAtomicType.STRING, OPT, EMPTY));
-            // Runtime 2026-06-11 batch6e: accumulator-after/before#1 (XSLT30FunctionSet:42/:46).
+            // accumulator-after/before#1 (XSLT30FunctionSet:42/:46).
             Register("accumulator-after", 1, (e) => e.Populate(() => new AccumulatorFn.AccumulatorAfter(), AnyItemType.GetInstance(), STAR, LATE | CITEM).Arg(0, BuiltInAtomicType.STRING, ONE, null));
             Register("accumulator-before", 1, (e) => e.Populate(() => new AccumulatorFn.AccumulatorBefore(), AnyItemType.GetInstance(), STAR, LATE | CITEM).Arg(0, BuiltInAtomicType.STRING, ONE, null));
-            // Runtime 2026-06-11 batch6e: system-property#1 (XSLT30FunctionSet:105) +
+            // system-property#1 (XSLT30FunctionSet:105) +
             // regex-group#1 (XSLT30FunctionSet:97; SIDE prevents loop-lifting).
             Register("system-property", 1, (e) => e.Populate(() => new SystemProperty(), BuiltInAtomicType.STRING, ONE, NS | LATE).Arg(0, BuiltInAtomicType.STRING, ONE, null));
             Register("regex-group", 1, (e) => e.Populate(() => new RegexGroup(), BuiltInAtomicType.STRING, ONE, LATE | SIDE).Arg(0, BuiltInAtomicType.INTEGER, ONE, null));
-            // Runtime 2026-06-11 batch6c: HOF quartet (XPath30FunctionSet:81-110 sigs verbatim).
+            // HOF quartet (XPath30FunctionSet:81-110 sigs verbatim).
             {
                 var __predicate = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_ITEM }, SequenceType.SINGLE_BOOLEAN);
                 Register("filter", 2, (e) => e.Populate(() => new FilterFn(), AnyItemType.GetInstance(), STAR, AS_ARG0 | LATE).Arg(0, AnyItemType.GetInstance(), STAR | TRA, EMPTY).Arg(1, __predicate, ONE, null));
@@ -194,7 +193,7 @@ namespace OutSmart.DAXon.Functions
                 var __forEachArg = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_ITEM }, SequenceType.ANY_SEQUENCE);
                 Register("for-each", 2, (e) => e.Populate(() => new ForEachFn(), AnyItemType.GetInstance(), STAR, LATE).Arg(0, AnyItemType.GetInstance(), STAR, EMPTY).Arg(1, __forEachArg, ONE, null));
             }
-            // Runtime 2026-06-11 batch3: fn:sort (upstream XPath31FunctionSet) + current-group/current-grouping-key (XSLT30FunctionSet, LATE).
+            // fn:sort (upstream XPath31FunctionSet) + current-group/current-grouping-key (XSLT30FunctionSet, LATE).
             Register("sort", 1, (e) => e.Populate(() => new Sort_1(), AnyItemType.GetInstance(), STAR, 0).Arg(0, AnyItemType.GetInstance(), STAR, null));
             Register("sort", 2, (e) => e.Populate(() => new Sort_2(), AnyItemType.GetInstance(), STAR, 0).Arg(0, AnyItemType.GetInstance(), STAR, null).Arg(1, BuiltInAtomicType.STRING, OPT, null));
             Register("sort", 3, (e) => e.Populate(() => new Sort_3(), AnyItemType.GetInstance(), STAR, 0).Arg(0, AnyItemType.GetInstance(), STAR, null).Arg(1, BuiltInAtomicType.STRING, OPT, null).Arg(2, AnyFunctionType.GetInstance(), ONE, null));

@@ -8,14 +8,26 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
+using OutSmart.DAXon.Events;
+using OutSmart.DAXon.Api;
+using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Trees.Linked
 {
+    // Was a fully hollow shell (content dropped on construction, kind/copy/string-value all NIE):
+    // a comment in a linked tree crashed the moment anything asked for its kind or value.
     public class CommentImpl : NodeImpl
     {
+        private UnicodeString content = EmptyUnicodeString.GetInstance();
+
         public CommentImpl() { }
-        public CommentImpl(object data) { }
+        public CommentImpl(object data) { content = data as UnicodeString ?? BMPString.Of(data?.ToString() ?? ""); }
         public void SetLocation(object _loc) { }
-        public void SetLocation(string systemId, int line, int column) { } /* Phase B: real CommentImpl.SetLocation(string,int,int); LinkedTreeBuilder calls it (CS1501), mirrors ProcInstImpl stub */
+        public void SetLocation(string systemId, int line, int column) { } /* location tracking not kept for linked-tree comments */
+
+        public override UnicodeString UnicodeStringValue => content;
+        public override int GetNodeKind() => Types.Type.COMMENT;
+        public override void ReplaceStringValue(UnicodeString value) => content = value;
+        public override void Copy(IReceiver @out, int copyOptions, ILocation locationId) => @out.Comment(content, locationId, 0);
     }
 }

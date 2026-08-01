@@ -13,7 +13,7 @@ using System.Text;
 
 namespace OutSmart.DAXon.Resources
 {
-    // Phase B: real CatalogCollection.cs (excluded) holds the static utility MakeStringFromStream,
+    // Real CatalogCollection.cs (excluded) holds the static utility MakeStringFromStream,
     // called by the compiled base AbstractResourceCollection. The other callers (StandardCollectionFinder,
     // UnparsedTextResource) are excluded, so only this static method is needed -> a static-only stub
     // avoids an AbstractResourceCollection base cascade. Faithful re-impl (compat has no
@@ -25,7 +25,10 @@ namespace OutSmart.DAXon.Resources
             var ms = new MemoryStream();
             byte[] buffer = new byte[1024];
             // IO-removal: System.IO.Stream.Read(byte[]) has no 1-arg overload and returns 0 (not -1) at EOF.
-            for (int length; (length = input.Read(buffer, 0, buffer.Length)) != 0;) { ms.Write(buffer, 0, length); }
+            for (int length; (length = input.Read(buffer, 0, buffer.Length)) != 0;)
+            {
+                ms.Write(buffer, 0, length);
+            }
             return Encoding.GetEncoding(encoding).GetString(ms.ToArray());
         }
     }

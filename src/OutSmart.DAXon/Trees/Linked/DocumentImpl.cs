@@ -44,84 +44,12 @@ namespace OutSmart.DAXon.Trees.Linked
         private Durability durability;
         private ISpaceStrippingRule spaceStrippingRule = NoElementsSpaceStrippingRule.GetInstance();
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public ElementImpl DocumentElement { get => documentElement; set => documentElement = value; }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override NodeInfo Root => this;
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override DocumentImpl PhysicalRoot => this;
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public IEnumerator<string> UnparsedEntityNames
         {
             get
@@ -129,36 +57,15 @@ namespace OutSmart.DAXon.Trees.Linked
                 if (entityTable == null)
                 {
                     IList<string> ls = new List<string>();
-                    return ls.IIterator();
+                    return ls.GetEnumerator();
                 }
                 else
                 {
-                    return entityTable.KeySet().IIterator();
+                    return entityTable.Keys.GetEnumerator();
                 }
             }
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public ISpaceStrippingRule SpaceStrippingRule
         {
             get => spaceStrippingRule; set
@@ -166,80 +73,47 @@ namespace OutSmart.DAXon.Trees.Linked
                 this.spaceStrippingRule = value;
             }
         }
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
         public DocumentImpl()
         {
             SetRawParent(null);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
         public NodeInfo GetRootNode()
         {
             return this;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
         public void SetConfiguration(Configuration config)
         {
             this.config = config;
             documentNumber = config.DocumentNumberAllocator.AllocateDocumentNumber();
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
         public override Configuration GetConfiguration()
         {
             return config;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
         public bool IsMutable()
         {
             return durability == Durability.MUTABLE;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
         public Durability GetDurability()
         {
             return durability;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
         public void SetMutable(bool mutable)
         {
             this.durability = mutable ? Durability.MUTABLE : Durability.LASTING;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
         public override NamePool GetNamePool()
         {
             return config.GetNamePool();
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
         public override Builder NewBuilder()
         {
             LinkedTreeBuilder builder = new LinkedTreeBuilder(config.MakePipelineConfiguration(), Durability.MUTABLE);
@@ -247,45 +121,21 @@ namespace OutSmart.DAXon.Trees.Linked
             return builder;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
         public void SetImaginary(bool imaginary)
         {
             this.imaginary = imaginary;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
         public bool IsImaginary()
         {
             return imaginary;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
         public bool IsTyped()
         {
             return documentElement != null && documentElement.GetSchemaType() != Untyped.INSTANCE;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
         /// <summary>
         /// Get the unique document number
         /// </summary>
@@ -295,12 +145,6 @@ namespace OutSmart.DAXon.Trees.Linked
         }
 
         /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
         /// Get the unique document number
         /// </summary>
         public void GraftLocationMap(DocumentImpl original)
@@ -309,15 +153,6 @@ namespace OutSmart.DAXon.Trees.Linked
             lineNumberMap = original.lineNumberMap;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
         /// <summary>
         /// Set the system id (base URI) of this node
         /// </summary>
@@ -331,61 +166,16 @@ namespace OutSmart.DAXon.Trees.Linked
             systemIdMap.SetSystemId(GetRawSequenceNumber(), uri);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
         public override string GetSystemId()
         {
             return systemIdMap.GetSystemId(GetRawSequenceNumber());
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
         public void SetBaseURI(string uri)
         {
             baseURI = uri;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
         public override string GetBaseURI()
         {
             if (baseURI != null)
@@ -396,21 +186,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return GetSystemId();
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
         public void SetSystemId(int seq, string uri)
         {
             if (uri == null)
@@ -421,68 +196,17 @@ namespace OutSmart.DAXon.Trees.Linked
             systemIdMap.SetSystemId(seq, uri);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
         public string GetSystemId(int seq)
         {
             return systemIdMap.GetSystemId(seq);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void SetLineNumbering()
         {
             lineNumberMap = new LineNumberMap();
             lineNumberMap.SetLineAndColumn(GetRawSequenceNumber(), 0, -1);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void SetLineAndColumn(int sequence, int line, int column)
         {
             if (lineNumberMap != null && sequence >= 0)
@@ -491,24 +215,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public int GetLineNumber(int sequence)
         {
             if (lineNumberMap != null && sequence >= 0)
@@ -519,24 +225,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return -1;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public int GetColumnNumber(int sequence)
         {
             if (lineNumberMap != null && sequence >= 0)
@@ -547,24 +235,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return -1;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void AddNilledElement(ElementImpl element)
         {
             if (nilledElements == null)
@@ -575,47 +245,11 @@ namespace OutSmart.DAXon.Trees.Linked
             nilledElements.Add(element);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public bool IsNilledElement(ElementImpl element)
         {
             return nilledElements != null && nilledElements.Contains(element);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void MarkTopWithinEntity(ElementImpl element)
         {
             if (topWithinEntityElements == null)
@@ -626,164 +260,38 @@ namespace OutSmart.DAXon.Trees.Linked
             topWithinEntityElements.Add(element);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public bool IsTopWithinEntity(ElementImpl element)
         {
             return topWithinEntityElements != null && topWithinEntityElements.Contains(element);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override int GetLineNumber()
         {
             return 0;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override int GetNodeKind()
         {
             return Types.Type.DOCUMENT;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override
         NodeImpl GetNextSibling()
         {
             return null;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override NodeImpl GetPreviousSibling()
         {
             return null;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override void GenerateId(StringBuilder buffer)
         {
             buffer.Append('d');
             buffer.Append(documentNumber);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public IAxisIterator GetAllElements(int fingerprint)
         {
             if (elementList == null)
@@ -813,24 +321,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return new NodeListIterator(list);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void DeIndex(NodeImpl node)
         {
             if (node is ElementImpl)
@@ -861,24 +351,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         private void IndexIDs()
         {
             if (idTable != null)
@@ -916,24 +388,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void RegisterID(NodeInfo e, string id)
         {
 
@@ -947,24 +401,6 @@ namespace OutSmart.DAXon.Trees.Linked
             table.PutIfAbsent(id, e);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public NodeInfo SelectID(string id, bool getParent)
         {
             if (idTable == null)
@@ -972,7 +408,7 @@ namespace OutSmart.DAXon.Trees.Linked
                 IndexIDs();
             }
 
-            NodeInfo node = idTable.Get(id);
+            NodeInfo node = idTable.GetOrDefault(id);
             if (node != null && getParent && node.IsId() && node.UnicodeStringValue.Equals(id))
             {
                 node = node.GetParent();
@@ -981,24 +417,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return node;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void DeregisterID(string id)
         {
             id = Whitespace.Trim(id);
@@ -1008,24 +426,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void SetUnparsedEntity(string name, string uri, string publicId)
         {
 
@@ -1037,27 +437,9 @@ namespace OutSmart.DAXon.Trees.Linked
             string[] ids = new string[2];
             ids[0] = uri;
             ids[1] = publicId;
-            entityTable.Put(name, ids);
+            entityTable[name] = ids;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public String[] GetUnparsedEntity(string name)
         {
             if (entityTable == null)
@@ -1065,27 +447,9 @@ namespace OutSmart.DAXon.Trees.Linked
                 return null;
             }
 
-            return entityTable.Get(name);
+            return entityTable.GetOrDefault(name);
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override ISchemaType GetSchemaType()
         {
             if (documentElement == null || documentElement.GetSchemaType() == Untyped.INSTANCE)
@@ -1098,27 +462,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public override void Copy(IReceiver @out, int copyOptions, ILocation locationId)
         {
             @out.StartDocument(CopyOptions.GetStartDocumentProperties(copyOptions));
@@ -1144,80 +487,17 @@ namespace OutSmart.DAXon.Trees.Linked
             @out.EndDocument();
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public override void ReplaceStringValue(UnicodeString stringValue)
         {
             throw new NotSupportedException("Cannot replace the value of a document node");
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public void ResetIndexes()
         {
             idTable = null;
             elementList = null;
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public void SetUserData(string key, object value)
         {
             if (userData == null)
@@ -1231,31 +511,10 @@ namespace OutSmart.DAXon.Trees.Linked
             }
             else
             {
-                userData.Put(key, value);
+                userData[key] = value;
             }
         }
 
-        /// <summary>
-        /// Create a DocumentImpl
-        /// </summary>
-        /// <summary>
-        /// Get the name pool used for the names in this document
-        /// </summary>
-        /// <summary>
-        /// Get the unique document number
-        /// </summary>
-        /// <summary>
-        /// Set the system id (base URI) of this node
-        /// </summary>
-        /// <summary>
-        /// Get the system id of this root node
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Copy this node to a given outputter
-        /// </summary>
         public object GetUserData(string key)
         {
             if (userData == null)
@@ -1264,7 +523,7 @@ namespace OutSmart.DAXon.Trees.Linked
             }
             else
             {
-                return userData.Get(key);
+                return userData.GetOrDefault(key);
             }
         }
     }

@@ -29,52 +29,31 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private bool declaredStreamable;
         private IPushEvaluator bodyEvaluator;
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public virtual int FocusDependencies => body.Dependencies & StaticProperty.DEPENDS_ON_FOCUS;
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public AttributeSet()
         {
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public override SymbolicName GetSymbolicName()
         {
             return new SymbolicName(StandardNames.XSL_ATTRIBUTE_SET, attributeSetName);
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public virtual void SetName(StructuredQName attributeSetName)
         {
             this.attributeSetName = attributeSetName;
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public virtual void SetDeclaredStreamable(bool value)
         {
             this.declaredStreamable = value;
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public virtual bool IsDeclaredStreamable()
         {
             return this.declaredStreamable;
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public override void SetStackFrameMap(SlotManager stackFrameMap)
         {
             if (stackFrameMap != null)
@@ -83,12 +62,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public virtual void Expand(Outputter output, IXPathContext context)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (bodyEvaluator == null)
                 {
@@ -102,26 +78,29 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 throw new XPathException("Attribute set " + GetObjectName().EQName + " invokes itself recursively", "XTDE0640");
             }
 
+            // The pop MUST be in a finally: the body can raise a dynamic error that xsl:try catches,
+            // and a frame left on the stack makes every later use of this attribute set in the same
+            // run report XTDE0640 "invokes itself recursively" - a wrong answer, not a leak.
             stack.Push(this);
-            Expression.DispatchTailCall(bodyEvaluator.ProcessLeavingTail(output, context));
-            stack.Pop();
-            if (stack.IsEmpty())
+            try
             {
-                ((XsltController)context.GetController()).ReleaseAttributeSetEvaluationStack();
+                Expression.DispatchTailCall(bodyEvaluator.ProcessLeavingTail(output, context));
+            }
+            finally
+            {
+                stack.Pop();
+                if (stack.Count == 0)
+                {
+                    ((XsltController)context.GetController()).ReleaseAttributeSetEvaluationStack();
+                }
             }
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public virtual StructuredQName GetObjectName()
         {
             return attributeSetName;
         }
 
-        /// <summary>
-        /// Create an empty attribute set
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             presenter.StartElement("attributeSet");

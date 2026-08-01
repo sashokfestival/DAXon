@@ -3,7 +3,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Phase 4 runtime: a minimal .NET IPlatform so Configuration/Processor can construct. The real
+// A minimal .NET IPlatform so Configuration/Processor can construct. The real
 // JavaPlatform (1075 lines, heavy deps) is excluded; this provides sane values for the construction path
 // and throws a clearly-labelled NotImplementedException for transform-time services not yet wired (each
 // throw localizes the next runtime un-stub target). Usings mirror Platform.cs so the IPlatform method
@@ -21,10 +21,8 @@ using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
 using System;
 using System.Collections.Generic;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Functions;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Resources;
 using System.Globalization;
 using System.Text;
@@ -58,9 +56,8 @@ namespace OutSmart.DAXon.Core
         public virtual bool IsDotNet() => true;
         public virtual bool IsWindows() => true;
         public virtual string GetDefaultLanguage() => CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-        // Runtime 2026-06-10: WIRED to embedded resources (Saxon's data/*.xml: casevariants/categories/
-        // unicodeBlocks - regex case-blind matching, \p{} categories and \p{Is...} blocks need them).
-        // The files are embedded from upstream/saxon12-9-src/net/sf/saxon/data via the csproj.
+        // Backed by embedded resources (upstream data/*.xml via the csproj): casevariants/categories/
+        // unicodeBlocks — regex case-blind matching, \p{} categories and \p{Is...} blocks need them.
         public virtual Stream LocateResource(string filename, IList<string> messages)
         {
             var asm = typeof(DotNetPlatform).Assembly;
@@ -69,7 +66,10 @@ namespace OutSmart.DAXon.Core
                 if (n.EndsWith("." + filename, StringComparison.OrdinalIgnoreCase) || string.Equals(n, filename, StringComparison.OrdinalIgnoreCase))
                 {
                     var s = asm.GetManifestResourceStream(n);
-                    if (s != null) { return s; } // IO-removal Stage B: returns System.IO.Stream directly
+                    if (s != null) // IO-removal Stage B: returns System.IO.Stream directly
+                    {
+                        return s;
+                    }
                 }
             }
             messages?.Add("Resource not found in embedded manifest: " + filename);
@@ -158,9 +158,15 @@ namespace OutSmart.DAXon.Core
             string ignore = props.GetProperty("ignore-width");
             if (ignore != null)
             {
-                if (ignore.Equals("yes") && strengthAtt == null) { comparer.Options = CompareOptions.None; }
+                if (ignore.Equals("yes") && strengthAtt == null)
+                {
+                    comparer.Options = CompareOptions.None;
+                }
                 else if (ignore.Equals("no")) { /* no-op */ }
-                else { throw new XPathException("ignore-width must be yes or no"); }
+                else
+                {
+                    throw new XPathException("ignore-width must be yes or no");
+                }
             }
             ignore = props.GetProperty("ignore-case");
             if (ignore != null && strengthAtt == null)
@@ -175,9 +181,15 @@ namespace OutSmart.DAXon.Core
             ignore = props.GetProperty("ignore-modifiers");
             if (ignore != null)
             {
-                if (ignore.Equals("yes") && strengthAtt == null) { comparer.Options = CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreSymbols; }
+                if (ignore.Equals("yes") && strengthAtt == null)
+                {
+                    comparer.Options = CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace | CompareOptions.IgnoreSymbols;
+                }
                 else if (ignore.Equals("no")) { /* no-op */ }
-                else { throw new XPathException("ignore-modifiers must be yes or no"); }
+                else
+                {
+                    throw new XPathException("ignore-modifiers must be yes or no");
+                }
             }
             // decomposition and ignore-symbols: not separately configurable through CompareInfo -> ignored (as Java ignores ignore-symbols)
 
@@ -214,18 +226,43 @@ namespace OutSmart.DAXon.Core
 
         // Get a CultureInfo given a language code in XML (BCP-47-ish) format. Mirrors
         // JavaCollationFactory.getLocale but builds a .NET CultureInfo. Falls back to the invariant
-        // culture if the platform does not recognize the code (so the collation still constructs).
+        // culture if the OS does not know the code (so the collation still constructs).
+        //
+        // Only OS-known names may reach GetCultureInfo: on Windows 10+/Server 2016+ it does not
+        // throw for an unknown well-formed BCP-47 tag but SYNTHESIZES a culture, and every name is
+        // interned process-wide forever (~1.1 KB/tag measured). lang= arrives in runtime collation
+        // URIs (fn:compare#3, xsl:sort AVT), so without this gate distinct tags in input data grow
+        // the process without bound. Synthetic cultures collate like the invariant culture anyway.
+        private static readonly Lazy<HashSet<string>> knownCultureNames = new Lazy<HashSet<string>>(() =>
+        {
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (CultureInfo c in CultureInfo.GetCultures(CultureTypes.AllCultures))
+            {
+                names.Add(c.Name);
+            }
+
+            return names;
+        });
+
         private static CultureInfo GetCultureInfo(string lang)
         {
-            try { return CultureInfo.GetCultureInfo(lang.Replace('_', '-')); }
-            catch (CultureNotFoundException)
+            string tag = lang.Replace('_', '-');
+            if (knownCultureNames.Value.Contains(tag))
             {
-                int hyphen = lang.IndexOf('-');
-                if (hyphen < 1) { hyphen = lang.IndexOf('_'); }
-                string language = hyphen < 1 ? lang : lang.Substring(0, hyphen);
-                try { return CultureInfo.GetCultureInfo(language); }
-                catch (CultureNotFoundException) { return CultureInfo.InvariantCulture; }
+                return CultureInfo.GetCultureInfo(tag);
             }
+
+            int hyphen = tag.IndexOf('-');
+            string language = hyphen < 1 ? tag : tag.Substring(0, hyphen);
+            return knownCultureNames.Value.Contains(language) ? CultureInfo.GetCultureInfo(language) : CultureInfo.InvariantCulture;
+        }
+
+        // Same gated lookup for callers that need "known or nothing" (Numberer selection):
+        // null for tags the OS doesn't know — never a synthesized culture.
+        internal static CultureInfo TryGetKnownCulture(string lang)
+        {
+            CultureInfo culture = GetCultureInfo(lang);
+            return culture.Equals(CultureInfo.InvariantCulture) ? null : culture;
         }
 
         // .NET CAN return real collation keys (CompareInfo.GetSortKey) for SimpleCollation instances
@@ -252,15 +289,17 @@ namespace OutSmart.DAXon.Core
         // Properties consumed by MakeCollation, so we let that path build it. Returning null here makes
         // the resolver fall through to its param-translation + MakeCollation branch (the desired behaviour).
         public virtual IStringCollator MakeUcaCollator(string uri, Configuration config) => null;
-        // Runtime 2026-06-10: WIRED to the Saxon-native regex engine (ARegularExpression + RECompiler +
-        // Op* operations, all re-included). Java JavaPlatform's "!"-flag selects java.util.regex instead -
-        // that engine has no .NET twin here, so the flag is stripped and the Saxon engine always used
-        // (spec-conformant: XPath regex semantics ARE the Saxon engine's native dialect).
+        // Always the Saxon-native regex engine (ARegularExpression). Java's "!"-flag selects java.util.regex
+        // instead; that engine has no twin here, so the flag is stripped (XPath regex semantics ARE the
+        // Saxon engine's native dialect, so this stays spec-conformant).
         public virtual IRegularExpression CompileRegularExpression(Configuration config, UnicodeString regex, string flags, string hostLanguage, IList<string> warnings)
         {
             string f = flags == null ? "" : flags.Replace("!", "");
             int semi = f.IndexOf(';');
-            if (semi >= 0) { f = f.Substring(0, semi); } // implementation-defined engine selectors - not applicable
+            if (semi >= 0) // implementation-defined engine selectors - not applicable
+            {
+                f = f.Substring(0, semi);
+            }
             return new ARegularExpression(regex, f, hostLanguage, warnings, config);
         }
         public virtual ExternalObjectType GetExternalObjectType(Configuration config, NamespaceUri uri, string localName) => throw NI("GetExternalObjectType");
@@ -283,7 +322,10 @@ namespace OutSmart.DAXon.Core
 
             public int Compare(string x, string y)
             {
-                if (Ordinal) { return string.CompareOrdinal(x, y); }
+                if (Ordinal)
+                {
+                    return string.CompareOrdinal(x, y);
+                }
                 return CompareInfo.Compare(x, y, Options);
             }
         }

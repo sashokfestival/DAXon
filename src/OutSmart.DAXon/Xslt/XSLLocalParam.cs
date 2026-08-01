@@ -11,7 +11,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Utilities;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -243,9 +242,6 @@ namespace OutSmart.DAXon.Xslt
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
 
-            //        if (!"iterate".equals(getParent().getLocalPart()) &&
-            //            return null;
-            //        }
             if (GetParent() is XSLFunction)
             {
                 if (GetCompilation().GetCompilerInfo().XsltVersion >= 40 && !IsRequiredParam())

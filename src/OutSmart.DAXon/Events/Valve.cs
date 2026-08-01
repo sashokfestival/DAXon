@@ -40,7 +40,7 @@ namespace OutSmart.DAXon.Events
                     alternativeReceiver.StartDocument(ReceiverOption.NONE);
                     try
                     {
-                        NextReceiver.Dispose();
+                        NextReceiver.Close();
                     }
                     catch (XPathException err)
                     {

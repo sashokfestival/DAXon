@@ -105,7 +105,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException err)
             {
-                XPathException xe = new XPathException("First argument to parse-xml-fragment() is not a well-formed and namespace-well-formed XML fragment. XML parser reported: " + err.GetMessage(), "FODC0006");
+                XPathException xe = new XPathException("First argument to parse-xml-fragment() is not a well-formed and namespace-well-formed XML fragment. XML parser reported: " + err.Message, "FODC0006");
                 xe.MaybeSetContext(context);
                 throw xe;
             }

@@ -36,7 +36,7 @@ namespace OutSmart.DAXon.Expressions.Elaboration
                 SequenceCollector seq = controller.AllocateSequenceOutputter(1);
                 ITailCall tc = pushEval.ProcessLeavingTail(new ComplexContentOutputter(seq), context);
                 Expression.DispatchTailCall(tc);
-                seq.Dispose();
+                seq.Close();
                 ISequenceIterator result = seq.Iterate();
                 seq.Reset();
                 return result;
@@ -57,7 +57,7 @@ namespace OutSmart.DAXon.Expressions.Elaboration
                 SequenceCollector seq = controller.AllocateSequenceOutputter(1);
                 ITailCall tc = pushEval.ProcessLeavingTail(new ComplexContentOutputter(seq), context);
                 Expression.DispatchTailCall(tc);
-                seq.Dispose();
+                seq.Close();
                 IItem result = seq.FirstItem;
                 seq.Reset();
                 return result;

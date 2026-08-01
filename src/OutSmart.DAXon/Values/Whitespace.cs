@@ -569,7 +569,7 @@ namespace OutSmart.DAXon.Values
             CONTENT
         }
 
-        // Phase 5: ITokenHandler interface->delegate.
+        // ITokenHandler interface->delegate.
         private delegate void ITokenHandler(int start, int end, TokenCategory category);
 
         /// <summary>

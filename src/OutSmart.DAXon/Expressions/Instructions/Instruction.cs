@@ -21,26 +21,16 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
     public abstract class Instruction : Expression
     {
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override int ImplementationMethod => Expression.PROCESS_METHOD;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual int InstructionNameCode => -1;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override string ExpressionName
         {
             get
@@ -57,48 +47,27 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override int NetCost => 20;
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public Instruction()
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override bool IsInstruction()
         {
             return true;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return Types.Type.ITEM_TYPE;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public abstract override IEnumerable<Operand> Operands();
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             try
@@ -106,23 +75,20 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 ITailCall tc = MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context);
                 DispatchTailCall(tc);
             }
-            catch (XPathException err)
+            catch (XPathException err) when (!(err is XPathException.StackOverflow))
             {
+                // Filtered: this sits under EVERY instruction, so on a recursive template it is
+                // one catch-and-rethrow per level - the most expensive shape there is for a
+                // stack-guard abort, which must reach the host instead of being re-decorated.
                 throw err.MaybeWithFailingExpression(this).MaybeWithContext(context);
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual ILocation GetSourceLocator()
         {
             return GetLocation();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected static XPathException DynamicError(ILocation loc, XPathException error, IXPathContext context)
         {
             if (error is TerminationException)
@@ -133,9 +99,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return error.MaybeWithLocation(loc).MaybeWithContext(context);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public static ParameterSet AssembleParams(IXPathContext context, WithParam[] actualParams)
         {
             if (actualParams == null || actualParams.Length == 0)
@@ -152,9 +115,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return @params;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public static ParameterSet AssembleTunnelParams(IXPathContext context, WithParam[] actualParams)
         {
             ParameterSet existingParams = context.GetTunnelParameters();
@@ -177,9 +137,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return newParams;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
@@ -198,25 +155,16 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool MayCreateNewNodes()
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool AlwaysCreatesNewNodes()
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected bool SomeOperandCreatesNewNodes()
         {
             foreach (Operand o in Operands())
@@ -232,24 +180,14 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context); //        int m = getImplementationMethod();
             //        if ((m & EVALUATE_METHOD) != 0) {
             //            throw new AssertionError(
             //                    "evaluateItem() is not implemented in the subclass " + getClass());
-            //        } else if ((m & ITERATE_METHOD) != 0) {
-            //            return iterate(context).next();
-            //        } else {
-            //        }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             Elaborator elaborator = MakeElaborator();
@@ -264,21 +202,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
 
             return elaborator.ElaborateForPull().Iterate(context); //        int m = getImplementationMethod();
-            //        if ((m & EVALUATE_METHOD) != 0) {
-            //            IItem item = evaluateItem(context);
-            //            if (item == null) {
             //                return EmptyIterator.emptyIterator();
-            //            } else {
-            //            }
-            //        } else if ((m & ITERATE_METHOD) != 0) {
-            //            throw new AssertionError("iterate() is not implemented in the subclass " + getClass());
-            //        } else {
-            //        }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override UnicodeString EvaluateAsString(IXPathContext context)
         {
             IItem item = EvaluateItem(context);
@@ -292,9 +218,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool IsXSLT()
         {
             return GetPackageData().IsXSLT();

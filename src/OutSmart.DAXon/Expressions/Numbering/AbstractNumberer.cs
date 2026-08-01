@@ -26,9 +26,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
         public static int[] lowerCaseAlphabet = StringTool.Expand(new Twine8("0123456789abcdefghijklmnopqrstuvwxyz"));
         public static int[] upperCaseAlphabet = StringTool.Expand(new Twine8("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly int[] westernDigits = new int[]
         {
@@ -43,65 +40,29 @@ namespace OutSmart.DAXon.Expressions.Numbering
             '8',
             '9'
         };
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string latinUpper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string latinLower = "abcdefghijklmnopqrstuvwxyz";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string greekUpper = "ΑΒΓΔΕΖΗΘΙΚ" + "ΛΜΝΞΟΠΡ\u03a2ΣΤ" + "ΥΦΧΨΩ";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string greekLower = "αβγδεζηθικ" + "λμνξοπρςστ" + "υφχψω";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string cyrillicUpper = "АБВГДЕЖЗИ" + "КЛМНОПРССУ" + "ФХЦЧШЩЫЭЮЯ";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string cyrillicLower = "абвгдежзи" + "клмнопрссу" + "фхцчшщыэюя";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string hebrew = "אבגדהוזחטיכל" + "מנסעפצקרשת";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string hiraganaA = "あいうえおかきくけこ" + "さしすせそたちつてと" + "なにぬねのはひふへほ" + "まみむめもやゆよらり" + "るれろわをん";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string katakanaA = "アイウエオカキクケコ" + "サシスセソタチツテト" + "ナニヌネノハヒフヘホ" + "マミムメモヤユヨラリ" + "ルレロワヲン";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string hiraganaI = "いろはにほへとちりぬ" + "るをわかよたれそつね" + "ならむうゐのおくやま" + "けふこえてあさきゆめ" + "みしゑひもせす";
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected static readonly string katakanaI = "イロハニホヘトチリヌ" + "ルヲワカヨタレソツネ" + "ナラムウヰノオクヤマ" + "ケフコエテアサキユメ" + "ミシヱヒモセス";
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         private static readonly string[] romanThousands = new[]
         {
@@ -116,9 +77,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             "mmmmmmmm",
             "mmmmmmmmm"
         };
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         private static readonly string[] romanHundreds = new[]
         {
@@ -133,9 +91,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             "dccc",
             "cm"
         };
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         private static readonly string[] romanTens = new[]
         {
@@ -150,9 +105,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             "lxxx",
             "xc"
         };
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         private static readonly string[] romanUnits = new[]
         {
@@ -168,9 +120,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             "ix"
         };
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         // no action (not used at top level)
         private static readonly int[] kanjiDigits = new[]
@@ -189,9 +138,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
         private string country;
         private string language;
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         public virtual string Country
         {
             get => country; set
@@ -199,38 +145,26 @@ namespace OutSmart.DAXon.Expressions.Numbering
                 this.country = value;
             }
         }
-        public virtual Locale DefaultedLocale()
+        public virtual global::System.Globalization.CultureInfo DefaultedLocale()
         {
             return null;
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         public virtual void SetLanguage(string language)
         {
             this.language = language;
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         public virtual string GetLanguage()
         {
             return language;
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         public string Format(long number, UnicodeString picture, int groupSize, string groupSeparator, string letterValue, string cardinal, string ordinal)
         {
             return Format(number, picture, new RegularGroupFormatter(groupSize, groupSeparator, EmptyUnicodeString.GetInstance()), letterValue, cardinal, ordinal);
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         public virtual string Format(long number, UnicodeString picture, NumericGroupFormatter numGroupFormatter, string letterValue, string cardinal, string ordinal)
         {
             int[] digits = westernDigits;
@@ -343,7 +277,7 @@ namespace OutSmart.DAXon.Expressions.Numbering
 
                     if (letterValue == null || (letterValue.Length == 0) || letterValue.Equals("traditional"))
                     {
-                        return ToRoman(number).ToUpperCase();
+                        return ToRoman(number).ToUpperInvariant();
                     }
                     else
                     {
@@ -632,17 +566,11 @@ namespace OutSmart.DAXon.Expressions.Numbering
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected virtual string OrdinalSuffix(string ordinalParam, long number)
         {
             return "";
         }
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected virtual void AlphaDefault(long number, char formchar, StringBuilder sb)
         {
@@ -658,9 +586,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             sb.Append(ToAlpha(number, min, max));
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected virtual string ToAlpha(long number, int min, int max)
         {
@@ -670,20 +595,26 @@ namespace OutSmart.DAXon.Expressions.Numbering
             }
 
             int range = max - min + 1;
-            char last = (char)(((number - 1) % range) + min);
-            if (number > range)
+            // Iterative: the recursion was linear in `number` when range == 1 (format token 'z',
+            // whose contiguous letter range is just {z}), so format-integer(1000000,'z') overflowed
+            // the stack with an uncatchable SOE. Digits emerge least-significant first; reverse once.
+            StringBuilder sb = new StringBuilder();
+            while (number > 0)
             {
-                return ToAlpha((number - 1) / range, min, max) + last;
+                sb.Append((char)(((number - 1) % range) + min));
+                number = (number - 1) / range;
+                // Only the range==1 case reaches four digits; the deadline then bounds an output
+                // that would otherwise run to a billion characters. Common runs (log depth) never
+                // trip this, so it costs the ordinary format-integer nothing.
+                if ((sb.Length & 0xfff) == 0)
+                {
+                    OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
+                }
             }
-            else
-            {
-                return "" + last;
-            }
+
+            return Reversed(sb);
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         protected virtual string ToAlphaSequence(long number, string alphabet)
         {
@@ -692,21 +623,30 @@ namespace OutSmart.DAXon.Expressions.Numbering
                 return "" + number;
             }
 
+            // Iterative, for the same stack-overflow reason as ToAlpha: a one-character alphabet
+            // makes the recursion linear in `number`.
             int range = alphabet.Length;
-            char last = alphabet[(int)((number - 1) % range)];
-            if (number > range)
+            StringBuilder sb = new StringBuilder();
+            while (number > 0)
             {
-                return ToAlphaSequence((number - 1) / range, alphabet) + last;
+                sb.Append(alphabet[(int)((number - 1) % range)]);
+                number = (number - 1) / range;
             }
-            else
-            {
-                return "" + last;
-            }
+
+            return Reversed(sb);
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
+        private static string Reversed(StringBuilder sb)
+        {
+            char[] a = new char[sb.Length];
+            for (int i = 0; i < a.Length; i++)
+            {
+                a[i] = sb[a.Length - 1 - i];
+            }
+
+            return new string(a);
+        }
+
         /*if (formchar == 'w')*/
         private string ToRadical(long number, int[] digits, int pictureLength, NumericGroupFormatter numGroupFormatter)
         {
@@ -719,9 +659,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             return numGroupFormatter.Format(temp);
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public static string ConvertDigitSystem(long number, int[] digits, int requiredLength)
         {
@@ -747,9 +684,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             return temp.ToString();
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public static string ToRoman(long n)
         {
@@ -760,9 +694,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
 
             return romanThousands[(int)n / 1000] + romanHundreds[((int)n / 100) % 10] + romanTens[((int)n / 10) % 10] + romanUnits[(int)n % 10];
         }
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public virtual string ToJapanese(long number)
         {
@@ -783,9 +714,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         private static void ToJapanese(int nr, StringBuilder fsb, bool isInitial)
         {
@@ -822,14 +750,8 @@ namespace OutSmart.DAXon.Expressions.Numbering
                 ToJapanese(nr % 1000, fsb, false);
             }
         }
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public abstract string ToWords(string cardinal, long number);
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public virtual string ToWords(string cardinal, long number, int wordCase)
         {
@@ -846,41 +768,26 @@ namespace OutSmart.DAXon.Expressions.Numbering
             switch (wordCase)
             {
                 case UPPER_CASE:
-                    return s.ToUpperCase();
+                    return s.ToUpperInvariant();
                 case LOWER_CASE:
-                    return s.ToLowerCase();
+                    return s.ToLowerInvariant();
                 default:
                     return s;
             }
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public virtual string Zero()
         {
             return "Zero";
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public abstract string ToOrdinalWords(string ordinalParam, long number, int wordCase);
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public abstract string MonthName(int month, int minWidth, int maxWidth);
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public abstract string DayName(int day, int minWidth, int maxWidth);
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public virtual string HalfDayName(int minutes, int minWidth, int maxWidth)
         {
@@ -929,27 +836,18 @@ namespace OutSmart.DAXon.Expressions.Numbering
             return s;
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public virtual string GetOrdinalSuffixForDateTime(string component)
         {
             return "yes";
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public virtual string GetEraName(int year)
         {
             return year > 0 ? "AD" : "BC";
         }
 
-        /// <summary>
-        /// Set the country used by this numberer (currently used only for names of timezones)
-        /// </summary>
         /*if (formchar == 'w')*/
         public virtual string GetCalendarName(string code)
         {

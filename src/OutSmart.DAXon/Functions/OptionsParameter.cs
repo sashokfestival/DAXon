@@ -12,7 +12,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -48,28 +47,28 @@ namespace OutSmart.DAXon.Functions
 
         public virtual void AddAllowedOption(string name, SequenceType type)
         {
-            allowedOptions.Put(name, type);
+            allowedOptions[name] = type;
         }
 
         public virtual void AddRequiredOption(string name, SequenceType type)
         {
-            allowedOptions.Put(name, type);
+            allowedOptions[name] = type;
             requiredOptions.Add(name);
         }
 
         public virtual void AddAllowedOption(string name, SequenceType type, IGroundedValue defaultValue)
         {
-            allowedOptions.Put(name, type);
+            allowedOptions[name] = type;
             if (defaultValue != null)
             {
-                defaultValues.Put(name, defaultValue);
+                defaultValues[name] = defaultValue;
             }
         }
 
         public virtual void SetAllowedValues(string name, string errorCode, params string[] values)
         {
             HashSet<string> valueSet = new HashSet<string>(values.ToList());
-            allowedValues.Put(name, valueSet);
+            allowedValues[name] = valueSet;
             errorCodeForDisallowedValue = errorCode;
         }
 
@@ -93,7 +92,7 @@ namespace OutSmart.DAXon.Functions
                 }
             }
 
-            foreach (KeyValuePair<string, SequenceType> allowed in allowedOptions.EntrySet())
+            foreach (KeyValuePair<string, SequenceType> allowed in allowedOptions)
             {
                 string nominalKey = allowed.Key;
                 AtomicValue actualKey;
@@ -135,7 +134,7 @@ namespace OutSmart.DAXon.Functions
                     }
 
                     actual = actual.Materialize();
-                    HashSet<string> permitted = allowedValues.Get(nominalKey);
+                    HashSet<string> permitted = allowedValues.GetOrDefault(nominalKey);
                     if (permitted != null)
                     {
                         if (!(actual is AtomicValue) || !permitted.Contains(((AtomicValue)actual).GetStringValue()))
@@ -151,14 +150,14 @@ namespace OutSmart.DAXon.Functions
                         }
                     }
 
-                    result.Put(nominalKey, actual);
+                    result[nominalKey] = actual;
                 }
                 else
                 {
                     IGroundedValue def = defaultValues.TryGetValue(nominalKey, out var __def) ? __def : null;
                     if (def != null)
                     {
-                        result.Put(nominalKey, def);
+                        result[nominalKey] = def;
                     }
                 }
             }

@@ -26,8 +26,6 @@ using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
@@ -83,15 +81,15 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
             SetValidationAction(validationAction, schemaType);
             this.serializationAttributes = new Dictionary<StructuredQName, Operand>(serializationAttributes.Count);
-            foreach (KeyValuePair<StructuredQName, Expression> entry in serializationAttributes.EntrySet())
+            foreach (KeyValuePair<StructuredQName, Expression> entry in serializationAttributes)
             {
-                this.serializationAttributes.Put(entry.Key, new Operand(this, entry.Value, OperandRole.SINGLE_ATOMIC));
+                this.serializationAttributes[entry.Key] = new Operand(this, entry.Value, OperandRole.SINGLE_ATOMIC);
             }
 
             this.characterMapIndex = characterMapIndex;
 
             //this.nsResolver = nsResolver;
-            foreach (Expression e in serializationAttributes.Values())
+            foreach (Expression e in serializationAttributes.Values)
             {
                 AdoptChildExpression(e);
             }
@@ -203,9 +201,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
         public override Expression Copy(RebindingMap rebindings)
         {
             Dictionary<StructuredQName, Expression> map = new Dictionary<StructuredQName, Expression>();
-            foreach (KeyValuePair<StructuredQName, Operand> entry in serializationAttributes.EntrySet())
+            foreach (KeyValuePair<StructuredQName, Operand> entry in serializationAttributes)
             {
-                map.Put(entry.Key, entry.Value.GetChildExpression().Copy(rebindings));
+                map[entry.Key] = entry.Value.GetChildExpression().Copy(rebindings);
             }
 
             ResultDocument r = new ResultDocument(globalProperties, localProperties, Href == null ? null : Href.Copy(rebindings), FormatExpression == null ? null : FormatExpression.Copy(rebindings), GetValidationAction(), GetSchemaType(), map, characterMapIndex);
@@ -235,7 +233,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 list.Add(formatOp);
             }
 
-            list.AddAll(serializationAttributes.Values());
+            list.AddRange(serializationAttributes.Values);
             return list;
         }
 
@@ -272,7 +270,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             {
                 try
                 {
-                    @out.Dispose();
+                    @out.Close();
                 }
                 catch (XPathException e)
                 {
@@ -422,13 +420,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     throw new XPathException("Exception thrown by output resolver", err);
                 }
             }
-            catch (TransformerException e)
+            catch (XPathException e)
             {
                 throw XPathException.MakeXPathException(e);
             }
         }
 
-        public static void TraceDestination(IXPathContext context, Result result)
+        public static void TraceDestination(IXPathContext context, IResultTarget result)
         {
             Configuration config = context.GetConfiguration();
             bool timing = config.IsTiming();
@@ -443,7 +441,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                     else
                     {
-                        dest = result.GetType().GetName();
+                        dest = result.GetType().FullName;
                     }
                 }
 
@@ -463,7 +461,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
                 DocumentKey documentKey = new DocumentKey(uri);
 
-                lock (controller)
+                lock (controller.syncLock)
                 {
                     if (!controller.CheckUniqueOutputDestination(documentKey))
                     {
@@ -541,9 +539,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
 
             // Now add the properties that were specified as AVTs
-            if (!serializationAttributes.IsEmpty())
+            if (serializationAttributes.Count > 0)
             {
-                foreach (KeyValuePair<StructuredQName, Operand> entry in serializationAttributes.EntrySet())
+                foreach (KeyValuePair<StructuredQName, Operand> entry in serializationAttributes)
                 {
                     string value = entry.Value.GetChildExpression().EvaluateAsString(context).ToString();
                     string lname = entry.Key.GetLocalPart();
@@ -616,11 +614,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
                         if (value.Equals("xml") || value.Equals("html") || value.Equals("text") || value.Equals("xhtml") || value.Equals("json") || value.Equals("adaptive") || prevalidated || value.StartsWith("{", StringComparison.Ordinal))
                         {
-                            details.SetProperty(OutputKeys.METHOD, value);
+                            details.SetProperty(DAXonOutputKeys.METHOD, value);
                         }
                         else if (value.StartsWith("Q{", StringComparison.Ordinal))
                         {
-                            details.SetProperty(OutputKeys.METHOD, value.Substring(1));
+                            details.SetProperty(DAXonOutputKeys.METHOD, value.Substring(1));
                         }
                         else
                         {
@@ -641,11 +639,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
                                         throw new XPathException("Namespace prefix '" + prefix + "' has not been declared").WithErrorCode("SEPM0016").AsStaticError();
                                     }
 
-                                    details.SetProperty(OutputKeys.METHOD, '{' + muri.ToString() + '}' + parts[1]);
+                                    details.SetProperty(DAXonOutputKeys.METHOD, '{' + muri.ToString() + '}' + parts[1]);
                                 }
                                 else
                                 {
-                                    details.SetProperty(OutputKeys.METHOD, value);
+                                    details.SetProperty(DAXonOutputKeys.METHOD, value);
                                 }
                             }
                             catch (QNameException e)
@@ -770,7 +768,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 FormatExpression.Export(@out);
             }
 
-            foreach (KeyValuePair<StructuredQName, Operand> p in serializationAttributes.EntrySet())
+            foreach (KeyValuePair<StructuredQName, Operand> p in serializationAttributes)
             {
                 StructuredQName name = p.Key;
                 Expression value = p.Value.GetChildExpression();
@@ -794,7 +792,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     val = ExpressionPresenter.JsEscape(val);
                 }
 
-                if (key.Equals(DAXonOutputKeys.USE_CHARACTER_MAPS) || key.Equals(OutputKeys.METHOD))
+                if (key.Equals(DAXonOutputKeys.USE_CHARACTER_MAPS) || key.Equals(DAXonOutputKeys.METHOD))
                 {
 
                     // TODO: other QName-valued fields such as cdata-section-elements??
@@ -802,7 +800,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 }
 
                 string adjustedKey = key.StartsWith("{", StringComparison.Ordinal) ? "Q" + key : key;
-                writer.Append(adjustedKey).Append("=").Append(val).Append("\n");
+                writer.Append(adjustedKey).Append('=').Append(val).Append("\n");
             }
 
             return writer.ToString();

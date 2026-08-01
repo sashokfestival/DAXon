@@ -20,18 +20,21 @@ namespace OutSmart.DAXon.Types
 {
     public class JavaExternalObjectType : ExternalObjectType
     {
-        private static readonly Dictionary<System.Type, JavaExternalObjectType> cache = new Dictionary<System.Type, JavaExternalObjectType>(20);
+        // Concurrent: shared across every Processor in the process; two threads first wrapping the
+        // same (or different) CLR types at once must not race a plain Dictionary's resize.
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<System.Type, JavaExternalObjectType> cache
+            = new System.Collections.Concurrent.ConcurrentDictionary<System.Type, JavaExternalObjectType>();
         protected System.Type javaClass;
 
-        public override string Name => ClassNameToQName(javaClass.GetName()).GetLocalPart();
+        public override string Name => ClassNameToQName(javaClass.FullName).GetLocalPart();
 
         public override string TargetNamespace => NamespaceConstant.JAVA_TYPE;
 
-        public override StructuredQName TypeName => ClassNameToQName(javaClass.GetName());
+        public override StructuredQName TypeName => ClassNameToQName(javaClass.FullName);
 
         public virtual System.Type JavaClass => javaClass;
 
-        public virtual string DisplayName => "java-type:" + javaClass.GetName();
+        public virtual string DisplayName => "java-type:" + javaClass.FullName;
         private JavaExternalObjectType(System.Type javaClass)
         {
             this.javaClass = javaClass;
@@ -39,7 +42,7 @@ namespace OutSmart.DAXon.Types
 
         public static JavaExternalObjectType Of(System.Type javaClass)
         {
-            return cache.ComputeIfAbsent(javaClass, k => new JavaExternalObjectType(k));
+            return cache.GetOrAdd(javaClass, k => new JavaExternalObjectType(k));
         }
 
         public override ItemType GetPrimitiveItemType()
@@ -85,36 +88,24 @@ namespace OutSmart.DAXon.Types
 
         public override string ToString()
         {
-            return ClassNameToQName(javaClass.GetName()).EQName;
+            return ClassNameToQName(javaClass.FullName).EQName;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override int GetHashCode()
         {
             return javaClass.GetHashCode();
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public override bool Equals(object obj)
         {
             return obj is JavaExternalObjectType && javaClass == ((JavaExternalObjectType)obj).javaClass;
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public static string ClassNameToLocalName(string className)
         {
             return className.Replace('$', '-').Replace("[", "_-");
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         public static string LocalNameToClassName(string className)
         {
             StringBuilder fsb = new StringBuilder(className.Length);
@@ -144,9 +135,6 @@ namespace OutSmart.DAXon.Types
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Returns a hash code value for the object.
-        /// </summary>
         /// <summary>
         /// Static method to get the QName corresponding to a Java class name
         /// </summary>

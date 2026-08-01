@@ -147,11 +147,9 @@ namespace OutSmart.DAXon.Xslt
                 {
                     case "strip":
 
-                        //setInputTypeAnnotations(ANNOTATION_STRIP);
                         break;
                     case "preserve":
 
-                        //setInputTypeAnnotations(ANNOTATION_PRESERVE);
                         break;
                     case "unspecified":
 

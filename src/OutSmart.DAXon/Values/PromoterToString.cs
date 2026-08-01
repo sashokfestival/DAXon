@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 
-// Phase 7.8d r19: stub PromoterToX classes (TypeChecker.cs references unqualified).
+// Stub PromoterToX classes (TypeChecker.cs references unqualified).
 // Java source has these as nested in Converter; we expose them in OutSmart.DAXon.Values
 // since TypeChecker has `using OutSmart.DAXon.Values`.
 namespace OutSmart.DAXon.Values

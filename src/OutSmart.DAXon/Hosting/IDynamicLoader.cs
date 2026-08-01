@@ -19,10 +19,9 @@ namespace OutSmart.DAXon.Lib
 {
     public interface IIDynamicLoader
     {
-        void SetClassLoader(ClassLoader classLoader);
-        System.Type GetType(string className, Logger traceOut, ClassLoader classLoader);
-        object GetInstance(string className, ClassLoader classLoader);
-        object GetInstance(string className, Logger traceOut, ClassLoader classLoader);
+        System.Type GetType(string className, Logger traceOut);
+        object GetInstance(string className);
+        object GetInstance(string className, Logger traceOut);
         System.IO.Stream GetResourceAsStream(string name);
     }
 }

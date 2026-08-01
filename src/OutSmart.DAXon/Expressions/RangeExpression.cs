@@ -12,7 +12,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Numerics;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,15 +35,6 @@ namespace OutSmart.DAXon.Expressions
 
         public virtual Expression EndExpression => end.GetChildExpression();
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override IntegerValue[] IntegerBounds
         {
             get
@@ -68,26 +58,8 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override string ExpressionName => "range";
         public RangeExpression(Expression start, Expression end)
         {
@@ -97,9 +69,6 @@ namespace OutSmart.DAXon.Expressions
             AdoptChildExpression(end);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             start.TypeCheck(visitor, contextInfo);
@@ -113,9 +82,6 @@ namespace OutSmart.DAXon.Expressions
             return MakeConstantRange();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             start.Optimize(visitor, contextInfo);
@@ -123,17 +89,11 @@ namespace OutSmart.DAXon.Expressions
             return MakeConstantRange();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             return OperandList(start, end);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private Expression MakeConstantRange()
         {
             if (StartExpression is Literal && EndExpression is Literal)
@@ -155,7 +115,7 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else
                     {
-                        if (System.Math.Abs((i2 - i0)) > int.MaxValue)
+                        if (IntegerRange.CountExceedsLimit(i0, 1, i2))
                         {
                             throw new XPathException("Maximum length of sequence in Saxon is " + int.MaxValue, "XPDY0130");
                         }
@@ -193,9 +153,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Get the data type of the items returned
         /// </summary>
         public override ItemType GetItemType()
@@ -204,9 +161,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Get the data type of the items returned
         /// </summary>
         public override UType GetStaticUType(UType contextItemType)
@@ -214,29 +168,11 @@ namespace OutSmart.DAXon.Expressions
             return UType.DECIMAL;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             RangeExpression exp = new RangeExpression(StartExpression.Copy(rebindings), EndExpression.Copy(rebindings));
@@ -244,33 +180,12 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
             return p | StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             if (other is RangeExpression && HasCompatibleStaticContext((Expression)other))
@@ -286,69 +201,21 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return StartExpression.GetHashCode() ^ (EndExpression.GetHashCode() << 7);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToString()
         {
             return StartExpression.ToString() + " to " + EndExpression.ToString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToShortString()
         {
             return StartExpression.ToShortString() + " to " + EndExpression.ToShortString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
 
@@ -359,21 +226,6 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
-        /// <summary>
-        /// Return an iteration over the sequence
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             IntegerValue av1 = (IntegerValue)StartExpression.EvaluateItem(context);
@@ -381,41 +233,11 @@ namespace OutSmart.DAXon.Expressions
             return AscendingRangeIterator.MakeRangeIterator(av1, Int64Value.PLUS_ONE, av3);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
-        /// <summary>
-        /// Return an iteration over the sequence
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new RangeElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the data type of the items returned
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
-        /// <summary>
-        /// Return an iteration over the sequence
-        /// </summary>
         public class RangeElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()

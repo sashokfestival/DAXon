@@ -63,15 +63,9 @@ namespace OutSmart.DAXon.Types
         public override string Description => "xs:numeric";
 
         //    }
-        /// <summary>
-        /// Get the validation status of this component.
-        /// </summary>
         public SchemaValidationStatus ValidationStatus => SchemaValidationStatus.VALIDATED;
 
         //    }
-        /// <summary>
-        /// Get the validation status of this component.
-        /// </summary>
         public int RedefinitionLevel => 0;
 
         private NumericType() : base(new List<IAtomicType> { BuiltInAtomicType.DOUBLE, BuiltInAtomicType.FLOAT, BuiltInAtomicType.DECIMAL })
@@ -180,7 +174,7 @@ namespace OutSmart.DAXon.Types
             }
             catch (FormatException e)
             {
-                return new ValidationFailure(e.GetMessage());
+                return new ValidationFailure(e.Message);
             }
         }
 
@@ -266,27 +260,18 @@ namespace OutSmart.DAXon.Types
         }
 
         //    }
-        /// <summary>
-        /// Get the validation status of this component.
-        /// </summary>
         public override string ToExportString()
         {
             return ToString();
         }
 
         //    }
-        /// <summary>
-        /// Get the validation status of this component.
-        /// </summary>
         public override string ToString()
         {
             return "xs:numeric";
         }
 
         //    }
-        /// <summary>
-        /// Get the validation status of this component.
-        /// </summary>
         public void CheckTypeDerivationIsOK(ISchemaType @base, int block)
         {
         }

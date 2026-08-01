@@ -15,84 +15,32 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Collections
 {
+    // Deliberate triplet with IntHashMap/IntHashSet (C1): same Knuth open-addressing core, kept
+    // as three copies because the empty-slot encoding differs per class — here any int value is
+    // valid, so occupancy needs the explicit _filled[] array. The probe loops sit on hot paths
+    // and must stay monomorphic, without a shared dispatching core.
     public class IntToIntHashMap : IIntToIntMap
     {
-
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private const int NBIT = 30; // NMAX = 2^NBIT
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private const int NMAX = 1 << NBIT; // maximum number of keys mapped
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private readonly double _factor; // 0.0 <= _factor <= 1.0
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int _defaultValue = int.MaxValue;
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int _nmax; // 0 <= _nmax = 2^nbit <= 2^NBIT = NMAX
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int _n; // 0 <= _n <= _nmax <= NMAX
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int _nlo; // _nmax*_factor (_n<=_nlo, if possible)
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int _nhi; //  NMAX*_factor (_n< _nhi, if possible)
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int _shift; // _shift = 1 + NBIT - nbit (see function hash() below)
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int _mask; // _mask = _nmax - 1
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int[] _key; // array[_nmax] of keys
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int[] _value; // array[_nmax] of values
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private bool[] _filled; // _filled[i]==true iff _key[i] is mapped
-        // Phase 7.8d: indexer for `intMap[key]` syntax
+
         public virtual int this[int key]
         {
             get { return Get(key); }
             set { Put(key, value); }
         }
 
-        /// <summary>
-        /// Initializes a map with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public virtual int DefaultValue
         {
             get => _defaultValue; set
@@ -101,32 +49,20 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Initializes a map with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public IntToIntHashMap() : this(8, 0.25)
         {
         }
 
-        /// <summary>
-        /// Initializes a map with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public IntToIntHashMap(int capacity) : this(capacity, 0.25)
         {
         }
 
-        /// <summary>
-        /// Initializes a map with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public IntToIntHashMap(int capacity, double factor)
         {
             _factor = factor;
             SetCapacity(capacity);
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
         public virtual void Clear()
         {
             _n = 0;
@@ -136,34 +72,22 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
         public virtual bool Contains(int key)
         {
             return _filled[IndexOf(key)];
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
         public virtual int Get(int key)
         {
             int i = IndexOf(key);
             return _filled[i] ? _value[i] : _defaultValue;
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
         public virtual int Size()
         {
             return _n;
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
         public virtual bool Remove(int key)
         {
 
@@ -197,9 +121,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
         public virtual void Put(int key, int value)
         {
             int i = IndexOf(key);
@@ -216,17 +137,11 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
         public virtual IIntIterator KeyIterator()
         {
             return new IntToIntHashMapKeyIterator(this);
         }
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
+
         private int Hash(int key)
         {
 
@@ -236,10 +151,6 @@ namespace OutSmart.DAXon.Collections
             return ((1327217885 * key) >> _shift) & _mask;
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private int IndexOf(int key)
         {
             int i = Hash(key);
@@ -256,16 +167,12 @@ namespace OutSmart.DAXon.Collections
             return i;
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private void Grow()
         {
             ++_n;
             if (_n > NMAX)
             {
-                throw new Exception("number of keys mapped exceeds " + NMAX);
+                throw new InvalidOperationException("number of keys mapped exceeds " + NMAX);
             }
 
             if (_nlo < _n && _n <= _nhi)
@@ -274,10 +181,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
         private void SetCapacity(int capacity)
         {
             if (capacity < _n)
@@ -307,8 +210,6 @@ namespace OutSmart.DAXon.Collections
             bool[] filled = _filled;
             _n = 0;
             _key = new int[nmax];
-
-            // semantically equivalent to _value = new V[nmax]
             _value = new int[nmax];
             _filled = new bool[nmax];
             if (key != null)
@@ -323,17 +224,11 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
-        // no-op
+        // Diagnostics only; capped at ~100 entries.
         public override string ToString()
         {
-
-            // For diagnostics
             StringBuilder buffer = new StringBuilder(256);
-            buffer.Append("{");
+            buffer.Append('{');
             IIntIterator keys = KeyIterator();
             int count = 0;
             while (keys.MoveNext())
@@ -348,18 +243,10 @@ namespace OutSmart.DAXon.Collections
                 }
             }
 
-            buffer.SetCharAt(buffer.Length - 1, '}');
+            buffer[buffer.Length - 1] = '}';
             return buffer.ToString();
         }
 
-        /// <summary>
-        /// Clears the map.
-        /// </summary>
-        // private
-        // no-op
-        /// <summary>
-        /// IIterator over keys
-        /// </summary>
         private class IntToIntHashMapKeyIterator : AbstractIntIterator
         {
             private readonly IntToIntHashMap map;

@@ -92,7 +92,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (InvalidCastException e)
             {
-                throw new XPathException("Non-comparable types found while sorting: " + e.GetMessage(), "XPTY0004").AsTypeError();
+                throw new XPathException("Non-comparable types found while sorting: " + e.Message, "XPTY0004").AsTypeError();
             }
 
             List<IItem> outputList = new List<IItem>(inputList.Count);

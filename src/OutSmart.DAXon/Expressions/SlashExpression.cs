@@ -17,7 +17,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -47,9 +46,6 @@ namespace OutSmart.DAXon.Expressions
 
         public override IntegerValue[] IntegerBounds => GetStep().IntegerBounds;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override double Cost
         {
             get
@@ -58,25 +54,13 @@ namespace OutSmart.DAXon.Expressions
                 double lh = GetLhsExpression().Cost + 1;
                 double rh = GetRhsExpression().Cost;
                 double product = lh + factor * rh;
-                return System.Math.Max(product, MAX_COST);
+                return Math.Max(product, MAX_COST);
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public virtual Expression FirstStep
@@ -94,16 +78,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public virtual Expression RemainingSteps
@@ -114,7 +89,7 @@ namespace OutSmart.DAXon.Expressions
                 {
                     IList<Expression> list = new List<Expression>(4);
                     GatherSteps(list);
-                    Expression rem = RebuildSteps(list.SubList(1, list.Count));
+                    Expression rem = RebuildSteps(list.GetRange(1, (list.Count) - (1)));
                     ExpressionTool.CopyLocationInfo(this, rem);
                     return rem;
                 }
@@ -125,16 +100,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public virtual Expression LastStep
@@ -152,16 +118,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public virtual Expression LeadingSteps
@@ -172,7 +129,7 @@ namespace OutSmart.DAXon.Expressions
                 {
                     IList<Expression> list = new List<Expression>(4);
                     GatherSteps(list);
-                    Expression rem = RebuildSteps(list.SubList(0, list.Count - 1));
+                    Expression rem = RebuildSteps(list.GetRange(0, (list.Count - 1) - (0)));
                     ExpressionTool.CopyLocationInfo(this, rem);
                     return rem;
                 }
@@ -183,16 +140,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public override string StreamerName => "ForEach";
@@ -240,9 +188,6 @@ namespace OutSmart.DAXon.Expressions
             return GetStep().GetStaticUType(Start.GetStaticUType(contextItemType));
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Lhs.TypeCheck(visitor, contextInfo);
@@ -321,9 +266,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public virtual SlashExpression SimplifyDescendantPath(IStaticContext env)
         {
             Expression underlyingStep = GetStep();
@@ -402,7 +344,7 @@ namespace OutSmart.DAXon.Expressions
                     underlyingStep = ((FilterExpression)underlyingStep).GetSelectExpression();
                 }
 
-                while (!filters.IsEmpty())
+                while (filters.Count > 0)
                 {
                     newStep = new FilterExpression(newStep, filters.Pop());
                     ExpressionTool.CopyLocationInfo(GetStep(), newStep);
@@ -439,9 +381,6 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Configuration config = visitor.GetConfiguration();
@@ -564,9 +503,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public virtual SlashExpression TryToMakeAbsolute()
         {
             Expression first = FirstStep;
@@ -619,9 +555,6 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public virtual Expression TryToMakeSorted(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
 
@@ -666,9 +599,6 @@ namespace OutSmart.DAXon.Expressions
             return k;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Unordered(bool retainAllNodes, bool forStreaming)
         {
             if ((GetStep().Dependencies & (StaticProperty.DEPENDS_ON_POSITION | StaticProperty.DEPENDS_ON_LAST)) == 0)
@@ -680,18 +610,12 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             PathMap.PathMapNodeSet target = Start.AddToPathMap(pathMap, pathMapNodeSet);
             return GetStep().AddToPathMap(pathMap, target);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             Expression exp = ExpressionTool.MakePathExpression(Start.Copy(rebindings), GetStep().Copy(rebindings));
@@ -704,9 +628,6 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int startProperties = Start.GetSpecialProperties();
@@ -768,9 +689,6 @@ namespace OutSmart.DAXon.Expressions
             return p;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         private bool TestNaturallySorted(int startProperties, int stepProperties)
         {
 
@@ -818,9 +736,6 @@ namespace OutSmart.DAXon.Expressions
             return ((startProperties & StaticProperty.PEER_NODESET) != 0) && ((stepProperties & StaticProperty.SUBTREE_NODESET) != 0);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
         private bool TestNaturallyReverseSorted()
         {
@@ -841,13 +756,7 @@ namespace OutSmart.DAXon.Expressions
             return !Cardinality.AllowsMany(GetStep().GetCardinality()) && (Start is AxisExpression) && !AxisInfo.isForwards[((AxisExpression)Start).Axis];
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         protected override int ComputeCardinality()
         {
             int c1 = Start.GetCardinality();
@@ -855,13 +764,7 @@ namespace OutSmart.DAXon.Expressions
             return Cardinality.Multiply(c1, c2);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public override Patterns.Pattern ToPattern(Configuration config)
         {
             Expression head = LeadingSteps;
@@ -929,37 +832,19 @@ namespace OutSmart.DAXon.Expressions
             return new AncestorQualifiedPattern(tailPattern, headPattern, axis);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public virtual bool IsContextFree()
         {
             return contextFree;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         public virtual void SetContextFree(bool free)
         {
             this.contextFree = free;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
         /// <summary>
         /// Is this expression the same as another expression?
         /// </summary>
@@ -974,60 +859,28 @@ namespace OutSmart.DAXon.Expressions
             return Start.IsEqual(p.Start) && GetStep().IsEqual(p.GetStep());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return "SlashExpression".GetHashCode() + Start.GetHashCode() + GetStep().GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return MakeElaborator().ElaborateForPull().Iterate(context); //        // This class delivers the result of the path expression in unsorted order,
             //        // without removal of duplicates. If sorting and deduplication are needed,
             //        // this is achieved by wrapping the path expression in a DocumentSorter
             //
-            //        Expression step = getStep();
-            //        if (contextFree && step instanceof AxisExpression) {
             //            // See bug 4730: the step might have been changed to something else
             //            return MappingIterator.map(
             //                    getStart().iterate(context),
             //                    item -> ((AxisExpression) step).iterate((NodeInfo)item));
             //        }
             //
-            //        IXPathContext context2 = context.newMinorContext();
-            //        context2.trackFocus(getStart().iterate(context));
-            //        return new ContextMappingIterator(c1 -> getStep().iterate(c1), context2);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public override void Export(ExpressionPresenter destination)
@@ -1047,16 +900,7 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public override string ToString()
@@ -1064,16 +908,7 @@ namespace OutSmart.DAXon.Expressions
             return ExpressionTool.Parenthesize(Start) + "/" + ExpressionTool.Parenthesize(GetStep());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public override string ToShortString()
@@ -1081,16 +916,7 @@ namespace OutSmart.DAXon.Expressions
             return ExpressionTool.ParenthesizeShort(Start) + "/" + ExpressionTool.ParenthesizeShort(GetStep());
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         private void GatherSteps(IList<Expression> list)
@@ -1114,16 +940,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         private Expression RebuildSteps(IList<Expression> list)
@@ -1134,20 +951,11 @@ namespace OutSmart.DAXon.Expressions
             }
             else
             {
-                return new SlashExpression(list[0].Copy(new RebindingMap()), RebuildSteps(list.SubList(1, list.Count)));
+                return new SlashExpression(list[0].Copy(new RebindingMap()), RebuildSteps(list.GetRange(1, (list.Count) - (1))));
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         public virtual bool IsAbsolute()
@@ -1155,16 +963,7 @@ namespace OutSmart.DAXon.Expressions
             return FirstStep.GetItemType().PrimitiveType == Types.Type.DOCUMENT;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         // sic
@@ -1173,16 +972,7 @@ namespace OutSmart.DAXon.Expressions
             return new SlashExprElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         //}
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         //
         //
         // sic

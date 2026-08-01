@@ -17,7 +17,6 @@ using OutSmart.DAXon.Trees.Utilities;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -35,6 +34,7 @@ namespace OutSmart.DAXon.Transformation
 {
     public class SimpleMode : Mode
     {
+        private readonly object syncLock = new object();
         protected readonly RuleChain genericRuleChain = new RuleChain();
         // Real template rules registered (hasRules is also true for a merely DECLARED mode)
         private int templateRuleCount = 0;
@@ -63,9 +63,6 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual string Label => IsUnnamedMode() ? "the unnamed mode" : "mode " + modeName.DisplayName;
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public override int MaxPrecedence
         {
             get
@@ -90,9 +87,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public override int MaxRank => highestRank;
         public SimpleMode(StructuredQName modeName) : base(modeName)
         {
@@ -113,7 +107,7 @@ namespace OutSmart.DAXon.Transformation
         {
             bool failOnMultipleMatch = false;
             bool warningOnMultipleMatch = true;
-            foreach (KeyValuePair<string, string> entry in ActivePart.explicitPropertyValues.EntrySet())
+            foreach (KeyValuePair<string, string> entry in ActivePart.explicitPropertyValues)
             {
                 string prop = entry.Key;
                 string value = entry.Value;
@@ -167,7 +161,7 @@ namespace OutSmart.DAXon.Transformation
                                 break;
                         }
 
-                        if ("yes".Equals(explicitPropertyValues.Get("warning-on-no-match")))
+                        if ("yes".Equals(explicitPropertyValues.GetOrDefault("warning-on-no-match")))
                         {
                             @base = new RuleSetWithWarnings(@base);
                         }
@@ -189,7 +183,7 @@ namespace OutSmart.DAXon.Transformation
                         HashSet<Accumulator> accumulators = new HashSet<Accumulator>();
                         if (!(value.Length == 0))
                         {
-                            string[] tokens = value.Split("[ \t\r\n]+");
+                            string[] tokens = value.SplitRegex("[ \t\r\n]+");
                             foreach (string eqname in tokens)
                             {
                                 Accumulator acc = registry.GetAccumulator(StructuredQName.FromEQName(eqname));
@@ -235,18 +229,18 @@ namespace OutSmart.DAXon.Transformation
             {
                 if (p < precedence)
                 {
-                    explicitPropertyPrecedences.Put(name, precedence);
-                    explicitPropertyValues.Put(name, value);
+                    explicitPropertyPrecedences[name] = precedence;
+                    explicitPropertyValues[name] = value;
                 }
                 else if (p == precedence)
                 {
-                    string v = explicitPropertyValues.Get(name);
+                    string v = explicitPropertyValues.GetOrDefault(name);
                     if (v != null & !v.Equals(value))
                     {
 
                         // We don't throw an exception, because the conflict is an error only if this
                         // is the highest-precedence declaration of this mode
-                        explicitPropertyValues.Put(name, "##conflict##");
+                        explicitPropertyValues.PutAndGetPrevious(name, "##conflict##");
                     }
                 }
                 else
@@ -255,11 +249,11 @@ namespace OutSmart.DAXon.Transformation
             }
             else
             {
-                explicitPropertyPrecedences.Put(name, precedence);
-                explicitPropertyValues.Put(name, value);
+                explicitPropertyPrecedences[name] = precedence;
+                explicitPropertyValues[name] = value;
             }
 
-            string typed = explicitPropertyValues.Get("typed");
+            string typed = explicitPropertyValues.GetOrDefault("typed");
             mustBeTyped = "yes".Equals(typed) || "strict".Equals(typed) || "lax".Equals(typed);
             mustBeUntyped = "no".Equals(typed);
         }
@@ -308,8 +302,6 @@ namespace OutSmart.DAXon.Transformation
             //        int sequence;
             //        if (mostRecentRule == null) {
             //            sequence = 0;
-            //        } else {
-            //        }
             int minImportPrecedence = module.MinImportPrecedence;
             Rule newRule = MakeRule(pattern, action, precedence, minImportPrecedence, priority, position, part);
             if (pattern is NodeTestPattern)
@@ -456,7 +448,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual void AllocatePatternSlots(int slots)
         {
-            stackFrameSlotsNeeded = System.Math.Max(stackFrameSlotsNeeded, slots);
+            stackFrameSlotsNeeded = Math.Max(stackFrameSlotsNeeded, slots);
         }
 
         public override Rule GetRule(IItem item, IXPathContext context)
@@ -524,7 +516,15 @@ namespace OutSmart.DAXon.Transformation
         // the full search every time. Compared by reference only; never returned to a caller.
         private static readonly Rule NotMemoizable = new SentinelRule();
 
-        private volatile ConcurrentDictionary<int, Rule> elementRuleMemo;
+        // Bounded (round BG-P3): the memo lives on the Mode, i.e. on the compiled stylesheet a host
+        // keeps for years, and it used to grow per distinct element fingerprint with no cap - a
+        // workload whose element names encode data walked it toward the NamePool's own ceiling.
+        // 1024 covers any real stylesheet's element vocabulary outright (hits stay lock-free CD
+        // reads, same as before); only generated-name inputs ever evict, and for those a re-search
+        // after eviction is the price of boundedness. Per-Mode deliberately, not static: the memo's
+        // content is meaningless outside its owning mode's rule chains.
+        private const int ElementRuleMemoCapacity = 1024;
+        private volatile Internal.Caching.ClockCache<int, Rule> elementRuleMemo;
         private volatile int elementMemoState;   // 0 = not yet decided, 1 = enabled, 2 = disabled
 
         // The memo can help only if the chains searched for EVERY element (the unnamed-element and generic
@@ -537,13 +537,13 @@ namespace OutSmart.DAXon.Transformation
                 return s == 1;
             }
 
-            lock (this)
+            lock (syncLock)
             {
                 if (elementMemoState == 0)
                 {
                     if (ChainAllUnconditional(unnamedElementRuleChain) && ChainAllUnconditional(genericRuleChain))
                     {
-                        elementRuleMemo = new ConcurrentDictionary<int, Rule>();
+                        elementRuleMemo = new Internal.Caching.ClockCache<int, Rule>(ElementRuleMemoCapacity);
                         elementMemoState = 1;
                     }
                     else
@@ -601,7 +601,7 @@ namespace OutSmart.DAXon.Transformation
             if (nodeKind == Types.Type.ELEMENT && node.HasFingerprint() && ElementMemoEnabled())
             {
                 memoFp = node.Fingerprint;
-                if (elementRuleMemo.TryGetValue(memoFp, out Rule cached))
+                if (elementRuleMemo.TryGet(memoFp, out Rule cached))
                 {
                     if (!ReferenceEquals(cached, NotMemoizable))
                     {
@@ -691,9 +691,10 @@ namespace OutSmart.DAXon.Transformation
 
             if (memoFp >= 0)
             {
-                // first resolution for this element name: cache it if content-independent, else record
-                // that it must always be searched.
-                elementRuleMemo.TryAdd(memoFp, IsFpContentIndependent(memoFp) ? bestRule : NotMemoizable);
+                // first resolution for this element name (or first since eviction): cache it if
+                // content-independent, else record that it must always be searched. Set rather than
+                // TryAdd: racing writers store the same deterministic value, so last-wins is fine.
+                elementRuleMemo.Set(memoFp, IsFpContentIndependent(memoFp) ? bestRule : NotMemoizable);
             }
 
             return bestRule;
@@ -704,19 +705,24 @@ namespace OutSmart.DAXon.Transformation
 
             // If this is the first attempt to match a non-fingerprinted node, build indexes
             // to the rule chains based on StructuredQName rather than fingerprint
-            lock (this)
+            lock (syncLock)
             {
                 if (qNamedElementRuleChains == null)
                 {
-                    qNamedElementRuleChains = new Dictionary<StructuredQName, RuleChain>(namedElementRuleChains.Count);
-                    qNamedAttributeRuleChains = new Dictionary<StructuredQName, RuleChain>(namedAttributeRuleChains.Count);
+                    // Publish only after both indexes are complete: a throw mid-build used to
+                    // leave the guard field assigned, so every later call skipped the rebuild
+                    // and matched against a permanently half-populated index.
+                    var elementChains = new Dictionary<StructuredQName, RuleChain>(namedElementRuleChains.Count);
+                    var attributeChains = new Dictionary<StructuredQName, RuleChain>(namedAttributeRuleChains.Count);
                     NamePool pool = c.GetNamePool();
-                    IndexByQName(pool, namedElementRuleChains, qNamedElementRuleChains);
-                    IndexByQName(pool, namedAttributeRuleChains, qNamedAttributeRuleChains);
+                    IndexByQName(pool, namedElementRuleChains, elementChains);
+                    IndexByQName(pool, namedAttributeRuleChains, attributeChains);
+                    qNamedAttributeRuleChains = attributeChains;
+                    qNamedElementRuleChains = elementChains;
                 }
             }
 
-            return (kind == Types.Type.ELEMENT ? qNamedElementRuleChains : qNamedAttributeRuleChains).Get(new StructuredQName("", uri, local));
+            return (kind == Types.Type.ELEMENT ? qNamedElementRuleChains : qNamedAttributeRuleChains).GetOrDefault(new StructuredQName("", uri, local));
         }
 
         private static void IndexByQName(NamePool pool, IntHashMap<RuleChain> indexByFP, Dictionary<StructuredQName, RuleChain> indexByQN)
@@ -727,7 +733,7 @@ namespace OutSmart.DAXon.Transformation
                 int fp = ii.Current;
                 RuleChain eChain = indexByFP[fp];
                 StructuredQName name = pool.GetStructuredQName(fp);
-                indexByQN.Put(name, eChain);
+                indexByQN[name] = eChain;
             }
         }
 
@@ -810,7 +816,6 @@ namespace OutSmart.DAXon.Transformation
                     if (RecoveryPolicy == RecoveryPolicy.RECOVER_SILENTLY)
                     {
 
-                        //ruleSearchState.count();
                         break; // choose the first match; rules within a chain are in order of rank
                     }
                 }
@@ -965,7 +970,7 @@ namespace OutSmart.DAXon.Transformation
 
             while (head != null)
             {
-                if (filter == null || filter.Test(head))
+                if (filter == null || filter(head))
                 {
                     if (bestRule != null)
                     {
@@ -1106,7 +1111,7 @@ namespace OutSmart.DAXon.Transformation
                     if (!patternsProcessed.ContainsKey(pattern))
                     {
                         AllocateBindingSlotsRecursive(pack, mode, pattern, bindings);
-                        patternsProcessed.Put(pattern, true);
+                        patternsProcessed[pattern] = true;
                     }
 
                     TemplateRule tr = (TemplateRule)r.GetAction();
@@ -1123,23 +1128,14 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public virtual void ComputeStreamability()
         {
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public virtual void InvertStreamableTemplates()
         {
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public override void ExplainTemplateRules(ExpressionPresenter @out)
         {
             IRuleAction action = (r) => r.Export(@out, IsDeclaredStreamable());
@@ -1152,9 +1148,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public override void ExportTemplateRules(ExpressionPresenter @out)
         {
 
@@ -1163,17 +1156,11 @@ namespace OutSmart.DAXon.Transformation
             ProcessRules((r) => r.Export(@out, IsDeclaredStreamable()));
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public override void ProcessRules(IRuleAction action)
         {
             ProcessRules(action, null);
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public virtual void ProcessRules(IRuleAction action, IRuleGroupAction group)
         {
             ProcessRuleChain(documentRuleChain, action, SetGroup(group, "document-node()"));
@@ -1190,9 +1177,6 @@ namespace OutSmart.DAXon.Transformation
             ProcessRuleChain(functionItemRuleChain, action, SetGroup(group, "function()"));
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         protected virtual IRuleGroupAction SetGroup(IRuleGroupAction group, string type)
         {
             if (group != null)
@@ -1203,9 +1187,6 @@ namespace OutSmart.DAXon.Transformation
             return group;
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public virtual void ProcessRuleChains(IntHashMap<RuleChain> chains, IRuleAction action, IRuleGroupAction group)
         {
             if (chains.Count > 0)
@@ -1239,9 +1220,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public virtual void ProcessRuleChain(RuleChain chain, IRuleAction action)
         {
             Rule r = chain == null ? null : chain.Head();
@@ -1252,9 +1230,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public virtual void ProcessRuleChain(RuleChain chain, IRuleAction action, IRuleGroupAction group)
         {
             Rule r = chain == null ? null : chain.Head();
@@ -1278,16 +1253,10 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public virtual void OptimizeRules()
         {
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         public override void ComputeRankings(int start)
         {
 
@@ -1302,13 +1271,7 @@ namespace OutSmart.DAXon.Transformation
             highestRank = start + sorter.NumberOfRules;
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         //
-        /// <summary>
-        /// Invoked at the end of a group
-        /// </summary>
         public virtual void AllocateAllPatternSlots()
         {
             IList<int> count = new List<int>(1); // used to allow inner class to have side-effects
@@ -1319,7 +1282,7 @@ namespace OutSmart.DAXon.Transformation
                 ProcessRules((r) =>
                 {
                     int slots = r.Pattern.AllocateSlots(slotManager, 0);
-                    int max = System.Math.Max(count[0], slots);
+                    int max = Math.Max(count[0], slots);
                     count[0] = max;
                 });
             }
@@ -1331,33 +1294,18 @@ namespace OutSmart.DAXon.Transformation
             stackFrameSlotsNeeded = count[0];
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         //
-        /// <summary>
-        /// Invoked at the end of a group
-        /// </summary>
         public override int GetStackFrameSlotsNeeded()
         {
             return stackFrameSlotsNeeded;
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         //
-        /// <summary>
-        /// Invoked at the end of a group
-        /// </summary>
         public virtual void SetStackFrameSlotsNeeded(int slots)
         {
             this.stackFrameSlotsNeeded = slots;
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         private class RuleGroupExplainAction : IRuleGroupAction
         {
             private string type;
@@ -1390,9 +1338,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         private class RuleSorter
         {
             public List<Rule> rules = new List<Rule>(100);
@@ -1427,9 +1372,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Compute the streamability of all template rules. No action in Saxon-HE.
-        /// </summary>
         //
         public interface IRuleGroupAction
         {
@@ -1439,9 +1381,6 @@ namespace OutSmart.DAXon.Transformation
             /// </summary>
             void Start();
             void Start(int i);
-            /// <summary>
-            /// Invoked at the end of a group
-            /// </summary>
             void End();
         }
     }

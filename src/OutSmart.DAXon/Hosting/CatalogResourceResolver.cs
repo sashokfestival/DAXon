@@ -8,11 +8,10 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 
 namespace OutSmart.DAXon.Lib
 {
-    // Phase 5: CatalogResourceResolver implements IResourceResolver.
+    // CatalogResourceResolver implements IResourceResolver.
     public class CatalogResourceResolver : IResourceResolver
     {
         public CatalogResourceResolver() { }

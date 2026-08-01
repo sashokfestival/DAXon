@@ -789,7 +789,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
         private static void MapDouble(string doubleKeyword, int token)
         {
-            doubleKeywords.Put(doubleKeyword, token);
+            doubleKeywords[doubleKeyword] = token;
             tokens[token] = doubleKeyword;
         }
 

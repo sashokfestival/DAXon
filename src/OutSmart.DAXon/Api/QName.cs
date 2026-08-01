@@ -16,7 +16,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Events;
-using OutSmart.DAXon.Internal.Jaxp.Namespace;
 namespace OutSmart.DAXon.Api
 {
     public class QName
@@ -330,9 +329,9 @@ namespace OutSmart.DAXon.Api
             }
         }
 
-        public QName(OutSmart.DAXon.Internal.Jaxp.Namespace.QName qName)
+        public QName(System.Xml.XmlQualifiedName qName)
         {
-            sqName = new StructuredQName(qName.GetPrefix(), NamespaceUri.Of(qName.GetNamespaceURI()), qName.GetLocalPart());
+            sqName = new StructuredQName("", NamespaceUri.Of(qName.Namespace), qName.Name);
         }
 
         public QName(StructuredQName sqName)

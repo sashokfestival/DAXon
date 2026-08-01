@@ -39,11 +39,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
         public virtual int CompareAtomicValues(AtomicValue a, AtomicValue b)
         {
 
-            //        if (a == null) {
-            //            return (b == null ? 0 : -1);
-            //        } else if (b == null) {
-            //            return +1;
-            //        }
             //        return ((IContextFreeAtomicValue) a).getXPathComparable()
             return ((IXPathComparable)a).CompareTo((IXPathComparable)b);
         }

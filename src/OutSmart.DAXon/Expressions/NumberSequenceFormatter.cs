@@ -205,7 +205,7 @@ namespace OutSmart.DAXon.Expressions
         public virtual IList<int> ParseStartAtValue(string value)
         {
             IList<int> list = new List<int>();
-            string[] tokens = value.Split("\\s+");
+            string[] tokens = value.SplitRegex("\\s+");
             foreach (string tok in tokens)
             {
                 try
@@ -219,7 +219,7 @@ namespace OutSmart.DAXon.Expressions
                 }
             }
 
-            if (list.IsEmpty())
+            if (list.Count == 0)
             {
                 throw new XPathException("Invalid start-at value: no numeric components found").WithErrorCode("XTDE0030").WithLocation(GetLocation());
             }
@@ -332,7 +332,7 @@ namespace OutSmart.DAXon.Expressions
                     int pos = 0;
                     while ((val = (AtomicValue)iter.Next()) != null)
                     {
-                        if (expr.backwardsCompatible && !vec.IsEmpty())
+                        if (expr.backwardsCompatible && vec.Count > 0)
                         {
                             break;
                         }
@@ -388,12 +388,12 @@ namespace OutSmart.DAXon.Expressions
                             else
                             {
                                 vec.Add(val.UnicodeStringValue);
-                                throw new XPathException("Cannot convert supplied value to an integer. " + err.GetMessage()).WithErrorCode("XTDE0980").WithLocation(expr.GetLocation()).WithXPathContext(context);
+                                throw new XPathException("Cannot convert supplied value to an integer. " + err.Message).WithErrorCode("XTDE0980").WithLocation(expr.GetLocation()).WithXPathContext(context);
                             }
                         }
                     }
 
-                    if (expr.backwardsCompatible && vec.IsEmpty())
+                    if (expr.backwardsCompatible && vec.Count == 0)
                     {
                         vec.Add("NaN");
                     }

@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Api
     public class XdmStream<T>
     {
         public XdmStream() { }
-        // Phase 7.8: 1-arg ctor wrapping an iterator/sequence.
+        // 1-arg ctor wrapping an iterator/sequence.
         public XdmStream(object source) { }
         public XdmStream<T> Filter(object predicate) => throw new NotImplementedException("XdmStream excluded from build");
         public XdmStream<TR> Map<TR>(object mapper) => throw new NotImplementedException("XdmStream excluded from build");

@@ -19,8 +19,11 @@ namespace OutSmart.DAXon.Model
 {
     public class NamespaceUri
     {
-        // A map from strings to NamespaceUris
-        private static readonly Dictionary<string, NamespaceUri> stringToNamespaceUri = new Dictionary<string, NamespaceUri>(20);
+        // A map from strings to NamespaceUris. Concurrent (as in the Java original): Of() is called
+        // while parsing source documents, and two threads first meeting new URIs at once would race
+        // an unsynchronized Dictionary's resize. Grows with distinct URIs for the process lifetime.
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, NamespaceUri> stringToNamespaceUri
+            = new System.Collections.Concurrent.ConcurrentDictionary<string, NamespaceUri>();
 
         /// <summary>
         /// A URI representing the null namespace (actually, an empty string)
@@ -223,7 +226,7 @@ namespace OutSmart.DAXon.Model
                 content = "";
             }
 
-            return stringToNamespaceUri.ComputeIfAbsent(Whitespace.Trim(content), k => new NamespaceUri(k));
+            return stringToNamespaceUri.GetOrAdd(Whitespace.Trim(content), k => new NamespaceUri(k));
         }
 
         public static implicit operator string(NamespaceUri u) => u?.stringContent;

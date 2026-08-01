@@ -12,10 +12,6 @@ using OutSmart.DAXon.Types;
 
 namespace OutSmart.DAXon.Functions
 {
-    // Runtime 2026-06-10: FunctionLiteral hollow stub REMOVED (MakeLiteral=>null put a NULL child into every
-    // sum#1 call via Sum.MakeFunctionCall - NRE in SetDeepRetainedStaticContext; implicit=>null nulled every
-    // new FunctionLiteral(...) site). Real class re-included (csproj); MakeLiteral resolves to the inherited
-    // static Literal.MakeLiteral (Java static-inheritance semantics carry over).
     public class StringToDouble11 : StringToDouble
     {
         private static readonly StringToDouble11 _instance = new StringToDouble11();

@@ -42,17 +42,8 @@ namespace OutSmart.DAXon.Values.Maps
         private int entries = -1;
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override UType KeyUType => keyUType;
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
         public HashTrieMap()
         {
             this.imap = ImmutableHashTrieMap<IAtomicMatchKey, KeyValuePair>.Empty();
@@ -60,9 +51,6 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
         public HashTrieMap(IImmutableMap<IAtomicMatchKey, KeyValuePair> imap)
         {
             this.imap = imap;
@@ -70,18 +58,12 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
         public static HashTrieMap Singleton(AtomicValue key, IGroundedValue value)
         {
             return (HashTrieMap)new HashTrieMap().AddEntry(key, value);
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
         public static HashTrieMap Copy(MapItem map)
         {
             if (map is HashTrieMap)
@@ -99,14 +81,9 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
         private void UpdateTypeInformation(AtomicValue key, ISequence val, bool wasEmpty)
         {
 
-            //        if (Instrumentation.ACTIVE) {
-            //        }
             if (wasEmpty)
             {
                 keyUType = key.GetUType();
@@ -133,12 +110,6 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override int Size()
         {
             if (entries >= 0)
@@ -157,24 +128,12 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override bool IsEmpty()
         {
             return entries == 0 || !imap.Any();
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override bool Conforms(IPlainType requiredKeyType, SequenceType requiredValueType, TypeHierarchy th)
         {
             if (IsEmpty())
@@ -253,12 +212,6 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override ItemType GetItemType(TypeHierarchy th)
         {
             UType keyType = UType.VOID;
@@ -294,12 +247,6 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override MapItem AddEntry(AtomicValue key, IGroundedValue value)
         {
             IAtomicMatchKey amk = MakeKey(key);
@@ -363,17 +310,9 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public virtual bool InitialPut(AtomicValue key, IGroundedValue value)
         {
 
-            //        if (Instrumentation.ACTIVE) {
-            //        }
             bool empty = IsEmpty();
             IAtomicMatchKey amk = MakeKey(key);
             bool exists = imap[amk] != null;
@@ -384,24 +323,12 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         private IAtomicMatchKey MakeKey(AtomicValue key)
         {
             return key.AsMapKey();
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override MapItem Remove(AtomicValue key)
         {
 
@@ -430,12 +357,6 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override IGroundedValue Get(AtomicValue key)
         {
             KeyValuePair o = imap[MakeKey(key)];
@@ -443,36 +364,18 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public virtual KeyValuePair GetKeyValuePair(AtomicValue key)
         {
             return imap[MakeKey(key)];
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override IAtomicIterator Keys()
         {
             return new AnonymousAtomicIterator(this);
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public override IEnumerable<KeyValuePair> KeyValuePairs()
         {
 
@@ -481,12 +384,6 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         public virtual void DiagnosticDump()
         {
             Console.Error.WriteLine("IMap details:");
@@ -500,22 +397,7 @@ namespace OutSmart.DAXon.Values.Maps
         }
 
         // type.
-        /// <summary>
-        /// Create an empty map
-        /// </summary>
-        /// <summary>
-        /// Get the size of the map
-        /// </summary>
         //    public String toShortString() {
-        //        int size = size();
-        //        if (size == 0) {
-        //            return "map{}";
-        //        } else if (size > 5) {
-        //            return "map{(:size " + size + ":)}";
-        //        } else {
-        //            StringBuilder buff = new StringBuilder(256);
-        //            buff.append("map{");
-        //            IIterator<Tuple2<IAtomicMatchKey, KeyValuePair>> iter = imap.iterator();
         //                Tuple2<IAtomicMatchKey, KeyValuePair> entry = iter.next();
         //                IAtomicMatchKey k1 = entry._1;
         //                AtomicValue k2 = entry._2.key;
@@ -526,9 +408,6 @@ namespace OutSmart.DAXon.Values.Maps
         //                buff.append(", ");
         //            if (size == 1) {
         //                buff.append("}");
-        //            } else {
-        //            return buff.toString().trim();
-        //    }
         public override string ToString()
         {
             return MapItem.MapToString(this);

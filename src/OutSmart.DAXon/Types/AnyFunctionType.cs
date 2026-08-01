@@ -11,7 +11,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.XQuery;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -129,22 +128,34 @@ namespace OutSmart.DAXon.Types
         public virtual Genre GetGenre() => Genre.FUNCTION;
         public virtual SequenceType One()
         {
-            if (_one == null) { _one = new SequenceType(this, StaticProperty.EXACTLY_ONE); }
+            if (_one == null)
+            {
+                _one = new SequenceType(this, StaticProperty.EXACTLY_ONE);
+            }
             return _one;
         }
         public virtual SequenceType ZeroOrOne()
         {
-            if (_zeroOrOne == null) { _zeroOrOne = new SequenceType(this, StaticProperty.ALLOWS_ZERO_OR_ONE); }
+            if (_zeroOrOne == null)
+            {
+                _zeroOrOne = new SequenceType(this, StaticProperty.ALLOWS_ZERO_OR_ONE);
+            }
             return _zeroOrOne;
         }
         public virtual SequenceType OneOrMore()
         {
-            if (_oneOrMore == null) { _oneOrMore = new SequenceType(this, StaticProperty.ALLOWS_ONE_OR_MORE); }
+            if (_oneOrMore == null)
+            {
+                _oneOrMore = new SequenceType(this, StaticProperty.ALLOWS_ONE_OR_MORE);
+            }
             return _oneOrMore;
         }
         public virtual SequenceType ZeroOrMore()
         {
-            if (_zeroOrMore == null) { _zeroOrMore = new SequenceType(this, StaticProperty.ALLOWS_ZERO_OR_MORE); }
+            if (_zeroOrMore == null)
+            {
+                _zeroOrMore = new SequenceType(this, StaticProperty.ALLOWS_ZERO_OR_MORE);
+            }
             return _zeroOrMore;
         }
     }

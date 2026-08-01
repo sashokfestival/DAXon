@@ -36,37 +36,22 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override string StreamerName => "SubscriptExpression";
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override string ExpressionName => "subscript";
         public SubscriptExpression(Expression @base, Expression subscript) : base(@base)
         {
             subscriptOp = new Operand(this, subscript, OperandRole.SINGLE_ATOMIC);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().Optimize(visitor, contextInfo);
@@ -85,9 +70,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             SubscriptExpression exp = new SubscriptExpression(BaseExpression.Copy(rebindings), Subscript.Copy(rebindings));
@@ -95,49 +77,31 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override IEnumerable<Operand> Operands()
         {
             return OperandList(GetOperand(), subscriptOp);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public virtual Expression GetSubscriptExpression()
         {
             return Subscript;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is SubscriptExpression && BaseExpression.IsEqual(((SubscriptExpression)other).BaseExpression) && Subscript.IsEqual(((SubscriptExpression)other).Subscript);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return BaseExpression.GetHashCode() ^ Subscript.GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public static IItem GetItemAt(ISequenceIterator iter, int index)
         {
             IItem item;
@@ -172,9 +136,6 @@ namespace OutSmart.DAXon.Expressions
             return item;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("subscript", this);
@@ -183,33 +144,21 @@ namespace OutSmart.DAXon.Expressions
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override string ToString()
         {
             return ExpressionTool.Parenthesize(BaseExpression) + "[" + Subscript + "]";
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override string ToShortString()
         {
             return ExpressionTool.Parenthesize(BaseExpression) + "[" + Subscript.ToShortString() + "]";
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new SubscriptExprElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public class SubscriptExprElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()

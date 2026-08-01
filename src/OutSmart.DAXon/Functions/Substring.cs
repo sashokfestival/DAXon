@@ -185,7 +185,7 @@ namespace OutSmart.DAXon.Functions
                 return StringValue.EMPTY_STRING;
             }
 
-            long a2 = System.Math.Min(slength, (int)lend - 1);
+            long a2 = Math.Min(slength, (int)lend - 1);
             if (a1 < 0)
             {
                 if (a2 < 0)

@@ -70,7 +70,11 @@ namespace OutSmart.DAXon.Regex
         private sealed class AnonymousIntIterator : AbstractIntIterator
         {
 
-            private readonly OpCapture parent; private readonly IIntIterator basis; private readonly REMatcher matcher; private readonly int position; private int groupNr => parent.groupNr;
+            private readonly OpCapture parent;
+            private readonly IIntIterator basis;
+            private readonly REMatcher matcher;
+            private readonly int position;
+            private int groupNr => parent.groupNr;
             public AnonymousIntIterator(OpCapture parent, IIntIterator basis, REMatcher matcher, int position)
             {
                 this.parent = parent; this.basis = basis; this.matcher = matcher; this.position = position;

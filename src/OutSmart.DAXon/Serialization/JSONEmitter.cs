@@ -11,7 +11,6 @@ using OutSmart.DAXon.Json;
 using OutSmart.DAXon.Serialization.CharCodes;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
-using OutSmart.DAXon.Internal.Text;
 using OutSmart.DAXon.Internal.Collections;
 using System;
 using System.Collections.Generic;
@@ -21,7 +20,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
 {
@@ -31,7 +29,7 @@ namespace OutSmart.DAXon.Serialization
         private Configuration config;
         private IUnicodeWriter writer;
         private bool normalize;
-        private Normalizer.Form normalizationForm;
+        private NormalizationForm normalizationForm;
         private CharacterMap characterMap;
         private Properties outputProperties;
         private ICharacterSet characterSet;
@@ -55,7 +53,7 @@ namespace OutSmart.DAXon.Serialization
             get => outputProperties; set
             {
                 this.outputProperties = value;
-                if ("yes".Equals(value.GetProperty(OutputKeys.INDENT)))
+                if ("yes".Equals(value.GetProperty(DAXonOutputKeys.INDENT)))
                 {
                     isIndenting = true;
                 }
@@ -94,7 +92,7 @@ namespace OutSmart.DAXon.Serialization
                     }
                 }
 
-                string encoding = value.GetProperty(OutputKeys.ENCODING);
+                string encoding = value.GetProperty(DAXonOutputKeys.ENCODING);
                 try
                 {
                     characterSet = config.GetCharacterSetFactory().GetCharacterSet(encoding);
@@ -119,7 +117,7 @@ namespace OutSmart.DAXon.Serialization
             this.mustClose = mustClose;
         }
 
-        public virtual void SetNormalizationForm(Normalizer.Form form)
+        public virtual void SetNormalizationForm(NormalizationForm form)
         {
             this.normalize = true;
             this.normalizationForm = form;
@@ -190,7 +188,7 @@ namespace OutSmart.DAXon.Serialization
                 else
                 {
                     double val = num.GetDoubleValue();
-                    double abs = System.Math.Abs(val);
+                    double abs = Math.Abs(val);
 
                     // Avoid exponential notation except in extremis
                     Emit(FloatingPointConverter.ConvertDouble(val, abs >= 1E+18 || abs < 1E-18)); //                if (num.isWholeNumber() && abs < 1e18) {
@@ -360,7 +358,7 @@ namespace OutSmart.DAXon.Serialization
         private void ConditionalComma(bool opening)
         {
             bool wasFirst = first;
-            bool oneLiner = !oneLinerStack.IsEmpty() && oneLinerStack.Peek();
+            bool oneLiner = oneLinerStack.Count > 0 && oneLinerStack.Peek();
             bool actuallyIndenting = isIndenting && level != 0 && !oneLiner;
             if (first)
             {
@@ -436,7 +434,7 @@ namespace OutSmart.DAXon.Serialization
         {
             if (normalize)
             {
-                cs = Normalizer.Normalize(cs, normalizationForm);
+                cs = cs.Normalize(normalizationForm);
             }
 
             // Table-driven clean scan; only dirty or non-ASCII strings pay the delegate-per-char path.

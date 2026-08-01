@@ -12,7 +12,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,9 +36,6 @@ namespace OutSmart.DAXon.Expressions
 
         public int SingletonOperator => @operator;
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override string ExpressionName => "equivalent";
         public SwitchCaseComparison(Expression p1, int @operator, Expression p2, bool allowMultiple) : base(p1, @operator, p2)
         {
@@ -142,41 +138,26 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override ItemType GetItemType()
         {
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public virtual bool IsKnownToBeComparable()
         {
             return knownToBeComparable;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public virtual IAtomicComparer GetComparer()
         {
             return comparer;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             SwitchCaseComparison sc = new SwitchCaseComparison(GetLhsExpression().Copy(rebindings), @operator, GetRhsExpression().Copy(rebindings), allowMultiple);
@@ -186,41 +167,26 @@ namespace OutSmart.DAXon.Expressions
             return sc;
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return BooleanValue.Get(EffectiveBooleanValue(context));
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             return MakeElaborator().ElaborateForBoolean().Eval(context);
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         protected override void ExplainExtraAttributes(ExpressionPresenter @out)
         {
             @out.EmitAttribute("cardinality", "singleton");
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new EquivalenceComparisonElaborator();
         }
 
-        /// <summary>
-        /// Determine the static cardinality. Returns [1..1]
-        /// </summary>
         private class EquivalenceComparisonElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()

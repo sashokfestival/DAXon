@@ -69,15 +69,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
         protected internal virtual long SequenceNumber
         {
             get
@@ -98,18 +89,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual string DisplayName
         {
             get
@@ -121,34 +100,10 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeInfo LastChild => null;
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeInfo Root
         {
             get
@@ -167,18 +122,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual DocumentImpl PhysicalRoot
         {
             get
@@ -195,18 +138,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeImpl PreviousInDocument
         {
             get
@@ -228,18 +159,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         private NodeImpl LastDescendantOrSelf
         {
             get
@@ -256,20 +175,8 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NamespaceMap AllNamespaces => null;
-        public virtual UnicodeString UnicodeStringValue => throw new NotImplementedException();
+        public abstract UnicodeString UnicodeStringValue { get; }
         public virtual NodeImpl Head()
         {
             return this;
@@ -389,9 +296,6 @@ namespace OutSmart.DAXon.Trees.Linked
         //
         //    }
         /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
         /// Get the system ID for the node. Default implementation for child nodes.
         /// </summary>
         public virtual string GetSystemId()
@@ -401,15 +305,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
         public virtual string GetBaseURI()
         {
             return parent.GetBaseURI();
@@ -417,15 +312,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
         public int CompareOrder(NodeInfo other)
         {
             if (other is NamespaceNode)
@@ -447,18 +333,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual Configuration GetConfiguration()
         {
             return PhysicalRoot.GetConfiguration();
@@ -466,18 +340,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual NamePool GetNamePool()
         {
             return PhysicalRoot.GetNamePool();
@@ -485,18 +347,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual string GetPrefix()
         {
             INodeName qName = GetNodeName();
@@ -505,18 +355,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual NamespaceUri GetNamespaceUri()
         {
             INodeName qName = GetNodeName();
@@ -525,18 +363,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the configuration
-        /// </summary>
         public virtual string GetLocalPart()
         {
             INodeName qName = GetNodeName();
@@ -545,18 +371,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual int GetLineNumber()
         {
             return parent.GetLineNumber();
@@ -564,18 +378,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual ILocation SaveLocation()
         {
             return this;
@@ -583,18 +385,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public NodeImpl GetParent()
         {
             if (parent is DocumentImpl && ((DocumentImpl)parent).IsImaginary())
@@ -607,18 +397,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         protected ParentNodeImpl GetRawParent()
         {
             return parent;
@@ -626,18 +404,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public void SetRawParent(ParentNodeImpl parent)
         {
             this.parent = parent;
@@ -645,18 +411,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeImpl GetPreviousSibling()
         {
             if (parent == null)
@@ -669,18 +423,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeImpl GetNextSibling()
         {
             if (parent == null)
@@ -693,18 +435,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeImpl GetFirstChild()
         {
             return null;
@@ -712,18 +442,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual IAxisIterator IterateAxis(int axisNumber)
         {
 
@@ -747,18 +465,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual IAxisIterator IterateAxis(int axisNumber, INodePredicate predicate)
         {
             NodeTest nodeTest = Navigator.NodeTestFromPredicate(predicate);
@@ -838,18 +544,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
 
 
         public virtual string GetAttributeValue(string uri, string localName) => default;
@@ -861,18 +555,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeImpl GetNextInDocument(NodeImpl anchor)
         {
 
@@ -920,18 +602,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NodeImpl GetSuccessorElement(ISteppingNode anchor, NamespaceUri uri, string local)
         {
             NodeImpl next = GetNextInDocument((NodeImpl)anchor);
@@ -945,18 +615,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual NamespaceBinding[] GetDeclaredNamespaces(NamespaceBinding[] buffer)
         {
             return null;
@@ -964,18 +622,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual bool HasChildNodes()
         {
             return GetFirstChild() != null;
@@ -983,39 +629,12 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
         public virtual void SetTypeAnnotation(ISchemaType type)
         {
         }
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void Delete()
         {
 
@@ -1034,21 +653,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual bool IsDeleted()
         {
             return index == -1 || (parent != null && parent.IsDeleted());
@@ -1056,21 +660,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void SetAttributes(IAttributeMap attributes)
         {
             throw new NotSupportedException("setAttributes() applies only to element nodes");
@@ -1078,105 +667,30 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void RemoveAttribute(NodeInfo attribute)
         {
         }
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void AddAttribute(INodeName name, ISimpleType attType, string value, int properties, bool inheritNamespaces)
         {
         }
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void Rename(INodeName newNameCode, bool inherit)
         {
         }
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void AddNamespace(NamespaceBinding nscode, bool inherit)
         {
         }
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void Replace(NodeInfo[] replacement, bool inherit)
         {
             if (IsDeleted())
@@ -1196,42 +710,12 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void InsertChildren(NodeInfo[] source, bool atStart, bool inherit)
         {
         }
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void InsertSiblings(NodeInfo[] source, bool before, bool inherit)
         {
             if (parent == null)
@@ -1244,42 +728,12 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual void RemoveTypeAnnotation()
         {
         }
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual Builder NewBuilder()
         {
             return PhysicalRoot.NewBuilder();
@@ -1287,21 +741,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         //
         //    }
-        /// <summary>
-        /// Get a character string that uniquely identifies this node
-        /// </summary>
-        /// <summary>
-        /// Get the system ID for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the base URI for the node. Default implementation for child nodes.
-        /// </summary>
-        /// <summary>
-        /// Get the line number of the node within its source document entity
-        /// </summary>
-        /// <summary>
-        /// Delete this node (that @is, detach it from its parent)
-        /// </summary>
         public virtual bool EffectiveBooleanValue()
         {
             return true;
@@ -1314,8 +753,8 @@ namespace OutSmart.DAXon.Trees.Linked
         NodeInfo NodeInfo.GetParent() => GetParent();
         IItem IGroundedValue.Head() => this;
         IItem ISequence.Head() => this;
-        public virtual void ReplaceStringValue(UnicodeString arg0) => throw new NotImplementedException();
-        public virtual int GetNodeKind() => throw new NotImplementedException();
+        public abstract void ReplaceStringValue(UnicodeString arg0);
+        public abstract int GetNodeKind();
         public virtual Genre GetGenre() => Genre.NODE; // upstream NodeInfo default
         // A node is a singleton grounded value (mirrors TinyNodeImpl; these were hollow NIE stubs —
         // a variable bound to a linked-tree node crashed VariableReference.Iterate, docbook-001).
@@ -1324,19 +763,21 @@ namespace OutSmart.DAXon.Trees.Linked
         public virtual IGroundedValue Subsequence(int arg0, int arg1) => (arg0 <= 0 && (long)arg0 + arg1 > 0) ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance();
         public virtual int GetLength() => 1;
         public virtual string GetStringValue() => UnicodeStringValue.ToString();
-        public virtual void Deliver(IReceiver arg0, ParseOptions arg1) => throw new NotImplementedException();
-        public virtual string GetPublicId() => throw new NotImplementedException();
+        // Node-as-ActiveSource: stream this subtree's events (mirrors NodeSource; was a hollow NIE stub).
+        public virtual void Deliver(IReceiver @out, ParseOptions options) => Events.Sender.SendDocumentInfo(this, @out, new Expressions.Parsing.Loc(GetSystemId(), -1, -1));
+        public virtual string GetPublicId() => null; // upstream NodeInfo default
         IItem IItem.Head() => this;
         SingletonIterator IItem.Iterate() => new SingletonIterator(this);
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void RemoveNamespace(string prefix) { throw new NotImplementedException(); }
-        public virtual void AddNamespace(string prefix, NamespaceUri uri) { throw new NotImplementedException(); }
-        public virtual bool IsSameNodeInfo(NodeInfo other) => throw new NotImplementedException();
-        public virtual string GetURI() => throw new NotImplementedException();
+        // Namespace mutation is defined only for elements (ElementImpl overrides); the old NIE
+        // stubs here are now the upstream UnsupportedOperation contract, coded.
+        public virtual void RemoveNamespace(string prefix) => throw new InvalidOperationException("Namespaces can only be removed from an element node");
+        public virtual void AddNamespace(string prefix, NamespaceUri uri) => throw new InvalidOperationException("Namespaces can only be added to an element node");
+        public virtual bool IsSameNodeInfo(NodeInfo other) => this == other; // node identity
+        public virtual string GetURI() => GetNodeName() == null ? "" : GetNodeName().GetURI();
         public virtual IEnumerable<NodeInfo> Children() => new Navigator.ChildrenAsIterable(this);
         public virtual IEnumerable<NodeInfo> Children(INodePredicate filter) => new Navigator.ChildrenAsIterable(this, filter);
-        public virtual void Copy(IReceiver @out, int copyOptions, ILocation locationId) { throw new NotImplementedException(); }
+        public abstract void Copy(IReceiver @out, int copyOptions, ILocation locationId);
         public virtual IActiveSource AsActiveSource() => new NodeSource(this);
         public virtual bool IsId() => false; // upstream NodeInfo/Item default
         public virtual bool IsIdref() => false; // upstream NodeInfo/Item default

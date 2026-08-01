@@ -79,7 +79,6 @@ namespace OutSmart.DAXon.Expressions
                 ExpressionTool.CopyLocationInfo(this, ds);
                 ds.ParentExpression = parent;
 
-                //ds.verifyParentPointers();
                 return ds;
             }
 

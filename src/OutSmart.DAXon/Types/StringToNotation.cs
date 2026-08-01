@@ -7,16 +7,20 @@
 
 using System;
 using System.Collections.Generic;
+using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Types
 {
-    // Phase 5: extend StringConverter so `stringConverter = new StringToX()` assignments work.
+    // Extend StringConverter so `stringConverter = new StringToX()` assignments work.
     public class StringToNotation : StringConverter
     {
+        private readonly StringConverter inner;
         public StringToNotation() { }
-        public StringToNotation(object x) { }
-        public override IConversionResult ConvertString(UnicodeString input) => throw new NotImplementedException("STUB: StringToNotation.ConvertString not ported (excluded stub)");
+        public StringToNotation(object x) : base(x as ConversionRules) { inner = new StringConverter.StringToNotation(x as ConversionRules); }
+        // Delegates to the proven nested converter (BuiltInAtomicType binds that one; this top-level
+        // copy is what ConversionRules binds - it used to throw NIE if that registry path went live).
+        public override IConversionResult ConvertString(UnicodeString input) => inner.ConvertString(input);
     }
 }

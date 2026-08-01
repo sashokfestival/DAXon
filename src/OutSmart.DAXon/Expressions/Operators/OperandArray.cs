@@ -8,7 +8,6 @@ using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Functions;
 
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -71,7 +70,7 @@ namespace OutSmart.DAXon.Expressions.Operators
 
         public virtual IEnumerator<Operand> IIterator()
         {
-            return operandArray.ToList().IIterator();
+            return operandArray.ToList().GetEnumerator();
         }
 
         public virtual Operand[] Copy()
@@ -138,7 +137,7 @@ namespace OutSmart.DAXon.Expressions.Operators
         {
             foreach (T arg in args)
             {
-                if (!condition.Test(arg))
+                if (!condition(arg))
                 {
                     return false;
                 }
@@ -151,7 +150,7 @@ namespace OutSmart.DAXon.Expressions.Operators
         {
             foreach (T arg in args)
             {
-                if (condition.Test(arg))
+                if (condition(arg))
                 {
                     return true;
                 }

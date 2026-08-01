@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,8 +19,7 @@ namespace OutSmart.DAXon.Tracing
     public interface ITraceable : ILocatable
     {
         StructuredQName GetObjectName();
-        void GatherProperties(Action<string, object> consumer)
-;
+        void GatherProperties(Action<string, object> consumer);
 
     }
 }

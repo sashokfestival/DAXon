@@ -521,7 +521,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
                             ITailCall tc = null;
                             while (iter.Next() != null)
                             {
-                                controller.CheckTimeout();
+                                controller.CheckTimeoutPerStep();
                                 DispatchTailCall(tc);
                                 tc = action.ProcessLeavingTail(@out, c2);
                             }
@@ -548,7 +548,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
                         while (iter.Next() != null)
                         {
-                            controller.CheckTimeout();
+                            controller.CheckTimeoutPerStep();
                             @out.Append(separator);
                             DispatchTailCall(tc);
                             tc = action.ProcessLeavingTail(@out, c2);

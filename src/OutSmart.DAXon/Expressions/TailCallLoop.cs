@@ -29,52 +29,28 @@ namespace OutSmart.DAXon.Expressions
 
         public UserFunction ContainingFunction => containingFunction;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override int ImplementationMethod => BaseExpression.ImplementationMethod;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
         public override string ExpressionName => "tailCallLoop";
         public TailCallLoop(UserFunction function, Expression body) : base(body)
         {
             containingFunction = function;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected override OperandRole GetOperandRole()
         {
             return OperandRole.SAME_FOCUS_ACTION;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             throw new NotSupportedException("TailCallLoop.copy()"); /*TailCallLoop e2 = new TailCallLoop(containingFunction);
@@ -82,9 +58,6 @@ namespace OutSmart.DAXon.Expressions
         return e2;*/
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
@@ -96,35 +69,17 @@ namespace OutSmart.DAXon.Expressions
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         private UserFunction EstablishTargetFunction(ITailCallInfo tail, XPathContextMajor cm)
         {
             if (tail is TailCallFunction)
@@ -143,35 +98,17 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             ITailCall tc = MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
         private ISequence TailCallDifferentFunction(UserFunction userFunction, XPathContextMajor cm)
         {
             cm.ResetStackFrameMap(userFunction.GetStackFrameMap(), userFunction.GetArity());
@@ -185,121 +122,49 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
         public override ItemType GetItemType()
         {
             return BaseExpression.GetItemType();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new TailCallLoopElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
         public interface ITailCallInfo
         {
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
         public class TailCallComponent : ITailCallInfo
         {
             public Component component;
             public UserFunction function;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
         public class TailCallFunction : ITailCallInfo
         {
             public UserFunction function;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        /// <summary>
-        /// Evaluate as an IItem.
-        /// </summary>
-        /// <summary>
-        /// Determine the data type of the items returned by the expression
-        /// </summary>
         private class TailCallLoopElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
@@ -314,7 +179,7 @@ namespace OutSmart.DAXon.Expressions
                         Controller controller = cm.GetController();
                         while (true)
                         {
-                            controller.CheckTimeout();
+                            controller.CheckTimeoutPerStep();
                             ISequenceIterator iter = contentEval.Iterate(context);
                             IGroundedValue extent = SequenceTool.ToGroundedValue(iter);
                             ITailCallInfo tail = cm.TailCallInfo;
@@ -349,7 +214,7 @@ namespace OutSmart.DAXon.Expressions
                     Controller controller = cm.GetController();
                     while (true)
                     {
-                        controller.CheckTimeout();
+                        controller.CheckTimeoutPerStep();
                         ITailCall tc = contentPush.ProcessLeavingTail(output, context);
                         ITailCallInfo tail = cm.TailCallInfo;
                         if (tail == null)
@@ -379,7 +244,7 @@ namespace OutSmart.DAXon.Expressions
                     Controller controller = cm.GetController();
                     while (true)
                     {
-                        controller.CheckTimeout();
+                        controller.CheckTimeoutPerStep();
                         IItem item = contentEval.Eval(context);
                         ITailCallInfo tail = cm.TailCallInfo;
                         if (tail == null)

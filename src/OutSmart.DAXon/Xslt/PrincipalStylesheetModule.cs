@@ -53,11 +53,6 @@ namespace OutSmart.DAXon.Xslt
         private readonly IList<IAction> fixupActions = new List<IAction>();
         private bool needsDynamicOutputProperties = false;
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual HashSet<NamespaceUri> ImportedSchemaTable => stylesheetPackage.SchemaNamespaces;
         public PrincipalStylesheetModule(XSLPackage sourceElement) : base(sourceElement, 0)
         {
@@ -96,7 +91,7 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual Component GetComponent(SymbolicName name)
         {
-            return stylesheetPackage.ComponentIndex.Get(name);
+            return stylesheetPackage.ComponentIndex.GetOrDefault(name);
         }
 
         public override PrincipalStylesheetModule GetPrincipalStylesheetModule()
@@ -162,12 +157,12 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual void PutStylesheetDocument(DocumentKey key, XSLStylesheet module)
         {
-            moduleCache.Put(key, module);
+            moduleCache[key] = module;
         }
 
         public virtual XSLModuleRoot GetStylesheetDocument(DocumentKey key)
         {
-            XSLModuleRoot sheet = moduleCache.Get(key);
+            XSLModuleRoot sheet = moduleCache.GetOrDefault(key);
             if (sheet != null)
             {
                 sheet.IssueWarning("Stylesheet module " + key + " is included or imported more than once. " + "This is permitted, but may lead to errors or unexpected behavior", DAXonErrorCode.SXWN9019);
@@ -286,7 +281,7 @@ namespace OutSmart.DAXon.Xslt
                 }
             }
 
-            if (outputNames.IsEmpty())
+            if (outputNames.Count == 0)
             {
                 if (needsDynamicOutputProperties)
                 {
@@ -335,10 +330,6 @@ namespace OutSmart.DAXon.Xslt
         {
 
             // Warning message deleted by bug 3278
-            //        if (info.isVersionWarning() &&
-            //            XPathException w = new XPathException(
-            //            compilation.reportWarning(w);
-            //        }
             IList<XSLUsePackage> useDeclarations = new List<XSLUsePackage>();
             GatherUsePackageDeclarations(compilation, xslpackage, useDeclarations);
 
@@ -350,7 +341,6 @@ namespace OutSmart.DAXon.Xslt
             }
 
 
-            //gatherOverridingDeclarations(compilation, xslpackage, overrides);
             // Second pass: make modified copies of the named components in the used packages
             StylesheetPackage thisPackage = GetStylesheetPackage();
             foreach (XSLUsePackage use in useDeclarations)
@@ -385,7 +375,7 @@ namespace OutSmart.DAXon.Xslt
                 {
                     string href = Whitespace.Trim(use.GetAttributeValue(NamespaceUri.NULL, "href"));
                     DocumentKey key = DocumentFn.ComputeDocumentKey(href, use.GetBaseURI(), compilation.GetPackageData(), false);
-                    ITreeInfo includedTree = compilation.StylesheetModules.Get(key);
+                    ITreeInfo includedTree = compilation.StylesheetModules.GetOrDefault(key);
                     if (includedTree == null)
                     {
                         throw new XPathException("Internal problem: the included stylesheet module '" + href + "' should be in the compiler's module store, but was not found");
@@ -471,18 +461,18 @@ namespace OutSmart.DAXon.Xslt
                 SymbolicName.F sName = new SymbolicName.F(sourceFunction.GetObjectName(), arity);
 
                 // see if there is already a named function with this precedence
-                ComponentDeclaration otherDecl = functionIndex.Get(sName);
-                Component otherComp = componentIndex.Get(sName);
+                ComponentDeclaration otherDecl = functionIndex.GetOrDefault(sName);
+                Component otherComp = componentIndex.GetOrDefault(sName);
                 if (otherDecl == null && otherComp == null)
                 {
 
                     // this is the first one in this stylesheet; and there is none in a used package
                     if (arity == maxArity)
                     {
-                        componentIndex.Put(sName, declaringComponent);
+                        componentIndex[sName] = declaringComponent;
                     }
 
-                    functionIndex.Put(sName, decl);
+                    functionIndex[sName] = decl;
                 }
                 else if (otherDecl != null)
                 {
@@ -507,13 +497,13 @@ namespace OutSmart.DAXon.Xslt
                 }
                 else
                 {
-                    Component other = componentIndex.Get(new SymbolicName.F(sourceFunction.GetObjectName(), maxArity));
+                    Component other = componentIndex.GetOrDefault(new SymbolicName.F(sourceFunction.GetObjectName(), maxArity));
                     if (other != null && other.DeclaringPackage == GetStylesheetPackage())
                     {
 
                         // check the precedences
                         int thisPrecedence = decl.Precedence;
-                        ComponentDeclaration otherFunction = functionIndex.Get(sName);
+                        ComponentDeclaration otherFunction = functionIndex.GetOrDefault(sName);
                         int otherPrecedence = otherFunction.Precedence;
                         if (thisPrecedence == otherPrecedence)
                         {
@@ -533,16 +523,16 @@ namespace OutSmart.DAXon.Xslt
                         {
 
                             // can't happen, but we'll play safe
-                            componentIndex.Put(sName, declaringComponent);
-                            functionIndex.Put(sName, decl);
+                            componentIndex.PutAndGetPrevious(sName, declaringComponent);
+                            functionIndex[sName] = decl;
                         }
                     }
                     else if (sourceFunction.FindAncestorElement(StandardNames.XSL_OVERRIDE) != null)
                     {
 
                         // the new one wins
-                        componentIndex.Put(sName, declaringComponent);
-                        functionIndex.Put(sName, decl);
+                        componentIndex.PutAndGetPrevious(sName, declaringComponent);
+                        functionIndex[sName] = decl;
                     }
                     else
                     {
@@ -575,13 +565,13 @@ namespace OutSmart.DAXon.Xslt
 
                 // see if there is already a global variable with this precedence
                 SymbolicName sName = varDecl.GetSymbolicName();
-                Component other = componentIndex.Get(sName);
+                Component other = componentIndex.GetOrDefault(sName);
                 if (other == null)
                 {
 
                     // this is the first
-                    globalVariableIndex.Put(qName, decl);
-                    componentIndex.Put(new SymbolicName(StandardNames.XSL_VARIABLE, qName), varDecl.GetActor().DeclaringComponent);
+                    globalVariableIndex.PutAndGetPrevious(qName, decl);
+                    componentIndex[new SymbolicName(StandardNames.XSL_VARIABLE, qName)] = varDecl.GetActor().DeclaringComponent;
                 }
                 else
                 {
@@ -590,7 +580,7 @@ namespace OutSmart.DAXon.Xslt
 
                         // check the precedences
                         int thisPrecedence = decl.Precedence;
-                        ComponentDeclaration otherVarDecl = globalVariableIndex.Get(sName.ComponentName);
+                        ComponentDeclaration otherVarDecl = globalVariableIndex.GetOrDefault(sName.ComponentName);
                         int otherPrecedence = otherVarDecl.Precedence;
                         if (thisPrecedence == otherPrecedence)
                         {
@@ -611,16 +601,16 @@ namespace OutSmart.DAXon.Xslt
                         else if (varDecl != otherVarDecl.SourceElement)
                         {
                             ((XSLGlobalVariable)otherVarDecl.SourceElement).SetRedundant(true);
-                            globalVariableIndex.Put(qName, decl);
-                            componentIndex.Put(new SymbolicName(StandardNames.XSL_VARIABLE, qName), varDecl.GetActor().DeclaringComponent);
+                            globalVariableIndex[qName] = decl;
+                            componentIndex[new SymbolicName(StandardNames.XSL_VARIABLE, qName)] = varDecl.GetActor().DeclaringComponent;
                         }
                     }
                     else if (varDecl.FindAncestorElement(StandardNames.XSL_OVERRIDE) != null)
                     {
 
                         // the new one wins
-                        componentIndex.Put(sName, declaringComponent);
-                        globalVariableIndex.Put(sName.ComponentName, decl);
+                        componentIndex.PutAndGetPrevious(sName, declaringComponent);
+                        globalVariableIndex[sName.ComponentName] = decl;
                     }
                     else
                     {
@@ -634,7 +624,7 @@ namespace OutSmart.DAXon.Xslt
         //}
         public virtual SourceBinding GetGlobalVariableBinding(StructuredQName qName)
         {
-            ComponentDeclaration decl = globalVariableIndex.Get(qName);
+            ComponentDeclaration decl = globalVariableIndex.GetOrDefault(qName);
             return decl == null ? null : ((XSLGlobalVariable)decl.SourceElement).GetSourceBinding();
         }
 
@@ -647,7 +637,7 @@ namespace OutSmart.DAXon.Xslt
             {
 
                 // see if there is already a named template with this precedence
-                Component other = componentIndex.Get(sName);
+                Component other = componentIndex.GetOrDefault(sName);
                 if (other == null)
                 {
 
@@ -655,9 +645,9 @@ namespace OutSmart.DAXon.Xslt
                     //NamedTemplate compiledTemplate = new NamedTemplate();
                     NamedTemplate compiledTemplate = ((XSLTemplate)decl.SourceElement).CompiledNamedTemplate;
                     Component declaringComponent = compiledTemplate.ObtainDeclaringComponent(sourceTemplate);
-                    componentIndex.Put(sName, declaringComponent);
+                    componentIndex[sName] = declaringComponent;
                     SetLocalParamDetails(sourceTemplate, compiledTemplate);
-                    templateIndex.Put(sName.ComponentName, decl);
+                    templateIndex[sName.ComponentName] = decl;
                 }
                 else
                 {
@@ -666,7 +656,7 @@ namespace OutSmart.DAXon.Xslt
 
                         // check the precedences
                         int thisPrecedence = decl.Precedence;
-                        ComponentDeclaration otherTemplate = templateIndex.Get(sName.ComponentName);
+                        ComponentDeclaration otherTemplate = templateIndex.GetOrDefault(sName.ComponentName);
                         int otherPrecedence = otherTemplate.Precedence;
                         if (thisPrecedence == otherPrecedence)
                         {
@@ -681,8 +671,8 @@ namespace OutSmart.DAXon.Xslt
 
                             NamedTemplate compiledTemplate = new NamedTemplate(sName.ComponentName, GetConfiguration());
                             Component declaringComponent = compiledTemplate.ObtainDeclaringComponent(sourceTemplate);
-                            componentIndex.Put(sName, declaringComponent);
-                            templateIndex.Put(sName.ComponentName, decl);
+                            componentIndex[sName] = declaringComponent;
+                            templateIndex[sName.ComponentName] = decl;
                             SetLocalParamDetails(sourceTemplate, compiledTemplate);
                         }
                     }
@@ -692,8 +682,8 @@ namespace OutSmart.DAXon.Xslt
                         // the new one wins
                         NamedTemplate compiledTemplate = sourceTemplate.CompiledNamedTemplate; //new NamedTemplate();
                         Component declaringComponent = compiledTemplate.ObtainDeclaringComponent(sourceTemplate);
-                        componentIndex.Put(sName, declaringComponent);
-                        templateIndex.Put(sName.ComponentName, decl);
+                        componentIndex[sName] = declaringComponent;
+                        templateIndex[sName.ComponentName] = decl;
                     }
                     else
                     {
@@ -703,8 +693,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
         private static void SetLocalParamDetails(XSLTemplate source, NamedTemplate nt)
         {
             IAxisIterator kids = source.IterateAxis(AxisInfo.CHILD, NodeKindTest.ELEMENT);
@@ -729,7 +717,7 @@ namespace OutSmart.DAXon.Xslt
         public virtual NamedTemplate GetNamedTemplate(StructuredQName name)
         {
             Dictionary<SymbolicName, Component> componentIndex = stylesheetPackage.ComponentIndex;
-            Component component = componentIndex.Get(new SymbolicName(StandardNames.XSL_TEMPLATE, name));
+            Component component = componentIndex.GetOrDefault(new SymbolicName(StandardNames.XSL_TEMPLATE, name));
             return component == null ? null : (NamedTemplate)component.GetActor();
         }
 
@@ -738,11 +726,11 @@ namespace OutSmart.DAXon.Xslt
 
             XSLAttributeSet sourceAttributeSet = (XSLAttributeSet)decl.SourceElement;
             StructuredQName name = sourceAttributeSet.AttributeSetName;
-            IList<ComponentDeclaration> entries = attributeSetDeclarations.Get(name);
+            IList<ComponentDeclaration> entries = attributeSetDeclarations.GetOrDefault(name);
             if (entries == null)
             {
                 entries = new List<ComponentDeclaration>();
-                attributeSetDeclarations.Put(name, entries);
+                attributeSetDeclarations[name] = entries;
             }
             else
             {
@@ -754,20 +742,18 @@ namespace OutSmart.DAXon.Xslt
                 }
             }
 
-            entries.Add(0, decl);
+            entries.Insert(0,decl);
         }
 
-        //}
-        //return;
         public virtual IList<ComponentDeclaration> GetAttributeSetDeclarations(StructuredQName name)
         {
-            return attributeSetDeclarations.Get(name);
+            return attributeSetDeclarations.GetOrDefault(name);
         }
 
         public virtual void CombineAttributeSets(Compilation compilation)
         {
             Dictionary<StructuredQName, AttributeSet> index = new Dictionary<StructuredQName, AttributeSet>();
-            foreach (KeyValuePair<StructuredQName, IList<ComponentDeclaration>> entry in attributeSetDeclarations.EntrySet())
+            foreach (KeyValuePair<StructuredQName, IList<ComponentDeclaration>> entry in attributeSetDeclarations)
             {
                 AttributeSet @as = new AttributeSet();
                 @as.SetName(entry.Key);
@@ -776,7 +762,7 @@ namespace OutSmart.DAXon.Xslt
                 @as.SetSystemId(firstDecl.GetSystemId());
                 @as.SetLineNumber(firstDecl.GetLineNumber());
                 @as.SetColumnNumber(firstDecl.GetColumnNumber());
-                index.Put(entry.Key, @as);
+                index[entry.Key] = @as;
                 Component declaringComponent = @as.DeclaringComponent;
                 if (declaringComponent == null)
                 {
@@ -786,7 +772,7 @@ namespace OutSmart.DAXon.Xslt
                 stylesheetPackage.AddComponent(declaringComponent);
             }
 
-            foreach (KeyValuePair<StructuredQName, IList<ComponentDeclaration>> entry in attributeSetDeclarations.EntrySet())
+            foreach (KeyValuePair<StructuredQName, IList<ComponentDeclaration>> entry in attributeSetDeclarations)
             {
                 IList<Expression> content = new List<Expression>();
                 Visibility vis = Visibility.UNDEFINED;
@@ -805,7 +791,7 @@ namespace OutSmart.DAXon.Xslt
                     XSLAttributeSet src = (XSLAttributeSet)attSetDecl.SourceElement;
                     if (!elements.Contains(src))
                     {
-                        entries.Add(0, attSetDecl);
+                        entries.Insert(0,attSetDecl);
                         elements.Add(src);
                     }
                 }
@@ -815,12 +801,12 @@ namespace OutSmart.DAXon.Xslt
                     XSLAttributeSet src = (XSLAttributeSet)decl.SourceElement;
                     streamable |= src.IsDeclaredStreamable();
                     src.CompileDeclaration(compilation, decl);
-                    content.AddAll(src.ContainedInstructions);
+                    content.AddRange(src.ContainedInstructions);
                     vis = src.GetVisibility();
                     explicitVisibility = explicitVisibility || src.GetAttributeValue(NamespaceUri.NULL, "visibility") != null;
                 }
 
-                AttributeSet aSet = index.Get(entry.Key);
+                AttributeSet aSet = index.GetOrDefault(entry.Key);
                 aSet.SetDeclaredStreamable(streamable);
                 Expression block = Block.MakeBlock(content);
                 aSet.SetBody(block);
@@ -836,8 +822,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
         protected virtual void CheckStreamability(AttributeSet aSet)
         {
         }
@@ -860,8 +844,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
         public virtual void IndexMode(ComponentDeclaration decl)
         {
             XSLMode sourceMode = (XSLMode)decl.SourceElement;
@@ -881,8 +863,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
         public virtual bool CheckAcceptableModeForPackage(XSLTemplate template, Mode mode)
         {
             StylesheetPackage templatePack = template.GetPackageData();
@@ -968,7 +948,7 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual NamespaceBinding GetNamespaceAlias(NamespaceUri uri)
         {
-            return namespaceAliasMap.Get(uri);
+            return namespaceAliasMap.GetOrDefault(uri);
         }
 
         public virtual bool IsAliasResultNamespace(NamespaceUri uri)
@@ -976,11 +956,6 @@ namespace OutSmart.DAXon.Xslt
             return aliasResultUriSet.Contains(uri);
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         private void CollectNamespaceAliases()
         {
             namespaceAliasMap = new Dictionary<NamespaceUri, NamespaceBinding>(numberOfAliases);
@@ -1008,15 +983,15 @@ namespace OutSmart.DAXon.Xslt
 
                 if (aliasesAtThisPrecedence.Contains(scode))
                 {
-                    if (!namespaceAliasMap.Get(scode).GetNamespaceUri().Equals(resultBinding.GetNamespaceUri()))
+                    if (!namespaceAliasMap.GetOrDefault(scode).GetNamespaceUri().Equals(resultBinding.GetNamespaceUri()))
                     {
                         xna.CompileError("More than one alias is defined for the same namespace", "XTSE0810");
                     }
                 }
 
-                if (namespaceAliasMap.Get(scode) == null)
+                if (namespaceAliasMap.GetOrDefault(scode) == null)
                 {
-                    namespaceAliasMap.Put(scode, resultBinding);
+                    namespaceAliasMap[scode] = resultBinding;
                     aliasResultUriSet.Add(resultBinding.GetNamespaceUri());
                 }
 
@@ -1026,21 +1001,11 @@ namespace OutSmart.DAXon.Xslt
             namespaceAliasList = null; // throw it in the garbage
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual bool HasNamespaceAliases()
         {
             return numberOfAliases > 0;
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual Properties GatherOutputProperties(StructuredQName formatQName)
         {
             bool found = formatQName == null;
@@ -1069,11 +1034,6 @@ namespace OutSmart.DAXon.Xslt
             return details;
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void Compile(Compilation compilation)
         {
             try
@@ -1368,11 +1328,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         private void RegisterImplicitModes(StyleElement element, RuleManager manager)
         {
             if (element is XSLApplyTemplates || element is XSLTemplate)
@@ -1380,7 +1335,7 @@ namespace OutSmart.DAXon.Xslt
                 string modeAtt = element.GetAttributeValue("mode");
                 if (modeAtt != null)
                 {
-                    string[] tokens = Whitespace.Trim(modeAtt).Split("[ \t\n\r]+");
+                    string[] tokens = Whitespace.Trim(modeAtt).SplitRegex("[ \t\n\r]+");
                     foreach (string s in tokens)
                     {
                         if (!s.StartsWith("#", StringComparison.Ordinal))
@@ -1388,7 +1343,7 @@ namespace OutSmart.DAXon.Xslt
                             StructuredQName modeName = element.MakeQName(s, null, "mode");
                             SymbolicName sName = new SymbolicName(StandardNames.XSL_MODE, modeName);
                             Dictionary<SymbolicName, Component> componentIndex = GetStylesheetPackage().ComponentIndex;
-                            Component existing = componentIndex.Get(sName);
+                            Component existing = componentIndex.GetOrDefault(sName);
                             if (existing != null && existing.DeclaringPackage != GetStylesheetPackage())
                             {
                                 if (element is XSLTemplate && !(element.GetParent() is XSLOverride))
@@ -1416,11 +1371,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void OptimizeTopLevel()
         {
 
@@ -1442,31 +1392,16 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual bool IsImportedSchema(NamespaceUri targetNamespace)
         {
             return stylesheetPackage.SchemaNamespaces.Contains(targetNamespace);
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void AddImportedSchema(NamespaceUri targetNamespace)
         {
             stylesheetPackage.SchemaNamespaces.Add(targetNamespace);
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual ComponentDeclaration GetCharacterMap(StructuredQName name)
         {
             for (int i = topLevel.Count - 1; i >= 0; i--)
@@ -1485,11 +1420,6 @@ namespace OutSmart.DAXon.Xslt
             return null;
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void AdjustExposedVisibility()
         {
             IList<XSLExpose> exposeDeclarations = new List<XSLExpose>(); // xsl:expose declarations in reverse order
@@ -1497,18 +1427,18 @@ namespace OutSmart.DAXon.Xslt
             {
                 if (decl.SourceElement is XSLExpose)
                 {
-                    exposeDeclarations.Add(0, (XSLExpose)decl.SourceElement);
+                    exposeDeclarations.Insert(0,(XSLExpose)decl.SourceElement);
                 }
             }
 
-            if (exposeDeclarations.IsEmpty())
+            if (exposeDeclarations.Count == 0)
             {
                 return;
             }
 
             NamePool pool = GetConfiguration().GetNamePool();
             Dictionary<SymbolicName, Component> componentIndex = stylesheetPackage.ComponentIndex;
-            foreach (Component component in componentIndex.Values())
+            foreach (Component component in componentIndex.Values)
             {
                 int fp = component.ComponentKind;
                 if (fp == StandardNames.XSL_MODE && ((Mode)component.GetActor()).IsUnnamedMode())
@@ -1547,11 +1477,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         private void LookForAnyWildcard(IList<XSLExpose> exposeDeclarations, Component component)
         {
             foreach (XSLExpose exposure in exposeDeclarations)
@@ -1572,11 +1497,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         private bool LookForMatchingWildcard(IList<XSLExpose> exposeDeclarations, Component component, bool matched)
         {
 
@@ -1601,33 +1521,18 @@ namespace OutSmart.DAXon.Xslt
             return matched;
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void CompileError(string message, string errorCode)
         {
             XPathException tce = new XPathException(message, errorCode);
             CompileError(tce);
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void CompileError(XPathException error)
         {
             error.SetIsStaticError(true);
             RootElement.CompileError(error);
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void Fixup()
         {
 
@@ -1638,51 +1543,26 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void Complete()
         {
             stylesheetPackage.Complete();
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual SlotManager GetSlotManager()
         {
             return null;
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public GlobalVariable GetEquivalentVariable(Expression select)
         {
             return null; // implemented in Saxon-EE
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public void AddGlobalVariable(GlobalVariable variable)
         {
             AddGlobalVariable(variable, Visibility.PRIVATE);
         }
 
-        //}
-        //return;
-        /// <summary>
-        /// Collect any namespace aliases
-        /// </summary>
         public virtual void AddGlobalVariable(GlobalVariable variable, Visibility visibility)
         {
             Component component = variable.MakeDeclaringComponent(visibility, GetStylesheetPackage());
@@ -1697,7 +1577,7 @@ namespace OutSmart.DAXon.Xslt
             }
             else
             {
-                stylesheetPackage.ComponentIndex.Put(new SymbolicName(StandardNames.XSL_VARIABLE, variable.GetVariableQName()), component);
+                stylesheetPackage.ComponentIndex[new SymbolicName(StandardNames.XSL_VARIABLE, variable.GetVariableQName())] = component;
             }
         }
     }

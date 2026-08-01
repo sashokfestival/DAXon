@@ -4,7 +4,6 @@
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Phase 7.8 round 3: another CS0246 batch.
 
 namespace OutSmart.DAXon.Patterns
 {

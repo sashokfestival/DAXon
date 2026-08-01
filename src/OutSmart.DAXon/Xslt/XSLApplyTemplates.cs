@@ -14,7 +14,6 @@ using OutSmart.DAXon.Transformation.Rules;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -132,7 +131,7 @@ namespace OutSmart.DAXon.Xslt
                 Dictionary<SymbolicName, Component> componentIndex = containingPackage.ComponentIndex;
 
                 // see if there is a mode with this name in a used package
-                Component existing = componentIndex.Get(sName);
+                Component existing = componentIndex.GetOrDefault(sName);
                 if (existing != null)
                 {
                     mode = (Mode)existing.GetActor();

@@ -19,8 +19,6 @@ namespace OutSmart.DAXon.Functions
 {
     public interface IFunctionLibrary
     {
-        void SetConfiguration(Configuration config)
-;
 
 
         bool IsAvailable(SymbolicName.F functionName, int languageLevel);

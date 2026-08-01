@@ -58,8 +58,11 @@ namespace OutSmart.DAXon.Expressions
                     {
                         stepIterator = action.IMap(context);
                     }
-                    catch (XPathException e)
+                    catch (XPathException e) when (!(e is XPathException.StackOverflow))
                     {
+                        // Filtered: `!` over a recursive function nests this iterator once per
+                        // level, and wrapping from inside a catch costs ~20KB of stack per level -
+                        // enough to overrun the guard's headroom before the abort reaches the host.
                         throw new UncheckedXPathException(e);
                     }
 
@@ -129,8 +132,9 @@ namespace OutSmart.DAXon.Expressions
                 {
                     item = action(context);
                 }
-                catch (XPathException e)
+                catch (XPathException e) when (!(e is XPathException.StackOverflow))
                 {
+                    // Filtered: see above - same per-level wrap on the singleton mapping path.
                     throw new UncheckedXPathException(e);
                 }
 

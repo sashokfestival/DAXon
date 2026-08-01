@@ -20,7 +20,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Regex
@@ -57,7 +56,7 @@ namespace OutSmart.DAXon.Regex
             System.IO.Stream @in = Core.Version.platform.LocateResource("casevariants.xml", new List<string>());
             if (@in == null)
             {
-                throw new Exception("Unable to read casevariants.xml file");
+                throw new InvalidOperationException("Unable to read casevariants.xml file");
             }
 
             Configuration config = new Configuration();
@@ -74,7 +73,7 @@ namespace OutSmart.DAXon.Regex
             }
             catch (XPathException e)
             {
-                throw new Exception("Failed to build casevariants.xml", e);
+                throw new InvalidOperationException("Failed to build casevariants.xml", e);
             }
 
             IAxisIterator iter = doc.IterateAxis(AxisInfo.DESCENDANT, new NameTest(Types.Type.ELEMENT, NamespaceUri.NULL, "c", config.GetNamePool()));
@@ -89,7 +88,7 @@ namespace OutSmart.DAXon.Regex
                 string code = item.GetAttributeValue(NamespaceUri.NULL, "n");
                 int icode = Convert.ToInt32(code, 16);
                 string variants = item.GetAttributeValue(NamespaceUri.NULL, "v");
-                string[] vhex = variants.Split(",");
+                string[] vhex = variants.SplitRegex(",");
                 int[] vint = new int[vhex.Length];
                 for (int i = 0; i < vhex.Length; i++)
                 {

@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Resources
 {
-    // Phase 7.8c: EncodingDetector stub - real class excluded.
+    // EncodingDetector stub - real class excluded.
     public static class EncodingDetector
     {
         public static string InferStreamEncoding(object stream, string defaultEnc, object opts) => defaultEnc;

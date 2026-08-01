@@ -13,7 +13,6 @@ using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -45,9 +44,6 @@ namespace OutSmart.DAXon.XQuery
         private AnnotationList annotations = AnnotationList.EMPTY;
         private int mandatoryParams = 0;
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual Expression Body
         {
             get => body; set
@@ -56,19 +52,10 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual string DisplayName => functionName.DisplayName;
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual SymbolicName IdentificationKey => new SymbolicName.F(functionName, parameters.Count);
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual Values.SequenceType ResultType
         {
             get => resultType; set
@@ -77,9 +64,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual Values.SequenceType[] ArgumentTypes
         {
             get
@@ -94,14 +78,8 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual int NumberOfParameters => parameters.Count;
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual AnnotationList Annotations
         {
             get => annotations; set
@@ -118,33 +96,21 @@ namespace OutSmart.DAXon.XQuery
                 }
             }
         }
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public XQueryFunction()
         {
             parameters = new List<UserFunctionParameter>(8);
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual PackageData GetPackageData()
         {
             return staticContext.GetPackageData();
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void SetFunctionName(StructuredQName name)
         {
             functionName = name;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void AddParameter(UserFunctionParameter param)
         {
             parameters.Add(param);
@@ -154,58 +120,37 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void SetLocation(ILocation location)
         {
             this.location = location;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual StructuredQName GetFunctionName()
         {
             return functionName;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public static SymbolicName GetIdentificationKey(StructuredQName qName, int arity)
         {
             return new SymbolicName.F(qName, arity);
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void SetStaticContext(QueryModule env)
         {
             staticContext = env;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual IStaticContext GetStaticContext()
         {
             return staticContext;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual UserFunctionParameter[] GetParameterDefinitions()
         {
             UserFunctionParameter[] @params = new UserFunctionParameter[parameters.Count];
-            return parameters.ToArray(@params);
+            return parameters.ToArray();
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual int GetPositionOfParameter(StructuredQName name)
         {
             int pos = 0;
@@ -222,89 +167,56 @@ namespace OutSmart.DAXon.XQuery
             return -1;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual StructuredQName GetParameterName(int i)
         {
             return parameters[i].GetVariableQName();
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual Expression GetDefaultValueExpression(int i)
         {
             return parameters[i].DefaultValueExpression;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual int GetMinimumArity()
         {
             return mandatoryParams;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void RegisterReference(IUserFunctionResolvable ufc)
         {
             references.Add(ufc);
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void SetMemoFunction(bool isMemoFunction)
         {
             memoFunction = isMemoFunction;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual bool IsMemoFunction()
         {
             return memoFunction;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void SetUpdating(bool isUpdating)
         {
             this.updating = isUpdating;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual bool IsUpdating()
         {
             return updating;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual bool HasAnnotation(StructuredQName name)
         {
             return annotations.Includes(name);
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual bool IsPrivate()
         {
             return HasAnnotation(Annotation.PRIVATE);
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void Compile()
         {
             Configuration config = staticContext.GetConfiguration();
@@ -386,9 +298,6 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         public virtual void Optimize()
         {
             body.CheckForUpdatingSubexpressions();
@@ -453,17 +362,10 @@ namespace OutSmart.DAXon.XQuery
 
             compiledFunction.SetBody(body);
 
-            //compiledFunction.computeEvaluationMode();
             ExpressionTool.AllocateSlots(body, arity, compiledFunction.GetStackFrameMap());
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual void FixupReferences()
         {
             foreach (IUserFunctionResolvable ufc in references)
@@ -472,13 +374,7 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual void CheckReferences(ExpressionVisitor visitor)
         {
             foreach (IUserFunctionResolvable ufr in references)
@@ -495,13 +391,7 @@ namespace OutSmart.DAXon.XQuery
             references = new List<IUserFunctionResolvable>(0);
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual void Explain(ExpressionPresenter @out)
         {
             @out.StartElement("declareFunction");
@@ -525,109 +415,55 @@ namespace OutSmart.DAXon.XQuery
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual UserFunction GetUserFunction()
         {
             return compiledFunction;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual StructuredQName GetObjectName()
         {
             return functionName;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual string GetSystemId()
         {
             return location.GetSystemId();
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual int GetLineNumber()
         {
             return location.GetLineNumber();
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual string GetPublicId()
         {
             return null;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual int GetColumnNumber()
         {
             return -1;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual ILocation SaveLocation()
         {
             return this;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual INamespaceResolver GetNamespaceResolver()
         {
             return namespaceResolver;
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual object GetProperty(string name)
         {
             if ("name".Equals(name))
@@ -644,26 +480,14 @@ namespace OutSmart.DAXon.XQuery
             }
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual IEnumerator<string> GetProperties()
         {
             yield return "name";
             yield return "as";
         }
 
-        /// <summary>
-        /// Create an XQuery function
-        /// </summary>
         // module.
-        /// <summary>
-        /// Fix up references to this function
-        /// </summary>
         public virtual HostLanguage GetHostLanguage()
         {
             return HostLanguage.XQUERY;

@@ -37,9 +37,6 @@ namespace OutSmart.DAXon.Lib
         private bool outputErrorCodes = true;
         private HashSet<StructuredQName> suppressedWarnings;
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual Logger Logger
         {
             get => logger; set
@@ -48,9 +45,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual int MaximumNumberOfWarnings
         {
             get => this.maximumNumberOfWarnings; set
@@ -59,9 +53,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual int MaximumNumberOfErrors
         {
             get => this.maximumNumberOfErrors; set
@@ -70,9 +61,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual int MaxOrdinaryCharacter
         {
             get => maxOrdinaryCharacter; set
@@ -81,9 +69,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual int StackTraceDetail
         {
             get => stackTraceDetail; set
@@ -92,38 +77,20 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual int NumberOfWarnings => warningCount;
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual int NumberOfErrors => errorCount;
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual IXmlProcessingError LatestError => latestError;
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public StandardErrorReporter()
         {
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual void SetOutputErrorCodes(bool include)
         {
             this.outputErrorCodes = include;
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual void SuppressWarning(string code)
         {
             if (suppressedWarnings == null)
@@ -141,17 +108,11 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual bool IsSuppressedWarning(StructuredQName errorCode)
         {
             return suppressedWarnings != null && suppressedWarnings.Contains(errorCode);
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public void Report(IXmlProcessingError processingError)
         {
             if (processingError != latestError)
@@ -171,9 +132,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         protected virtual void Warning(IXmlProcessingError error)
         {
             if (logger == null)
@@ -182,36 +140,48 @@ namespace OutSmart.DAXon.Lib
             }
 
             string message = ConstructMessage(error, "", "Warning ");
-            if (!warningsIssued.Contains(message))
+
+            // Locked (round BG-P3): ONE StandardErrorReporter sits on the Configuration's default
+            // compiler info and every XsltCompiler shares it by reference, so concurrent compiles
+            // used to race a bare HashSet. Cold path - warnings are compile diagnostics.
+            lock (warningsIssued)
             {
-                if (warningCount > MaximumNumberOfWarnings)
+                if (!warningsIssued.Contains(message))
                 {
-                    if (warningCount == MaximumNumberOfWarnings + 1)
+                    if (warningCount > MaximumNumberOfWarnings)
                     {
-                        logger.Info("No more warnings will be displayed");
+                        if (warningCount == MaximumNumberOfWarnings + 1)
+                        {
+                            logger.Info("No more warnings will be displayed");
+                        }
+                    }
+                    else
+                    {
+                        logger.Warning(message);
+                    }
+
+                    warningCount++;
+
+                    // The set exists to dedup what is DISPLAYED, and this reporter lives as long as
+                    // the Processor - so once display has permanently stopped, remembering further
+                    // texts would only grow the set by one full formatted message per distinct
+                    // warning ever seen (each embeds systemId+line, i.e. per stylesheet compiled)
+                    // for the life of the process. Bounded at the display cap instead; the price is
+                    // that post-cap repeats re-enter this block and inflate NumberOfWarnings, which
+                    // no longer drives any behavior at that point.
+                    if (warningCount <= MaximumNumberOfWarnings + 1)
+                    {
+                        warningsIssued.Add(message);
                     }
                 }
-                else
-                {
-                    logger.Warning(message);
-                }
-
-                warningCount++;
-                warningsIssued.Add(message);
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual bool IsReportingWarnings()
         {
             return warningCount < MaximumNumberOfWarnings;
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         protected virtual void Error(IXmlProcessingError err)
         {
             if (errorCount++ > maximumNumberOfErrors)
@@ -271,17 +241,11 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string ConstructMessage(IXmlProcessingError exception, string langText, string kind)
         {
             return ConstructFirstLine(exception, langText, kind) + "\n  " + ConstructSecondLine(exception);
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string ConstructFirstLine(IXmlProcessingError error, string langText, string kind)
         {
             ILocation locator = error.GetLocation();
@@ -330,9 +294,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string FormatExtraContext(Expression failingExpression, string nearBy)
         {
             if (failingExpression != null)
@@ -356,26 +317,17 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string ConstructSecondLine(IXmlProcessingError err)
         {
             return ExpandSpecialCharacters(WordWrap(GetExpandedMessage(err)));
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         protected virtual string GetLocationMessage(IXmlProcessingError err)
         {
             ILocation loc = err.GetLocation();
             return GetLocationMessageText(loc);
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string GetExpandedMessage(IXmlProcessingError err)
         {
             string message = FormatErrorCode(err) + " " + err.GetMessage();
@@ -383,9 +335,6 @@ namespace OutSmart.DAXon.Lib
             return message;
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string FormatNestedMessages(IXmlProcessingError err, string message)
         {
             if (err.GetCause() == null)
@@ -404,39 +353,30 @@ namespace OutSmart.DAXon.Lib
                         AppendStackTrace(e, sw);
                         sb.Append('\n').Append(sw);
                     }
-                    else if (!message.Contains(e.GetMessage()))
+                    else if (!message.Contains(e.Message))
                     {
-                        sb.Append(". Caused by ").Append(e.GetType().GetName());
+                        sb.Append(". Caused by ").Append(e.GetType().FullName);
                     }
 
-                    string next = e.GetMessage();
+                    string next = e.Message;
                     if (next != null)
                     {
                         sb.Append(": ").Append(next);
                     }
 
-                    e = e.GetCause() as Exception ?? (e.GetCause() == null ? null : new Exception(e.GetCause().Message)); // message-only wrap: keeping the inner exception loops forever (wrap.GetCause()==cause)
+                    e = e.InnerException as Exception ?? (e.InnerException == null ? null : new Exception(e.InnerException.Message)); // message-only wrap: keeping the inner exception loops forever (wrap.GetCause()==cause)
                 }
 
                 return sb.ToString();
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         private void AppendStackTrace(Exception e, StringWriter sw)
         {
             sw.WriteLine(e.ToString()); sw.WriteLine(e.StackTrace);
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string FormatErrorCode(IXmlProcessingError err)
         {
             if (outputErrorCodes)
@@ -458,9 +398,6 @@ namespace OutSmart.DAXon.Lib
             return "";
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         public virtual string ExpandSpecialCharacters(string @in)
         {
             if (logger.IsUnicodeAware())
@@ -473,9 +410,6 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        /// <summary>
-        /// Create a Standard Error Reporter
-        /// </summary>
         protected virtual void OutputStackTrace(Logger @out, IXPathContext context)
         {
             LogStackTrace(context, @out, stackTraceDetail);

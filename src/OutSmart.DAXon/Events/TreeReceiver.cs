@@ -77,14 +77,19 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// End of event sequence
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
             if (nextReceiver != null)
             {
-                nextReceiver.Dispose();
+                nextReceiver.Close();
             }
 
             previousAtomic = false;
+        }
+
+        public override void Dispose()
+        {
+            nextReceiver?.Dispose();
         }
 
         /// <summary>

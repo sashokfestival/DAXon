@@ -25,9 +25,6 @@ namespace OutSmart.DAXon.Functions
     public class Subsequence_2 : SystemFunction, ICallable
     {
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         // fall through  (for example, in 1.0 mode start can be a StringValue ...)
         public override string StreamerName => "Subsequence";
 
@@ -37,25 +34,16 @@ namespace OutSmart.DAXon.Functions
             return arguments[0].GetSpecialProperties();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override int GetCardinality(Expression[] arguments)
         {
             return arguments[0].GetCardinality() | StaticProperty.ALLOWS_ZERO_OR_ONE;
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             return SequenceTool.ToLazySequence(SubSequence(arguments[0].Iterate(), (NumericValue)arguments[1].Head()));
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public static ISequenceIterator SubSequence(ISequenceIterator seq, NumericValue startVal)
         {
             long lstart;
@@ -98,9 +86,6 @@ namespace OutSmart.DAXon.Functions
             return TailIterator.Make(seq, (int)lstart);
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override Expression MakeFunctionCall(Expression[] arguments)
         {
 

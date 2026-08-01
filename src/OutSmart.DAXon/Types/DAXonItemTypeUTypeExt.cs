@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Patterns;
 
-// Phase 5: replace OutSmart.DAXon.Internal's `GetUType(this ItemType) => object` (which broke 42 sites)
+// Replace OutSmart.DAXon.Internal's `GetUType(this ItemType) => object` (which broke 42 sites)
 // with a UType-typed shim on the Saxon side. ItemType lives in OutSmart.DAXon.Types namespace
 // so we put the extension there too. Callers already have `using OutSmart.DAXon.Types;`.
 namespace OutSmart.DAXon.Types

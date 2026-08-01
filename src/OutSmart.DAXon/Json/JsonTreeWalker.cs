@@ -47,7 +47,7 @@ namespace OutSmart.DAXon.Json
                 WalkElement(tree, root, receiver, controller);
             }
 
-            receiver.Dispose();
+            receiver.Close();
             return true;
         }
 

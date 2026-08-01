@@ -16,7 +16,6 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Collections;
 
 namespace OutSmart.DAXon.Text
@@ -54,7 +53,7 @@ namespace OutSmart.DAXon.Text
 
         public static StringView Of(string s) => new StringView(s);
         public static UnicodeString TidyZeroLength(UnicodeString us) => us == null ? (UnicodeString)new StringView("") : us;
-        // Phase 5: Tidy(UnicodeString) - normalizes / interns the string.
+        // Tidy(UnicodeString) - normalizes / interns the string.
         public static UnicodeString Tidy(UnicodeString us) => us ?? (UnicodeString)new StringView("");
         public static UnicodeString Tidy(string s) => new StringView(s);
         public override long Length() => _cps != null ? _cps.Length : _s.Length;
@@ -93,7 +92,10 @@ namespace OutSmart.DAXon.Text
         {
             if (_cps != null)
             {
-                for (long i = Math.Max(from, 0); i < _cps.Length; i++) { if (_cps[i] == codePoint) return i; }
+                for (long i = Math.Max(from, 0); i < _cps.Length; i++)
+                {
+                    if (_cps[i] == codePoint) return i;
+                }
                 return -1;
             }
             if (codePoint > char.MaxValue)
@@ -105,10 +107,16 @@ namespace OutSmart.DAXon.Text
         {
             if (_cps != null)
             {
-                for (long i = Math.Max(from, 0); i < _cps.Length; i++) { if (predicate(_cps[i])) return i; }
+                for (long i = Math.Max(from, 0); i < _cps.Length; i++)
+                {
+                    if (predicate(_cps[i])) return i;
+                }
                 return -1;
             }
-            for (int i = (int)from; i < _s.Length; i++) { if (predicate(_s[i])) return i; }
+            for (int i = (int)from; i < _s.Length; i++)
+            {
+                if (predicate(_s[i])) return i;
+            }
             return -1;
         }
         public override string ToString() => _s;
@@ -126,7 +134,11 @@ namespace OutSmart.DAXon.Text
         }
         public override void Copy32bit(int[] target, int offset)
         {
-            if (_cps != null) { Array.Copy(_cps, 0, target, offset, _cps.Length); return; }
+            if (_cps != null)
+            {
+                Array.Copy(_cps, 0, target, offset, _cps.Length);
+                return;
+            }
             for (int i = 0; i < _s.Length; i++)
                 target[offset + i] = _s[i];
         }

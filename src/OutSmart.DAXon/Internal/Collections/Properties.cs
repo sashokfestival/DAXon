@@ -4,14 +4,12 @@
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using System.Collections.Generic;
-using System.IO;
 
 namespace OutSmart.DAXon.Internal.Collections
 {
-    /// <summary>
-    /// Java Properties shim — string-keyed string-valued map with load/store and defaults.
-    /// Minimal implementation sufficient for Saxon config loading.
-    /// </summary>
+    // String-keyed map with a DEFAULTS chain (java.util.Properties semantics): lookups fall
+    // through to the defaults instance, writes stay local. The serialization pipeline layers
+    // local output properties over stylesheet/global defaults this way.
     public class Properties : Dictionary<string, string>
     {
         private readonly Properties _defaults;
@@ -28,31 +26,16 @@ namespace OutSmart.DAXon.Internal.Collections
         public string GetProperty(string key, string defaultValue) => GetProperty(key) ?? defaultValue;
         public object SetProperty(string key, string value) { TryGetValue(key, out var prev); this[key] = value; return prev; }
 
-        public ICollection<string> StringPropertyNames() => Keys;
-
-        public void Load(TextReader reader)
+        // Includes keys inherited from the defaults chain, as in Java — enumerating an
+        // instance whose values all live in its defaults must not come back empty.
+        public ICollection<string> StringPropertyNames()
         {
-            string line;
-            while ((line = reader.ReadLine()) != null)
-            {
-                line = line.Trim();
-                if (line.Length == 0 || line.StartsWith("#", global::System.StringComparison.Ordinal) || line.StartsWith("!", global::System.StringComparison.Ordinal))
-                    continue;
-                var eq = line.IndexOfAny(new[] { '=', ':' });
-                if (eq < 0)
-                    this[line] = "";
-                else
-                    this[line.Substring(0, eq).Trim()] = line.Substring(eq + 1).Trim();
-            }
-        }
-        public void Load(global::System.IO.Stream s) { using (var r = new StreamReader(s)) Load(r); }
-
-        public void Store(TextWriter writer, string comments)
-        {
-            if (comments != null)
-                writer.WriteLine("# " + comments);
-            foreach (var kv in this)
-                writer.WriteLine(kv.Key + "=" + kv.Value);
+            if (_defaults == null)
+                return Keys;
+            var names = new HashSet<string>(Keys);
+            foreach (string k in _defaults.StringPropertyNames())
+                names.Add(k);
+            return names;
         }
     }
 }

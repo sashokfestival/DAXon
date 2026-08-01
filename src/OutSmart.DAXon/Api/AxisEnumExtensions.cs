@@ -13,7 +13,6 @@
 // This file provides extension methods that recreate the Java method semantics
 // for use sites that still call them as `enum.Method()`.
 //
-// Phase 5 — paulirwin conversion drift cleanup.
 
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Lib;
@@ -23,7 +22,7 @@ using OutSmart.DAXon.Values;
 
 namespace OutSmart.DAXon.Api
 {
-    // Phase 5: Axis.GetAxisNumber() — Java enum had this method.
+    // Axis.GetAxisNumber() — Java enum had this method.
     public static class AxisEnumExtensions
     {
         public static int GetAxisNumber(this Axis axis) => (int)axis;

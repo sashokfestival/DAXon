@@ -40,7 +40,7 @@ namespace OutSmart.DAXon.Api
 
         public string GetMessage()
         {
-            return InnerException.GetMessage();
+            return InnerException.Message;
         }
 
         public virtual QName GetErrorCode()

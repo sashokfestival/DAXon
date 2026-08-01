@@ -5,6 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace OutSmart.DAXon.Internal.Regex
 {
+    using System;
     using SysMatch = global::System.Text.RegularExpressions.Match;
     using SysGroup = global::System.Text.RegularExpressions.Group;
 
@@ -23,14 +24,22 @@ namespace OutSmart.DAXon.Internal.Regex
         public bool Find()
         {
             _current = _pattern.Regex.Match(_input, _searchStart);
-            if (_current.Success) { _searchStart = _current.Index + global::System.Math.Max(1, _current.Length); return true; }
+            if (_current.Success)
+            {
+                _searchStart = _current.Index + Math.Max(1, _current.Length);
+                return true;
+            }
             return false;
         }
 
         public bool Find(int start)
         {
             _current = _pattern.Regex.Match(_input, start);
-            if (_current.Success) { _searchStart = _current.Index + global::System.Math.Max(1, _current.Length); return true; }
+            if (_current.Success)
+            {
+                _searchStart = _current.Index + Math.Max(1, _current.Length);
+                return true;
+            }
             return false;
         }
 

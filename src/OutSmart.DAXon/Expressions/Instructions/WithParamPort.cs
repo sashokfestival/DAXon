@@ -5,16 +5,8 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Runtime 2026-06-10: HAND-PORTED from upstream/saxon12-9-src/net/sf/saxon/expr/instruct/WithParam.java (338
-// lines). The JavaToCSharp converter CRASHES on this file (ArgumentException: identifier — a `params`-named
-// Java parameter), so poc/output/full has only WithParam.error and the class previously existed solely as a
-// HOLLOW compat stub (JavaInternals.cs, namespace OutSmart.DAXon.Transformation): GetSelectValue=>null, GetSlotNumber=>0,
-// all statics no-ops. Consequences: xsl:next-iteration set slots to null (NRE in SetLocalVariable via
-// MakeRepeatable), and every xsl:with-param value for apply-templates/call-template silently evaporated.
-// This is a faithful 1:1 port; member shapes match the transpiled call sites exactly (verified by grep:
-// SetSelectExpression(parent,select), Copy(parent,params,rebindings), ExportParameters(params,out,tunnel),
-// TypeCheck(params,visitor,info), Optimize(visitor,params,info), GatherOperands(parent,params,list),
-// GetSelectValue(context), Get/SetSlotNumber, Get/SetVariableQName, Is/SetTypeChecked, GetRequiredType).
+// Hand-ported 1:1 from upstream WithParam.java (the JavaToCSharp converter crashes on it — a `params`-named
+// Java parameter). Member shapes match the transpiled call sites exactly.
 
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Expressions.Elaboration;

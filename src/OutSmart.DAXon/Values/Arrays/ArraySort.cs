@@ -110,7 +110,7 @@ namespace OutSmart.DAXon.Values.Arrays
             }
             catch (InvalidCastException e)
             {
-                throw new XPathException("Non-comparable types found while sorting: " + e.GetMessage()).WithErrorCode("XPTY0004").AsTypeError();
+                throw new XPathException("Non-comparable types found while sorting: " + e.Message).WithErrorCode("XPTY0004").AsTypeError();
             }
 
             IList<IGroundedValue> outputList = new List<IGroundedValue>(array.ArrayLength());

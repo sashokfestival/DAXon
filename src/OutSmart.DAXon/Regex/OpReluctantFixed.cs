@@ -50,7 +50,8 @@ namespace OutSmart.DAXon.Regex
         private sealed class AnonymousIntIterator : AbstractIntIterator
         {
 
-            private readonly OpReluctantFixed parent; private readonly REMatcher matcher;
+            private readonly OpReluctantFixed parent;
+            private readonly REMatcher matcher;
             private int pos;
             private int count = 0;
             private bool started = false;

@@ -118,12 +118,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add two dayTimeDurations
-        /// </summary>
-        /// <summary>
-        /// Subtract two dayTime-durations
-        /// </summary>
         public IXPathComparable XPathComparable => this;
 
         public DayTimeDurationValue(int sign, int days, int hours, int minutes, long seconds, int microseconds) : base(sign > 0, 0, 0, days, hours, minutes, seconds, microseconds, BuiltInAtomicType.DAY_TIME_DURATION)
@@ -171,7 +165,7 @@ namespace OutSmart.DAXon.Values
 
         public static DayTimeDurationValue FromMilliseconds(long milliseconds)
         {
-            int sign = System.Math.Sign(milliseconds);
+            int sign = Math.Sign(milliseconds);
             if (sign < 0)
             {
                 milliseconds = -milliseconds;
@@ -191,7 +185,7 @@ namespace OutSmart.DAXon.Values
 
         public static DayTimeDurationValue FromMicroseconds(long microseconds)
         {
-            int sign = System.Math.Sign(microseconds);
+            int sign = Math.Sign(microseconds);
             if (sign < 0)
             {
                 microseconds = -microseconds;
@@ -209,7 +203,7 @@ namespace OutSmart.DAXon.Values
         {
 
             // Fast path for simple cases
-            if (System.Math.Abs(factor) < 0x7fffffff && System.Math.Abs(_seconds) < 0x7fffffff && _nanoseconds == 0)
+            if (Math.Abs(factor) < 0x7fffffff && Math.Abs(_seconds) < 0x7fffffff && _nanoseconds == 0)
             {
                 return new DayTimeDurationValue(0, 0, 0, _seconds * factor * (_negative ? -1 : 1), 0);
             }
@@ -245,9 +239,9 @@ namespace OutSmart.DAXon.Values
             }
             catch (ArgumentException err)
             {
-                if (err.GetCause() is XPathException)
+                if (err.InnerException is XPathException)
                 {
-                    throw (XPathException)err.GetCause();
+                    throw (XPathException)err.InnerException;
                 }
                 else
                 {
@@ -256,9 +250,9 @@ namespace OutSmart.DAXon.Values
             }
             catch (ArithmeticException err)
             {
-                if (err.GetCause() is XPathException)
+                if (err.InnerException is XPathException)
                 {
-                    throw (XPathException)err.GetCause();
+                    throw (XPathException)err.InnerException;
                 }
                 else
                 {
@@ -287,9 +281,9 @@ namespace OutSmart.DAXon.Values
             }
             catch (ArgumentException err)
             {
-                if (err.GetCause() is XPathException)
+                if (err.InnerException is XPathException)
                 {
-                    throw (XPathException)err.GetCause();
+                    throw (XPathException)err.InnerException;
                 }
                 else
                 {
@@ -298,9 +292,9 @@ namespace OutSmart.DAXon.Values
             }
             catch (ArithmeticException err)
             {
-                if (err.GetCause() is XPathException)
+                if (err.InnerException is XPathException)
                 {
-                    throw (XPathException)err.GetCause();
+                    throw (XPathException)err.InnerException;
                 }
                 else
                 {
@@ -364,12 +358,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add two dayTimeDurations
-        /// </summary>
-        /// <summary>
-        /// Subtract two dayTime-durations
-        /// </summary>
         public override DurationValue Subtract(DurationValue other)
         {
             if (other is DayTimeDurationValue)
@@ -403,12 +391,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add two dayTimeDurations
-        /// </summary>
-        /// <summary>
-        /// Subtract two dayTime-durations
-        /// </summary>
         public override DurationValue Negate()
         {
             if (_negative)
@@ -421,23 +403,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add two dayTimeDurations
-        /// </summary>
-        /// <summary>
-        /// Subtract two dayTime-durations
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             return this;
         }
 
-        /// <summary>
-        /// Add two dayTimeDurations
-        /// </summary>
-        /// <summary>
-        /// Subtract two dayTime-durations
-        /// </summary>
         public int CompareTo(IXPathComparable other)
         {
             if (other is DayTimeDurationValue)
@@ -464,12 +434,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Add two dayTimeDurations
-        /// </summary>
-        /// <summary>
-        /// Subtract two dayTime-durations
-        /// </summary>
         public override IAtomicMatchKey GetXPathMatchKey(IStringCollator collator, int implicitTimezone)
         {
             return this;

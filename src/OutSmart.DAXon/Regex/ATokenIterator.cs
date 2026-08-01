@@ -28,9 +28,6 @@ namespace OutSmart.DAXon.Regex
         private readonly REMatcher matcher;
         private StringValue current;
         private int prevEnd;
-        /// <summary>
-        /// Construct an ATokenIterator.
-        /// </summary>
         public ATokenIterator(UnicodeString input, REMatcher matcher)
         {
             this.input = input;
@@ -38,9 +35,6 @@ namespace OutSmart.DAXon.Regex
             prevEnd = 0;
         }
 
-        /// <summary>
-        /// Construct an ATokenIterator.
-        /// </summary>
         public virtual StringValue Next()
         {
             if (prevEnd < 0)
@@ -54,10 +48,10 @@ namespace OutSmart.DAXon.Regex
             {
                 matched = matcher.Match(input, prevEnd);
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                // Same conversion as ARegexIterator: iterator protocol, so unchecked wrap.
-                throw new UncheckedXPathException(ARegularExpression.StackOverflowError());
+                // Same as ARegexIterator: described, not wrapped.
+                throw ARegularExpression.DescribeOverflow(e);
             }
 
             if (matched)
@@ -75,9 +69,6 @@ namespace OutSmart.DAXon.Regex
             return CurrentStringValue();
         }
 
-        /// <summary>
-        /// Construct an ATokenIterator.
-        /// </summary>
         private StringValue CurrentStringValue()
         {
             return current;

@@ -6,8 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Buffers;
-using OutSmart.DAXon.Internal.Charsets;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -56,32 +54,26 @@ namespace OutSmart.DAXon.Values
             // are replaced with '\uFFFD'.
             // Exception: any "%" found between "[]" is left alone. It is an IPv6 literal
             //            with a scope_id
-            //
+            // A '%' with fewer than two characters after it is kept literally: the previous
+            // version indexed past the end of the string, and its Java-shim decoder was a
+            // hollow stub that turned EVERY escape into the empty string.
             if (s == null)
             {
                 return null;
             }
 
             int n = s.Length;
-            if (n == 0)
-            {
-                return s;
-            }
-
-            if (s.IndexOf('%') < 0)
+            if (n == 0 || s.IndexOf('%') < 0)
             {
                 return s;
             }
 
             StringBuilder sb = new StringBuilder(n);
-            ByteBuffer bb = ByteBuffer.Allocate(n);
-            Charset utf8 = StandardCharsets.UTF_8;
-
-            // This is not horribly efficient, but it will do for now
-            char c = s[0];
+            var octets = new List<byte>(8);
             bool betweenBrackets = false;
             for (int i = 0; i < n;)
             {
+                char c = s[i];
                 if (c == '[')
                 {
                     betweenBrackets = true;
@@ -94,33 +86,27 @@ namespace OutSmart.DAXon.Values
                 if (c != '%' || betweenBrackets)
                 {
                     sb.Append(c);
-                    if (++i >= n)
-                    {
-                        break;
-                    }
-
-                    c = s[i];
+                    i++;
                     continue;
                 }
 
-                bb.Clear();
-                for (; ; )
+                if (i + 2 >= n)
                 {
-                    bb.Put(Hex(s[++i], s[++i]));
-                    if (++i >= n)
-                    {
-                        break;
-                    }
-
-                    c = s[i];
-                    if (c != '%')
-                    {
-                        break;
-                    }
+                    // "%" or "%X" at the very end: keep it literally instead of reading past the string
+                    sb.Append(s, i, n - i);
+                    break;
                 }
 
-                bb.Flip();
-                sb.Append(utf8.Decode(bb));
+                // Collect the octets of consecutive %XX escapes, then UTF-8-decode them together
+                // (a multi-byte character spans several escapes); invalid sequences become U+FFFD.
+                octets.Clear();
+                while (i + 2 < n && s[i] == '%')
+                {
+                    octets.Add(Hex(s[i + 1], s[i + 2]));
+                    i += 3;
+                }
+
+                sb.Append(Encoding.UTF8.GetString(octets.ToArray()));
             }
 
             return sb.ToString();

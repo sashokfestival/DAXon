@@ -50,6 +50,9 @@ namespace OutSmart.DAXon.Values.Arrays
 
         public override IAtomicSequence Atomize()
         {
+            // Nested arrays recurse back through here, one level per member. The depth is the
+            // input's, not the stylesheet's: ~8KB of attacker JSON atomized by a fixed sheet.
+            StackGuard.Probe();
             IList<AtomicValue> list = new List<AtomicValue>(ArrayLength());
             foreach (IGroundedValue seq in Members())
             {
@@ -177,20 +180,36 @@ namespace OutSmart.DAXon.Values.Arrays
         /// </summary>
         public override string ToString()
         {
-            StringBuilder buffer = new StringBuilder(256);
-            buffer.Append("[");
-            foreach (IGroundedValue seq in Members())
+            // Host-facing full dump (nothing in the engine calls it): unlike ToShortString it
+            // keeps every member, but the DEPTH must still be bounded - the nesting is the
+            // value's, and a debugger evaluating ToString on attacker JSON must not die.
+            Err.EnterDepiction();
+            try
             {
-                if (buffer.Length > 1)
+                if (Err.DepictionTooDeep)
                 {
-                    buffer.Append(", ");
+                    return "[...]";
                 }
 
-                buffer.Append(seq.ToString());
-            }
+                StringBuilder buffer = new StringBuilder(256);
+                buffer.Append('[');
+                foreach (IGroundedValue seq in Members())
+                {
+                    if (buffer.Length > 1)
+                    {
+                        buffer.Append(", ");
+                    }
 
-            buffer.Append("]");
-            return buffer.ToString();
+                    buffer.Append(seq.ToString());
+                }
+
+                buffer.Append(']');
+                return buffer.ToString();
+            }
+            finally
+            {
+                Err.LeaveDepiction();
+            }
         }
 
         /// <summary>
@@ -229,8 +248,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
 
             return memberType; //        } catch (XPathException e) {
-            //            return SequenceType.ANY_SEQUENCE;
-            //        }
         }
     }
 }

@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Internal.Functional;
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Values;
 
@@ -47,7 +46,10 @@ namespace OutSmart.DAXon.Functions
                 {
                     size = 0;
                     IItem __c;
-                    while ((__c = __it.Next()) != null) { size++; }
+                    while ((__c = __it.Next()) != null)
+                    {
+                        size++;
+                    }
                 }
             }
             return Int64Value.MakeIntegerValue(size);

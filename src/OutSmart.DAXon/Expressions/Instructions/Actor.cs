@@ -26,6 +26,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 {
     public abstract class Actor : IExpressionOwner, ILocation
     {
+        protected readonly object syncLock = new object();
         protected Expression body;
         private string systemId;
         private int lineNumber;
@@ -257,7 +258,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         protected virtual ITailCall Process(Outputter @out, IXPathContext context)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (bodyEvaluator == null)
                 {

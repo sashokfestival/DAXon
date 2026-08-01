@@ -36,10 +36,10 @@ namespace OutSmart.DAXon.Regex
         {
             IIntIterator baseIter = @base.IterateMatches(matcher, position);
             int iterNr = counter++;
-            string clName = baseIter.GetType().GetName();
+            string clName = baseIter.GetType().FullName;
             int lastDot = clName.LastIndexOf('.');
             string iterName = clName.Substring(lastDot + 1);
-            Console.Error.WriteLine("Iterating over " + @base.GetType().GetSimpleName() + " " + @base.Display() + " at position " + position + " returning " + iterName + " " + iterNr);
+            Console.Error.WriteLine("Iterating over " + @base.GetType().Name + " " + @base.Display() + " at position " + position + " returning " + iterName + " " + iterNr);
             return new AnonymousIntIterator(this, baseIter, iterNr);
         }
 
@@ -62,7 +62,9 @@ namespace OutSmart.DAXon.Regex
         private sealed class AnonymousIntIterator : AbstractIntIterator
         {
 
-            private readonly OpTrace parent; private readonly IIntIterator baseIter; private readonly int iterNr;
+            private readonly OpTrace parent;
+            private readonly IIntIterator baseIter;
+            private readonly int iterNr;
             public AnonymousIntIterator(OpTrace parent, IIntIterator baseIter, int iterNr)
             {
                 this.parent = parent; this.baseIter = baseIter; this.iterNr = iterNr;

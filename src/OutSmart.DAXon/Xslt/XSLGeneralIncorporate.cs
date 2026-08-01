@@ -16,7 +16,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Xslt
 {
@@ -73,9 +72,12 @@ namespace OutSmart.DAXon.Xslt
                 return null;
             }
 
+            // Each level of xsl:include/xsl:import recurses through here into SpliceIncludes below.
+            // The XTSE0180 cycle check only catches a repeated URI, so a server handing out a fresh
+            // URI per level (or a generated chain) recurses without bound and overflows the
+            // uncatchable .NET stack while compiling - ~900 levels on a 1 MB worker thread (AW).
+            ProbeStylesheetDepth();
 
-            //checkEmpty();
-            //checkTopLevel((this instanceof XSLInclude ? "XTSE0170" : "XTSE0190"));
             try
             {
                 PrincipalStylesheetModule psm = importer.GetPrincipalStylesheetModule();

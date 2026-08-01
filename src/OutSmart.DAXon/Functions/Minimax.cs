@@ -33,12 +33,6 @@ namespace OutSmart.DAXon.Functions
 
         public virtual IPlainType ArgumentType => argumentType;
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override string StreamerName => "Minimax";
         public abstract bool IsMaxFunction();
         public virtual void SetIgnoreNaN(bool ignore)
@@ -89,12 +83,6 @@ namespace OutSmart.DAXon.Functions
             return @base.GetPrimitiveItemType();
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override int GetCardinality(Expression[] arguments)
         {
             if (!Cardinality.AllowsZero(arguments[0].GetCardinality()))
@@ -107,12 +95,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
 
@@ -160,12 +142,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override IAtomicComparer GetAtomicComparer(IXPathContext context)
         {
             IAtomicComparer comparer = PreAllocatedAtomicComparer;
@@ -184,12 +160,6 @@ namespace OutSmart.DAXon.Functions
             return GenericAtomicComparer.MakeAtomicComparer(prim, prim, StringCollator, context);
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public static AtomicValue MinimaxFn(ISequenceIterator iter, bool isMaxFunction, IAtomicComparer atomicComparer, bool ignoreNaN, IXPathContext context)
         {
             ConversionRules rules = context.GetConfiguration().GetConversionRules();
@@ -404,23 +374,11 @@ namespace OutSmart.DAXon.Functions
             return min;
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             return SequenceTool.ItemOrEmpty(MinimaxFn(arguments[0].Iterate(), IsMaxFunction(), GetAtomicComparer(context), ignoreNaN, context));
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override void ExportAttributes(ExpressionPresenter @out)
         {
             base.ExportAttributes(@out);
@@ -430,12 +388,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override void ImportAttributes(Properties attributes)
         {
             base.ImportAttributes(attributes);
@@ -447,12 +399,6 @@ namespace OutSmart.DAXon.Functions
         }
 
         /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
-        /// <summary>
         /// Concrete subclass to define the fn:min() function
         /// </summary>
         public class Min : Minimax
@@ -463,12 +409,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Static analysis: preallocate a comparer if possible
-        /// </summary>
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         /// <summary>
         /// Concrete subclass to define the fn:max() function
         /// </summary>

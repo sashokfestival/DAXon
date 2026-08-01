@@ -8,7 +8,6 @@ using OutSmart.DAXon.Collections;using OutSmart.DAXon.Functions;
 
 using static OutSmart.DAXon.Text.StrHelpers;
 
-using OutSmart.DAXon.Internal.Functional;
 
 using System;
 
@@ -103,7 +102,7 @@ namespace OutSmart.DAXon.Text
         {
             for (int i = requireNonNegativeInt(from) + start; i < end; i++)
             {
-                if (predicate.Test(chars[i]))
+                if (predicate(chars[i]))
                 {
                     return i - start;
                 }

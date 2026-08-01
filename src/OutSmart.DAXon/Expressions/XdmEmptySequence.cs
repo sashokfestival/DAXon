@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Expressions
 {
-    // Phase 5: more Expr stubs.
+    // More Expr stubs.
     public class XdmEmptySequence
     {
         private static readonly XdmEmptySequence _instance = new XdmEmptySequence();

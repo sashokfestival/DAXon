@@ -358,7 +358,7 @@ namespace OutSmart.DAXon.Lib
         {
             s1 = Whitespace.RemoveAllWhitespace(s1);
             s2 = Whitespace.RemoveAllWhitespace(s2);
-            if (s1.EqualsIgnoreCase(s2))
+            if (s1.Equals(s2, global::System.StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -370,7 +370,7 @@ namespace OutSmart.DAXon.Lib
             {
                 return true;
             }
-            else if (s1.Length > 8 && System.Math.Abs(s2.Length - s1.Length) < 3)
+            else if (s1.Length > 8 && Math.Abs(s2.Length - s1.Length) < 3)
             {
                 int diff = 0;
                 for (int i = 0; i < s1.Length; i++)

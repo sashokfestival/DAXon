@@ -184,7 +184,7 @@ namespace OutSmart.DAXon.Json
                     hex.Insert(0, "0");
                 }
 
-                escaped.Append(hex.ToString().ToUpperCase());
+                escaped.Append(hex.ToString().ToUpperInvariant());
             }
 
             string replacement = Replace(escaped.ToString(), context);
@@ -192,14 +192,14 @@ namespace OutSmart.DAXon.Json
             {
                 for (int j = 0; j < count; j++)
                 {
-                    buffer.SetCharAt(offset + j, replacement[j]);
+                    buffer[offset + j] = replacement[j];
                 }
             }
             else
             {
                 for (int j = 0; j < count; j++)
                 {
-                    buffer.DeleteCharAt(offset + j);
+                    buffer.Remove(offset + j, 1);
                 }
 
                 for (int j = 0; j < replacement.Length; j++)
@@ -227,7 +227,7 @@ namespace OutSmart.DAXon.Json
 
         public virtual void SetFallbackFunction(Dictionary<string, IGroundedValue> options, IXPathContext context)
         {
-            IGroundedValue val = options.ContainsKey("fallback") ? options.Get("fallback") : null;
+            IGroundedValue val = options.ContainsKey("fallback") ? options.GetOrDefault("fallback") : null;
             if (val != null)
             {
                 IItem fn = val.Head();

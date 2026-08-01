@@ -51,44 +51,8 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
-        /// Notify a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Notify a comment
-        /// </summary>
         public virtual ParentNodeImpl CurrentParentNode => currentNode;
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
-        /// Notify a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Notify a comment
-        /// </summary>
         public virtual NodeImpl CurrentLeafNode => (NodeImpl)currentNode.LastChild;
         public LinkedTreeBuilder(PipelineConfiguration pipe) : base(pipe)
         {
@@ -144,7 +108,7 @@ namespace OutSmart.DAXon.Trees.Linked
 
             if (useEventLocation)
             {
-                object copier = GetPipelineConfiguration().GetComponent(typeof(ICopyInformee).GetName());
+                object copier = GetPipelineConfiguration().GetComponent(typeof(ICopyInformee).FullName);
                 if (copier is LocationCopier)
                 {
                     SetSystemId(((LocationCopier)copier).GetSystemId());
@@ -191,7 +155,7 @@ namespace OutSmart.DAXon.Trees.Linked
         /// <summary>
         /// Close the stream of IReceiver events
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
             if (currentNode == null)
             {
@@ -204,13 +168,10 @@ namespace OutSmart.DAXon.Trees.Linked
             // we're not going to use this Builder again so give the garbage collector
             // something to play with
             arrays = null;
-            base.Dispose();
+            base.Close();
             nodeFactory = DefaultNodeFactory.THE_INSTANCE;
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
         /// <summary>
         /// Notify the start of an element
         /// </summary>
@@ -272,12 +233,6 @@ namespace OutSmart.DAXon.Trees.Linked
         }
 
         /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
         /// Notify the end of an element
         /// </summary>
         public override void EndElement()
@@ -289,15 +244,6 @@ namespace OutSmart.DAXon.Trees.Linked
             namespaceStack.Pop();
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
         /// <summary>
         /// Notify a text node. Adjacent text nodes must have already been merged
         /// </summary>
@@ -323,18 +269,6 @@ namespace OutSmart.DAXon.Trees.Linked
         }
 
         /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
         /// Notify a processing instruction
         /// </summary>
         public override void ProcessingInstruction(string name, UnicodeString remainder, ILocation locationId, int properties)
@@ -344,24 +278,6 @@ namespace OutSmart.DAXon.Trees.Linked
             pi.SetLocation(locationId.GetSystemId(), locationId.GetLineNumber(), locationId.GetColumnNumber());
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
-        /// Notify a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Notify a comment
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
             CommentImpl comment = new CommentImpl(chars.Tidy());
@@ -369,50 +285,11 @@ namespace OutSmart.DAXon.Trees.Linked
             comment.SetLocation(locationId.GetSystemId(), locationId.GetLineNumber(), locationId.GetColumnNumber());
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
-        /// Notify a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Notify a comment
-        /// </summary>
         public virtual void GraftElement(ElementImpl element)
         {
             currentNode.AddChild(element, size[depth]++);
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
-        /// Notify a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Notify a comment
-        /// </summary>
-        /// <summary>
-        /// Set an unparsed entity URI for the document
-        /// </summary>
         public override void SetUnparsedEntity(string name, string uri, string publicId)
         {
             if (((DocumentImpl)currentRoot).GetUnparsedEntity(name) == null)
@@ -423,53 +300,11 @@ namespace OutSmart.DAXon.Trees.Linked
             }
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
-        /// Notify a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Notify a comment
-        /// </summary>
-        /// <summary>
-        /// Set an unparsed entity URI for the document
-        /// </summary>
         public override BuilderMonitor GetBuilderMonitor()
         {
             return new LinkedBuilderMonitor(this);
         }
 
-        /// <summary>
-        /// Close the stream of IReceiver events
-        /// </summary>
-        /// <summary>
-        /// Notify the start of an element
-        /// </summary>
-        /// <summary>
-        /// Notify the end of an element
-        /// </summary>
-        /// <summary>
-        /// Notify a text node. Adjacent text nodes must have already been merged
-        /// </summary>
-        /// <summary>
-        /// Notify a processing instruction
-        /// </summary>
-        /// <summary>
-        /// Notify a comment
-        /// </summary>
-        /// <summary>
-        /// Set an unparsed entity URI for the document
-        /// </summary>
         // Inner class DefaultNodeFactory. This creates the nodes in the tree.
         // It can be overridden, e.g. when building the stylesheet tree
         private class DefaultNodeFactory : INodeFactory

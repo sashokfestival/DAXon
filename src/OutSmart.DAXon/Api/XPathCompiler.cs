@@ -352,6 +352,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
 
             string module = BaseURI == null ? null : BaseURI.ToString();
             env.SetContainingLocation(new Loc(module, 1, 1));
@@ -374,7 +378,7 @@ namespace OutSmart.DAXon.Api
 
             // Compile under the Processor's deadline: constant folding of hostile expression text is
             // otherwise unbounded work before any run-time deadline exists (see ArmThreadDeadline).
-            Controller prevDeadline = Controller.ArmThreadDeadline(processor.UnderlyingConfiguration);
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(processor.UnderlyingConfiguration);
             try
             {
                 XPathExpression cexp = eval.CreateExpression(source);
@@ -383,6 +387,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
             catch (UncheckedXPathException e)
             {
@@ -454,9 +462,13 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
 
             // Compile under the Processor's deadline (see InternalCompile).
-            Controller prevDeadline = Controller.ArmThreadDeadline(processor.UnderlyingConfiguration);
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(processor.UnderlyingConfiguration);
             try
             {
                 string @base = BaseURI == null ? null : BaseURI.ToString();
@@ -467,6 +479,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
             finally
             {
@@ -555,6 +571,10 @@ namespace OutSmart.DAXon.Api
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
         }
     }

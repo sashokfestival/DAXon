@@ -34,7 +34,10 @@ namespace OutSmart.DAXon.Expressions.Sorting
         public override int GetHashCode()
         {
             int h = 17;
-            foreach (var k in keys) { h = h * 31 + (k?.GetHashCode() ?? 0); }
+            foreach (var k in keys)
+            {
+                h = h * 31 + (k?.GetHashCode() ?? 0);
+            }
             return h;
         }
     }

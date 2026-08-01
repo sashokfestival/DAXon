@@ -12,7 +12,7 @@ using OutSmart.DAXon.Types;
 
 namespace OutSmart.DAXon.Patterns
 {
-    // Phase B: real NameTestUnion.cs (excluded) has STATIC WithTests(IList<NodeTest>); the stub had an
+    // Real NameTestUnion.cs (excluded) has STATIC WithTests(IList<NodeTest>); the stub had an
     // INSTANCE WithTests(object[]), so XPathParser's NameTestUnion.WithTests(tests) (tests is
     // IList<NodeTest>) hit CS0120 (object reference required) and the CastInjector wrapped the arg in
     // (object[]). Match the real static signature so the call binds directly with no injected cast.

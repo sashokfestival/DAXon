@@ -13,7 +13,6 @@
 // This file provides extension methods that recreate the Java method semantics
 // for use sites that still call them as `enum.Method()`.
 //
-// Phase 5 — paulirwin conversion drift cleanup.
 
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Lib;
@@ -24,6 +23,6 @@ using OutSmart.DAXon.Values;
 
 namespace OutSmart.DAXon.Transformation
 {
-    // Phase 7.8: see FunctionStreamabilityExtensions.Of -- call sites need to use `FunctionStreamabilityExtensions.Of(s)` not the enum's static method.
+    // See FunctionStreamabilityExtensions.Of -- call sites need to use `FunctionStreamabilityExtensions.Of(s)` not the enum's static method.
 }
 

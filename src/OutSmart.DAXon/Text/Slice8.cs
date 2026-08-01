@@ -12,7 +12,6 @@ using OutSmart.DAXon.Collections;
 
 using OutSmart.DAXon.Internal.Charsets;
 
-using OutSmart.DAXon.Internal.Functional;
 
 using System;
 
@@ -114,7 +113,7 @@ namespace OutSmart.DAXon.Text
         {
             for (int i = requireNonNegativeInt(from) + start; i < end; i++)
             {
-                if (predicate.Test(bytes[i] & 0xff))
+                if (predicate(bytes[i] & 0xff))
                 {
                     return i - start;
                 }
@@ -491,11 +490,6 @@ namespace OutSmart.DAXon.Text
 
         //    @Override
         //    public UnicodeString concat(UnicodeString other) {
-        //            return ZenoString.concatSegments(this, other);
-        //        } else {
-        //            return super.concat(other);
-        //        }
-        //    }
         /// <summary>
         /// Display as a string.
         /// </summary>

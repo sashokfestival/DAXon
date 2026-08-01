@@ -17,6 +17,6 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    // Phase 7: IPullEvaluator interface -> delegate for lambda assignability.
+    // IPullEvaluator interface -> delegate for lambda assignability.
     public delegate ISequenceIterator IPullEvaluator(IXPathContext context);
 }

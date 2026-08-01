@@ -27,9 +27,6 @@ namespace OutSmart.DAXon.Functions
     public class NotFn : SystemFunction
     {
 
-        /// <summary>
-        /// Evaluate the effective boolean value
-        /// </summary>
         public override string StreamerName => "NotFn";
 
         public static Func<NotFn> New() => () => new NotFn();
@@ -52,9 +49,6 @@ namespace OutSmart.DAXon.Functions
             return new AnonymousSystemFunctionCall(this, arguments);
         }
 
-        /// <summary>
-        /// Evaluate the effective boolean value
-        /// </summary>
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
             TypeHierarchy th = visitor.StaticContext.GetConfiguration().GetTypeHierarchy();
@@ -72,9 +66,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        /// <summary>
-        /// Evaluate the effective boolean value
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new NotFnElaborator();
@@ -88,9 +79,6 @@ namespace OutSmart.DAXon.Functions
             {
                 this.parent = parent;
             }
-            /// <summary>
-            /// Evaluate the effective boolean value
-            /// </summary>
             public override bool EffectiveBooleanValue(IXPathContext c)
             {
                 try
@@ -104,9 +92,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Evaluate the effective boolean value
-        /// </summary>
         public class NotFnElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()

@@ -20,6 +20,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 {
     public sealed class Bindery
     {
+        internal readonly object syncLock = new object();
         private SlotManager slotManager;
         private IGroundedValue[] globals; // values of global variables and parameters
 
@@ -47,7 +48,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public IGroundedValue SaveGlobalVariableValue(GlobalVariable binding, IGroundedValue value)
         {
-            lock (this)
+            lock (syncLock)
             {
                 int slot = binding.BinderySlotNumber;
                 if (globals[slot] != null)

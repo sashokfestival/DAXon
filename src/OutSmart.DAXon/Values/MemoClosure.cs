@@ -24,9 +24,6 @@ namespace OutSmart.DAXon.Values
     {
         private ISequence sequence;
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual ISequence SequenceAsIs => sequence;
         public MemoClosure(Expression expr, IPullEvaluator inputEvaluator, IXPathContext context)
         {
@@ -38,9 +35,6 @@ namespace OutSmart.DAXon.Values
             SaveContext(expr, context);
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public override ISequenceIterator Iterate()
         {
             lock (this)
@@ -58,9 +52,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         private void MakeSequence()
         {
             if (sequence == null)
@@ -90,9 +81,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual IItem ItemAt(int n)
         {
             lock (this)
@@ -113,9 +101,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public override IGroundedValue Reduce()
         {
             try
@@ -135,9 +120,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public override ISequence MakeRepeatable()
         {
             return this;

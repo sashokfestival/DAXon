@@ -78,7 +78,7 @@ namespace OutSmart.DAXon.Model
             prefixes[code] = prefix;
             if (index != null)
             {
-                index.Put(prefix, code);
+                index[prefix] = code;
             }
 
             return code;
@@ -89,7 +89,7 @@ namespace OutSmart.DAXon.Model
             index = new Dictionary<string, int>(used);
             for (int i = 0; i < used; i++)
             {
-                index.Put(prefixes[i], i);
+                index[prefixes[i]] = i;
             }
         }
 

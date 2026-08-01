@@ -20,7 +20,8 @@ namespace OutSmart.DAXon.Text
     // reporter). Surrogate-pair aware so astral code points iterate as single values.
     internal sealed class StrCodePointIterator : AbstractIntIterator
     {
-        private readonly string _s; private int _i;
+        private readonly string _s;
+        private int _i;
         public StrCodePointIterator(string s) { _s = s ?? ""; }
         public override bool HasNext() => _i < _s.Length;
         public override int Next()

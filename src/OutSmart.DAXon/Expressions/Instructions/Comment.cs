@@ -33,41 +33,23 @@ namespace OutSmart.DAXon.Expressions.Instructions
     public sealed class Comment : SimpleNodeConstructor
     {
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         private static readonly UnicodeString TWO_HYPHENS = new Twine8(StringConstants.TWO_HYPHENS);
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override int InstructionNameCode => StandardNames.XSL_COMMENT;
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public Comment()
         {
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return NodeKindTest.COMMENT;
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             Comment exp = new Comment();
@@ -76,9 +58,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return exp;
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override void LocalTypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
 
@@ -94,18 +73,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override void ProcessValue(UnicodeString value, Outputter output, IXPathContext context)
         {
             UnicodeString comment = CheckContent(value, context);
             output.Comment(comment, GetLocation(), ReceiverOption.NONE);
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override UnicodeString CheckContent(UnicodeString comment, IXPathContext context)
         {
             if (IsXSLT())
@@ -125,9 +98,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public static UnicodeString CheckContentXSLT(UnicodeString comment)
         {
             string message = IInvalidity(comment);
@@ -148,9 +118,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return comment;
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public static UnicodeString CheckContentXQuery(UnicodeString comment)
         {
             string message = IInvalidity(comment);
@@ -162,9 +129,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return comment;
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         private static string IInvalidity(UnicodeString comment)
         {
             if (comment.IndexOf(TWO_HYPHENS, 0) >= 0)
@@ -179,9 +143,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
             return null;
         }
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("comment", this);
@@ -200,17 +161,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CommentElaborator();
         }
 
-        /// <summary>
-        /// Construct the instruction
-        /// </summary>
         private class CommentElaborator : SimpleNodePushElaborator
         {
             public override IPushEvaluator ElaborateForPush()

@@ -18,7 +18,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,7 +28,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using System.IO;
 namespace OutSmart.DAXon.Expressions.Parsing
 {
@@ -227,7 +225,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
         public static bool Contains(Expression exp, bool sameFocusOnly, Func<Expression, bool> predicate)
         {
-            if (predicate.Test(exp))
+            if (predicate(exp))
             {
                 return true;
             }
@@ -470,7 +468,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             Controller controller = context.GetController();
             SequenceCollector seq = controller.AllocateSequenceOutputter();
             exp.Process(new ComplexContentOutputter(seq), context);
-            seq.Dispose();
+            seq.Close();
             return seq.Iterate();
         }
 
@@ -865,7 +863,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
             opt.PrepareForStreaming(body);
 
-            //computeEvaluationModesForUserFunctionCalls(body);
             body.RestoreParentPointers();
             return body;
         }
@@ -1028,7 +1025,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 }
 
                 Expression child = o.GetChildExpression();
-                if (selector.Test(child))
+                if (selector(child))
                 {
                     Expression e2 = mustCopy ? replacement.Copy(new RebindingMap()) : replacement;
                     o.SetChildExpression(e2);
@@ -1411,7 +1408,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             return !exp.IsUpdatingExpression() && !exp.IsVacuousExpression();
         }
 
-        public static URI GetBaseURI(IStaticContext env, SourceLocator locator, bool fail)
+        public static URI GetBaseURI(IStaticContext env, OutSmart.DAXon.Api.ILocation locator, bool fail)
         {
             URI expressionBaseURI = null;
             string @base = null;
@@ -1447,7 +1444,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 if (expressionBaseURI == null && fail)
                 {
                     XPathException err = new XPathException("The base URI " + Err.Wrap(env.StaticBaseURI, Err.URI) + " is not a valid URI");
-                    err.Locator = locator;
+                    err.SetLocator(locator);
                     throw err;
                 }
             }

@@ -26,14 +26,14 @@ namespace OutSmart.DAXon.Types
         // Use `object` for the field so OutSmart.DAXon.Internal doesn't need to know the Saxon
         // ConversionRules type. Subclasses cast on use.
         protected object conversionRules;
-        // Phase 5: GetTargetType — callers chain .Preprocess(...) on the target type.
+        // GetTargetType — callers chain .Preprocess(...) on the target type.
         public virtual ISimpleType TargetType => null;
         protected Converter() { }
         protected Converter(object rules) { this.conversionRules = rules; }
         // Cast the stored ConversionRules back to its real type — callers in Saxon code use it as `ConversionRules`.
         public OutSmart.DAXon.Lib.ConversionRules GetConversionRules() => (OutSmart.DAXon.Lib.ConversionRules)conversionRules;
         public void SetConversionRules(object rules) { this.conversionRules = rules; }
-        // Phase 5: Convert/ConvertString return IConversionResult; callers assign directly.
+        // Convert/ConvertString return IConversionResult; callers assign directly.
         // (14 sites in Cast/CastableExpression/UnionConstructorFunction etc.)
         public virtual IConversionResult Convert(object value) => null;
         public virtual IConversionResult ConvertString(object input) => null;
@@ -56,7 +56,7 @@ namespace OutSmart.DAXon.Types
             }
             return value;
         }
-        // Phase 7.8: 2-arg instance variant for callers like phaseTwo.Convert(value, in).
+        // 2-arg instance variant for callers like phaseTwo.Convert(value, in).
         public virtual IConversionResult Convert(object value, object @in) => (IConversionResult)value;
         public virtual bool IsAlwaysSuccessful() => false;
         public virtual bool IsPromoter() => false; // Saxon default; only PromotingConverter overrides to true (ASC.Export reads this)
@@ -70,8 +70,6 @@ namespace OutSmart.DAXon.Types
                 return new OutSmart.DAXon.Values.BigIntegerValue(new OutSmart.DAXon.Internal.Numerics.BigDecimal(d).ToBigInteger());
             return new Int64Value((long)d);
         }
-        // Runtime 2026-06-10: the *ToInteger family was HOLLOW (inherited Convert=>null) -> xs:integer(7.9)
-        // / xs:integer(true()) NRE-d CastExpression.PreEvaluate via MakeLiteral(null) (probe_conv2).
         // Java semantics: cast to xs:integer truncates toward zero = NumericValue.longValue().
         public class FloatToInteger : Converter
         {
@@ -106,12 +104,9 @@ namespace OutSmart.DAXon.Types
         {
             public static readonly IntegerToDouble INSTANCE = new IntegerToDouble();
         }
-        // REMOVED 2026-05-26: nested Converter.StringToDouble conflicts with the real
-        // OutSmart.DAXon.Types.StringToDouble class (poc/output/full/StringToDouble.cs).
-        // The bare `StringToDouble` reference in Configuration.cs and ItemType.cs was
-        // resolving to this nested stub instead of the real class, causing CS1503.
-        // public class StringToDouble : Converter { public static readonly StringToDouble INSTANCE = new StringToDouble(); }
-        // Runtime 2026-06-10: StringToFloat was hollow -> xs:float(string) NRE (probe_conv2). Java: parse with INF/NaN forms.
+        // No nested StringToDouble here: bare `StringToDouble` refs (Configuration.cs, ItemType.cs) must
+        // resolve to the real Types.StringToDouble — a nested namesake shadowed it (CS1503).
+        // Java: parse with INF/NaN forms.
         public class StringToFloat : Converter
         {
             public static readonly StringToFloat INSTANCE = new StringToFloat();
@@ -130,10 +125,8 @@ namespace OutSmart.DAXon.Types
             public static readonly StringToDecimal INSTANCE = new StringToDecimal();
         }
 
-        // Runtime 2026-06-18: TwoPhaseConverter was a HOLLOW stub (discarded its phases; Convert=>null) -> every cast
-        // routed through it NRE-d at CastExpression.PreEvaluate. ConversionRules dispatches date->gYear/gYearMonth/gMonth/
-        // gDay/gMonthDay as a two-phase DATE->DATE_TIME->gXxx, plus subtype-via-primitive casts. Faithful Java
-        // (net.sf.saxon.type.Converter.TwoPhaseConverter): run phaseOne, then phaseTwo on the intermediate result.
+        // ConversionRules dispatches date->gYear/gYearMonth/gMonth/gDay/gMonthDay as two-phase DATE->DATE_TIME->gXxx,
+        // plus subtype-via-primitive casts. Faithful Java: run phaseOne, then phaseTwo on the intermediate result.
         public class TwoPhaseConverter : Converter
         {
             private readonly Converter phaseOne;
@@ -151,7 +144,11 @@ namespace OutSmart.DAXon.Types
                 System.Reflection.MethodInfo gc = null;
                 foreach (var mi in rules.GetType().GetMethods())
                 {
-                    if (mi.Name == "GetConverter" && mi.GetParameters().Length == 2) { gc = mi; break; }
+                    if (mi.Name == "GetConverter" && mi.GetParameters().Length == 2)
+                    {
+                        gc = mi;
+                        break;
+                    }
                 }
                 Converter p1 = (Converter)gc.Invoke(rules, new object[] { inputType, viaType });
                 Converter p2 = (Converter)gc.Invoke(rules, new object[] { viaType, outputType });
@@ -159,28 +156,38 @@ namespace OutSmart.DAXon.Types
             }
             public override IConversionResult Convert(object value)
             {
-                if (phaseOne == null || phaseTwo == null) { return null; }
+                if (phaseOne == null || phaseTwo == null)
+                {
+                    return null;
+                }
                 object temp = phaseOne.Convert(value);
-                if (temp == null) { return null; }
+                if (temp == null)
+                {
+                    return null;
+                }
                 // Short-circuit a ValidationFailure from phase one (don't feed it to phase two).
-                if (temp.GetType().Name == "ValidationFailure") { return (IConversionResult)temp; }
+                if (temp.GetType().Name == "ValidationFailure")
+                {
+                    return (IConversionResult)temp;
+                }
                 return phaseTwo.Convert(temp);
             }
             public override Converter SetNamespaceResolver(object resolver)
             {
-                if (phaseOne == null || phaseTwo == null) { return this; }
+                if (phaseOne == null || phaseTwo == null)
+                {
+                    return this;
+                }
                 return new TwoPhaseConverter(phaseOne.SetNamespaceResolver(resolver), phaseTwo.SetNamespaceResolver(resolver));
             }
         }
-        // Runtime 2026-06-10: IdentityConverter inherited the hollow base Convert(object)=>null -> every
-        // identity conversion (e.g. xsl:attribute string content through ASC) returned null -> .AsAtomic() NRE.
         // Java IdentityConverter.convert returns the input unchanged.
         public class IdentityConverter : Converter
         {
             public static readonly IdentityConverter INSTANCE = new IdentityConverter();
             public override IConversionResult Convert(object value) => (IConversionResult)value;
         }
-        // Phase 5: nested-class form of converter pairs (some Saxon code references
+        // Nested-class form of converter pairs (some Saxon code references
         // `Converter.FloatToDecimal.INSTANCE` — the nested type with an INSTANCE field).
         // Cast float/double -> decimal must give the EXACT value (upstream: new BigDecimalValue(floatValue)),
         // not GetDecimalValue()'s BigDecimal.ValueOf (shortest, ~17 sig digits). The rounded form broke map
@@ -249,10 +256,8 @@ namespace OutSmart.DAXon.Types
             public static readonly BooleanToDouble INSTANCE = new BooleanToDouble();
             public override IConversionResult Convert(object value) => (IConversionResult)new DoubleValue(((BooleanValue)value).GetBooleanValue() ? 1.0 : 0.0);
         }
-        // Runtime 2026-06-18: the temporal-cast converters below were HOLLOW (inherited Convert=>null) -> casts like
-        // xs:dateTime(xs:date(..)), xs:date/xs:time/xs:gYearMonth/xs:gYear(xs:dateTime(..)) NRE-d CastExpression.PreEvaluate
-        // via Literal.MakeLiteral(null). Faithful Java (net.sf.saxon.type.Converter): the value is rebuilt in the target
-        // temporal type from the source components (constructed directly via the engine value ctors).
+        // Faithful Java (net.sf.saxon.type.Converter): the value is rebuilt in the target temporal type
+        // from the source components (constructed directly via the engine value ctors).
         public class DateToDateTime : Converter
         {
             public static readonly DateToDateTime INSTANCE = new DateToDateTime();
@@ -278,9 +283,7 @@ namespace OutSmart.DAXon.Types
             public static readonly DateTimeToGYear INSTANCE = new DateTimeToGYear();
             public override IConversionResult Convert(object value) { var dt = (DateTimeValue)value; int year = dt.Year; int tz = dt.TimezoneInMinutes; bool xsd10 = dt.IsXsd10Rules(); return (IConversionResult)new GYearValue(year, tz, xsd10); }
         }
-        // Runtime 2026-06-18: was HOLLOW (Convert=>null) -> xs:gMonthDay(xs:dateTime(..)) NRE'd via MakeLiteral(null)
-        // once GMonthDayValue was re-included. Faithful Java Converter.DateTimeToGMonthDay: new GMonthDayValue(month,day,tz).
-        // (The sibling DateTime/Date -> gYear/gMonth/gDay/gYearMonth converters remain hollow -- separate latent gap.)
+        // Faithful Java Converter.DateTimeToGMonthDay: new GMonthDayValue(month,day,tz).
         public class DateTimeToGMonthDay : Converter
         {
             public static readonly DateTimeToGMonthDay INSTANCE = new DateTimeToGMonthDay();
@@ -311,7 +314,6 @@ namespace OutSmart.DAXon.Types
         }
         public class DateToGMonth : Converter { public static readonly DateToGMonth INSTANCE = new DateToGMonth(); }
         public class DateToGDay : Converter { public static readonly DateToGDay INSTANCE = new DateToGDay(); }
-        // Runtime 2026-06-18: binary cross-casts were HOLLOW -> xs:hexBinary(xs:base64Binary(..)) / reverse NRE-d.
         // Faithful Java: new HexBinaryValue(base64.getBinaryValue()) / new Base64BinaryValue(hex.getBinaryValue()).
         public class Base64BinaryToHexBinary : Converter
         {
@@ -323,13 +325,13 @@ namespace OutSmart.DAXon.Types
             public static readonly HexBinaryToBase64Binary INSTANCE = new HexBinaryToBase64Binary();
             public override IConversionResult Convert(object value) { byte[] b = ((HexBinaryValue)value).BinaryValue; return (IConversionResult)new Base64BinaryValue(b); }
         }
-        // Runtime 2026-06-18: NotationToQName was HOLLOW. Faithful Java: new QNameValue(notation.getStructuredQName(), QNAME).
+        // Faithful Java: new QNameValue(notation.getStructuredQName(), QNAME).
         public class NotationToQName : Converter
         {
             public static readonly NotationToQName INSTANCE = new NotationToQName();
             public override IConversionResult Convert(object value) { var sqn = ((QualifiedNameValue)value).GetStructuredQName(); return (IConversionResult)new QNameValue((StructuredQName)sqn, BuiltInAtomicType.QNAME); }
         }
-        // Runtime 2026-06-18: NumericToBoolean was HOLLOW -> xs:boolean(<numeric>) NRE-d. Faithful Java: BooleanValue.get(input.effectiveBooleanValue()).
+        // Faithful Java: BooleanValue.get(input.effectiveBooleanValue()).
         public class NumericToBoolean : Converter
         {
             public static readonly NumericToBoolean INSTANCE = new NumericToBoolean();
@@ -346,11 +348,9 @@ namespace OutSmart.DAXon.Types
         {
             public static readonly NumericToBigDecimal INSTANCE = new NumericToBigDecimal();
         }
-        // Runtime 2026-06-18: ToUntypedAtomicConverter / ToStringConverter were HOLLOW. The engine PhaseBConverters wrapper has a
-        // name-based fallback for them, but direct Convert() dispatch sites still NRE-d -> implement faithfully (matches the
-        // fallback byte-for-byte). Java: ToUntyped -> StringValue.makeUntypedAtomic(input.getUnicodeStringValue());
-        // ToString -> new StringValue(input.getUnicodeStringValue().tidy()).
-        // ToStringConverter is exercised and byte-verified (xs:string(..) casts go via CastExpression.PreEvaluate / TO_STRING_MAPPER).
+        // Java: ToUntyped -> StringValue.makeUntypedAtomic(input.getUnicodeStringValue());
+        // ToString -> new StringValue(input.getUnicodeStringValue().tidy()). Matches the PhaseBConverters
+        // name-based fallback byte-for-byte (both dispatch paths must agree).
         // KNOWN ENGINE-SIDE GAP (NOT this converter): xs:untypedAtomic(..) casts compile to an AtomicSequenceConverter whose
         // MapItem (poc/output/full/expr/AtomicSequenceConverter.cs:~500) does `IConversionResult r = converter.Convert(item)` --
         // a dynamic->IConversionResult assignment that yields null for the (otherwise-perfect: engine StringValue, implements
@@ -367,8 +367,6 @@ namespace OutSmart.DAXon.Types
             public static readonly ToStringConverter INSTANCE = new ToStringConverter();
             public override IConversionResult Convert(object value) { var us = ((AtomicValue)value).UnicodeStringValue.Tidy(); return (IConversionResult)new StringValue((UnicodeString)us); }
         }
-        // Runtime 2026-06-18: both were HOLLOW (inherited Convert=>null) -> xs:dayTimeDuration('PT1H30M') /
-        // xs:duration / xs:yearMonthDuration string-casts NRE-d CastExpression.PreEvaluate via MakeLiteral(null).
         // Faithful Java (Converter.DurationToDayTimeDuration / DurationToYearMonthDuration): rebuild the duration
         // value in the narrower type from the parsed components (constructed directly via the engine value ctors).
         public class DurationToDayTimeDuration : Converter
@@ -378,7 +376,10 @@ namespace OutSmart.DAXon.Types
             {
                 var d = (DurationValue)value;
                 int days = d.Days, hours = d.Hours, minutes = d.Minutes, seconds = d.Seconds, nanos = d.Nanoseconds;
-                if (d.Signum() < 0) { return (IConversionResult)new DayTimeDurationValue(-days, -hours, -minutes, -(long)seconds, -nanos); }
+                if (d.Signum() < 0)
+                {
+                    return (IConversionResult)new DayTimeDurationValue(-days, -hours, -minutes, -(long)seconds, -nanos);
+                }
                 return (IConversionResult)new DayTimeDurationValue(days, hours, minutes, (long)seconds, nanos);
             }
         }
@@ -387,34 +388,34 @@ namespace OutSmart.DAXon.Types
             public static readonly DurationToYearMonthDuration INSTANCE = new DurationToYearMonthDuration();
             public override IConversionResult Convert(object value) { int months = ((DurationValue)value).TotalMonths; return (IConversionResult)YearMonthDurationValue.FromMonths(months); }
         }
-        // Runtime 2026-06-18: QNameToNotation was HOLLOW. Faithful Java: new NotationValue(qname.getStructuredQName(), NOTATION).
+        // Faithful Java: new NotationValue(qname.getStructuredQName(), NOTATION).
         public class QNameToNotation : Converter
         {
             public static readonly QNameToNotation INSTANCE = new QNameToNotation();
             public override IConversionResult Convert(object value) { var sqn = ((QualifiedNameValue)value).GetStructuredQName(); return (IConversionResult)new NotationValue((StructuredQName)sqn, BuiltInAtomicType.NOTATION); }
         }
-        // Runtime 2026-06-10: NumericToInteger was hollow (probe_conv2 xs:integer(7.9)). Truncate toward zero.
+        // Truncate toward zero.
         public class NumericToInteger : Converter
         {
             public static readonly NumericToInteger INSTANCE = new NumericToInteger();
             public override IConversionResult Convert(object value) => (IConversionResult)new Int64Value((long)((NumericValue)value).LongValue());
         }
-        // Runtime 2026-06-18: NumericToFloat was HOLLOW -> xs:float(<decimal/double>) NRE-d (integer->float uses IntegerToFloat).
-        // Faithful Java: new FloatValue(((NumericValue)input).getFloatValue()).
+        // Faithful Java: new FloatValue(((NumericValue)input).getFloatValue()). Integer->float uses IntegerToFloat.
         public class NumericToFloat : Converter
         {
             public static readonly NumericToFloat INSTANCE = new NumericToFloat();
             public override IConversionResult Convert(object value) => (IConversionResult)new FloatValue(((NumericValue)value).GetFloatValue());
         }
-        // Runtime 2026-06-10: NumericToDouble inherited the hollow base Convert=>null -> every numeric->double
-        // cast/promotion returned null (CastExpression.PreEvaluate of xs:double(2) -> MakeLiteral(null) NRE).
         // Faithful Java NumericToDouble.convert: DoubleValue passes through; otherwise new DoubleValue(getDoubleValue()).
         public class NumericToDouble : Converter
         {
             public static readonly NumericToDouble INSTANCE = new NumericToDouble();
             public override IConversionResult Convert(object value)
             {
-                if (value is DoubleValue) { return (IConversionResult)value; }
+                if (value is DoubleValue)
+                {
+                    return (IConversionResult)value;
+                }
                 return (IConversionResult)new DoubleValue(((NumericValue)value).GetDoubleValue());
             }
         }

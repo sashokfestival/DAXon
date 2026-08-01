@@ -12,7 +12,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,12 +28,6 @@ namespace OutSmart.DAXon.Expressions
     public class CastExpression : CastingExpression, ICallable
     {
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         public override IntegerValue[] IntegerBounds
         {
             get
@@ -54,34 +47,13 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ExpressionName => "cast";
         public CastExpression(Expression source, IAtomicType target, bool allowEmpty) : base(source, target, allowEmpty)
         {
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             GetOperand().TypeCheck(visitor, contextInfo);
@@ -148,9 +120,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeHierarchy th = visitor.GetConfiguration().GetTypeHierarchy();
@@ -258,9 +227,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         protected virtual Expression PreEvaluate()
         {
             IGroundedValue literalOperand = ((Literal)BaseExpression).GroundedValue;
@@ -302,9 +268,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
         /// Get the static cardinality of the expression
         /// </summary>
         protected override int ComputeCardinality()
@@ -312,34 +275,16 @@ namespace OutSmart.DAXon.Expressions
             return AllowsEmpty() && Cardinality.AllowsZero(BaseExpression.GetCardinality()) ? StaticProperty.ALLOWS_ZERO_OR_ONE : StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         public override ItemType GetItemType()
         {
             return TargetType;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return TargetType.GetUType();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties();
@@ -351,12 +296,6 @@ namespace OutSmart.DAXon.Expressions
             return p;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             CastExpression c2 = new CastExpression(BaseExpression.Copy(rebindings), TargetType, AllowsEmpty());
@@ -367,24 +306,12 @@ namespace OutSmart.DAXon.Expressions
             return c2;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         public ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             AtomicValue result = DoCast((AtomicValue)arguments[0].Head(), context);
             return SequenceTool.ItemOrEmpty(result);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
         public virtual AtomicValue DoCast(AtomicValue value, IXPathContext context)
         {
             if (value == null)
@@ -426,12 +353,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
         /// Evaluate the expression
         /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
@@ -439,117 +360,36 @@ namespace OutSmart.DAXon.Expressions
             return (AtomicValue)MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is CastExpression && BaseExpression.IsEqual(((CastExpression)other).BaseExpression) && TargetType == ((CastExpression)other).TargetType && AllowsEmpty() == ((CastExpression)other).AllowsEmpty();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return base.ComputeHashCode() ^ TargetType.GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToString()
         {
             return TargetType.EQName + "(" + BaseExpression.ToString() + ")";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override string ToShortString()
         {
             return TargetType.DisplayName + "(" + BaseExpression.ToShortString() + ")";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             Export(@out, "cast");
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
-        /// <summary>
-        /// Is this expression the same as another expression?
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new CastExprElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Get the static type of the expression
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression
-        /// </summary>
         /// <summary>
         /// Elaborator for {@code cast as} expression, or the equivalent constructor function call
         /// </summary>

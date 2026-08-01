@@ -60,7 +60,7 @@ namespace OutSmart.DAXon.Xslt
             fc.SetFunction(fn);
             fc.SetFunctionName(fn.GetFunctionName());
             int maxArity = fn.GetArity();
-            if (staticArgs.Length == maxArity && (keywords == null || keywords.IsEmpty()))
+            if (staticArgs.Length == maxArity && (keywords == null || keywords.Count == 0))
             {
                 fc.Arguments = staticArgs;
             }
@@ -108,7 +108,7 @@ namespace OutSmart.DAXon.Xslt
         {
             Dictionary<SymbolicName, Component> allComponents = pack.ComponentIndex;
             functionIndex = new Dictionary<StructuredQName, IList<Component>>();
-            foreach (KeyValuePair<SymbolicName, Component> entry in allComponents.EntrySet())
+            foreach (KeyValuePair<SymbolicName, Component> entry in allComponents)
             {
                 if (entry.Value.ComponentKind == StandardNames.XSL_FUNCTION)
                 {
@@ -116,13 +116,13 @@ namespace OutSmart.DAXon.Xslt
                     StructuredQName functionName = entry.Key.ComponentName;
                     if (functionIndex.ContainsKey(functionName))
                     {
-                        functionIndex.Get(functionName).Add(entry.Value);
+                        functionIndex.GetOrDefault(functionName).Add(entry.Value);
                     }
                     else
                     {
                         IList<Component> functionList = new List<Component>();
                         functionList.Add(entry.Value);
-                        functionIndex.Put(functionName, functionList);
+                        functionIndex[functionName] = functionList;
                     }
                 }
             }
@@ -135,7 +135,7 @@ namespace OutSmart.DAXon.Xslt
                 BuildFunctionIndex();
             }
 
-            IList<Component> candidates = functionIndex.Get(name);
+            IList<Component> candidates = functionIndex.GetOrDefault(name);
             if (candidates == null)
             {
                 return null;
@@ -169,6 +169,5 @@ namespace OutSmart.DAXon.Xslt
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void SetConfiguration(Configuration config) { throw new NotImplementedException(); }
     }
 }

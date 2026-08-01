@@ -11,7 +11,6 @@ using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -86,14 +85,8 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public IntegerValue[] IntegerBoundsForVariable => null;
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override string ExpressionName => "param";
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         private string Flags
         {
             get
@@ -276,81 +269,51 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return OperandSparseList(selectOp, conversionOp);
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public ISequence EvaluateVariable(IXPathContext c)
         {
             return c.EvaluateLocalVariable(slotNumber);
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public bool IsCompatible(LocalParam other)
         {
             return GetVariableQName().Equals(other.GetVariableQName()) && GetRequiredType().Equals(other.GetRequiredType()) && IsTunnelParam() == other.IsTunnelParam();
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override bool IsLiftable(bool forStreaming)
         {
             return false;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override bool HasVariableBinding(IBinding binding)
         {
             return this == binding;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override ItemType GetItemType()
         {
             return ErrorType.GetInstance();
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.ALLOWS_ZERO_OR_MORE;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             return StaticProperty.HAS_SIDE_EFFECTS;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return false;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override string ToShortString()
         {
             return "$" + GetVariableQName().DisplayName;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("param", this);
@@ -383,41 +346,20 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
-        /// <summary>
-        /// Say that the bound value has the potential to be indexed
-        /// </summary>
         public void SetIndexedVariable()
         {
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
-        /// <summary>
-        /// Say that the bound value has the potential to be indexed
-        /// </summary>
         public bool IsIndexedVariable()
         {
             return false;
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
-        /// <summary>
-        /// Say that the bound value has the potential to be indexed
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new LocalParamElaborator();
         }
 
-        /// <summary>
-        /// Evaluate the variable
-        /// </summary>
         /// <summary>
         /// The Elaborator for this kind of expression
         /// </summary>

@@ -26,12 +26,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
 
         public override IGroundedValue GroundedValue => (IFunctionItem)base.GroundedValue;
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override string ExpressionName => "namedFunctionRef";
         public FunctionLiteral(IFunctionItem value) : base(value)
         {
@@ -62,33 +56,21 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             return ((IFunctionItem)GroundedValue).FunctionItemType;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             return StaticProperty.NO_NODES_NEWLY_CREATED | StaticProperty.COMPUTED_FUNCTION;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override bool IsVacuousExpression()
         {
             return false;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             FunctionLiteral fl2 = new FunctionLiteral((IFunctionItem)GroundedValue);
@@ -96,39 +78,21 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             return fl2;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override void SetRetainedStaticContext(RetainedStaticContext rsc)
         {
             base.SetRetainedStaticContext(rsc);
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
         public override bool Equals(object obj)
         {
             return obj is FunctionLiteral && ((FunctionLiteral)obj).GroundedValue == GroundedValue;
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return GroundedValue.GetHashCode();
         }
 
-        /// <summary>
-        /// Determine the cardinality
-        /// </summary>
-        /// <summary>
-        /// Return a hash code to support the equals() function
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             IFunctionItem f = (IFunctionItem)GroundedValue;

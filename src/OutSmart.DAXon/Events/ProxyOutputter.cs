@@ -108,9 +108,14 @@ namespace OutSmart.DAXon.Events
             next.Append(item);
         }
 
+        public override void Close()
+        {
+            next.Close();
+        }
+
         public override void Dispose()
         {
-            next.Dispose();
+            next?.Dispose();
         }
 
         public override bool UsesTypeAnnotations()

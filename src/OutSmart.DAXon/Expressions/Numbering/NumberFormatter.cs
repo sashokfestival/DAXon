@@ -90,7 +90,7 @@ namespace OutSmart.DAXon.Expressions.Numbering
                 }
             }
 
-            if (formatTokens.IsEmpty())
+            if (formatTokens.Count == 0)
             {
                 formatTokens.Add(BMPString.Of("1"));
                 if (punctuationTokens.Count == 1)
@@ -136,7 +136,7 @@ namespace OutSmart.DAXon.Expressions.Numbering
 
                         // The first punctuation token isn't a separator if it appears before the first
                         // formatting token. Such a punctuation token is used only once, at the start.
-                        sb.Append(".");
+                        sb.Append('.');
                     }
                     else
                     {

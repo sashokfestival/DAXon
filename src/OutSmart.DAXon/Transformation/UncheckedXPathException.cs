@@ -40,7 +40,7 @@ namespace OutSmart.DAXon.Transformation
 
         public string GetMessage()
         {
-            return InnerException.GetMessage();
+            return InnerException.Message;
         }
     }
 }

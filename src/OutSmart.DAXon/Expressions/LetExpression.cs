@@ -13,7 +13,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -33,38 +32,14 @@ namespace OutSmart.DAXon.Expressions
         private bool needsLazyEvaluation = false;
         private bool _isInstruction;
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override string ExpressionName => "let";
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override double Cost => Sequence.Cost + GetAction().Cost;
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override IntegerValue[] IntegerBounds => GetAction().IntegerBounds;
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override int ImplementationMethod => GetAction().ImplementationMethod;
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public virtual ISequenceEvaluator Evaluator
         {
             get => evaluator; set
@@ -72,32 +47,20 @@ namespace OutSmart.DAXon.Expressions
                 this.evaluator = value;
             }
         }
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public LetExpression()
         {
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public virtual void SetInstruction(bool inst)
         {
             _isInstruction = inst;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override bool IsInstruction()
         {
             return _isInstruction;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public virtual void SetNeedsEagerEvaluation(bool req)
         {
             if (req && needsLazyEvaluation)
@@ -107,9 +70,6 @@ namespace OutSmart.DAXon.Expressions
             this.needsEagerEvaluation = req;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public virtual void SetNeedsLazyEvaluation(bool req)
         {
             if (req && needsEagerEvaluation)
@@ -120,50 +80,32 @@ namespace OutSmart.DAXon.Expressions
             this.needsLazyEvaluation = req;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public virtual bool IsNeedsLazyEvaluation()
         {
             return needsLazyEvaluation;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public virtual bool IsNeedsEagerEvaluation()
         {
             return needsEagerEvaluation;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override bool SupportsLazyEvaluation()
         {
             return !needsEagerEvaluation;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override bool IsLiftable(bool forStreaming)
         {
             return base.IsLiftable(forStreaming) && !needsEagerEvaluation;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override void ResetLocalStaticProperties()
         {
             base.ResetLocalStaticProperties();
             references = new List<VariableReference>(); // bug 3233
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
 
@@ -188,17 +130,11 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override bool ImplementsStaticTypeCheck()
         {
             return true;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override Expression StaticTypeCheck(SequenceType req, bool backwardsCompatible, Func<RoleDiagnostic> roleSupplier, ExpressionVisitor visitor)
         {
             TypeChecker tc = visitor.GetConfiguration().GetTypeChecker(backwardsCompatible);
@@ -206,9 +142,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Optimizer opt = visitor.ObtainOptimizer();
@@ -289,7 +222,7 @@ namespace OutSmart.DAXon.Expressions
                     considerRemoval = references != null;
                 }
 
-                if (considerRemoval && references.IsEmpty())
+                if (considerRemoval && references.Count == 0)
                 {
 
                     // variable is not used - no need to evaluate it
@@ -390,7 +323,7 @@ namespace OutSmart.DAXon.Expressions
                     VerifyReferences();
                     if (references != null && references.Count < 2)
                     {
-                        if (references.IsEmpty())
+                        if (references.Count == 0)
                         {
 
                             // We may have removed references to the variable; try again at eliminating this expression.
@@ -412,13 +345,9 @@ namespace OutSmart.DAXon.Expressions
 
 
             // Don't use lazy evaluation for a variable that is referenced inside the "try" part of a contained try catch (XSLT3 test try-031)
-            //setEvaluator();
             return this;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public virtual void SetEvaluator()
         {
             if (IsIndexedVariable())
@@ -440,9 +369,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         private void InlineReferences()
         {
 
@@ -465,9 +391,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         private bool AllReferencesAreFlattened()
         {
             if (references != null)
@@ -486,33 +409,21 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override bool IsVacuousExpression()
         {
             return GetAction().IsVacuousExpression();
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
             GetAction().CheckPermittedContents(parentType, whole);
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         public override void GatherProperties(Action<string, object> consumer)
         {
-            consumer.Accept("name", GetVariableQName());
+            consumer("name",GetVariableQName());
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         /// <summary>
         /// Iterate over the result of the expression to return a sequence of items
         /// </summary>
@@ -538,9 +449,6 @@ namespace OutSmart.DAXon.Expressions
             return let.GetAction().Iterate(context);
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
         /// <summary>
         /// Iterate over the result of the expression to return a sequence of items
         /// </summary>
@@ -576,29 +484,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
 
@@ -621,43 +511,16 @@ namespace OutSmart.DAXon.Expressions
             return let.GetAction().EffectiveBooleanValue(context);
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             DispatchTailCall(MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context));
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
         public override ItemType GetItemType()
         {
             return GetAction().GetItemType();
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             if (IsInstruction())
@@ -669,15 +532,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
         protected override int ComputeCardinality()
@@ -685,15 +539,6 @@ namespace OutSmart.DAXon.Expressions
             return GetAction().GetCardinality();
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
         /// <summary>
         /// Determine the static cardinality of the expression
         /// </summary>
@@ -709,35 +554,11 @@ namespace OutSmart.DAXon.Expressions
             return props;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public override int MarkTailFunctionCalls(StructuredQName qName, int arity)
         {
             return ExpressionTool.MarkTailFunctionCalls(GetAction(), qName, arity);
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             LetExpression let = new LetExpression();
@@ -756,52 +577,16 @@ namespace OutSmart.DAXon.Expressions
             return let;
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public override string ToString()
         {
             return "let $" + VariableEQName + " := " + Sequence + " return " + ExpressionTool.Parenthesize(GetAction());
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public override string ToShortString()
         {
             return "let $" + VariableName + " := ...";
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("let", this);
@@ -828,35 +613,11 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new LetExprElaborator();
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         public class LetExprElaborator : PullElaborator
         {
             private ISequenceEvaluator MakeSequenceEvaluator(LetExpression let)
@@ -1051,18 +812,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Create a LetExpression
-        /// </summary>
-        /// <summary>
-        /// Iterate over the result of the expression to return a sequence of items
-        /// </summary>
-        /// <summary>
-        /// Evaluate the expression as a singleton
-        /// </summary>
-        /// <summary>
-        /// Mark tail function calls
-        /// </summary>
         private class EagerLocalVariableEvaluator : ISequenceEvaluator
         {
             private readonly int slot;

@@ -61,27 +61,15 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual Patterns.Pattern Match => match;
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual Expression Use => GetBody();
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual string CollationName => collationName;
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual IStringCollator Collation => collation;
         public KeyDefinition(SymbolicName symbolicName, Patterns.Pattern match, Expression use, string collationName, IStringCollator collation)
@@ -148,9 +136,6 @@ namespace OutSmart.DAXon.Transformation
             return convertUntypedToOther;
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         public override void SetStackFrameMap(SlotManager map)
         {
             if (map != null)
@@ -159,9 +144,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public override void AllocateAllBindingSlots(StylesheetPackage pack)
         {
@@ -169,9 +151,6 @@ namespace OutSmart.DAXon.Transformation
             AllocateBindingSlotsRecursive(pack, this, match, DeclaringComponent.ComponentBindings);
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual void SetLocation(ILocation loc)
         {
@@ -180,13 +159,10 @@ namespace OutSmart.DAXon.Transformation
             SetColumnNumber(loc.GetColumnNumber());
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual IPullEvaluator ObtainUseEvaluator()
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (useExpressionEvaluator == null)
                 {
@@ -197,18 +173,12 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual StructuredQName GetObjectName()
         {
             return symbolicName.ComponentName;
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public virtual void Export(ExpressionPresenter @out, bool reusable, Dictionary<Component, int> componentIdMap)
         {
@@ -283,9 +253,6 @@ namespace OutSmart.DAXon.Transformation
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Set the map of local variables needed while evaluating the "use" expression
-        /// </summary>
         /*&& map.getNumberOfVariables() > 0 */
         public override void Export(ExpressionPresenter presenter)
         {

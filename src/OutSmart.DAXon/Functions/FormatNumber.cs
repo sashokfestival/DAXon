@@ -99,7 +99,7 @@ namespace OutSmart.DAXon.Functions
                     }
                     catch (XPathException e)
                     {
-                        throw new XPathException("Invalid decimal format name. " + e.GetMessage(), "FODF1280");
+                        throw new XPathException("Invalid decimal format name. " + e.Message, "FODF1280");
                     }
                 }
 
@@ -248,7 +248,7 @@ namespace OutSmart.DAXon.Functions
             // zeros/nines heuristic — the general path would parse "…E…" back to this same integer
             // (scale 0) and find nothing to simplify. Byte-identical, and (long) is exact in range.
             // The heavy caller is format-number(number(.), …) over columns of integer-valued prices.
-            if (value == System.Math.Floor(value) && System.Math.Abs(value) < 9007199254740992.0)
+            if (value == Math.Floor(value) && Math.Abs(value) < 9007199254740992.0)
             {
                 return new BigDecimal((long)value);
             }
@@ -361,9 +361,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         /* 4.7.4 Rule 3 */
         /* 4.7.4 Rule 8 */
         /* 4.7.4 Rule 9 */
@@ -380,9 +377,6 @@ namespace OutSmart.DAXon.Functions
             return array;
         }
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         /* 4.7.4 Rule 3 */
         /* 4.7.4 Rule 8 */
         /* 4.7.4 Rule 9 */
@@ -444,9 +438,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         /* 4.7.4 Rule 3 */
         /* 4.7.4 Rule 8 */
         /* 4.7.4 Rule 9 */
@@ -461,7 +452,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException e)
             {
-                throw new XPathException("Invalid decimal format name. " + e.GetMessage(), "FODF1280");
+                throw new XPathException("Invalid decimal format name. " + e.Message, "FODF1280");
             }
 
             dfs = dfm.GetNamedDecimalFormat(qName);
@@ -473,9 +464,6 @@ namespace OutSmart.DAXon.Functions
             return dfs;
         }
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         /* 4.7.4 Rule 3 */
         /* 4.7.4 Rule 8 */
         /* 4.7.4 Rule 9 */
@@ -485,9 +473,6 @@ namespace OutSmart.DAXon.Functions
             return ch >= zeroDigit && ch < zeroDigit + 10;
         }
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         /* 4.7.4 Rule 3 */
         /* 4.7.4 Rule 8 */
         /* 4.7.4 Rule 9 */
@@ -507,9 +492,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         /* 4.7.4 Rule 3 */
         /* 4.7.4 Rule 8 */
         /* 4.7.4 Rule 9 */
@@ -524,9 +506,6 @@ namespace OutSmart.DAXon.Functions
             return copy;
         }
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         /* 4.7.4 Rule 3 */
         /* 4.7.4 Rule 8 */
         /* 4.7.4 Rule 9 */
@@ -540,9 +519,6 @@ namespace OutSmart.DAXon.Functions
         ISequence ICallable.Call(IXPathContext arg0, ISequence[] arg1) => Call(arg0, arg1);
         SystemFunction IStatefulSystemFunction.Copy() => Copy();
 
-        /// <summary>
-        /// Inner class to represent one sub-picture (the negative or positive subpicture)
-        /// </summary>
         public class SubPicture
         {
             protected int minWholePartSize = 0;
@@ -922,7 +898,6 @@ namespace OutSmart.DAXon.Functions
                     if (wholePartGroupingPositions[0] == 0)
                     {
 
-                        //grumble("Cannot have a grouping separator adjacent to the decimal separator");
                         Grumble("Cannot have a grouping separator at the end of the integer part");
                     }
                 }
@@ -1056,7 +1031,6 @@ namespace OutSmart.DAXon.Functions
                         {
                             ib = Insert(ib, ibused++, dfs.GetGroupingSeparator(), p);
 
-                            //sb.insert(p, unicodeChar(dfs.groupingSeparator));
                             p -= g;
                         }
                     }
@@ -1124,7 +1098,7 @@ namespace OutSmart.DAXon.Functions
                 }
 
                 BigDecimalValue.DecimalToString(dval, fsb);
-                int point = fsb.IndexOf(".");
+                int point = fsb.ToString().IndexOf(".", global::System.StringComparison.Ordinal);
                 int intDigits;
                 if (point >= 0)
                 {
@@ -1133,7 +1107,7 @@ namespace OutSmart.DAXon.Functions
                     {
                         if (fsb[fsb.Length - 1] == '0')
                         {
-                            fsb.SetLength(fsb.Length - 1);
+                            fsb.Length = fsb.Length - 1;
                             zz--;
                         }
                         else
@@ -1145,7 +1119,7 @@ namespace OutSmart.DAXon.Functions
                     intDigits = point;
                     if (fsb[fsb.Length - 1] == '.')
                     {
-                        fsb.SetLength(fsb.Length - 1);
+                        fsb.Length = fsb.Length - 1;
                     }
                 }
                 else
@@ -1163,7 +1137,7 @@ namespace OutSmart.DAXon.Functions
 
                 if (minWholePartSize == 0 && intDigits == 1 && fsb[0] == '0')
                 {
-                    fsb.DeleteCharAt(0);
+                    fsb.Remove(0, 1);
                 }
                 else if (minWholePartSize > intDigits)
                 {

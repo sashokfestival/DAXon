@@ -130,6 +130,37 @@ namespace OutSmart.DAXon.Internal.Collections
         /// java.util.LinkedList.removeLast() - removes AND RETURNS the last element;
         /// throws on empty. Named RemoveLastAndGet for the same instance-collision reason.
         /// </summary>
+        // java.util.Collection.containsAll.
+        public static bool ContainsAll<T>(this ICollection<T> c, global::System.Collections.Generic.IEnumerable<T> other)
+        {
+            if (other == null)
+                return true;
+            foreach (var x in other)
+            {
+                if (!c.Contains(x))
+                    return false;
+            }
+            return true;
+        }
+
+        // List<T>.AddRange for arbitrary ICollection receivers (HashSet, IList, ...).
+        public static void AddRange<T>(this ICollection<T> dest, global::System.Collections.Generic.IEnumerable<T> src)
+        {
+            if (src == null)
+                return;
+            foreach (var x in src)
+                dest.Add(x);
+        }
+
+        // List<T>.GetRange for IList receivers (returns a copy, as List.GetRange does).
+        public static List<T> GetRange<T>(this IList<T> list, int index, int count)
+        {
+            var result = new List<T>(count);
+            for (int i = 0; i < count; i++)
+                result.Add(list[index + i]);
+            return result;
+        }
+
         public static T RemoveLastAndGet<T>(this global::System.Collections.Generic.LinkedList<T> list)
         {
             T v = list.GetLast();

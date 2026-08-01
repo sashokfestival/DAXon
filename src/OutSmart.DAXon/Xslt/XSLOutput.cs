@@ -19,7 +19,6 @@ using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Xslt
 {
     /// <summary>
@@ -55,7 +54,7 @@ namespace OutSmart.DAXon.Xslt
                 else if (f.Equals("version"))
                 {
                     string outputVersion = Whitespace.Trim(value);
-                    serializationAttributes.Put(f, outputVersion);
+                    serializationAttributes[f] = outputVersion;
                 }
                 else if (f.Equals("use-character-maps"))
                 {
@@ -73,7 +72,7 @@ namespace OutSmart.DAXon.Xslt
                         CompileError(XPathException.MakeXPathException(e));
                     }
 
-                    serializationAttributes.Put(f, val);
+                    serializationAttributes[f] = val;
                 }
                 else if (XSLResultDocument.fans.Contains(f) && !f.Equals("output-version"))
                 {
@@ -88,7 +87,7 @@ namespace OutSmart.DAXon.Xslt
                         val = Whitespace.Trim(val);
                     }
 
-                    serializationAttributes.Put(f, val);
+                    serializationAttributes[f] = val;
                 }
                 else
                 {
@@ -105,7 +104,7 @@ namespace OutSmart.DAXon.Xslt
                             userAttributes = new Dictionary<string, string>(5);
                         }
 
-                        userAttributes.Put(name, value);
+                        userAttributes[name] = value;
                     }
                 }
             }
@@ -138,7 +137,7 @@ namespace OutSmart.DAXon.Xslt
             {
                 if ("xml".Equals(method) || "html".Equals(method) || "text".Equals(method) || "xhtml".Equals(method) || "json".Equals(method) || "adaptive".Equals(method))
                 {
-                    CheckAndPut(sf, OutputKeys.METHOD, method, details, precedences, thisPrecedence); //details.put(OutputKeys.METHOD, method);
+                    CheckAndPut(sf, DAXonOutputKeys.METHOD, method, details, precedences, thisPrecedence); //details.put(DAXonOutputKeys.METHOD, method);
                 }
                 else
                 {
@@ -159,7 +158,7 @@ namespace OutSmart.DAXon.Xslt
                                 UndeclaredNamespaceError(prefix, "XTSE0280", "method");
                             }
 
-                            CheckAndPut(sf, OutputKeys.METHOD, "{" + uri + "}" + parts[1], details, precedences, thisPrecedence); //details.put(OutputKeys.METHOD, '{' + uri + '}' + parts[1] );
+                            CheckAndPut(sf, DAXonOutputKeys.METHOD, "{" + uri + "}" + parts[1], details, precedences, thisPrecedence); //details.put(DAXonOutputKeys.METHOD, '{' + uri + '}' + parts[1] );
                         }
                     }
                     catch (QNameException e)
@@ -169,7 +168,7 @@ namespace OutSmart.DAXon.Xslt
                 }
             }
 
-            foreach (KeyValuePair<string, string> entry in serializationAttributes.EntrySet())
+            foreach (KeyValuePair<string, string> entry in serializationAttributes)
             {
                 CheckAndPut(sf, entry.Key, entry.Value, details, precedences, thisPrecedence);
             }
@@ -189,7 +188,7 @@ namespace OutSmart.DAXon.Xslt
             // deal with user-defined attributes
             if (userAttributes != null)
             {
-                foreach (KeyValuePair<string, string> e in userAttributes.EntrySet())
+                foreach (KeyValuePair<string, string> e in userAttributes)
                 {
                     details.SetProperty(e.Key, e.Value);
                 }
@@ -219,11 +218,11 @@ namespace OutSmart.DAXon.Xslt
                 string code = property.Equals("method") ? "XTSE1570" : "XTSE0020";
                 if (property.Contains("{"))
                 {
-                    CompileError(err.GetMessage(), code);
+                    CompileError(err.Message, code);
                 }
                 else
                 {
-                    CompileErrorInAttribute(err.GetMessage(), code, property);
+                    CompileErrorInAttribute(err.Message, code, property);
                 }
 
                 return;
@@ -233,7 +232,7 @@ namespace OutSmart.DAXon.Xslt
             if (old == null)
             {
                 props.SetProperty(property, value);
-                precedences.Put(property, thisPrecedence);
+                precedences[property] = thisPrecedence;
             }
             else if (old.Equals(value))
             {
@@ -241,7 +240,7 @@ namespace OutSmart.DAXon.Xslt
             else if (IsListOfNames(property))
             {
                 props.SetProperty(property, old + " " + value);
-                precedences.Put(property, thisPrecedence);
+                precedences[property] = thisPrecedence;
             }
             else
             {
@@ -271,12 +270,12 @@ namespace OutSmart.DAXon.Xslt
         // ignore this value, the other has higher precedence
         private static bool IsListOfNames(string property)
         {
-            return property.Equals(OutputKeys.CDATA_SECTION_ELEMENTS) || property.Equals(DAXonOutputKeys.SUPPRESS_INDENTATION) || property.Equals(DAXonOutputKeys.ATTRIBUTE_ORDER) || property.Equals(DAXonOutputKeys.DOUBLE_SPACE);
+            return property.Equals(DAXonOutputKeys.CDATA_SECTION_ELEMENTS) || property.Equals(DAXonOutputKeys.SUPPRESS_INDENTATION) || property.Equals(DAXonOutputKeys.ATTRIBUTE_ORDER) || property.Equals(DAXonOutputKeys.DOUBLE_SPACE);
         }
 
         private static bool IsQName(string property)
         {
-            return property.Equals(OutputKeys.METHOD) || property.Equals(DAXonOutputKeys.JSON_NODE_OUTPUT_METHOD);
+            return property.Equals(DAXonOutputKeys.METHOD) || property.Equals(DAXonOutputKeys.JSON_NODE_OUTPUT_METHOD);
         }
 
         public static string PrepareCharacterMaps(StyleElement element, string useCharacterMaps, Properties details)
@@ -298,7 +297,7 @@ namespace OutSmart.DAXon.Xslt
                     element.CompileErrorInAttribute("No character-map named '" + displayname + "' has been defined", "XTSE1590", "use-character-maps");
                 }
 
-                s.Append(" ").Append(qName.ClarkName);
+                s.Append(' ').Append(qName.ClarkName);
             }
 
             existing = s + existing;

@@ -15,7 +15,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using static OutSmart.DAXon.Expressions.Flwor.Clause.ClauseName;
 using System;
 using System.Collections.Generic;

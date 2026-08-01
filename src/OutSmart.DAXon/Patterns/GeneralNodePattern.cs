@@ -36,17 +36,8 @@ namespace OutSmart.DAXon.Patterns
 
         public override int Dependencies => equivalentExpr.Dependencies & (StaticProperty.DEPENDS_ON_LOCAL_VARIABLES | StaticProperty.DEPENDS_ON_USER_FUNCTIONS);
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override int Fingerprint => itemType.Fingerprint;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
-        /// <summary>
-        /// Get a NodeTest that all the nodes matching this pattern must satisfy
-        /// </summary>
         public Expression EquivalentExpr => equivalentExpr;
         public GeneralNodePattern(Expression expr, NodeTest itemType)
         {
@@ -140,9 +131,6 @@ namespace OutSmart.DAXon.Patterns
             return this;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override void BindCurrent(ILocalBinding binding)
         {
             if (ExpressionTool.CallsFunction(equivalentExpr, Current.FN_CURRENT, false))
@@ -158,17 +146,11 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override int AllocateSlots(SlotManager slotManager, int nextFree)
         {
             return ExpressionTool.AllocateSlots(equivalentExpr, nextFree, slotManager);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool Matches(IItem item, IXPathContext context)
         {
             TypeHierarchy th = context.GetConfiguration().GetTypeHierarchy();
@@ -213,9 +195,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool MatchesBeneathAnchor(NodeInfo node, NodeInfo anchor, IXPathContext context)
         {
             if (!itemType.Test(node))
@@ -253,9 +232,6 @@ namespace OutSmart.DAXon.Patterns
             return IsSelected(node, anchor, equivalentExprEvaluator, context);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         private bool IsSelected(NodeInfo node, NodeInfo anchor, IPullEvaluator selector, IXPathContext context)
         {
 
@@ -283,10 +259,9 @@ namespace OutSmart.DAXon.Patterns
             {
                 throw e;
             }
-            catch (XPathException.StackOverflow e)
-            {
-                throw e;
-            }
+            // No StackOverflow catch: post-round-BC a recursion overflow raises RecursionDepthError,
+            // a foreign type that passes through the XPathException catch below untouched. The old
+            // XPathException.StackOverflow is constructed only at the API boundary, never thrown here.
             catch (XPathException e)
             {
                 HandleDynamicError(e, c2);
@@ -294,31 +269,16 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override UType GetUType()
         {
             return itemType.GetUType();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
-        /// <summary>
-        /// Get a NodeTest that all the nodes matching this pattern must satisfy
-        /// </summary>
         public override ItemType GetItemType()
         {
             return itemType;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
-        /// <summary>
-        /// Get a NodeTest that all the nodes matching this pattern must satisfy
-        /// </summary>
         public override bool Equals(object other)
         {
             if (other is GeneralNodePattern)
@@ -332,23 +292,11 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
-        /// <summary>
-        /// hashcode supporting equals()
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return 83641 ^ equivalentExpr.GetHashCode();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
-        /// <summary>
-        /// hashcode supporting equals()
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             GeneralNodePattern n = new GeneralNodePattern(equivalentExpr.Copy(rebindings), itemType);
@@ -359,12 +307,6 @@ namespace OutSmart.DAXon.Patterns
             return n;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
-        /// <summary>
-        /// hashcode supporting equals()
-        /// </summary>
         public override void Export(ExpressionPresenter presenter)
         {
             presenter.StartElement("p.genNode");

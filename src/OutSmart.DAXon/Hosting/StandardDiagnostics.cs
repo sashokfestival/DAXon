@@ -27,7 +27,6 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Lib
 {
     public class StandardDiagnostics
@@ -316,7 +315,7 @@ namespace OutSmart.DAXon.Lib
                                 sb.Append("  In template rule with match=\"").Append(rule.Pattern.ToShortString()).Append("\" ");
                                 if (loc != null && loc.GetLineNumber() != -1)
                                 {
-                                    sb.Append("on line ").Append(loc.GetLineNumber()).Append(" ");
+                                    sb.Append("on line ").Append(loc.GetLineNumber()).Append(' ');
                                 }
 
                                 if (loc != null && loc.GetSystemId() != null)
@@ -329,7 +328,7 @@ namespace OutSmart.DAXon.Lib
                         }
                         else
                         {
-                            @out.Error(GetLocationMessageText(component.GetActor()).ReplaceFirst("^at ", "In "));
+                            @out.Error(GetLocationMessageText(component.GetActor()).ReplaceFirstRegex("^at ","In "));
                         }
                     }
 
@@ -386,7 +385,7 @@ namespace OutSmart.DAXon.Lib
             }
             else if (originator is IBuiltInRuleSet)
             {
-                sb.Append("built-in template rule (").Append(((IBuiltInRuleSet)originator).Name).Append(")");
+                sb.Append("built-in template rule (").Append(((IBuiltInRuleSet)originator).Name).Append(')');
             }
             else if (originator is KeyDefinition)
             {
@@ -426,7 +425,7 @@ namespace OutSmart.DAXon.Lib
             }
             else
             {
-                sb.Append("unknown caller (").Append(originator.GetType()).Append(")");
+                sb.Append("unknown caller (").Append(originator.GetType()).Append(')');
             }
 
             if (originator is ILocatable)
@@ -446,7 +445,7 @@ namespace OutSmart.DAXon.Lib
         {
             StringBuilder message = new StringBuilder();
             IList<NodeInfo> offendingNodes = failure.OffendingNodes;
-            if (!offendingNodes.IsEmpty())
+            if (offendingNodes.Count > 0)
             {
                 message.Append("\n  Nodes for which the assertion fails:");
                 foreach (NodeInfo offender in offendingNodes)
@@ -562,7 +561,7 @@ namespace OutSmart.DAXon.Lib
                 {
                     fsb.Append("[x");
                     fsb.Append((ch).ToString("x"));
-                    fsb.Append("]");
+                    fsb.Append(']');
                 }
             }
 

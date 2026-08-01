@@ -11,7 +11,6 @@ using OutSmart.DAXon.Expressions.Sorting;
 using OutSmart.DAXon.Tracing;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using static OutSmart.DAXon.Expressions.Flwor.Clause.ClauseName;
 using System;
 using System.Collections.Generic;
@@ -86,13 +85,8 @@ namespace OutSmart.DAXon.Expressions.Flwor
         {
             processor.ProcessOperand(tupleOp);
             processor.ProcessOperand(sortKeysOp); //        for (SortKeyDefinition sortKey : sortKeys) {
-            //            sortKey.processSubExpressions(processor);
-            //        }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             bool allKeysFixed = true;
@@ -140,9 +134,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             SortKeyDefinitionList sortKeys = SortKeyDefinitions;
@@ -153,9 +144,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override void Explain(ExpressionPresenter @out)
         {
             @out.StartElement("order-by");
@@ -169,9 +157,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override string ToString()
         {
             StringBuilder fsb = new StringBuilder(64);
@@ -179,9 +164,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return fsb.ToString();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public virtual AtomicValue EvaluateSortKey(int n, IXPathContext c)
         {
             SortKeyDefinitionList sortKeys = SortKeyDefinitions;

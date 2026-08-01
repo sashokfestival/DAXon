@@ -31,33 +31,21 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         protected override bool IsPermittedChild(StyleElement child)
         {
             return child is XSLLocalParam || child is XSLOnCompletion;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         protected override bool MayContainSequenceConstructor()
         {
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override bool MayContainParam()
         {
             return true;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override void PrepareAttributes()
         {
             foreach (AttributeInfo att in Attributes())
@@ -83,29 +71,19 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual void SetCompilable(bool compilable)
         {
             this.compilable = compilable;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public virtual bool IsCompilable()
         {
             return compilable;
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override void Validate(ComponentDeclaration decl)
         {
 
-            //checkParamComesFirst(false);
             select = TypeCheck("select", select);
             if (!HasChildNodes())
             {
@@ -113,9 +91,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Specify that xsl:param is a permitted child
-        /// </summary>
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
             IList<NodeInfo> nonFinallyChildren = new List<NodeInfo>();

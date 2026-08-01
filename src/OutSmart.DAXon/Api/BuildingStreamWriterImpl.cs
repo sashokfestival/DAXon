@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Api
 {
-    public class BuildingStreamWriterImpl : StreamWriterToReceiver, IBuildingStreamWriter
+    public class BuildingStreamWriterImpl : StreamWriterToReceiver
     {
         Builder builder;
 
@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Api
             {
                 try
                 {
-                    builder.Dispose();
+                    builder.Close();
                 }
                 catch (XPathException e)
                 {

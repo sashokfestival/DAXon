@@ -16,7 +16,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Text;
 using OutSmart.DAXon.Internal.Collections;
 using System;
 using System.Collections.Generic;
@@ -25,7 +24,6 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
@@ -58,7 +56,7 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        public virtual void SetNormalizationForm(Normalizer.Form normalizationForm)
+        public virtual void SetNormalizationForm(NormalizationForm normalizationForm)
         {
         }
 
@@ -270,7 +268,7 @@ namespace OutSmart.DAXon.Serialization
                     IReceiver r = p.GetConfiguration().SerializerFactory.GetReceiver(uwr, sProps, p);
                     r.Open();
                     r.Append(node);
-                    r.Dispose();
+                    r.Close();
                     Emit(ub.ToString());
                     break;
             }
@@ -387,9 +385,9 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        public override void Dispose()
+        public override void Close()
         {
-            base.Dispose();
+            base.Close();
             if (writer != null)
             {
                 try

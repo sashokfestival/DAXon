@@ -57,7 +57,7 @@ namespace OutSmart.DAXon.Regex
             int guard = matcher.search.Length32();
             if (max < int.MaxValue)
             {
-                guard = System.Math.Min(guard, position + len * max);
+                guard = Math.Min(guard, position + len * max);
             }
 
             if (position >= guard && min > 0)

@@ -29,21 +29,9 @@ namespace OutSmart.DAXon.Expressions
     {
         private readonly Configuration config;
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual XPathContextMajor MajorContext => null;
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual int TemporaryOutputState
         {
             get => 0; set
@@ -51,16 +39,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual string CurrentOutputUri
         {
             get => null; set
@@ -72,42 +51,27 @@ namespace OutSmart.DAXon.Expressions
             this.config = config;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual ISequence EvaluateLocalVariable(int slotnumber)
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IXPathContext GetCaller()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IResourceResolver GetResourceResolver()
         {
             return config.GetResourceResolver();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IErrorReporter GetErrorReporter()
         {
             return config.MakeErrorReporter();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
         /// <summary>
         /// Get the current component
         /// </summary>
@@ -118,9 +82,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
         /// Get the Configuration
         /// </summary>
         public virtual Configuration GetConfiguration()
@@ -129,9 +90,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
         /// Get the Configuration
         /// </summary>
         public virtual IItem GetContextItem()
@@ -139,151 +97,73 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual Controller GetController()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual IGroupIterator GetCurrentGroupIterator()
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual IGroupIterator GetCurrentMergeGroupIterator()
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual FocusTrackingIterator GetCurrentIterator()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual Component.M GetCurrentMode()
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual IRegexIterator GetCurrentRegexIterator()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual Rule GetCurrentTemplateRule()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual int GetLast()
         {
             XPathException err = new XPathException("The context item is absent", "XPDY0002");
             throw new UncheckedXPathException(err);
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Controller. May return null when running outside XSLT or XQuery
-        /// </summary>
         public virtual ParameterSet GetLocalParameters()
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Name Pool
-        /// </summary>
         public virtual NamePool GetNamePool()
         {
             return config.GetNamePool();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Name Pool
-        /// </summary>
         public virtual StackFrame GetStackFrame()
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Name Pool
-        /// </summary>
         public virtual ParameterSet GetTunnelParameters()
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Get the Name Pool
-        /// </summary>
         public virtual bool IsAtLast()
         {
             XPathException err = new XPathException("The context item is absent");
@@ -291,57 +171,27 @@ namespace OutSmart.DAXon.Expressions
             throw err;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Construct a new context without copying (used for the context in a function call)
-        /// </summary>
         public virtual XPathContextMajor NewCleanContext()
         {
             NotAllowed();
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Construct a new context without copying (used for the context in a function call)
-        /// </summary>
         public virtual XPathContextMajor NewContext()
         {
             Controller controller = new Controller(config);
             return controller.NewXPathContext();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Construct a new context without copying (used for the context in a function call)
-        /// </summary>
         public virtual XPathContextMinor NewMinorContext()
         {
             return NewContext().NewMinorContext();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         public virtual void SetCaller(IXPathContext caller)
         {
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
         /// <summary>
         /// Set a new sequence iterator.
@@ -351,12 +201,6 @@ namespace OutSmart.DAXon.Expressions
             NotAllowed();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
         /// <summary>
         /// Set a new sequence iterator.
@@ -367,151 +211,61 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual void SetLocalVariable(int slotNumber, ISequence value)
         {
             NotAllowed();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual int UseLocalParameter(StructuredQName parameterId, int slotNumber, bool isTunnel)
         {
             return ParameterSet.NOT_SUPPLIED;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual DateTimeValue GetCurrentDateTime()
         {
             throw new NoDynamicContextException("current-dateTime");
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual int GetImplicitTimezone()
         {
             return CalendarValue.MISSING_TIMEZONE;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual IEnumerator<ContextStackFrame> IterateStackFrames()
         {
             return System.Linq.Enumerable.Empty<ContextStackFrame>().GetEnumerator();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual XPathException GetCurrentException()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual void WaitForChildThreads()
         {
             GetCaller().WaitForChildThreads();
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         private void NotAllowed()
         {
             throw new NotSupportedException((new NoDynamicContextException("Internal error: early evaluation of subexpression with no context")).ToString());
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual XPathContextMajor.ThreadManager GetThreadManager()
         {
             return null;
         }
 
-        /// <summary>
-        /// Get the value of a local variable, identified by its slot number
-        /// </summary>
-        /// <summary>
-        /// Set the calling IXPathContext
-        /// </summary>
         // no-op
-        /// <summary>
-        /// Set the value of a local variable, identified by its slot number
-        /// </summary>
         public virtual Component GetTargetComponent(int bindingSlot)
         {
             return null;

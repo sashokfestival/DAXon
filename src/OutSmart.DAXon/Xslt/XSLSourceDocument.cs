@@ -106,7 +106,7 @@ namespace OutSmart.DAXon.Xslt
                             break;
                         case "validation-params":
 
-                            // TODO
+                            // Schema validation parameters: ignored (schema-aware feature; this port is HE-level).
                             break;
                         case "strip-space":
                             switch (Whitespace.NormalizeWhitespace(StringView.Of(value)).ToString())
@@ -176,11 +176,9 @@ namespace OutSmart.DAXon.Xslt
             accumulators = registry.GetUsedAccumulators(useAccumulatorsAtt, this);
         }
 
-        // TODO
         public override void Validate(ComponentDeclaration decl)
         {
 
-            //checkParamComesFirst(false);
             href = TypeCheck("select", href);
             if (!HasChildNodes())
             {
@@ -188,7 +186,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        // TODO
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
             Configuration config = GetConfiguration();

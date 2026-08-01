@@ -11,7 +11,6 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Text;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,24 +23,24 @@ namespace OutSmart.DAXon.Serialization
 {
     public class UnicodeNormalizer : ProxyReceiver
     {
-        private readonly Normalizer.Form normForm;
+        private readonly NormalizationForm normForm;
 
-        public virtual Normalizer.Form NormalizationForm => normForm;
+        public virtual NormalizationForm NormalizationForm => normForm;
         public UnicodeNormalizer(string form, IReceiver next) : base(next)
         {
             switch (form)
             {
                 case "NFC":
-                    normForm = Normalizer.Form.NFC;
+                    normForm = NormalizationForm.FormC;
                     break;
                 case "NFD":
-                    normForm = Normalizer.Form.NFD;
+                    normForm = NormalizationForm.FormD;
                     break;
                 case "NFKC":
-                    normForm = Normalizer.Form.NFKC;
+                    normForm = NormalizationForm.FormKC;
                     break;
                 case "NFKD":
-                    normForm = Normalizer.Form.NFKD;
+                    normForm = NormalizationForm.FormKD;
                     break;
                 default:
                     throw new XPathException("Unknown normalization form " + form, "SESU0011");
@@ -92,7 +91,7 @@ namespace OutSmart.DAXon.Serialization
                 int nextNull = s.IndexOf((char)0);
                 while (nextNull >= 0)
                 {
-                    @out.Append(Normalizer.Normalize(s.Substring(start, nextNull - start) /*Java substring(begin,END) -> C# (start,LENGTH)*/, normForm));
+                    @out.Append(s.Substring(start, nextNull - start).Normalize(normForm));
                     @out.Append((char)0);
                     start = nextNull + 1;
                     nextNull = s.IndexOf((char)0, start);
@@ -102,12 +101,12 @@ namespace OutSmart.DAXon.Serialization
                     nextNull = s.IndexOf((char)0, start);
                 }
 
-                @out.Append(Normalizer.Normalize(s.Substring(start), normForm));
+                @out.Append(s.Substring(start).Normalize(normForm));
                 return StringView.Tidy(@out.ToString());
             }
             else
             {
-                return StringView.Tidy(Normalizer.Normalize(@in.ToString(), normForm));
+                return StringView.Tidy(@in.ToString().Normalize(normForm));
             }
         }
     }

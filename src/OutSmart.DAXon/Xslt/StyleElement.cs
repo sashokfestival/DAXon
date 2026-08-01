@@ -44,9 +44,6 @@ namespace OutSmart.DAXon.Xslt
         public const int ACTION_FIXUP = 16;
         public const int ACTION_PROCESS_ATTRIBUTES = 32;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public static readonly string[] YES_NO = new[]
         {
             "0",
@@ -74,9 +71,6 @@ namespace OutSmart.DAXon.Xslt
 
         protected int actionsCompleted = 0;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual Visibility DeclaredVisibility
         {
             get
@@ -93,9 +87,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual int DefaultValidation
         {
             get
@@ -117,14 +108,8 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual StylesheetPackage UsedPackage => null;
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual Component OverriddenComponent
         {
             get
@@ -150,9 +135,6 @@ namespace OutSmart.DAXon.Xslt
                 return usePackage.UsedPackage.GetComponent(originalName);
             }
         }
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual StyleElement LastChildInstruction
         {
             get
@@ -174,9 +156,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual int EffectiveVersion
         {
             get
@@ -198,15 +177,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual StructuredQName DefaultMode
         {
             get
@@ -238,15 +208,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual NamespaceUri DefaultXPathNamespace
         {
             get
@@ -267,15 +228,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual SlotManager ContainingSlotManager
         {
             get
@@ -301,15 +253,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual StylesheetPackage ContainingPackage
         {
             get
@@ -318,48 +261,30 @@ namespace OutSmart.DAXon.Xslt
                 return psm == null ? null : psm.GetStylesheetPackage();
             }
         }
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public StyleElement()
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual Compilation GetCompilation()
         {
             return compilation;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void SetCompilation(Compilation compilation)
         {
             this.compilation = compilation;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual StylesheetPackage GetPackageData()
         {
             return GetPrincipalStylesheetModule().GetStylesheetPackage();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override Configuration GetConfiguration()
         {
             return compilation.GetConfiguration();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual ExpressionContext GetStaticContext()
         {
             if (staticContext == null)
@@ -370,25 +295,16 @@ namespace OutSmart.DAXon.Xslt
             return staticContext;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual ExpressionContext GetStaticContext(StructuredQName attributeName)
         {
             return new ExpressionContext(this, attributeName);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool IsInXsltNamespace()
         {
             return true; // unless specified otherwise in a subclass
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public override string GetBaseURI()
         {
             if (baseURI == null)
@@ -399,25 +315,16 @@ namespace OutSmart.DAXon.Xslt
             return baseURI;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual ExpressionVisitor MakeExpressionVisitor()
         {
             return ExpressionVisitor.Make(GetStaticContext());
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool IsSchemaAware()
         {
             return GetCompilation().IsSchemaAware();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void SubstituteFor(StyleElement temp)
         {
             SetRawParent(temp.GetRawParent());
@@ -435,42 +342,27 @@ namespace OutSmart.DAXon.Xslt
             compilation = temp.compilation; //lineNumber = temp.lineNumber;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void SetValidationError(XmlProcessingIncident reason, OnFailure circumstances)
         {
             validationError = reason;
             reportingCircumstances = circumstances;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void SetIgnoreInstruction()
         {
             reportingCircumstances = OnFailure.IGNORED_INSTRUCTION;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool IsInstruction()
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool IsDeclaration()
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual Visibility GetVisibility()
         {
             string vis = GetAttributeValue(NamespaceUri.NULL, "visibility");
@@ -484,41 +376,26 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool MarkTailCalls()
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual bool MayContainSequenceConstructor()
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual bool MayContainFallback()
         {
             return MayContainSequenceConstructor();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool MayContainParam()
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public StructuredQName MakeQName(string lexicalQName, string errorCode, string attributeName)
         {
             StructuredQName qName;
@@ -563,9 +440,6 @@ namespace OutSmart.DAXon.Xslt
             return qName;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual StyleElement FindAncestorElement(int fingerprint)
         {
             NodeInfo parent = GetParent();
@@ -589,9 +463,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual Actor GetXslOriginal(int componentKind)
         {
             StyleElement container = componentKind == Fingerprint ? this : FindAncestorElement(componentKind);
@@ -624,36 +495,25 @@ namespace OutSmart.DAXon.Xslt
             return overridden.GetActor();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual RetainedStaticContext MakeRetainedStaticContext()
         {
             return GetStaticContext().MakeRetainedStaticContext();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool ChangesRetainedStaticContext()
         {
             NodeImpl parent = GetParent();
             return parent == null || !ExpressionTool.EqualOrNull(GetBaseURI(), parent.GetBaseURI()) || defaultCollationName != null || defaultXPathNamespace != null || !(parent is StyleElement) || AllNamespaces != parent.AllNamespaces || EffectiveVersion != ((StyleElement)parent).EffectiveVersion;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual INamespaceResolver GetNamespaceResolver()
         {
             return this;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void ProcessAllAttributes()
         {
+            ProbeStylesheetDepth();
             ProcessDefaultCollationAttribute();
             ProcessDefaultMode();
             staticContext = new ExpressionContext(this, null);
@@ -671,9 +531,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void ProcessStandardAttributes(NamespaceUri @namespace)
         {
             ProcessExtensionElementAttribute(@namespace);
@@ -684,26 +541,17 @@ namespace OutSmart.DAXon.Xslt
             ProcessExpandTextAttribute(@namespace);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual string GetAttributeValue(string clarkName)
         {
             INodeName nn = FingerprintedQName.FromClarkName(clarkName);
             return GetAttributeValue(nn.GetNamespaceUri(), nn.GetLocalPart());
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public void ProcessAttributes()
         {
             PrepareAttributes();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void CheckUnknownAttribute(INodeName nc)
         {
             NamespaceUri attributeURI = nc.GetNamespaceUri();
@@ -739,14 +587,8 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public abstract void PrepareAttributes();
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual Expression MakeExpression(string expression, AttributeInfo att)
         {
             try
@@ -775,9 +617,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual Patterns.Pattern MakePattern(string pattern, string attributeName)
         {
             try
@@ -798,9 +637,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual Expression MakeAttributeValueTemplate(string expression, AttributeInfo att)
         {
             IStaticContext env = att == null ? staticContext : GetStaticContext(att.GetNodeName().GetStructuredQName());
@@ -821,9 +657,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual void CheckAttributeValue(string name, string value, bool avt, string[] allowed)
         {
             if (avt && value.Contains("{"))
@@ -835,7 +668,7 @@ namespace OutSmart.DAXon.Xslt
             {
                 StringBuilder sb = new StringBuilder(64);
                 sb.Append("Invalid value for ");
-                sb.Append("@");
+                sb.Append('@');
                 sb.Append(name);
                 sb.Append(". Value must be one of (");
                 for (int i = 0; i < allowed.Length; i++)
@@ -844,13 +677,10 @@ namespace OutSmart.DAXon.Xslt
                     sb.Append(allowed[i]);
                 }
 
-                sb.Append(")");
+                sb.Append(')');
                 CompileError(sb.ToString(), "XTSE0020");
             }
         }
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool ProcessBooleanAttribute(string name, string value)
         {
             string s = Whitespace.Trim(value);
@@ -869,25 +699,16 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public static bool IsYes(string s)
         {
             return "yes".Equals(s) || "true".Equals(s) || "1".Equals(s);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public static bool IsNo(string s)
         {
             return "no".Equals(s) || "false".Equals(s) || "0".Equals(s);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual bool ProcessStreamableAtt(string streamableAtt)
         {
             bool streamable = ProcessBooleanAttribute("streamable", streamableAtt);
@@ -909,9 +730,6 @@ namespace OutSmart.DAXon.Xslt
             return streamable;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual Values.SequenceType MakeSequenceType(string sequenceType)
         {
             GetStaticContext();
@@ -921,9 +739,6 @@ namespace OutSmart.DAXon.Xslt
             return parser.ParseSequenceType(sequenceType, staticContext);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual Values.SequenceType MakeExtendedSequenceType(string sequenceType)
         {
             ExpressionContext env = GetStaticContext(new StructuredQName("saxon", NamespaceUri.SAXON, "as"));
@@ -933,9 +748,6 @@ namespace OutSmart.DAXon.Xslt
             return parser.ParseExtendedSequenceType(sequenceType, env);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void ProcessExtensionElementAttribute(NamespaceUri ns)
         {
             string ext = GetAttributeValue(ns, "extension-element-prefixes");
@@ -972,9 +784,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual void ProcessExcludedNamespaces(NamespaceUri ns)
         {
             string ext = GetAttributeValue(ns, "exclude-result-prefixes");
@@ -988,7 +797,7 @@ namespace OutSmart.DAXon.Xslt
                         excluded.Add(binding.GetNamespaceUri());
                     }
 
-                    excludedNamespaces = excluded.ToArray(new NamespaceUri[0]);
+                    excludedNamespaces = excluded.ToArray();
                 }
                 else
                 {
@@ -1026,9 +835,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected internal virtual void ProcessVersionAttribute(NamespaceUri ns)
         {
             string v = Whitespace.Trim(GetAttributeValue(ns, "version"));
@@ -1062,9 +868,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         protected virtual int ValidateValidationAttribute(string value)
         {
             int code = Validation.GetCode(value);
@@ -1088,9 +891,6 @@ namespace OutSmart.DAXon.Xslt
             return code;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool IsExtensionAttributeAllowed(string attribute)
         {
             if (GetConfiguration().IsLicensedFeature(Configuration.LicenseFeature.PROFESSIONAL_EDITION))
@@ -1104,28 +904,16 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool ForwardsCompatibleModeIsEnabled()
         {
             return EffectiveVersion > GetCompilation().GetCompilerInfo().XsltVersion;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
         public virtual bool XPath10ModeIsEnabled()
         {
             return EffectiveVersion < 20;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
         public virtual void ProcessDefaultCollationAttribute()
         {
             NamespaceUri ns = IsInXsltNamespace() ? NamespaceUri.NULL : NamespaceUri.XSLT;
@@ -1184,7 +972,7 @@ namespace OutSmart.DAXon.Xslt
                                 reasons.Append("; ");
                             }
 
-                            reasons.Append("Collation ").Append(uri).Append(" is not recognized (").Append(e.GetMessage()).Append(")"); // Ignore an unrecognized collation URI
+                            reasons.Append("Collation ").Append(uri).Append(" is not recognized (").Append(e.Message).Append(')'); // Ignore an unrecognized collation URI
                         }
                     } // if not recognized, try the next URI in order
                 }
@@ -1200,12 +988,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
         public virtual string GetDefaultCollationName()
         {
             StyleElement e = this;
@@ -1228,26 +1010,11 @@ namespace OutSmart.DAXon.Xslt
             return GetConfiguration().GetDefaultCollationName();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
         protected virtual IStringCollator FindCollation(string name, string baseURI)
         {
             return GetConfiguration().GetCollation(name, baseURI);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void ProcessDefaultMode()
         {
             NamespaceUri ns = IsInXsltNamespace() ? NamespaceUri.NULL : NamespaceUri.XSLT;
@@ -1280,15 +1047,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         private bool DefinesExtensionElement(NamespaceUri uri)
         {
             if (extensionNamespaces == null)
@@ -1307,15 +1065,6 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual bool IsExtensionNamespace(NamespaceUri uri)
         {
             NodeInfo anc = this;
@@ -1332,15 +1081,6 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         private bool DefinesExcludedNamespace(NamespaceUri uri)
         {
             if (excludedNamespaces == null)
@@ -1359,15 +1099,6 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         protected virtual bool IsExcludedNamespace(NamespaceUri uri)
         {
             if (uri.Equals(NamespaceUri.XSLT) || uri.Equals(NamespaceUri.XML))
@@ -1394,15 +1125,6 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void ProcessDefaultXPathNamespaceAttribute(NamespaceUri ns)
         {
             string v = GetAttributeValue(ns, "xpath-default-namespace");
@@ -1412,15 +1134,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void ProcessExpandTextAttribute(NamespaceUri ns)
         {
             string v = GetAttributeValue(ns, "expand-text");
@@ -1435,15 +1148,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void ProcessDefaultValidationAttribute(NamespaceUri ns)
         {
             string v = GetAttributeValue(ns, "default-validation");
@@ -1469,29 +1173,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual bool IsExpandingText()
         {
             return expandText;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual ISchemaType GetSchemaType(string typeAtt)
         {
             try
@@ -1562,29 +1248,11 @@ namespace OutSmart.DAXon.Xslt
             return null;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual ISimpleType GetTypeAnnotation(ISchemaType schemaType)
         {
             return (ISimpleType)schemaType;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         protected virtual Expression MapToSequence(Expression mapExpr)
         {
             try
@@ -1597,54 +1265,18 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void Validate(ComponentDeclaration decl)
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void PostValidate()
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void Index(ComponentDeclaration decl, PrincipalStylesheetModule top)
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual Expression TypeCheck(string name, Expression exp)
         {
             if (exp == null)
@@ -1666,8 +1298,6 @@ namespace OutSmart.DAXon.Xslt
                 //            if (explaining) {
                 //                System.Console.Error.println("Static type: " +
                 //                exp.display(10, getNamePool(), System.Console.Error);
-                //            }
-                //            if (injector != null) {
                 //                return injector.inject(exp, getStaticContext(), LocationKind.XPATH_IN_XSLT, new StructuredQName("", "", name));
                 //            }
                 return exp;
@@ -1677,7 +1307,6 @@ namespace OutSmart.DAXon.Xslt
 
                 // we can't report a dynamic error such as divide by zero unless the expression
                 // is actually executed.
-                //err.printStackTrace();
                 XPathException e2 = err;
                 if (e2.IsReportableStatically())
                 {
@@ -1698,15 +1327,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         protected virtual void AllocateLocalSlots(Expression exp)
         {
             SlotManager slotManager = ContainingSlotManager;
@@ -1729,15 +1349,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual Patterns.Pattern TypeCheck(string name, Patterns.Pattern pattern)
         {
             if (pattern == null)
@@ -1791,32 +1402,33 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void FixupReferences()
         {
+            ProbeStylesheetDepth();
             foreach (NodeInfo child in Children(new TypeIsInstancePredicate(typeof(StyleElement))))
             {
                 ((StyleElement)child).FixupReferences();
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
+        // Every recursive descent of the stylesheet's own element tree (ProcessAllAttributes,
+        // ValidateSubtree, FixupReferences, CompileSequenceConstructor) funnels through here, so a
+        // pathologically deep stylesheet raises a clean, catchable compile error instead of
+        // overflowing the uncatchable .NET stack at compile time. This build phase runs before the
+        // expression optimizer, so it never reaches ExpressionVisitor's static-descent guard; the
+        // adaptive stack probe (round AV) covers whatever depth the running thread's stack allows.
+        internal void ProbeStylesheetDepth()
+        {
+            try
+            {
+                StackGuard.Probe();
+            }
+            catch (RecursionDepthError e) when (!e.Described)
+            {
+                throw e.Describe("Stylesheet is too deeply nested (insufficient stack on this thread)", "XTSE0010", this);
+            }
+        }
+
         public virtual void ValidateSubtree(ComponentDeclaration decl, bool excludeStylesheet)
         {
             if (IsActionCompleted(StyleElement.ACTION_VALIDATE))
@@ -1824,6 +1436,7 @@ namespace OutSmart.DAXon.Xslt
                 return;
             }
 
+            ProbeStylesheetDepth();
             SetActionCompleted(StyleElement.ACTION_VALIDATE);
             if (validationError != null)
             {
@@ -1876,15 +1489,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         protected virtual void ValidateChildren(ComponentDeclaration decl, bool excludeStylesheet)
         {
             bool containsInstructions = MayContainSequenceConstructor();
@@ -1918,15 +1522,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         private bool ExamineTextNode(NodeInfo node)
         {
             if (node is TextValueTemplateNode)
@@ -1940,43 +1535,16 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         protected virtual bool IsPermittedChild(StyleElement child)
         {
             return false;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual PrincipalStylesheetModule GetPrincipalStylesheetModule()
         {
             return GetCompilation().GetPrincipalStylesheetModule();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         protected virtual void CheckSortComesFirst(bool sortRequired)
         {
             bool sortFound = false;
@@ -2013,15 +1581,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
         public virtual void CheckTopLevel(string errorCode, bool allowOverride)
         {
             NodeImpl parent = GetParent();
@@ -2038,18 +1597,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CheckEmpty()
         {
             if (HasChildNodes())
@@ -2058,35 +1605,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void ReportAbsence(string attribute)
         {
             CompileError("Element must have an " + Err.Wrap(attribute, Err.ATTRIBUTE) + " attribute", "XTSE0010");
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual Expression Compile(Compilation compilation, ComponentDeclaration decl)
         {
 
@@ -2094,18 +1617,6 @@ namespace OutSmart.DAXon.Xslt
             return null;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual bool IsWithinDeclaredStreamableConstruct()
         {
             if (IsInXsltNamespace())
@@ -2121,18 +1632,6 @@ namespace OutSmart.DAXon.Xslt
             return parent is StyleElement && ((StyleElement)parent).IsWithinDeclaredStreamableConstruct();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected virtual string GenerateId()
         {
             StringBuilder buff = new StringBuilder(16);
@@ -2140,34 +1639,10 @@ namespace OutSmart.DAXon.Xslt
             return buff.ToString();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileDeclaration(Compilation compilation, ComponentDeclaration decl)
         {
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual Expression CompileSequenceConstructor(Compilation compilation, ComponentDeclaration decl, bool includeParams)
         {
 
@@ -2212,8 +1687,8 @@ namespace OutSmart.DAXon.Xslt
                     }
                 }
 
-                vars.AddAll(others);
-                vars.AddAll(onEmpties);
+                vars.AddRange(others);
+                vars.AddRange(onEmpties);
                 return CompileSequenceConstructor(compilation, decl, new NodeListIterator(vars), includeParams);
             }
             else
@@ -2222,20 +1697,9 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual Expression CompileSequenceConstructor(Compilation compilation, ComponentDeclaration decl, ISequenceIterator iter, bool includeParams)
         {
+            ProbeStylesheetDepth();
             ILocation locationId = AllocateLocation();
             IList<Expression> contents = new List<Expression>(10);
             bool containsSpecials = false;
@@ -2368,18 +1832,6 @@ namespace OutSmart.DAXon.Xslt
             return block;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected virtual void CompileContentValueTemplate(TextImpl node, IList<Expression> contents)
         {
             if (node is TextValueTemplateNode)
@@ -2398,18 +1850,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected static void SetInstructionLocation(StyleElement source, Expression child)
         {
             if (child.GetLocation() == null || child.GetLocation() == Loc.NONE)
@@ -2418,18 +1858,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected virtual Expression FallbackProcessing(Compilation exec, ComponentDeclaration decl, StyleElement instruction)
         {
 
@@ -2465,18 +1893,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected virtual ILocation AllocateLocation()
         {
             if (savedLocation == null)
@@ -2487,18 +1903,6 @@ namespace OutSmart.DAXon.Xslt
             return savedLocation;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected internal virtual SortKeyDefinitionList MakeSortKeys(Compilation compilation, ComponentDeclaration decl)
         {
 
@@ -2535,18 +1939,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected virtual StructuredQName[] GetUsedAttributeSets(string use)
         {
             IList<StructuredQName> nameList = new List<StructuredQName>(4);
@@ -2556,26 +1948,14 @@ namespace OutSmart.DAXon.Xslt
                 nameList.Add(name);
             }
 
-            return nameList.ToArray(new StructuredQName[0]);
+            return nameList.ToArray();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual Visibility InterpretVisibilityValue(string s, string flags)
         {
             foreach (Visibility v in (Visibility[])Enum.GetValues(typeof(Visibility)))
             {
-                if (v.ToString().ToLowerCase().Equals(s) && (flags.Contains("h") || !s.Equals("hidden")) && (flags.Contains("a") || !s.Equals("absent")))
+                if (v.ToString().ToLowerInvariant().Equals(s) && (flags.Contains("h") || !s.Equals("hidden")) && (flags.Contains("a") || !s.Equals("absent")))
                 {
                     return v;
                 }
@@ -2585,18 +1965,6 @@ namespace OutSmart.DAXon.Xslt
             return Visibility.UNDEFINED;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual WithParam[] GetWithParamInstructions(Expression parent, Compilation compilation, ComponentDeclaration decl, bool tunnel)
         {
             int count = 0;
@@ -2638,18 +2006,6 @@ namespace OutSmart.DAXon.Xslt
             return array;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileError(IXmlProcessingError error)
         {
             XmlProcessingIncident.MaybeSetHostLanguage(error, HostLanguage.XSLT);
@@ -2665,18 +2021,6 @@ namespace OutSmart.DAXon.Xslt
             GetCompilation().ReportError(error);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileError(XPathException err)
         {
             if (err.GetLocator() == null)
@@ -2684,41 +2028,17 @@ namespace OutSmart.DAXon.Xslt
                 err.SetLocation(this);
             }
 
-            XmlProcessingIncident se = new XmlProcessingIncident(err.GetMessage(), err.ShowErrorCode(), err.GetLocator());
+            XmlProcessingIncident se = new XmlProcessingIncident(err.Message, err.ShowErrorCode(), err.GetLocator());
             se.SetHostLanguage(HostLanguage.XSLT);
             se.SetFailingExpression(err.GetFailingExpression());
             CompileError(se);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileError(string message)
         {
             CompileError(message, "XTSE0010");
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileError(string message, StructuredQName errorCode)
         {
             XmlProcessingIncident error = new XmlProcessingIncident(message, errorCode.EQName, this);
@@ -2726,52 +2046,16 @@ namespace OutSmart.DAXon.Xslt
             CompileError(error);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileError(string message, string errorCode)
         {
             CompileError(new XPathException(message, errorCode, this));
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileError(string message, string errorCode, ILocation loc)
         {
             CompileError(new XPathException(message, errorCode, loc));
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileErrorInAttribute(string message, string errorCode, string attributeName)
         {
             StructuredQName att = StructuredQName.FromClarkName(attributeName);
@@ -2779,53 +2063,17 @@ namespace OutSmart.DAXon.Xslt
             CompileError(new XPathException(message, errorCode, location));
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         public virtual void CompileErrorInAttribute(XPathException ex, string attributeName)
         {
             StructuredQName att = StructuredQName.FromClarkName(attributeName);
             CompileError(ex.WithLocation(new AttributeLocation(this, att)));
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected virtual void InvalidAttribute(string attributeName, string allowedValues)
         {
             CompileErrorInAttribute("Attribute " + DisplayName + "/@" + attributeName + " must be " + allowedValues, "XTSE0020", attributeName);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
         protected virtual bool RequireXslt40Attribute(string attributeName)
         {
             if (attributeName == null)
@@ -2846,21 +2094,6 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         protected virtual void RequireXslt40Element()
         {
             if (compilation.GetCompilerInfo().XsltVersion != 40)
@@ -2869,21 +2102,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         protected virtual void UndeclaredNamespaceError(string prefix, string errorCode, string attributeName)
         {
             if (errorCode == null)
@@ -2894,121 +2112,31 @@ namespace OutSmart.DAXon.Xslt
             CompileErrorInAttribute("Undeclared namespace prefix " + Err.Wrap(prefix), errorCode, attributeName);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual void CompileWarning(string message, StructuredQName errorCode)
         {
             GetCompilation().ReportWarning(message, errorCode.EQName, this);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual void CompileWarning(string message, string errorCode)
         {
             GetCompilation().ReportWarning(message, errorCode, this);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual void IssueWarning(string message, string errorCode, ILocation locator)
         {
             GetCompilation().ReportWarning(message, errorCode, locator == null ? this : locator);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual void IssueWarning(string message, string errorCode)
         {
             GetCompilation().ReportWarning(message, errorCode, this);
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual bool IsTopLevel()
         {
             return GetParent() is XSLModuleRoot;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         protected virtual bool IsConstructingComplexContent()
         {
             if (!IsInstruction())
@@ -3038,41 +2166,11 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual SourceBinding GetBindingInformation(StructuredQName name)
         {
             return null;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual SourceBinding BindVariable(StructuredQName variableName, StructuredQName attributeName)
         {
             SourceBinding decl = BindLocalVariable(variableName, attributeName);
@@ -3097,21 +2195,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual SourceBinding BindLocalVariable(StructuredQName variableName, StructuredQName attributeName)
         {
             NodeInfo curr = this;
@@ -3185,101 +2268,26 @@ namespace OutSmart.DAXon.Xslt
             return null;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         protected virtual bool SeesAvuncularVariables()
         {
             return true;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         protected virtual SourceBinding HasImplicitBinding(StructuredQName variableName, StructuredQName attributeName)
         {
             return null;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual StructuredQName GetObjectName()
         {
             return objectName;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual void SetObjectName(StructuredQName qName)
         {
             objectName = qName;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual IEnumerator<string> GetProperties()
         {
             IList<string> list = new List<string>(10);
@@ -3288,44 +2296,14 @@ namespace OutSmart.DAXon.Xslt
                 list.Add(att.GetNodeName().GetStructuredQName().ClarkName);
             }
 
-            return list.IIterator();
+            return list.GetEnumerator();
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual bool IsActionCompleted(int action)
         {
             return (actionsCompleted & action) != 0;
         }
 
-        /// <summary>
-        /// Constructor
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-collation attribute if there is one.
-        /// </summary>
-        /// <summary>
-        /// Process the [xsl:]default-mode attribute if there is one
-        /// </summary>
-        /// <summary>
-        /// Convenience method to check that the stylesheet element is empty
-        /// </summary>
-        /// <summary>
-        /// Report an error unless XSLT 4.0 syntax is enabled in the XSLT compiler
-        /// </summary>
         public virtual void SetActionCompleted(int action)
         {
             actionsCompleted |= action;

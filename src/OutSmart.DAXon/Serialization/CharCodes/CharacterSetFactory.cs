@@ -14,9 +14,9 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 using System.IO;
+using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Serialization.CharCodes
 {
     public class CharacterSetFactory
@@ -29,30 +29,30 @@ namespace OutSmart.DAXon.Serialization.CharCodes
         {
             Dictionary<string, ICharacterSet> c = characterSets;
             UTF8CharacterSet utf8 = UTF8CharacterSet.GetInstance();
-            c.Put("utf8", utf8);
+            c["utf8"] = utf8;
             UTF16CharacterSet utf16 = UTF16CharacterSet.GetInstance();
-            c.Put("utf16", utf16);
+            c["utf16"] = utf16;
             ASCIICharacterSet acs = ASCIICharacterSet.GetInstance();
-            c.Put("ascii", acs);
-            c.Put("iso646", acs);
-            c.Put("usascii", acs);
+            c["ascii"] = acs;
+            c["iso646"] = acs;
+            c["usascii"] = acs;
             ISO88591CharacterSet lcs = ISO88591CharacterSet.GetInstance();
-            c.Put("iso88591", lcs);
+            c["iso88591"] = lcs;
         }
 
         public virtual void SetCharacterSetImplementation(string encoding, ICharacterSet charSet)
         {
-            characterSets.Put(NormalizeCharsetName(encoding), charSet);
+            characterSets[NormalizeCharsetName(encoding)] = charSet;
         }
 
         private static string NormalizeCharsetName(string name)
         {
-            return name.Replace("-", "").Replace("_", "").ToLowerCase();
+            return name.Replace("-", "").Replace("_", "").ToLowerInvariant();
         }
 
         public virtual ICharacterSet GetCharacterSet(Properties details)
         {
-            string encoding = details.GetProperty(OutputKeys.ENCODING);
+            string encoding = details.GetProperty(DAXonOutputKeys.ENCODING);
             if (encoding == null)
             {
                 return UTF8CharacterSet.GetInstance();
@@ -70,7 +70,7 @@ namespace OutSmart.DAXon.Serialization.CharCodes
             else
             {
                 string encodingKey = NormalizeCharsetName(encoding);
-                ICharacterSet cs = characterSets.Get(encodingKey);
+                ICharacterSet cs = characterSets.GetOrDefault(encodingKey);
                 if (cs != null)
                 {
                     return cs;
@@ -79,37 +79,36 @@ namespace OutSmart.DAXon.Serialization.CharCodes
 
                 // Not one of the built-in sets: consult the platform. An encoding the platform doesn't
                 // recognise must raise SESU0007 — mirrors java.nio.Charset.forName throwing
-                // IllegalCharsetNameException / UnsupportedCharsetException. (Charset.ForName swallows the
-                // failure and falls back to UTF-8, so validate the name explicitly first.)
+                // IllegalCharsetNameException / UnsupportedCharsetException.
+                global::System.Text.Encoding platformEncoding;
                 try
                 {
-                    global::System.Text.Encoding.GetEncoding(encoding);
+                    platformEncoding = global::System.Text.Encoding.GetEncoding(encoding);
                 }
                 catch (global::System.ArgumentException)
                 {
                     throw new XPathException("Unknown encoding requested: " + encoding, "SESU0007");
                 }
 
-                Charset charset = Charset.ForName(encoding);
-                ICharacterSet res = JavaCharacterSet.MakeCharSet(charset);
-                characterSets.Put(encodingKey, res);
+                ICharacterSet res = JavaCharacterSet.MakeCharSet(platformEncoding);
+                characterSets[encodingKey] = res;
                 return res;
             }
         }
 
         public static void Main(string[] args)
         {
-            Console.Error.WriteLine("Available Character Sets in the Java.Nio package for this Java VM:");
-            foreach (string s in Charset.AvailableCharsets().KeySet())
+            Console.Error.WriteLine("Available platform encodings:");
+            foreach (string s in global::System.Text.Encoding.GetEncodings().Select(e => e.Name).OrderBy(n => n, StringComparer.Ordinal))
             {
                 Console.Error.WriteLine("    " + s);
             }
 
             Console.Error.WriteLine("Registered Character Sets in Saxon:");
             CharacterSetFactory factory = new CharacterSetFactory();
-            foreach (KeyValuePair<string, ICharacterSet> e in factory.characterSets.EntrySet())
+            foreach (KeyValuePair<string, ICharacterSet> e in factory.characterSets)
             {
-                Console.Error.WriteLine("    " + e.Key + " = " + e.Value.GetType().GetName());
+                Console.Error.WriteLine("    " + e.Key + " = " + e.Value.GetType().FullName);
             }
         }
     }

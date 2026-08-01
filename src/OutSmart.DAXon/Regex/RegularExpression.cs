@@ -8,7 +8,6 @@ using OutSmart.DAXon.Text;using OutSmart.DAXon.Functions;
 
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

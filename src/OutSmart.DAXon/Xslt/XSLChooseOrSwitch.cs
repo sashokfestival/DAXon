@@ -93,9 +93,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on templates and functions.
-        /// </summary>
         public override bool MarkTailCalls()
         {
             bool found = false;
@@ -107,9 +104,6 @@ namespace OutSmart.DAXon.Xslt
             return found;
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on templates and functions.
-        /// </summary>
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {
             int entries = numberOfWhens + (otherwise == null ? 0 : 1);
@@ -123,13 +117,7 @@ namespace OutSmart.DAXon.Xslt
             return choose;
         }
 
-        /// <summary>
-        /// Mark tail-recursive calls on templates and functions.
-        /// </summary>
         protected abstract void CompileConditions(Compilation exec, ComponentDeclaration decl, Expression[] conditions);
-        /// <summary>
-        /// Mark tail-recursive calls on templates and functions.
-        /// </summary>
         protected virtual void CompileActions(Compilation exec, ComponentDeclaration decl, Expression[] actions)
         {
             int w = 0;

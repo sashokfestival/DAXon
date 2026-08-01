@@ -12,7 +12,6 @@ using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Serialization;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,7 +21,6 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Internal.Streams;
 using OutSmart.DAXon.Values;
 using System.IO;
@@ -51,7 +49,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual void SetGlobalContextItem(XdmItem globalContextItem, bool alreadyStripped)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (primed)
                 {
@@ -66,7 +64,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual void SetStylesheetParameters<T>(Dictionary<QName, T> parameters)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (primed)
                 {
@@ -78,7 +76,7 @@ namespace OutSmart.DAXon.Api
                     globalParameterSet = new GlobalParameterSet();
                 }
 
-                foreach (KeyValuePair<QName, T> param in parameters.EntrySet())
+                foreach (KeyValuePair<QName, T> param in parameters)
                 {
                     StructuredQName name = param.Key.GetStructuredQName();
                     XdmValue value = (XdmValue)(object)param.Value;
@@ -113,6 +111,10 @@ namespace OutSmart.DAXon.Api
                 {
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
             }
 
             // Arm the Processor-wide cooperative deadline relative to the start of this run.
@@ -123,14 +125,14 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual void SetInitialTemplateParameters<T>(Dictionary<QName, T> parameters, bool tunnel)
         {
-            lock (this)
+            lock (syncLock)
             {
                 Dictionary<StructuredQName, ISequence> templateParams = new Dictionary<StructuredQName, ISequence>();
-                foreach (KeyValuePair<QName, T> entry in parameters.EntrySet())
+                foreach (KeyValuePair<QName, T> entry in parameters)
                 {
                     QName key = entry.Key;
                     XdmValue value = (XdmValue)(object)entry.Value;
-                    templateParams.Put<StructuredQName, ISequence>(key.GetStructuredQName(), (ISequence)(value.UnderlyingValue));
+                    templateParams[key.GetStructuredQName()] = (ISequence)(value.UnderlyingValue);
                 }
 
                 controller.SetInitialTemplateParameters(templateParams, tunnel);
@@ -141,7 +143,7 @@ namespace OutSmart.DAXon.Api
         // explicit system identifier — the caller no longer constructs a JAXP Source.
         public virtual void ApplyTemplates(global::System.IO.Stream input, string systemId, IDestination destination)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (destination == null)
                     throw new NullReferenceException();
@@ -149,6 +151,7 @@ namespace OutSmart.DAXon.Api
                     throw new NullReferenceException("input");
                 controller.OpenTraceEpisode();
                 Prime();
+                bool closed = false;
                 try
                 {
                     IReceiver sOut = GetDestinationReceiver(controller, destination);
@@ -158,6 +161,7 @@ namespace OutSmart.DAXon.Api
                     }
 
                     destination.CloseAndNotify();
+                    closed = true;
                 }
                 catch (XPathException e)
                 {
@@ -168,9 +172,17 @@ namespace OutSmart.DAXon.Api
 
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
                 finally
                 {
                     controller.CloseTraceEpisode();
+                    if (!closed)
+                    {
+                        DestinationHelper.ReleaseUnclosed(destination);
+                    }
                 }
             }
         }
@@ -178,7 +190,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         internal virtual void ApplyTemplates(IActiveSource source, IDestination destination)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (destination == null)
                     throw new NullReferenceException();
@@ -190,11 +202,13 @@ namespace OutSmart.DAXon.Api
 
                 controller.OpenTraceEpisode();
                 Prime();
+                bool closed = false;
                 try
                 {
                     IReceiver sOut = GetDestinationReceiver(controller, destination);
                     ApplyTemplatesToSource(source, sOut);
                     destination.CloseAndNotify();
+                    closed = true;
                 }
                 catch (XPathException e)
                 {
@@ -205,9 +219,17 @@ namespace OutSmart.DAXon.Api
 
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
                 finally
                 {
                     controller.CloseTraceEpisode();
+                    if (!closed)
+                    {
+                        DestinationHelper.ReleaseUnclosed(destination);
+                    }
                 }
             }
         }
@@ -215,7 +237,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         internal virtual XdmValue ApplyTemplates(IActiveSource source)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (source == null)
                     throw new NullReferenceException();
@@ -228,7 +250,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         internal virtual void Transform(IActiveSource source, IDestination destination)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (destination == null)
                     throw new NullReferenceException();
@@ -244,6 +266,7 @@ namespace OutSmart.DAXon.Api
                 }
 
                 Prime();
+                bool closed = false;
                 try
                 {
                     NodeInfo sourceNode;
@@ -261,6 +284,7 @@ namespace OutSmart.DAXon.Api
                     IReceiver sOut = GetDestinationReceiver(controller, destination);
                     controller.ApplyTemplates(sourceNode, sOut);
                     destination.CloseAndNotify();
+                    closed = true;
                 }
                 catch (XPathException e)
                 {
@@ -271,13 +295,24 @@ namespace OutSmart.DAXon.Api
 
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
+                finally
+                {
+                    if (!closed)
+                    {
+                        DestinationHelper.ReleaseUnclosed(destination);
+                    }
+                }
             }
         }
 
         /*staticParameters*/
         public virtual void ApplyTemplates(XdmValue selection, IDestination destination)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (selection == null)
                     throw new NullReferenceException();
@@ -285,6 +320,7 @@ namespace OutSmart.DAXon.Api
                     throw new NullReferenceException();
                 controller.OpenTraceEpisode();
                 Prime();
+                bool closed = false;
                 try
                 {
                     IReceiver sOut = GetDestinationReceiver(controller, destination);
@@ -295,6 +331,7 @@ namespace OutSmart.DAXon.Api
 
                     controller.ApplyTemplates((ISequence)(selection.UnderlyingValue), sOut);
                     destination.CloseAndNotify();
+                    closed = true;
                 }
                 catch (XPathException e)
                 {
@@ -305,9 +342,17 @@ namespace OutSmart.DAXon.Api
 
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
                 finally
                 {
                     controller.CloseTraceEpisode();
+                    if (!closed)
+                    {
+                        DestinationHelper.ReleaseUnclosed(destination);
+                    }
                 }
             }
         }
@@ -315,7 +360,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual XdmValue ApplyTemplates(XdmValue selection)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (selection == null)
                     throw new NullReferenceException();
@@ -328,7 +373,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual void CallTemplate(QName templateName, IDestination destination)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (destination == null)
                     throw new NullReferenceException();
@@ -339,6 +384,7 @@ namespace OutSmart.DAXon.Api
                     templateName = new QName("xsl", NamespaceConstant.XSLT, "initial-template");
                 }
 
+                bool closed = false;
                 try
                 {
                     IReceiver sOut = GetDestinationReceiver(controller, destination);
@@ -347,16 +393,15 @@ namespace OutSmart.DAXon.Api
                         sOut.SetSystemId(GetBaseOutputURI());
                     }
 
-
-                    //sOut.open();
                     controller.CallTemplate(templateName.GetStructuredQName(), sOut);
-
-                    //sOut.close();
                     destination.CloseAndNotify();
+                    closed = true;
                 }
                 catch (XPathException e)
                 {
-                    destination.CloseAndNotify();
+                    // The failing path used to CloseAndNotify here, which fired the host's OnClose
+                    // listeners for a run that produced no result; the finally now releases the
+                    // destination without notifying, as every other entry point does.
                     if (!e.HasBeenReported())
                     {
                         GetErrorReporter().Report(new XmlProcessingException(e));
@@ -364,9 +409,17 @@ namespace OutSmart.DAXon.Api
 
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
                 finally
                 {
                     controller.CloseTraceEpisode();
+                    if (!closed)
+                    {
+                        DestinationHelper.ReleaseUnclosed(destination);
+                    }
                 }
             }
         }
@@ -374,7 +427,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual XdmValue CallTemplate(QName templateName)
         {
-            lock (this)
+            lock (syncLock)
             {
                 RawDestination dest = new RawDestination();
                 CallTemplate(templateName, dest);
@@ -385,7 +438,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual XdmValue CallFunction(QName function, XdmValue[] arguments)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (function == null)
                     throw new NullReferenceException();
@@ -415,6 +468,10 @@ namespace OutSmart.DAXon.Api
 
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
                 finally
                 {
                     controller.CloseTraceEpisode();
@@ -425,7 +482,7 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         private Component GetFunctionComponent(QName function, XdmValue[] arguments)
         {
-            lock (this)
+            lock (syncLock)
             {
                 SymbolicName fName = new SymbolicName.F(function.GetStructuredQName(), arguments.Length);
                 PreparedStylesheet pss = (PreparedStylesheet)controller.GetExecutable();
@@ -468,10 +525,11 @@ namespace OutSmart.DAXon.Api
         /*staticParameters*/
         public virtual void CallFunction(QName function, XdmValue[] arguments, IDestination destination)
         {
-            lock (this)
+            lock (syncLock)
             {
                 controller.OpenTraceEpisode();
                 Prime();
+                bool ran = false;
                 try
                 {
                     Component f = GetFunctionComponent(function, arguments);
@@ -482,19 +540,34 @@ namespace OutSmart.DAXon.Api
                     context.TemporaryOutputState = StandardNames.XSL_FUNCTION;
                     context.CurrentOutputUri = null;
                     SerializationProperties @params = controller.GetExecutable().PrimarySerializationProperties;
-                    IReceiver receiver = destination.GetReceiver(controller.MakePipelineConfiguration(), @params);
-                    receiver.Open();
-                    uf.Process(context, vr, new ComplexContentOutputter(receiver));
-                    receiver.Dispose();
+                    using (IReceiver receiver = destination.GetReceiver(controller.MakePipelineConfiguration(), @params))
+                    {
+                        receiver.Open();
+                        uf.Process(context, vr, new ComplexContentOutputter(receiver));
+                        receiver.Close();
+                    }
+
+                    ran = true;
                 }
                 catch (XPathException e)
                 {
                     GetErrorReporter().Report(new XmlProcessingException(e));
                     throw new DAXonApiException(e);
                 }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
+                }
                 finally
                 {
                     controller.CloseTraceEpisode();
+
+                    // CloseAndNotify below is unreachable once the catch rethrows, so the
+                    // destination has to be released here or its output file stays open.
+                    if (!ran)
+                    {
+                        DestinationHelper.ReleaseUnclosed(destination);
+                    }
                 }
 
                 destination.CloseAndNotify();
@@ -559,15 +632,19 @@ namespace OutSmart.DAXon.Api
                 return receiver = rt;
             }
 
-            public override void Dispose()
+            public override void Close()
             {
                 try
                 {
-                    receiver.Dispose();
+                    receiver.Close();
                 }
                 catch (XPathException e)
                 {
                     throw new DAXonApiException(e);
+                }
+                catch (RecursionDepthError e)
+                {
+                    throw new DAXonApiException(e.ToXPathException());
                 }
             }
         }

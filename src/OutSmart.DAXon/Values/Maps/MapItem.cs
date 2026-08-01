@@ -72,7 +72,7 @@ namespace OutSmart.DAXon.Values.Maps
         public abstract IEnumerable<KeyValuePair> KeyValuePairs();
         public virtual ISequenceIterator Entries()
         {
-            return (ISequenceIterator)(new SequenceIteratorOverJavaIterator<KeyValuePair>(KeyValuePairs().IIterator(), (entry) => new SingleEntryMap(entry.key, entry.value)));
+            return (ISequenceIterator)(new SequenceIteratorOverJavaIterator<KeyValuePair>(KeyValuePairs().GetEnumerator(), (entry) => new SingleEntryMap(entry.key, entry.value)));
         }
 
         public abstract MapItem AddEntry(AtomicValue key, IGroundedValue value);
@@ -86,7 +86,7 @@ namespace OutSmart.DAXon.Values.Maps
             int count = Size();
             if (count == 0)
             {
-                sb.Append("}");
+                sb.Append('}');
             }
             else if (count <= 5)
             {
@@ -95,13 +95,13 @@ namespace OutSmart.DAXon.Values.Maps
                 {
                     if (pos++ > 0)
                     {
-                        sb.Append(",");
+                        sb.Append(',');
                     }
 
-                    sb.Append(Err.Depict(pair.key)).Append(":").Append(Err.DepictSequence(pair.value));
+                    sb.Append(Err.Depict(pair.key)).Append(':').Append(Err.DepictSequence(pair.value));
                 }
 
-                sb.Append("}");
+                sb.Append('}');
             }
             else
             {
@@ -330,22 +330,38 @@ namespace OutSmart.DAXon.Values.Maps
 
         public static string MapToString(MapItem map)
         {
-            StringBuilder buffer = new StringBuilder(256);
-            buffer.Append("map{");
-            foreach (KeyValuePair pair in map.KeyValuePairs())
+            // Host-facing full dump (nothing in the engine calls it): unlike ToShortString it
+            // keeps every entry, but the DEPTH must still be bounded - the nesting is the
+            // value's, and a debugger evaluating ToString on attacker JSON must not die.
+            Err.EnterDepiction();
+            try
             {
-                if (buffer.Length > 4)
+                if (Err.DepictionTooDeep)
                 {
-                    buffer.Append(",");
+                    return "map{...}";
                 }
 
-                buffer.Append(pair.key.ToString());
-                buffer.Append(":");
-                buffer.Append(pair.value.ToString());
-            }
+                StringBuilder buffer = new StringBuilder(256);
+                buffer.Append("map{");
+                foreach (KeyValuePair pair in map.KeyValuePairs())
+                {
+                    if (buffer.Length > 4)
+                    {
+                        buffer.Append(',');
+                    }
 
-            buffer.Append("}");
-            return buffer.ToString();
+                    buffer.Append(pair.key.ToString());
+                    buffer.Append(':');
+                    buffer.Append(pair.value.ToString());
+                }
+
+                buffer.Append('}');
+                return buffer.ToString();
+            }
+            finally
+            {
+                Err.LeaveDepiction();
+            }
         }
 
         /// <summary>
@@ -374,9 +390,9 @@ namespace OutSmart.DAXon.Values.Maps
         IItem IGroundedValue.ItemAt(int arg0) => ItemAt(arg0);
         public virtual ISequenceIterator Iterate() => new SingletonIterator(this);
         public virtual IItem Head() => this;
-        public virtual IGroundedValue Subsequence(int arg0, int arg1) => throw new NotImplementedException();
+        public virtual IGroundedValue Subsequence(int arg0, int arg1) => (arg0 <= 0 && (long)arg0 + arg1 > 0) ? (IGroundedValue)this : OutSmart.DAXon.Values.EmptySequence.GetInstance(); // singleton item (upstream GroundedValue default)
         public virtual int GetLength() => 1;
-        public virtual string GetStringValue() => throw new NotImplementedException();
+        public virtual string GetStringValue() => throw new UncheckedXPathException(new XPathException("The string value of a map is not defined", "FOTY0014"));
         IItem IItem.ItemAt(int arg0) => ItemAt(arg0);
         SingletonIterator IItem.Iterate() => new SingletonIterator(this);
 

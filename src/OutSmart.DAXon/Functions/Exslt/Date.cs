@@ -383,9 +383,15 @@ namespace OutSmart.DAXon.Functions.Exslt
                 return double.NaN;
             }
 
-            GregorianCalendar calDate = new GregorianCalendar((int)yy, (int)mm - 1, (int)dd);
-            calDate.SetFirstDayOfWeek(Calendar.SUNDAY);
-            return calDate[Calendar.DAY_OF_WEEK];
+            // Java Calendar numbering: SUNDAY=1..SATURDAY=7 (the shim predecessor always answered 0).
+            try
+            {
+                return (int)new global::System.DateTime((int)yy, (int)mm, (int)dd).DayOfWeek + 1;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return double.NaN;
+            }
         }
 
         public static double DayInWeek(IXPathContext context)
@@ -617,7 +623,7 @@ namespace OutSmart.DAXon.Functions.Exslt
             DayTimeDurationValue dv1s = (DayTimeDurationValue)Converter.DurationToDayTimeDuration.INSTANCE.Convert(dv1);
             int months = dv0m.LengthInMonths + dv1m.LengthInMonths;
             long micros = dv0s.LengthInMicroseconds + dv1s.LengthInMicroseconds;
-            if (System.Math.Sign(months) * System.Math.Sign(micros) < 0)
+            if (Math.Sign(months) * Math.Sign(micros) < 0)
             {
                 return null;
             }

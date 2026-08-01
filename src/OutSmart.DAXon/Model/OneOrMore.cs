@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Model
 
         public OneOrMore(IList<T> content) : base(content)
         {
-            if (content.IsEmpty())
+            if (content.Count == 0)
             {
                 throw new ArgumentException();
             }
@@ -39,7 +39,7 @@ namespace OutSmart.DAXon.Model
             IList<IItem> content = new List<IItem>();
 
             SequenceTool.Supply(sequence.Iterate(), (it) => content.Add(it));
-            if (content.IsEmpty())
+            if (content.Count == 0)
             {
                 throw new ArgumentException();
             }

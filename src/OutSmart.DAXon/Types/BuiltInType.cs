@@ -76,7 +76,10 @@ namespace OutSmart.DAXon.Types
         {
             _lookup[fingerprint] = type;
             var st = type as ISchemaType;
-            if (st != null) { _lookupByLocalName[st.Name] = type; }
+            if (st != null)
+            {
+                _lookupByLocalName[st.Name] = type;
+            }
         }
     }
 }

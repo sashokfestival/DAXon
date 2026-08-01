@@ -33,9 +33,6 @@ namespace OutSmart.DAXon.Regex
         private IntToIntHashMap nestingTable = null;
         private bool skip = false; // indicates the last match was zero length
 
-        /// <summary>
-        /// Get the number of captured groups
-        /// </summary>
         public virtual int NumberOfGroups => _matcher.ParenCount;
         public ARegexIterator(UnicodeString str, UnicodeString regex, REMatcher matcher)
         {
@@ -159,9 +156,12 @@ namespace OutSmart.DAXon.Regex
 
                 return CurrentStringValue();
             }
-            catch (RecursionDepthError)
+            catch (RecursionDepthError e) when (!e.Described)
             {
-                throw new UncheckedXPathException(ARegularExpression.StackOverflowError());
+                // Not wrapped into an XPathException: this Next() is pulled once per level of a
+                // recursion whose body sits inside xsl:analyze-string, so an XPathException from
+                // here unwinds through the whole engine stack above (round BC).
+                throw ARegularExpression.DescribeOverflow(e);
             }
         }
 
@@ -191,9 +191,6 @@ namespace OutSmart.DAXon.Regex
             return (us == null ? EmptyUnicodeString.GetInstance() : us);
         }
 
-        /// <summary>
-        /// Get the number of captured groups
-        /// </summary>
         public virtual void ProcessMatchingSubstring(IRegexMatchHandler action)
         {
             int c = _matcher.ParenCount - 1;
@@ -234,7 +231,7 @@ namespace OutSmart.DAXon.Regex
                                 actions.Put(end, e);
                             }
 
-                            e.Add(0, -i);
+                            e.Insert(0,-i);
                         }
                         else
                         {
@@ -272,8 +269,8 @@ namespace OutSmart.DAXon.Regex
                                     }
                                 }
 
-                                s.Add(pos, -i);
-                                s.Add(pos, i);
+                                s.Insert(pos,-i);
+                                s.Insert(pos,i);
                             }
                         }
                     }
@@ -317,9 +314,6 @@ namespace OutSmart.DAXon.Regex
             }
         }
 
-        /// <summary>
-        /// Get the number of captured groups
-        /// </summary>
         public static IntToIntHashMap ComputeNestingTable(UnicodeString regex)
         {
 

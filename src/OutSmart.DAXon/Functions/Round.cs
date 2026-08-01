@@ -26,17 +26,11 @@ namespace OutSmart.DAXon.Functions
     {
 
         public static Func<Round> New() => () => new Round();
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override int GetCardinality(Expression[] arguments)
         {
             return arguments[0].GetCardinality();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             NumericValue val0 = (NumericValue)arguments[0].Head();
@@ -69,17 +63,11 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new RoundElaborator();
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public static RoundingRule GetRoundingRule(string s)
         {
             switch (s)
@@ -109,9 +97,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public class RoundElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
@@ -189,9 +174,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Determine the cardinality of the function.
-        /// </summary>
         public enum RoundingRule
         {
             FLOOR,

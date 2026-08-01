@@ -59,7 +59,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public IEnumerator<SortKeyDefinition> IIterator()
         {
-            return sortKeyDefinitions.ToList().IIterator();
+            return sortKeyDefinitions.ToList().GetEnumerator();
         }
 
         public override Expression Copy(RebindingMap rebindings)

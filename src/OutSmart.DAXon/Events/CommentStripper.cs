@@ -10,7 +10,6 @@ using OutSmart.DAXon.Api;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,7 +39,7 @@ namespace OutSmart.DAXon.Events
         {
             if (depthOfHole == 0)
             {
-                if (skippedElementTest.Test(elemName))
+                if (skippedElementTest(elemName))
                 {
                     depthOfHole++;
                 }

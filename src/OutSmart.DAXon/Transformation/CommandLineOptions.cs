@@ -11,6 +11,6 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Transformation
 {
-    // Phase 7.8c: CommandLineOptions stub - real class excluded.
+    // CommandLineOptions stub - real class excluded.
     public static class CommandLineOptions { public static void SetCatalogFiles(object resolver, object files) { } }
 }

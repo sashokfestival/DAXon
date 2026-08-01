@@ -102,9 +102,9 @@ namespace OutSmart.DAXon.Values
             return "QName(\"" + GetNamespaceURI() + "\", \"" + LocalName + "\")";
         }
 
-        public virtual QName ToJaxpQName()
+        public virtual System.Xml.XmlQualifiedName ToXmlQualifiedName()
         {
-            return qName.ToJaxpQName();
+            return qName.ToXmlQualifiedName();
         }
 
         public virtual StructuredQName GetStructuredQName()

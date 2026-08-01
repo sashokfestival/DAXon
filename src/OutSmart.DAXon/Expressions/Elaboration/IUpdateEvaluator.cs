@@ -16,6 +16,6 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    // Phase 5: IUpdateEvaluator interface->delegate for lambda support.
+    // IUpdateEvaluator interface->delegate for lambda support.
     public delegate void IUpdateEvaluator(IXPathContext context, IPendingUpdateList updates);
 }

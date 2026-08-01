@@ -5,7 +5,6 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Events;
-using OutSmart.DAXon.Api.Jaxp;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Serialization;
 using OutSmart.DAXon.Transformation;
@@ -18,7 +17,6 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Api
 {
@@ -32,8 +30,6 @@ namespace OutSmart.DAXon.Api
         public abstract ValidationParams ValidationParameters { get; }
         public abstract void SetLax(bool lax);
         public abstract bool IsLax();
-        public abstract void SetErrorListener(ErrorListener listener);
-        public abstract ErrorListener GetErrorListener();
         public abstract void SetCollectStatistics(bool collect);
         public abstract bool IsCollectStatistics();
         public abstract void ReportValidationStatistics(IDestination destination);
@@ -52,7 +48,7 @@ namespace OutSmart.DAXon.Api
         }
 
         public override abstract IReceiver GetReceiver(PipelineConfiguration pipe, SerializationProperties @params);
-        public override abstract void Dispose();
+        public override abstract void Close();
 
         private sealed class AnonymousEventSource : EventSource
         {

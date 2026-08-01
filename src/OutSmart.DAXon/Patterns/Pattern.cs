@@ -32,23 +32,11 @@ namespace OutSmart.DAXon.Patterns
         private bool recoverable = true;
         private string originalText;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override int Dependencies => 0;
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual int Fingerprint => -1;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual double DefaultPriority => priority;
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual string OriginalText
         {
             get => originalText; set
@@ -93,40 +81,25 @@ namespace OutSmart.DAXon.Patterns
             return false;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual void BindCurrent(ILocalBinding binding)
         {
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual bool MatchesCurrentGroup()
         {
             return false;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual bool IsRecoverable()
         {
             return recoverable;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual void SetRecoverable(bool recoverable)
         {
             this.recoverable = recoverable;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         protected virtual void HandleDynamicError(XPathException ex, IXPathContext context)
         {
             if (ex.HasErrorCode("XTDE0640"))
@@ -143,20 +116,14 @@ namespace OutSmart.DAXon.Patterns
                 throw ex;
             }
 
-            context.GetController().Warning("An error occurred matching pattern {" + this + "}: " + ex.GetMessage(), ex.ErrorCodeQName.EQName, GetLocation());
+            context.GetController().Warning("An error occurred matching pattern {" + this + "}: " + ex.Message, ex.ErrorCodeQName.EQName, GetLocation());
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override Expression Simplify()
         {
             return this;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeCheckChildren(visitor, contextInfo);
@@ -181,17 +148,11 @@ namespace OutSmart.DAXon.Patterns
             return Simplify();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual int AllocateSlots(SlotManager slotManager, int nextFree)
         {
             return nextFree;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual bool IsMotionless()
         {
 
@@ -199,17 +160,11 @@ namespace OutSmart.DAXon.Patterns
             return true;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             return MatchesItem(context.GetContextItem(), context);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public bool MatchesItem(IItem item, IXPathContext context)
         {
             try
@@ -220,10 +175,8 @@ namespace OutSmart.DAXon.Patterns
             {
                 throw e;
             }
-            catch (XPathException.StackOverflow e)
-            {
-                throw e;
-            }
+            // No StackOverflow catch: RecursionDepthError (a foreign type since round BC) is not an
+            // XPathException, so it propagates untouched; the old subtype is never thrown here.
             catch (UncheckedXPathException ex)
             {
                 if (System.Environment.GetEnvironmentVariable("SAXON_DBG_PAT") != null)
@@ -240,13 +193,7 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public abstract bool Matches(IItem item, IXPathContext context);
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual bool MatchesBeneathAnchor(NodeInfo node, NodeInfo anchor, IXPathContext context)
         {
 
@@ -254,9 +201,6 @@ namespace OutSmart.DAXon.Patterns
             return Matches(node, context);
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual ISequenceIterator SelectNodes(ITreeInfo document, IXPathContext context)
         {
             NodeInfo doc = document.GetRootNode();
@@ -322,26 +266,14 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public abstract UType GetUType();
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public abstract override Types.ItemType GetItemType();
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual void SetPriority(double priority)
         {
             this.priority = priority;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override string ToString()
         {
             if (originalText != null)
@@ -354,73 +286,43 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual string Reconstruct()
         {
             return "pattern matching " + GetItemType();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual HostLanguage GetHostLanguage()
         {
             return HostLanguage.XSLT;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public virtual Pattern ConvertToTypedPattern(string val)
         {
             return null;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override Pattern ToPattern(Configuration config)
         {
             return this;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public abstract override void Export(ExpressionPresenter presenter);
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public abstract override Expression Copy(RebindingMap rebindings);
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             return this;
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override string ToShortString()
         {
             return ToString();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new PatternElaborator();
         }
 
-        /// <summary>
-        /// Replace any calls on current() by a variable reference bound to the supplied binding
-        /// </summary>
         private class PatternElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()

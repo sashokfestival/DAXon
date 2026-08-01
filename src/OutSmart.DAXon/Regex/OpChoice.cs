@@ -66,7 +66,7 @@ namespace OutSmart.DAXon.Regex
                 int max = 0;
                 foreach (Operation o in branches)
                 {
-                    max = System.Math.Max(max, o.MaxLoopingDepth);
+                    max = Math.Max(max, o.MaxLoopingDepth);
                 }
 
                 return max;
@@ -107,13 +107,14 @@ namespace OutSmart.DAXon.Regex
 
         public override ICharacterClass GetInitialCharacterClass(bool caseBlind)
         {
-            ICharacterClass result = EmptyCharacterClass.GetInstance();
+            // combined n-ary: pairwise MakeUnion nested a class per branch (round BD-F4)
+            IList<ICharacterClass> parts = new List<ICharacterClass>(branches.Count);
             foreach (Operation o in branches)
             {
-                result = RECompiler.MakeUnion(result, o.GetInitialCharacterClass(caseBlind));
+                parts.Add(o.GetInitialCharacterClass(caseBlind));
             }
 
-            return result;
+            return RECompiler.MakeUnion(parts);
         }
 
         public override Operation Optimize(REProgram program, REFlags flags)
@@ -155,20 +156,22 @@ namespace OutSmart.DAXon.Regex
                 fsb.Append(branch.Display());
             }
 
-            fsb.Append(")");
+            fsb.Append(')');
             return fsb.ToString();
         }
 
         private sealed class AnonymousIntIterator : AbstractIntIterator
         {
 
-            private readonly OpChoice parent; private readonly REMatcher matcher; private readonly int position;
+            private readonly OpChoice parent;
+            private readonly REMatcher matcher;
+            private readonly int position;
             readonly IEnumerator<Operation> branchIter;
             IIntIterator currentIter = null;
             Operation currentOp = null;
             public AnonymousIntIterator(OpChoice parent, REMatcher matcher, int position)
             {
-                this.parent = parent; this.matcher = matcher; this.position = position; this.branchIter = parent.branches.IIterator();
+                this.parent = parent; this.matcher = matcher; this.position = position; this.branchIter = parent.branches.GetEnumerator();
             }
             public override bool HasNext()
             {

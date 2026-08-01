@@ -21,14 +21,8 @@ namespace OutSmart.DAXon.Collections
         private readonly int endPoint;
         private int cachedHashCode = -1;
 
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public virtual int StartPoint => startPoint;
 
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public virtual int EndPoint => endPoint;
         public IntBlockSet(int startPoint, int endPoint)
         {
@@ -81,33 +75,21 @@ namespace OutSmart.DAXon.Collections
             throw new NotSupportedException("add");
         }
 
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public override IIntIterator IIterator()
         {
             return MutableCopy().IIterator();
         }
 
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public override string ToString()
         {
             return startPoint + " - " + endPoint;
         }
 
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public override bool Equals(object other)
         {
             return MutableCopy().Equals(other);
         }
 
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public override int GetHashCode()
         {
 

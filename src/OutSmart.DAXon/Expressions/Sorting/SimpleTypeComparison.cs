@@ -11,11 +11,6 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    // Runtime 2026-06-10: ContextFreeAtomicComparer stub REMOVED (no IAtomicComparer -> InvalidCast in fn:max/min
-    // PreAllocateComparer; Compare=>0 made everything equal). Real class re-included (csproj). CodepointCollatingComparer twin.
-    // Runtime 2026-06-10: CodepointCollatingComparer stub REMOVED (no IAtomicComparer -> InvalidCast; Compare=>0 made everything equal). Real class re-included (csproj).
-    // Runtime 2026-06-11: DoubleSortComparer hollow stub REMOVED (Compare=>0 made every numeric sort
-    // key equal -> xsl:sort data-type=number left input order untouched). Real file re-included (batch3).
     public class SimpleTypeComparison
     {
         private static readonly SimpleTypeComparison _i = new SimpleTypeComparison();

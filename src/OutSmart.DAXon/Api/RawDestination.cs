@@ -45,16 +45,20 @@ namespace OutSmart.DAXon.Api
         }
 
         // method.
-        public override void Dispose()
+        public override void Close()
         {
             try
             {
-                sequenceOutputter.Dispose();
+                sequenceOutputter.Close();
                 closed = true;
             }
             catch (XPathException e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
         }
 

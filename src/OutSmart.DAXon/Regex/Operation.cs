@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Regex
             get
             {
                 int @fixed = MatchLength;
-                return System.Math.Max(@fixed, 0);
+                return Math.Max(@fixed, 0);
             }
         }
         public virtual int MaxLoopingDepth => 0;
@@ -56,18 +56,25 @@ namespace OutSmart.DAXon.Regex
         protected class ForceProgressIterator : AbstractIntIterator
         {
             private readonly IIntIterator @base;
+            private readonly REMatcher matcher;
             int countZeroLength = 0;
             int currentPos = -1;
             int loopingDepth = 1;
             int maxTries = 10;
-            public ForceProgressIterator(IIntIterator @base, int loopingDepth)
+            public ForceProgressIterator(IIntIterator @base, int loopingDepth, REMatcher matcher)
             {
                 this.@base = @base;
-                this.loopingDepth = System.Math.Max(loopingDepth, 1);
+                this.loopingDepth = Math.Max(loopingDepth, 1);
+                this.matcher = matcher;
             }
 
             public override bool HasNext()
             {
+                // Every pull on an ambiguous repeat is one backtracking step (round BE):
+                // nested quantifiers never pass through OpSequence, so the shared budget
+                // and the deadline are enforced here, at every nesting level. Deterministic
+                // repeats (OpUnambiguousRepeat, the fixed/fast shapes) don't wrap and pay nothing.
+                matcher.CountBacktrackStep();
                 return countZeroLength <= maxTries && @base.MoveNext();
             }
 
@@ -86,7 +93,7 @@ namespace OutSmart.DAXon.Regex
                     // See bug #6426. We're computing an upper bound on the number of different ways
                     // that a position p in the input can be reached, essentially ((p+2) ^ n)/2 where n is
                     // the maximum depth of looping.
-                    double limit = System.Math.Min(int.MaxValue, System.Math.Pow(currentPos + 2, loopingDepth) / 2);
+                    double limit = Math.Min(int.MaxValue, Math.Pow(currentPos + 2, loopingDepth) / 2);
                     maxTries = (int)limit;
                 }
 

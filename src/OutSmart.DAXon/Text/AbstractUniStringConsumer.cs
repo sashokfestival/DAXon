@@ -16,10 +16,11 @@ namespace OutSmart.DAXon.Text
 {
     public abstract class AbstractUniStringConsumer : IUniStringConsumer
     {
-        public virtual IUniStringConsumer Accept(UnicodeString arg0) => throw new NotImplementedException();
+        public abstract IUniStringConsumer Accept(UnicodeString arg0);
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public virtual void Open() { }
+        public virtual void Close() { }
         public virtual void Dispose() { }
     }
 }

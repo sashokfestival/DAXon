@@ -13,12 +13,11 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Net;
 using OutSmart.DAXon.Internal.Streams;
 using OutSmart.DAXon.Core;
 using System.IO;
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Lib
 {
     public class StandardOutputResolver : IOutputURIResolver
@@ -34,7 +33,7 @@ namespace OutSmart.DAXon.Lib
             return this;
         }
 
-        public virtual Result Resolve(string href, string @base)
+        public virtual IResultTarget Resolve(string href, string @base)
         {
 
             string which = "base";
@@ -79,7 +78,7 @@ namespace OutSmart.DAXon.Lib
             {
                 throw new XPathException("Invalid " + which + " URI syntax", DAXonErrorCode.SXRD0001);
             }
-            catch (MalformedURLException err3)
+            catch (UriFormatException err3)
             {
                 throw new XPathException("Resolved URL is malformed", err3).WithErrorCode(DAXonErrorCode.SXRD0001);
             }
@@ -90,7 +89,7 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        protected virtual Result CreateResult(URI absoluteURI)
+        protected virtual IResultTarget CreateResult(URI absoluteURI)
         {
             if ("file".Equals(absoluteURI.Scheme))
             {
@@ -107,7 +106,7 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        public virtual void Dispose(Result result)
+        public virtual void Dispose(IResultTarget result)
         {
             if (result is StreamResult)
             {

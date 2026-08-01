@@ -13,7 +13,6 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -42,34 +41,10 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public virtual IAtomicComparer[] Comparators => comparators;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public override string StreamerName => "SortExpression";
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public virtual Expression Select
         {
             get => selectOp.GetChildExpression(); set
@@ -143,9 +118,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             selectOp.TypeCheck(visitor, contextInfo);
@@ -225,9 +197,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             selectOp.Optimize(visitor, contextItemType);
@@ -261,9 +230,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             int len = GetSortKeyDefinitionList().Count;
@@ -279,9 +245,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return se2;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
         public virtual bool IsSortKey(Expression child)
         {
             foreach (SortKeyDefinition sortKeyDefinition in GetSortKeyDefinitionList())
@@ -296,34 +259,16 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return false;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return Select.GetCardinality();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         public override ItemType GetItemType()
         {
             return Select.GetItemType();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             int props = 0;
@@ -345,15 +290,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return props;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             ISequenceIterator iter = Select.Iterate(context);
@@ -365,15 +301,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return IterateSorted(iter, context);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public virtual ISequenceIterator IterateSorted(ISequenceIterator iter, IXPathContext context)
         {
             IAtomicComparer[] comps = comparators;
@@ -399,18 +326,9 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return iter;
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public virtual void MakeSortKeyEvaluators()
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (sortKeyEvaluators == null)
                 {
@@ -424,43 +342,16 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public AtomicValue EvaluateSortKey(int n, IXPathContext c)
         {
             return (AtomicValue)sortKeyEvaluators[n].Eval(c);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public override string ToShortString()
         {
             return "sort(" + BaseExpression.ToShortString() + ")";
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("sort", this);
@@ -470,71 +361,26 @@ namespace OutSmart.DAXon.Expressions.Sorting
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public virtual SortKeyDefinitionList GetSortKeyDefinitionList()
         {
             return (SortKeyDefinitionList)sortOp.GetChildExpression();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public virtual SortKeyDefinition GetSortKeyDefinition(int i)
         {
             return GetSortKeyDefinitionList().GetSortKeyDefinition(i);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public virtual void SetSortKeyDefinitionList(SortKeyDefinitionList skd)
         {
             sortOp.SetChildExpression(skd);
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new SortExprElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression
-        /// </summary>
-        /// <summary>
-        /// Determine the static cardinality
-        /// </summary>
-        /// <summary>
-        /// Enumerate the results of the expression
-        /// </summary>
         /// <summary>
         /// Elaborator for a sort expression - sorts nodes into order based on a user-supplied sort key
         /// </summary>

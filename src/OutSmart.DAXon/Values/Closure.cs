@@ -136,29 +136,17 @@ namespace OutSmart.DAXon.Values
             this.inputEvaluator = inputEvaluator;
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public abstract ISequenceIterator Iterate();
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual IGroundedValue Reduce()
         {
             return SequenceTool.ToGroundedValue(Iterate());
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual ISequence MakeRepeatable()
         {
             return Materialize();
         }
 
-        /// <summary>
-        /// Evaluate the expression in a given context to return an iterator over a sequence
-        /// </summary>
         public virtual Expression GetExpression()
         {
             return expression;

@@ -15,6 +15,6 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    // Phase 5: IAction interface->delegate for lambda support.
+    // IAction interface->delegate for lambda support.
     public delegate void IAction();
 }

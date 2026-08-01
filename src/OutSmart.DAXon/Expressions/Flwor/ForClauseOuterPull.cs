@@ -26,6 +26,9 @@ namespace OutSmart.DAXon.Expressions.Flwor
         {
             while (true)
             {
+                // Same per-tuple deadline check as ForClausePull (see there): the outer-join
+                // variant overrides NextTuple in full, so it needs its own.
+                context.GetController().CheckTimeoutPerStep();
                 IItem next;
                 if (currentIteration == null)
                 {

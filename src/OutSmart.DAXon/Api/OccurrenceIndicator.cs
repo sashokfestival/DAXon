@@ -25,11 +25,7 @@ namespace OutSmart.DAXon.Api
         ONE_OR_MORE
 
         // --------------------
-        // TODO enum body members
         // protected int getCardinality() {
-        //     OccurrenceIndicator indicator = this;
-        //     switch(indicator) {
-        //         case ZERO:
         //             return StaticProperty.EMPTY;
         //         case ZERO_OR_ONE:
         //             return StaticProperty.ALLOWS_ZERO_OR_ONE;
@@ -41,11 +37,7 @@ namespace OutSmart.DAXon.Api
         //             return StaticProperty.ALLOWS_ONE_OR_MORE;
         //         default:
         //             return StaticProperty.EMPTY;
-        //     }
-        // }
         // protected static OccurrenceIndicator getOccurrenceIndicator(int cardinality) {
-        //     switch(cardinality) {
-        //         case StaticProperty.EMPTY:
         //             return ZERO;
         //         case StaticProperty.ALLOWS_ZERO_OR_ONE:
         //             return ZERO_OR_ONE;
@@ -57,7 +49,5 @@ namespace OutSmart.DAXon.Api
         //             return ONE_OR_MORE;
         //         default:
         //             return ZERO_OR_MORE;
-        //     }
-        // }
     }
 }

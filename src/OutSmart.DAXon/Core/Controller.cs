@@ -22,7 +22,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,8 +33,6 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
 
 namespace OutSmart.DAXon.Core
@@ -47,6 +44,7 @@ namespace OutSmart.DAXon.Core
     //})
     public class Controller : IContextOriginator
     {
+        protected internal readonly object syncLock = new object();
         public const string ANONYMOUS_PRINCIPAL_OUTPUT_URI = "dummy:/anonymous/principal/result";
         private readonly Configuration config;
         protected Executable executable;
@@ -90,75 +88,263 @@ namespace OutSmart.DAXon.Core
         // a run with no time limit pays nothing and its output stays byte-for-byte unchanged.
         private bool hasDeadline;
         private long deadlineTimestamp;      // Stopwatch timestamp at which to abort
-        private int timeoutCountdown;        // throttle: sample the clock only every stride calls
+        private DeadlineToken deadlineToken; // the adaptive throttle shared with the thread slot
         private TimeSpan timeoutSetting;     // remembered for the diagnostic message only
-        private const int TimeoutCheckStride = 4096;
+        private bool hasInheritedCap;        // nested run: may not outlive the enclosing run
+        private long inheritedDeadline;
+        private TimeSpan inheritedSetting;
 
-        // The controller whose deadline is active on the current thread, set when a deadline is
-        // armed (once per run). Lets loops with no XPathContext at hand - notably iterating a
-        // constant-folded integer range - honour the deadline via the static CheckActiveTimeout().
-        // A transformation is single-threaded, so a plain per-thread field is safe; nested runs on
-        // one thread (fn:load-xquery-module) inherit the same deadline, so the value stays correct.
+
+        // The deadline active on the current thread, published when a deadline is armed (once per
+        // run). Lets loops with no XPathContext at hand - notably iterating a constant-folded
+        // integer range - honour the deadline via the static CheckActiveTimeout(). A transformation
+        // is single-threaded, so a plain per-thread field is safe; nested runs on one thread
+        // (fn:load-xquery-module) inherit the same deadline, so the value stays correct.
+        // Deliberately a tiny value-only token, NOT the Controller itself: nothing resets the slot
+        // when a run finishes, so whatever it references stays reachable until the thread runs
+        // another transformation - a Controller here pinned the last input document, the bindery
+        // and the per-run document pool on every idle pool thread.
         [ThreadStatic]
-        private static Controller activeOnThread;
+        private static DeadlineToken activeOnThread;
+
+        // Snapshot of one run's deadline, shared between the arming Controller and the thread slot.
+        // Holds only value-typed state so a stale slot retains ~40 bytes, never the run's graph.
+        internal sealed class DeadlineToken
+        {
+            internal bool hasDeadline;
+            internal long deadlineTimestamp;
+            internal TimeSpan setting;
+
+            // TWO independent clock-sampling throttles, one per class of call site. Reading the
+            // clock costs ~25ns, far too much to do on every item of a hot iterator, so each class
+            // samples once per stride and retunes the stride from what it measures.
+            //
+            // They must not share a countdown, which is what round BA measured the hard way. Per-
+            // item sites (iterators) can fire millions of times a second and drive any shared
+            // stride to the cap; a per-STEP site - one xsl:for-each iteration, one tail call - then
+            // inherits that stride and needs thousands of its own steps to work it off. With one
+            // step costing a second, that is a deadline the run reaches hours late: deep-equal over
+            // two big trees checked 960k times on its first pass and essentially never again
+            // (the sequences are materialised by then), leaving the enclosing for-each - one call
+            // per second - starved behind a countdown of 4096. Split, each class adapts to its own
+            // pace, and no loop decrements more than one of them, so there is no stride^2 blind
+            // spot either.
+            private Throttle perItem = new Throttle();
+            private Throttle perStep = new Throttle();
+
+            internal void Arm(long deadline, TimeSpan limit)
+            {
+                deadlineTimestamp = deadline;
+                setting = limit;
+                hasDeadline = true;
+                long now = System.Diagnostics.Stopwatch.GetTimestamp();
+                perItem.Reset(now);
+                perStep.Reset(now);
+            }
+
+            /// <summary>Per-item sites: iterators, the regex driver, the parse loops.</summary>
+            internal void Check()
+            {
+                if (hasDeadline && perItem.Tick())
+                {
+                    Sample(perItem);
+                }
+            }
+
+            /// <summary>
+            /// Per-step sites: one iteration of an instruction whose body can cost anything at all.
+            /// </summary>
+            internal void CheckPerStep()
+            {
+                if (hasDeadline && perStep.Tick())
+                {
+                    Sample(perStep);
+                }
+            }
+
+            private void Sample(Throttle t)
+            {
+                long now = System.Diagnostics.Stopwatch.GetTimestamp();
+                if (now >= deadlineTimestamp)
+                {
+                    throw new XPathException(
+                        "Transformation exceeded its time limit of " + setting.TotalSeconds + "s", DAXonErrorCode.SXTO0001);
+                }
+
+                t.Retune(now);
+            }
+
+            // One class's sampling rate. Kept off the token so the two cannot be confused, and out
+            // of Sample() so the hot path stays a decrement and a branch.
+            private sealed class Throttle
+            {
+                private const int StrideMax = 4096;
+                private static readonly long SampleTargetTicks = System.Diagnostics.Stopwatch.Frequency / 50;   // 20 ms
+
+                private int countdown = 1;
+                private int stride = 1;
+                private long lastSample;
+
+                internal void Reset(long now)
+                {
+                    countdown = 1;
+                    stride = 1;
+                    lastSample = now;
+                }
+
+                internal bool Tick()
+                {
+                    return --countdown <= 0;
+                }
+
+                // Retune towards one sample per SampleTargetTicks of work. Shrinking is proportional
+                // and immediate - one slow sample drops the stride to 1, so the next step is
+                // checked. Growth is capped at a doubling per sample: the first sample of a run
+                // lands microseconds after Arm, and a proportional jump off that near-zero elapsed
+                // would put the stride straight at the cap - the fixed-stride blind spot this
+                // replaces, restored. Ramping 1 -> cap costs 13 samples, i.e. nothing.
+                internal void Retune(long now)
+                {
+                    long elapsed = now - lastSample;
+                    lastSample = now;
+                    long ceiling = (long)stride * 2;
+                    long scaled = elapsed <= 0 ? ceiling : (long)stride * SampleTargetTicks / elapsed;
+                    if (scaled > ceiling)
+                    {
+                        scaled = ceiling;
+                    }
+
+                    stride = (int)(scaled < 1 ? 1 : (scaled > StrideMax ? StrideMax : scaled));
+                    countdown = stride;
+                }
+            }
+
+            internal void CheckNow()
+            {
+                if (hasDeadline && System.Diagnostics.Stopwatch.GetTimestamp() >= deadlineTimestamp)
+                {
+                    throw new XPathException(
+                        "Transformation exceeded its time limit of " + setting.TotalSeconds + "s", DAXonErrorCode.SXTO0001);
+                }
+            }
+        }
 
         /// <summary>
         /// Honour the current thread's active transformation deadline from a context-less loop.
         /// </summary>
         public static void CheckActiveTimeout()
         {
-            activeOnThread?.CheckTimeout();
+            activeOnThread?.Check();
+        }
+
+        /// <summary>
+        /// As above, but sampling the clock on EVERY call. For slow blocking call sites - a network
+        /// read that returns a trickle of bytes - where the strided check would need thousands of
+        /// (individually slow) calls before it first looks at the clock.
+        /// </summary>
+        internal static void CheckActiveTimeoutNow()
+        {
+            activeOnThread?.CheckNow();
+        }
+
+        /// <summary>
+        /// Milliseconds left on this thread's active deadline, or -1 when none is armed. Blocking
+        /// I/O cannot poll a cooperative deadline, so the socket layer is given this as its own
+        /// timeout: a fetch can then never outlive the run that asked for it.
+        /// </summary>
+        internal static int RemainingMillis()
+        {
+            DeadlineToken token = activeOnThread;
+            if (token == null || !token.hasDeadline)
+            {
+                return -1;
+            }
+
+            long ticks = token.deadlineTimestamp - System.Diagnostics.Stopwatch.GetTimestamp();
+            if (ticks <= 0)
+            {
+                return 1;   // already past: fail on the next check rather than wait
+            }
+
+            double ms = ticks * 1000.0 / System.Diagnostics.Stopwatch.Frequency;
+            return ms >= int.MaxValue ? int.MaxValue : (int)ms + 1;
+        }
+
+        /// <summary>
+        /// Cap this controller's deadline at an enclosing run's. A nested transformation
+        /// (fn:transform) builds its own Processor-derived controller and would otherwise arm a
+        /// FULL fresh budget, so a 3s run could spawn a 60s one - and, recursively, any total.
+        /// The cap survives the re-arming that priming and the streaming path perform, because
+        /// <see cref="SetTimeout"/> applies it on every call. Copies out only the parent's absolute
+        /// deadline, never the parent controller, so nothing of the outer run is retained.
+        /// </summary>
+        internal void CapDeadlineTo(Controller parent)
+        {
+            if (parent != null && parent.hasDeadline)
+            {
+                hasInheritedCap = true;
+                inheritedDeadline = parent.deadlineTimestamp;
+                inheritedSetting = parent.timeoutSetting;
+            }
         }
 
         /// <summary>
         /// Arm - or, for a non-positive TimeSpan, clear - a wall-clock deadline for this
         /// transformation. Measured from the moment of this call, so it is armed once per run.
         /// When armed, hot evaluation loops abort with SXTO0001 once the limit is exceeded.
+        /// An inherited cap (<see cref="CapDeadlineTo"/>) always wins when it expires first, and
+        /// applies even to a nested run whose own Processor has no limit at all.
         /// </summary>
         public virtual void SetTimeout(TimeSpan timeout)
         {
-            activeOnThread = this;   // this controller now owns the deadline on the running thread
-            if (timeout <= TimeSpan.Zero)
+            var token = new DeadlineToken();
+            activeOnThread = token;   // this run now owns the deadline slot on the running thread
+            hasDeadline = false;
+
+            if (timeout > TimeSpan.Zero)
             {
-                hasDeadline = false;
-                return;
+                timeoutSetting = timeout;
+                long ticksFromNow = (long)(timeout.TotalSeconds * System.Diagnostics.Stopwatch.Frequency);
+                deadlineTimestamp = System.Diagnostics.Stopwatch.GetTimestamp() + ticksFromNow;
+                hasDeadline = true;
             }
 
-            timeoutSetting = timeout;
-            long ticksFromNow = (long)(timeout.TotalSeconds * System.Diagnostics.Stopwatch.Frequency);
-            deadlineTimestamp = System.Diagnostics.Stopwatch.GetTimestamp() + ticksFromNow;
-            timeoutCountdown = TimeoutCheckStride;
-            hasDeadline = true;
+            if (hasInheritedCap && (!hasDeadline || inheritedDeadline < deadlineTimestamp))
+            {
+                deadlineTimestamp = inheritedDeadline;
+                timeoutSetting = inheritedSetting;
+                hasDeadline = true;
+            }
+
+            if (!hasDeadline)
+            {
+                return;               // token stays unarmed
+            }
+
+            token.Arm(deadlineTimestamp, timeoutSetting);
+            deadlineToken = token;
         }
 
         /// <summary>
-        /// Called from hot evaluation loops. Returns immediately unless a deadline is armed and has
-        /// passed, in which case it throws SXTO0001. The clock is sampled only every stride calls,
-        /// so the per-iteration cost is a decrement and a branch.
+        /// Called per ITEM from hot evaluation loops - iterators, the regex driver, parse loops.
+        /// Returns immediately unless a deadline is armed and has passed, in which case it throws
+        /// SXTO0001. Shares its throttle with the context-less <see cref="CheckActiveTimeout"/>,
+        /// which is the same class of site.
         /// </summary>
         public void CheckTimeout()
         {
-            if (!hasDeadline)
-            {
-                return;
-            }
-
-            if (--timeoutCountdown > 0)
-            {
-                return;
-            }
-
-            timeoutCountdown = TimeoutCheckStride;
-            if (System.Diagnostics.Stopwatch.GetTimestamp() >= deadlineTimestamp)
-            {
-                ThrowTimeout();
-            }
+            deadlineToken?.Check();
         }
 
-        private void ThrowTimeout()
+        /// <summary>
+        /// Called per STEP from instruction-level loops - one xsl:for-each iteration, one XPath
+        /// 'for' binding, one tail call - where a single step can cost arbitrarily much. These get
+        /// their own throttle, because a per-item throttle driven to its cap by a burst of cheap
+        /// iterator calls would starve them for thousands of (second-long) steps.
+        /// </summary>
+        public void CheckTimeoutPerStep()
         {
-            throw new XPathException(
-                "Transformation exceeded its time limit of " + timeoutSetting.TotalSeconds + "s", DAXonErrorCode.SXTO0001);
+            deadlineToken?.CheckPerStep();
         }
 
         /// <summary>
@@ -169,17 +355,19 @@ namespace OutSmart.DAXon.Core
         /// </summary>
         public void InheritDeadlineFrom(Controller parent)
         {
-            activeOnThread = this;   // the nested run now owns the deadline on the running thread
+            var token = new DeadlineToken();
+            activeOnThread = token;   // the nested run now owns the deadline slot on the running thread
             if (parent == null || !parent.hasDeadline)
             {
                 hasDeadline = false;
-                return;
+                return;               // token stays unarmed
             }
 
             deadlineTimestamp = parent.deadlineTimestamp;
             timeoutSetting = parent.timeoutSetting;
-            timeoutCountdown = TimeoutCheckStride;
             hasDeadline = true;
+            token.Arm(deadlineTimestamp, timeoutSetting);
+            deadlineToken = token;
         }
 
         /// <summary>
@@ -190,9 +378,9 @@ namespace OutSmart.DAXon.Core
         /// restore (try/finally): a compile nested inside a running transformation (fn:transform)
         /// hands the slot back to that run's deadline on exit.
         /// </summary>
-        internal static Controller ArmThreadDeadline(Configuration config)
+        internal static DeadlineToken ArmThreadDeadline(Configuration config)
         {
-            Controller previous = activeOnThread;
+            DeadlineToken previous = activeOnThread;
             if (config.GetProcessor() is OutSmart.DAXon.Api.Processor p)
             {
                 new Controller(config).SetTimeout(p.TransformTimeout);
@@ -205,7 +393,7 @@ namespace OutSmart.DAXon.Core
             return previous;
         }
 
-        internal static void RestoreThreadDeadline(Controller previous)
+        internal static void RestoreThreadDeadline(DeadlineToken previous)
         {
             activeOnThread = previous;
         }
@@ -301,7 +489,7 @@ namespace OutSmart.DAXon.Core
         {
             get
             {
-                lock (this)
+                lock (syncLock)
                 {
                     if (localIndexes == null)
                     {
@@ -351,7 +539,7 @@ namespace OutSmart.DAXon.Core
             }
             catch (XPathException err)
             {
-                throw new InvalidOperationException(err.GetMessage());
+                throw new InvalidOperationException(err.Message);
             }
 
             if (tracer != null)
@@ -368,7 +556,7 @@ namespace OutSmart.DAXon.Core
 
         protected virtual void ClearPerTransformationData()
         {
-            lock (this)
+            lock (syncLock)
             {
                 userDataTable = new Dictionary<string, object>(20);
                 principalResult = null;
@@ -380,6 +568,31 @@ namespace OutSmart.DAXon.Core
                 if (!globalContextItemPreset)
                 {
                     globalContextItem = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Release the state a finished run leaves behind. Called when the run gives up `inUse`, NOT
+        /// at the start of the next one: the Api pools the principal input tree in MakeSourceTree
+        /// BEFORE it enters ApplyTemplates, so clearing on entry would throw away the pool entry that
+        /// gives doc($sameUri) its node identity with the input.
+        ///   Why it is needed at all: the pool holds the input tree plus every tree doc()/document()
+        /// pulled, keyed by URI, with no eviction, and it used to be reset only in Reset() - which is
+        /// called ONLY from the constructors. A host that reuses one Xslt30Transformer (the docs
+        /// forbid it; the engine allows it, since inUse is released in a finally) therefore
+        /// accumulated every document it ever transformed, silently, at megabytes per run.
+        /// </summary>
+        protected internal virtual void ReleaseRunState()
+        {
+            lock (syncLock)
+            {
+                // Nothing pooled means nothing to discard and no reason to allocate a replacement:
+                // the common shape (host passes a built XdmNode, stylesheet calls no doc()) never
+                // pools anything, so this keeps the per-run cost at one compare.
+                if (sourceDocumentPool != null && !sourceDocumentPool.IsEmpty)
+                {
+                    ClearDocumentPool();
                 }
             }
         }
@@ -535,13 +748,13 @@ namespace OutSmart.DAXon.Core
 
         public virtual Bindery GetBindery(PackageData packageData)
         {
-            lock (this)
+            lock (syncLock)
             {
-                Bindery b = binderies.Get(packageData);
+                Bindery b = binderies.GetOrDefault(packageData);
                 if (b == null)
                 {
                     b = new Bindery(packageData);
-                    binderies.Put(packageData, b);
+                    binderies[packageData] = b;
                 }
 
                 return b;
@@ -741,7 +954,7 @@ namespace OutSmart.DAXon.Core
         {
             if (traceListener != null)
             {
-                traceListener.Dispose();
+                traceListener.Close();
             }
         }
 
@@ -777,7 +990,6 @@ namespace OutSmart.DAXon.Core
             if (traceListener != null)
             {
 
-                //traceListener.open(this);
                 PreEvaluateGlobals(NewXPathContext());
             }
         }
@@ -789,17 +1001,17 @@ namespace OutSmart.DAXon.Core
 
         public virtual object GetUserData(object key, string name)
         {
-            lock (this)
+            lock (syncLock)
             {
                 string keyValue = key.GetHashCode() + " " + name;
 
-                return userDataTable.Get(keyValue);
+                return userDataTable.GetOrDefault(keyValue);
             }
         }
 
         public virtual void SetUserData(object key, string name, object data)
         {
-            lock (this)
+            lock (syncLock)
             {
 
                 string keyVal = key.GetHashCode() + " " + name;
@@ -809,14 +1021,14 @@ namespace OutSmart.DAXon.Core
                 }
                 else
                 {
-                    userDataTable.Put(keyVal, data);
+                    userDataTable[keyVal] = data;
                 }
             }
         }
 
         public virtual void SetRememberedNumber(NodeInfo node, int number)
         {
-            lock (this)
+            lock (syncLock)
             {
                 lastRememberedNode = node;
                 lastRememberedNumber = number;
@@ -825,7 +1037,7 @@ namespace OutSmart.DAXon.Core
 
         public virtual int GetRememberedNumber(NodeInfo node)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (lastRememberedNode == node)
                 {
@@ -1031,14 +1243,14 @@ namespace OutSmart.DAXon.Core
 
         public virtual void RegisterGlobalVariableDependency(GlobalVariable one, GlobalVariable two)
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (one == two)
                 {
                     throw new Circularity("Circular dependency among global variables: " + one.GetVariableQName().DisplayName + " depends on its own value");
                 }
 
-                HashSet<GlobalVariable> transitiveDependencies = globalVariableDependencies.Get(two);
+                HashSet<GlobalVariable> transitiveDependencies = globalVariableDependencies.GetOrDefault(two);
                 if (transitiveDependencies != null)
                 {
                     if (transitiveDependencies.Contains(one))
@@ -1054,11 +1266,11 @@ namespace OutSmart.DAXon.Core
                     }
                 }
 
-                HashSet<GlobalVariable> existingDependencies = globalVariableDependencies.Get(one);
+                HashSet<GlobalVariable> existingDependencies = globalVariableDependencies.GetOrDefault(one);
                 if (existingDependencies == null)
                 {
                     existingDependencies = new HashSet<GlobalVariable>();
-                    globalVariableDependencies.Put(one, existingDependencies);
+                    globalVariableDependencies[one] = existingDependencies;
                 }
 
                 existingDependencies.Add(two);
@@ -1112,7 +1324,7 @@ namespace OutSmart.DAXon.Core
 
         public virtual StylesheetCache GetStylesheetCache()
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (stylesheetCache == null)
                 {
@@ -1136,7 +1348,7 @@ namespace OutSmart.DAXon.Core
             }
             else
             {
-                return GetFocusTrackerFactory(multithreaded).Apply(iter);
+                return GetFocusTrackerFactory(multithreaded)(iter);
             }
         }
 

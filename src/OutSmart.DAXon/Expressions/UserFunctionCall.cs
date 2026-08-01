@@ -37,9 +37,6 @@ namespace OutSmart.DAXon.Expressions
         public const int FOREIGN_TAIL_CALL = 1;
         public const int SELF_TAIL_CALL = 2;
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         private const int UNHANDLED_DEPENDENCIES = StaticProperty.DEPENDS_ON_POSITION | StaticProperty.DEPENDS_ON_LAST | StaticProperty.DEPENDS_ON_XSLT_CONTEXT | StaticProperty.DEPENDS_ON_USER_FUNCTIONS;
         private SequenceType staticType;
         private UserFunction function;
@@ -50,9 +47,6 @@ namespace OutSmart.DAXon.Expressions
         private volatile ISequenceEvaluator[] argumentEvaluators = null; // built once under lock, then read lock-free
         private UnboundFunctionLibrary.UnboundFunctionCallDetails unboundCallDetails;
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public int BindingSlot
         {
             get => bindingSlot; set
@@ -61,9 +55,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public Component FixedTarget
         {
             get
@@ -80,19 +71,10 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual UnboundFunctionLibrary.UnboundFunctionCallDetails UnboundCallDetails => unboundCallDetails;
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual ISequenceEvaluator[] ArgumentEvaluators => argumentEvaluators;
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
@@ -100,17 +82,11 @@ namespace OutSmart.DAXon.Expressions
         //    }
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_USER_FUNCTIONS;
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override int ImplementationMethod
         {
             get
@@ -126,17 +102,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override string ExpressionName => "userFunctionCall";
         /// <summary>
         /// Create a function call to a user-written function in a query or stylesheet
@@ -162,9 +132,6 @@ namespace OutSmart.DAXon.Expressions
             this.beingInlined = beingInlined;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual void CopyFrom(UserFunctionCall ufc2)
         {
             staticType = ufc2.staticType;
@@ -177,57 +144,36 @@ namespace OutSmart.DAXon.Expressions
             unboundCallDetails = null;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public void SetFunctionName(StructuredQName name)
         {
             this.name = name;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual void SetStaticType(SequenceType type)
         {
             staticType = type;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public void SetFunction(UserFunction compiledFunction)
         {
             function = compiledFunction;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual UserFunction GetFunction()
         {
             return function;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual bool IsTailCall()
         {
             return tailCall != NOT_TAIL_CALL;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual bool IsRecursiveTailCall()
         {
             return tailCall == SELF_TAIL_CALL;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public override StructuredQName GetFunctionName()
         {
             if (name == null)
@@ -240,24 +186,15 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public SymbolicName GetSymbolicName()
         {
             return new SymbolicName.F(GetFunctionName(), GetArity());
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual Component GetTarget()
         {
             return function.DeclaringComponent;
         }
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public virtual void AllocateArgumentEvaluators()
         {
             // Built into a local and published with a single volatile store: EvaluateArguments
@@ -299,7 +236,7 @@ namespace OutSmart.DAXon.Expressions
                 else if (arg is Block && ((Block)arg).IsCandidateForSharedAppend())
                 {
 
-                    // If the expression is a Block, that @is, it is appending a value to a sequence,
+                    // If the expression is a Block, that is, it is appending a value to a sequence,
                     // then we have the opportunity to use a shared list underpinning the old value and
                     // the new. This takes precedence over lazy evaluation (it would be possible to do this
                     // lazily, but more difficult). We currently do this for any Block that has a variable
@@ -319,9 +256,6 @@ namespace OutSmart.DAXon.Expressions
             argumentEvaluators = evaluators;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
@@ -332,9 +266,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public override ItemType GetItemType()
         {
             if (staticType == null)
@@ -349,9 +280,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
@@ -370,17 +298,11 @@ namespace OutSmart.DAXon.Expressions
             return f.ResultType.PrimaryType.GetUType();
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         public override bool IsUpdatingExpression()
         {
             return function.IsUpdating();
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
 
@@ -397,7 +319,7 @@ namespace OutSmart.DAXon.Expressions
                 int props;
                 IList<UserFunction> calledFunctions = new List<UserFunction>();
                 ExpressionTool.GatherCalledFunctions(function.GetBody(), calledFunctions);
-                if (calledFunctions.IsEmpty())
+                if (calledFunctions.Count == 0)
                 {
                     props = function.GetBody().GetSpecialProperties();
                 }
@@ -419,9 +341,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
@@ -451,17 +370,11 @@ namespace OutSmart.DAXon.Expressions
             return ufc;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         protected override int ComputeCardinality()
         {
             if (staticType == null)
@@ -476,17 +389,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression e = base.TypeCheck(visitor, contextInfo);
@@ -509,17 +416,11 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
             Expression e = base.Optimize(visitor, contextItemType);
@@ -531,98 +432,62 @@ namespace OutSmart.DAXon.Expressions
             return e;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override void ResetLocalStaticProperties()
         {
             base.ResetLocalStaticProperties(); //argumentEvaluators = null;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             return AddExternalFunctionCallToPathMap(pathMap, pathMapNodeSet);
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override int MarkTailFunctionCalls(StructuredQName qName, int arity)
         {
             tailCall = GetFunctionName().Equals(qName) && arity == GetArity() ? SELF_TAIL_CALL : FOREIGN_TAIL_CALL;
             return tailCall;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext c)
         {
             return MakeElaborator().ElaborateForItem().Eval(c);
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext c)
         {
             return MakeElaborator().ElaborateForPull().Iterate(c);
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         private void RequestTailCall(IXPathContext context, ISequence[] actualArgs)
         {
             if (bindingSlot >= 0)
@@ -646,34 +511,22 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override void Process(Outputter output, IXPathContext context)
         {
             ITailCall tc = MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context);
             DispatchTailCall(tc);
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public virtual Component GetTargetComponent(IXPathContext context)
         {
             if (bindingSlot == -1)
@@ -688,33 +541,21 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override IFunctionItem GetTargetFunction(IXPathContext context)
         {
             return (UserFunction)GetTargetComponent(context).GetActor();
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public virtual ISequence[] EvaluateArguments(IXPathContext c, bool streamed)
         {
             int numArgs = GetArity();
@@ -726,7 +567,7 @@ namespace OutSmart.DAXon.Expressions
             ISequenceEvaluator[] evaluators = argumentEvaluators;
             if (evaluators == null)
             {
-                lock (this)
+                lock (syncLock)
                 {
                     if (argumentEvaluators == null)
                     {
@@ -751,17 +592,11 @@ namespace OutSmart.DAXon.Expressions
             return actualArgs;
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("ufCall", this);
@@ -787,17 +622,11 @@ namespace OutSmart.DAXon.Expressions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override object GetProperty(string name)
         {
             if (name.Equals("target"))
@@ -808,33 +637,21 @@ namespace OutSmart.DAXon.Expressions
             return base.GetProperty(name);
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override StructuredQName GetObjectName()
         {
             return GetFunctionName();
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             if (IsTailCall())
@@ -847,17 +664,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         private class TailCallElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
@@ -895,17 +706,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Copy details from another user function call
-        /// </summary>
         //
         //
         //
         //
         //    }
-        /// <summary>
-        /// Determine the cardinality of the result
-        /// </summary>
         private class UserFunctionCallElaborator : PullElaborator
         {
             private void TestNotAbstract(UserFunctionCall expr, Component target)
@@ -916,9 +721,9 @@ namespace OutSmart.DAXon.Expressions
                 }
             }
 
-            private XPathException.StackOverflow ReportStackOverflow(Expression expr)
+            private RecursionDepthError ReportStackOverflow(RecursionDepthError e, Expression expr)
             {
-                return new XPathException.StackOverflow("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, expr.GetLocation());
+                return e.Describe("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, expr.GetLocation());
             }
 
             public override IPullEvaluator ElaborateForPull()
@@ -940,9 +745,10 @@ namespace OutSmart.DAXon.Expressions
                             c2.SetCurrentComponent(target);
                             return targetFunction.Call(c2, actualArgs).Iterate();
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw ReportStackOverflow(expr);
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
                         }
                     };
                 }
@@ -959,9 +765,10 @@ namespace OutSmart.DAXon.Expressions
                             XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr);
                             return targetFunction.Call(c2, actualArgs).Iterate();
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw ReportStackOverflow(expr);
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
                         }
                     };
                 }
@@ -986,9 +793,10 @@ namespace OutSmart.DAXon.Expressions
                             c2.SetCurrentComponent(target);
                             return targetFunction.Call(c2, actualArgs).Head();
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw ReportStackOverflow(expr);
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
                         }
                     };
                 }
@@ -1005,9 +813,10 @@ namespace OutSmart.DAXon.Expressions
                             XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr);
                             return targetFunction.Call(c2, actualArgs).Head();
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw ReportStackOverflow(expr);
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
                         }
                     };
                 }
@@ -1039,9 +848,10 @@ namespace OutSmart.DAXon.Expressions
                             c2.SetCurrentComponent(target);
                             targetFunction.Process(c2, actualArgs, output);
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw ReportStackOverflow(expr);
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
                         }
 
                         return null;
@@ -1060,9 +870,10 @@ namespace OutSmart.DAXon.Expressions
                             XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr);
                             targetFunction.Process(c2, actualArgs, output);
                         }
-                        catch (RecursionDepthError)
+                        catch (RecursionDepthError e) when (!e.Described)
                         {
-                            throw ReportStackOverflow(expr);
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
                         }
 
                         return null;

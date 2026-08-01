@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Text
 {
 
-    // Phase 7.1: requireNonNegativeInt helper used by Twine* / BMPString /
+    // RequireNonNegativeInt helper used by Twine* / BMPString /
     // Slice16 -- Saxon source assumes a static helper that narrows a long
     // index to int with a bounds check.
     public static class StrHelpers

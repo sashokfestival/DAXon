@@ -20,7 +20,6 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -36,6 +35,7 @@ namespace OutSmart.DAXon.Expressions
 {
     public abstract class Expression : IIdentityComparable, IExportAgent, ILocatable, ITraceable
     {
+        protected internal readonly object syncLock = new object();
         public const int EVALUATE_METHOD = 1;
         public const int ITERATE_METHOD = 2;
         public const int PROCESS_METHOD = 4;
@@ -44,26 +44,11 @@ namespace OutSmart.DAXon.Expressions
         public const int EFFECTIVE_BOOLEAN_VALUE = 32;
         public const int UPDATE_METHOD = 64;
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public const double MAX_COST = 1000000000;
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public static readonly IntegerValue UNBOUNDED_LOWER = (IntegerValue)IntegerValue.FromDouble(-1E+100);
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public static readonly IntegerValue UNBOUNDED_UPPER = (IntegerValue)IntegerValue.FromDouble(+1E+100);
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public static readonly IntegerValue MAX_STRING_LENGTH = Int64Value.MakeIntegerValue(int.MaxValue);
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public static readonly IntegerValue MAX_SEQUENCE_LENGTH = Int64Value.MakeIntegerValue(int.MaxValue);
         protected int staticProperties = -1;
         private ILocation location = Loc.NONE;
@@ -83,27 +68,19 @@ namespace OutSmart.DAXon.Expressions
         private int cachedIsUpdating = -1;
         private Elaborator elaborator;
 
-        public virtual string ExpressionName => GetType().GetSimpleName();
+        public virtual string ExpressionName => GetType().Name;
 
         public virtual Expression ParentExpression
         {
             get => parentExpression; set
             {
 
-                //        if (parent != null && parent != parentExpression) {
-                //        }
                 parentExpression = value;
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public abstract int ImplementationMethod { get; }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual Expression ScopingExpression
         {
             get
@@ -127,24 +104,12 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual RetainedStaticContext LocalRetainedStaticContext => retainedStaticContext;
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual string StaticBaseURIString => GetRetainedStaticContext().StaticBaseUriString;
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual URI StaticBaseURI => GetRetainedStaticContext().GetStaticBaseUri();
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual double Cost
         {
             get
@@ -167,18 +132,9 @@ namespace OutSmart.DAXon.Expressions
                 return cost;
             }
         }
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual int NetCost => 1;
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual Values.SequenceType StaticType => Values.SequenceType.MakeSequenceType(GetItemType(), GetCardinality());
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual int Dependencies
         {
             get
@@ -195,20 +151,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual IntegerValue[] IntegerBounds => null;
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual int IntrinsicDependencies => 0;
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public int[] SlotsUsed
         {
@@ -223,7 +170,7 @@ namespace OutSmart.DAXon.Expressions
                     return cached;
                 }
 
-                lock (this)
+                lock (syncLock)
                 {
 
                     // synchronized because it's calculated lazily at run-time the first time it's needed
@@ -249,15 +196,9 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual string TracingTag => ExpressionName;
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual string StreamerName => null;
         public Expression()
@@ -355,9 +296,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void RestoreParentPointers()
         {
             foreach (Operand o in Operands())
@@ -367,25 +305,16 @@ namespace OutSmart.DAXon.Expressions
                 child.RestoreParentPointers();
             }
         }
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool ImplementsStaticTypeCheck()
         {
             return false;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool HasVariableBinding(IBinding binding)
         {
             return false;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool IsLiftable(bool forStreaming)
         {
             int p = GetSpecialProperties();
@@ -393,43 +322,28 @@ namespace OutSmart.DAXon.Expressions
             return (p & StaticProperty.NO_NODES_NEWLY_CREATED) != 0 && (p & StaticProperty.HAS_SIDE_EFFECTS) == 0 && ((d & StaticProperty.DEPENDS_ON_ASSIGNABLE_GLOBALS) == 0) && ((d & StaticProperty.DEPENDS_ON_POSITION) == 0) && ((d & StaticProperty.DEPENDS_ON_LAST) == 0);
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool SupportsLazyEvaluation()
         {
             return (Dependencies & (StaticProperty.DEPENDS_ON_POSITION | StaticProperty.DEPENDS_ON_LAST | StaticProperty.DEPENDS_ON_CURRENT_ITEM | StaticProperty.DEPENDS_ON_CURRENT_GROUP | StaticProperty.DEPENDS_ON_REGEX_GROUP)) == 0; // we can't save these values in a closure, so we evaluate
             // the expression eagerly
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool IsMultiThreaded(Configuration config)
         {
             return false;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool AllowExtractingCommonSubexpressions()
         {
             return true;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual Expression Simplify()
         {
             SimplifyChildren();
             return this;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         protected void SimplifyChildren()
         {
             foreach (Operand o in Operands())
@@ -446,9 +360,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void SetRetainedStaticContext(RetainedStaticContext rsc)
         {
             if (rsc != null)
@@ -468,9 +379,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void SetRetainedStaticContextThoroughly(RetainedStaticContext rsc)
         {
             if (rsc != null)
@@ -505,9 +413,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void SetRetainedStaticContextLocally(RetainedStaticContext rsc)
         {
             if (rsc != null)
@@ -516,9 +421,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public RetainedStaticContext GetRetainedStaticContext()
         {
             if (retainedStaticContext == null)
@@ -532,33 +434,24 @@ namespace OutSmart.DAXon.Expressions
                 {
                     ILocation location = GetLocation();
                     string loc = location.GetSystemId() + " - " + location.GetLineNumber() + ":" + location.GetColumnNumber();
-                    throw new NullReferenceException(npe.GetMessage() + " At " + ToShortString() + ": " + loc);
+                    throw new NullReferenceException(npe.Message + " At " + ToShortString() + ": " + loc);
                 }
             }
 
             return retainedStaticContext;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool IsCallOn(System.Type function)
         {
             return false;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeCheckChildren(visitor, contextInfo);
             return this;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         protected void TypeCheckChildren(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             foreach (Operand o in Operands())
@@ -567,17 +460,11 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual Expression StaticTypeCheck(Values.SequenceType req, bool backwardsCompatible, Func<RoleDiagnostic> roleSupplier, ExpressionVisitor visitor)
         {
             return visitor.GetConfiguration().GetTypeChecker(backwardsCompatible).StaticTypeCheck(this, req, roleSupplier, visitor);
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             if (visitor.IncrementAndTestDepth())
@@ -591,9 +478,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         protected void OptimizeChildren(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             foreach (Operand o in Operands())
@@ -602,24 +486,15 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void PrepareForStreaming()
         {
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual Expression Unordered(bool retainAllNodes, bool forStreaming)
         {
             return this;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public int GetSpecialProperties()
         {
             if (staticProperties == -1)
@@ -630,17 +505,11 @@ namespace OutSmart.DAXon.Expressions
             return staticProperties & StaticProperty.SPECIAL_PROPERTY_MASK;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool HasSpecialProperty(int property)
         {
             return (GetSpecialProperties() & property) != 0;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual int GetCardinality()
         {
             if (staticProperties == -1)
@@ -651,52 +520,31 @@ namespace OutSmart.DAXon.Expressions
             return staticProperties & StaticProperty.CARDINALITY_MASK;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public abstract Types.ItemType GetItemType();
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual UType GetStaticUType(UType contextItemType)
         {
             return UType.ANY;
         }
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void SetFlattened(bool flattened)
         {
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void SetFiltered(bool filtered)
         {
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual IItem EvaluateItem(IXPathContext context)
         {
             return Iterate(context).Next();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual ISequenceIterator Iterate(IXPathContext context)
         {
             IItem value = EvaluateItem(context);
             return SequenceTool.ItemOrEmpty(value).Iterate();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual bool EffectiveBooleanValue(IXPathContext context)
         {
             try
@@ -709,9 +557,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual UnicodeString EvaluateAsString(IXPathContext context)
         {
             IItem o = EvaluateItem(context);
@@ -723,9 +568,6 @@ namespace OutSmart.DAXon.Expressions
             return o.UnicodeStringValue;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void Process(Outputter output, IXPathContext context)
         {
             int m = ImplementationMethod;
@@ -760,9 +602,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public static void DispatchTailCall(ITailCall tc)
         {
             while (tc != null)
@@ -771,15 +610,12 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public override string ToString()
         {
 
             // fallback implementation
             StringBuilder buff = new StringBuilder(64);
-            string className = GetType().GetName();
+            string className = GetType().FullName;
             while (true)
             {
                 int dot = className.IndexOf('.');
@@ -804,15 +640,12 @@ namespace OutSmart.DAXon.Expressions
 
             if (!first)
             {
-                buff.Append(")");
+                buff.Append(')');
             }
 
             return buff.ToString();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual string ToShortString()
         {
 
@@ -820,13 +653,7 @@ namespace OutSmart.DAXon.Expressions
             return ExpressionName;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public abstract void Export(ExpressionPresenter @out);
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public void Explain(Logger @out)
         {
             ExpressionPresenter ep = new ExpressionPresenter(GetConfiguration(), @out);
@@ -840,23 +667,17 @@ namespace OutSmart.DAXon.Expressions
             catch (XPathException e)
             {
                 ep.StartElement("failure");
-                ep.EmitAttribute("message", e.GetMessage());
+                ep.EmitAttribute("message", e.Message);
                 ep.EndElement();
             }
 
             ep.Dispose();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         public virtual void CheckPermittedContents(ISchemaType parentType, bool whole)
         {
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void AdoptChildExpression(Expression child)
         {
@@ -868,8 +689,6 @@ namespace OutSmart.DAXon.Expressions
 
             //                    o.detachChild();
             //                }
-            //            }
-            //        }
             child.ParentExpression = this;
             if (child.retainedStaticContext == null)
             {
@@ -888,18 +707,12 @@ namespace OutSmart.DAXon.Expressions
             ResetLocalStaticProperties();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void SetLocation(ILocation id)
         {
             location = id;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual Expression WithLocation(ILocation id)
         {
@@ -907,9 +720,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public ILocation GetLocation()
         {
@@ -933,9 +743,6 @@ namespace OutSmart.DAXon.Expressions
             return exp.location == null ? Loc.NONE : exp.location;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual Configuration GetConfiguration()
         {
@@ -949,9 +756,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual PackageData GetPackageData()
         {
@@ -965,27 +769,18 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual bool IsInstruction()
         {
             return false;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public void ComputeStaticProperties()
         {
             staticProperties = ComputeDependencies() | ComputeCardinality() | ComputeSpecialProperties();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void ResetLocalStaticProperties()
         {
@@ -994,32 +789,20 @@ namespace OutSmart.DAXon.Expressions
             cachedIsUpdating = -1;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual bool IsStaticPropertiesKnown()
         {
             return staticProperties != -1;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         protected abstract int ComputeCardinality();
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         protected virtual int ComputeSpecialProperties()
         {
             return 0;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual int ComputeDependencies()
         {
@@ -1039,9 +822,6 @@ namespace OutSmart.DAXon.Expressions
             return dependencies;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void SetStaticProperty(int prop)
         {
@@ -1053,9 +833,6 @@ namespace OutSmart.DAXon.Expressions
             staticProperties |= prop;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void CheckForUpdatingSubexpressions()
         {
@@ -1075,9 +852,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual bool IsUpdatingExpression()
         {
@@ -1097,40 +871,25 @@ namespace OutSmart.DAXon.Expressions
             return cachedIsUpdating == 1;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual bool IsVacuousExpression()
         {
             return false;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public abstract Expression Copy(RebindingMap rebindings);
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void SuppressValidation(int parentValidationMode)
         {
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual int MarkTailFunctionCalls(StructuredQName qName, int arity)
         {
             return UserFunctionCall.NOT_TAIL_CALL;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual Patterns.Pattern ToPattern(Configuration config)
         {
@@ -1148,9 +907,6 @@ namespace OutSmart.DAXon.Expressions
             throw new XPathException("Cannot convert the expression {" + this + "} to a pattern");
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         private static void GatherSlotsUsed(Expression exp, IntHashSet slots)
         {
@@ -1172,36 +928,24 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         protected virtual void DynamicError(string message, string code, IXPathContext context)
         {
             throw new XPathException(message, code, GetLocation()).WithXPathContext(context).WithFailingExpression(this);
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         protected virtual void TypeError(string message, string errorCode, IXPathContext context)
         {
             throw new XPathException(message, errorCode, GetLocation()).AsTypeError().WithXPathContext(context).WithFailingExpression(this);
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual StructuredQName GetObjectName()
         {
             return null;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual object GetProperty(string name)
         {
@@ -1215,18 +959,12 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual IEnumerator<string> GetProperties()
         {
             yield return "expression";
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
@@ -1277,9 +1015,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual bool IsSubtreeExpression()
         {
@@ -1308,45 +1043,30 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void SetEvaluationMethod(int method)
         {
             this.evaluationMethod = method;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual int GetEvaluationMethod()
         {
             return evaluationMethod;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public override bool Equals(object obj)
         {
             return base.Equals(obj);
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public bool IsEqual(Expression other)
         {
             return this == other || (GetHashCode() == other.GetHashCode() && Equals(other));
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public override int GetHashCode()
         {
@@ -1358,9 +1078,6 @@ namespace OutSmart.DAXon.Expressions
             return cachedHashCode;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         protected virtual bool HasCompatibleStaticContext(Expression other)
         {
@@ -1379,36 +1096,24 @@ namespace OutSmart.DAXon.Expressions
             return true;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         protected virtual int ComputeHashCode()
         {
             return base.GetHashCode();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual bool IsIdentical(IIdentityComparable other)
         {
             return this == other;
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual int IdentityHashCode()
         {
             return RuntimeHelpers.GetHashCode(GetLocation());
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual void SetExtraProperty(string name, object value)
         {
@@ -1428,13 +1133,10 @@ namespace OutSmart.DAXon.Expressions
             }
             else
             {
-                extraProperties.Put(name, value);
+                extraProperties[name] = value;
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual object GetExtraProperty(string name)
         {
@@ -1444,26 +1146,20 @@ namespace OutSmart.DAXon.Expressions
             }
             else
             {
-                return extraProperties.Get(name);
+                return extraProperties.GetOrDefault(name);
             }
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public virtual Elaborator GetElaborator()
         {
             return new FallbackElaborator();
         }
 
-        /// <summary>
-        /// Restore parent pointers for the subtree rooted at this expression
-        /// </summary>
         //
         public Elaborator MakeElaborator()
         {
-            lock (this)
+            lock (syncLock)
             {
                 if (elaborator == null)
                 {
@@ -1479,6 +1175,9 @@ namespace OutSmart.DAXon.Expressions
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual void GatherProperties(Action<string, object> consumer) { throw new NotImplementedException(); }
+        // Upstream Traceable.gatherProperties default is a no-op; TraceExpression calls this on EVERY
+        // traced child, so a throwing base made compile-with-tracing crash on any expression without
+        // an override.
+        public virtual void GatherProperties(Action<string, object> consumer) { }
     }
 }

@@ -73,7 +73,7 @@ namespace OutSmart.DAXon.Model
 
         public virtual IEnumerator<AttributeInfo> IIterator()
         {
-            return attributes.IIterator();
+            return attributes.GetEnumerator();
         }
 
         public virtual List<AttributeInfo> AsList()

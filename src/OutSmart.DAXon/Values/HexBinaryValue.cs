@@ -107,25 +107,16 @@ namespace OutSmart.DAXon.Values
             return this;
         }
 
-        /// <summary>
-        /// Test if the two hexBinary or Base64Binaryvalues are equal.
-        /// </summary>
         public override bool Equals(object other)
         {
             return other is HexBinaryValue && ArrayTools.Equals(binaryValue, ((HexBinaryValue)other).binaryValue);
         }
 
-        /// <summary>
-        /// Test if the two hexBinary or Base64Binaryvalues are equal.
-        /// </summary>
         public override int GetHashCode()
         {
             return Base64BinaryValue.ByteArrayHashCode(binaryValue);
         }
 
-        /// <summary>
-        /// Test if the two hexBinary or Base64Binaryvalues are equal.
-        /// </summary>
         public int CompareTo(IXPathComparable o)
         {
             if (o is Base64BinaryValue)
@@ -138,7 +129,7 @@ namespace OutSmart.DAXon.Values
                 byte[] other = ((HexBinaryValue)o).binaryValue;
                 int len0 = binaryValue.Length;
                 int len1 = other.Length;
-                int shorter = System.Math.Min(len0, len1);
+                int shorter = Math.Min(len0, len1);
                 for (int i = 0; i < shorter; i++)
                 {
                     int a = (int)binaryValue[i] & 0xff;
@@ -149,7 +140,7 @@ namespace OutSmart.DAXon.Values
                     }
                 }
 
-                return System.Math.Sign(len0 - len1);
+                return Math.Sign(len0 - len1);
             }
             else
             {

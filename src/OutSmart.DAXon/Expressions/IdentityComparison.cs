@@ -216,7 +216,10 @@ namespace OutSmart.DAXon.Expressions
                                 {
                                     NodeInfo v0 = (NodeInfo)p0.Eval(context);
                                     NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                                    if (v0 == null) { return v1 == null; }
+                                    if (v0 == null)
+                                    {
+                                        return v1 == null;
+                                    }
                                     return v0.Equals(v1);
                                 };
                             }
@@ -226,7 +229,10 @@ namespace OutSmart.DAXon.Expressions
                                 {
                                     NodeInfo v0 = (NodeInfo)p0.Eval(context);
                                     NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                                    if (v0 == null || v1 == null) { return false; }
+                                    if (v0 == null || v1 == null)
+                                    {
+                                        return false;
+                                    }
                                     return v0.Equals(v1);
                                 };
                             }
@@ -241,7 +247,10 @@ namespace OutSmart.DAXon.Expressions
                         {
                             NodeInfo v0 = (NodeInfo)p0.Eval(context);
                             NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                            if (v0 == null || v1 == null) { return false; }
+                            if (v0 == null || v1 == null)
+                            {
+                                return false;
+                            }
                             return GlobalOrderComparer.GetInstance().Compare(v0, v1) < 0;
                         };
 
@@ -250,7 +259,10 @@ namespace OutSmart.DAXon.Expressions
                         {
                             NodeInfo v0 = (NodeInfo)p0.Eval(context);
                             NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                            if (v0 == null || v1 == null) { return false; }
+                            if (v0 == null || v1 == null)
+                            {
+                                return false;
+                            }
                             return GlobalOrderComparer.GetInstance().Compare(v0, v1) > 0;
                         };
 
@@ -280,8 +292,14 @@ namespace OutSmart.DAXon.Expressions
                                 {
                                     NodeInfo v0 = (NodeInfo)p0.Eval(context);
                                     NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                                    if (v0 == null) { return v1 == null ? (IItem)BooleanValue.TRUE : BooleanValue.FALSE; }
-                                    if (v1 == null) { return BooleanValue.FALSE; }
+                                    if (v0 == null)
+                                    {
+                                        return v1 == null ? (IItem)BooleanValue.TRUE : BooleanValue.FALSE;
+                                    }
+                                    if (v1 == null)
+                                    {
+                                        return BooleanValue.FALSE;
+                                    }
                                     return BooleanValue.Get(v0.Equals(v1));
                                 };
                             }
@@ -290,9 +308,15 @@ namespace OutSmart.DAXon.Expressions
                                 return (context) =>
                                 {
                                     NodeInfo v0 = (NodeInfo)p0.Eval(context);
-                                    if (v0 == null) { return null; }
+                                    if (v0 == null)
+                                    {
+                                        return null;
+                                    }
                                     NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                                    if (v1 == null) { return null; }
+                                    if (v1 == null)
+                                    {
+                                        return null;
+                                    }
                                     return BooleanValue.Get(v0.Equals(v1));
                                 };
                             }
@@ -306,9 +330,15 @@ namespace OutSmart.DAXon.Expressions
                         return (context) =>
                         {
                             NodeInfo v0 = (NodeInfo)p0.Eval(context);
-                            if (v0 == null) { return null; }
+                            if (v0 == null)
+                            {
+                                return null;
+                            }
                             NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                            if (v1 == null) { return null; }
+                            if (v1 == null)
+                            {
+                                return null;
+                            }
                             return BooleanValue.Get(GlobalOrderComparer.GetInstance().Compare(v0, v1) < 0);
                         };
 
@@ -316,9 +346,15 @@ namespace OutSmart.DAXon.Expressions
                         return (context) =>
                         {
                             NodeInfo v0 = (NodeInfo)p0.Eval(context);
-                            if (v0 == null) { return null; }
+                            if (v0 == null)
+                            {
+                                return null;
+                            }
                             NodeInfo v1 = (NodeInfo)p1.Eval(context);
-                            if (v1 == null) { return null; }
+                            if (v1 == null)
+                            {
+                                return null;
+                            }
                             return BooleanValue.Get(GlobalOrderComparer.GetInstance().Compare(v0, v1) > 0);
                         };
 

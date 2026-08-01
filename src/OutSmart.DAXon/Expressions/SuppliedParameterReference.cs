@@ -106,7 +106,7 @@ namespace OutSmart.DAXon.Expressions
             catch (InvalidOperationException e)
             {
                 new StandardDiagnostics().LogStackTrace(c, c.GetConfiguration().Logger, 2);
-                throw new InvalidOperationException(e.GetMessage() + ". No value has been set for parameter " + slotNumber);
+                throw new InvalidOperationException(e.Message + ". No value has been set for parameter " + slotNumber);
             }
         }
 

@@ -12,7 +12,6 @@ using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.XQuery;
 using OutSmart.DAXon.Types;
 
-// Phase 7.8: UnicodeChar.cs re-included into project. Stub removed to avoid CS0101.
 // namespace OutSmart.DAXon.Text
 // {
 //     public class UnicodeChar { public UnicodeChar() {} public UnicodeChar(int cp) {} }
@@ -33,7 +32,10 @@ namespace OutSmart.DAXon.Functions
         // %public+%private on declarations is caught separately in XQueryParser via CheckPublicPrivateAnnotations.)
         public void Check(AnnotationList annotations, string construct)
         {
-            if (construct != "IF") { return; }
+            if (construct != "IF")
+            {
+                return;
+            }
             foreach (OutSmart.DAXon.XQuery.Annotation ann in annotations)
             {
                 OutSmart.DAXon.Model.StructuredQName name = ann.AnnotationQName;

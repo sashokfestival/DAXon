@@ -25,20 +25,11 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     public class DistinctValues : CollatingFunctionFixed
     {
-        /// <summary>
-        /// A match key for use in situations where NaN = NaN
-        /// </summary>
         public static readonly IAtomicMatchKey NaN_MATCH_KEY = new QNameValue("", NamespaceUri.SAXON, "+NaN+");
-        /// <summary>
-        /// A match key for use in situations where NaN = NaN
-        /// </summary>
         public override string StreamerName => "DistinctValues";
 
         public static Func<DistinctValues> New() => () => new DistinctValues();
 
-        /// <summary>
-        /// A match key for use in situations where NaN = NaN
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             IStringCollator collator = StringCollator;

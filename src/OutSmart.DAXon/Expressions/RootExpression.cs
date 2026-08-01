@@ -30,53 +30,17 @@ namespace OutSmart.DAXon.Expressions
         private bool contextMaybeUndefined = true;
         private bool doneWarnings = false;
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
         public override int ImplementationMethod => EVALUATE_METHOD;
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_CONTEXT_DOCUMENT;
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string ExpressionName => "root";
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string StreamerName => "RootExpression";
         public RootExpression()
         {
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             TypeHierarchy th = visitor.GetConfiguration().GetTypeHierarchy();
@@ -110,9 +74,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)
         {
 
@@ -120,33 +81,21 @@ namespace OutSmart.DAXon.Expressions
             return TypeCheck(visitor, contextItemType);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         protected override int ComputeSpecialProperties()
         {
             return StaticProperty.ORDERED_NODESET | StaticProperty.CONTEXT_DOCUMENT_NODESET | StaticProperty.SINGLE_DOCUMENT_NODESET | StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         public virtual bool IsContextPossiblyUndefined()
         {
             return contextMaybeUndefined;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         protected virtual string NoContextMessage()
         {
             return "Leading '/' selects nothing";
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
         /// <summary>
         /// Is this expression the same as another expression?
         /// </summary>
@@ -155,62 +104,26 @@ namespace OutSmart.DAXon.Expressions
             return other is RootExpression;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
         protected override int ComputeCardinality()
         {
             return StaticProperty.EXACTLY_ONE;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
         public override ItemType GetItemType()
         {
             return NodeKindTest.DOCUMENT;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
         public override UType GetStaticUType(UType contextItemType)
         {
             return UType.DOCUMENT;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         protected override int ComputeHashCode()
         {
             return "RootExpression".GetHashCode();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public virtual NodeInfo GetNode(IXPathContext context)
         {
             IItem current = context.GetContextItem();
@@ -236,15 +149,6 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Expression Copy(RebindingMap rebindings)
         {
             RootExpression exp = new RootExpression();
@@ -252,29 +156,11 @@ namespace OutSmart.DAXon.Expressions
             return exp;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Patterns.Pattern ToPattern(Configuration config)
         {
             return new NodeTestPattern(NodeKindTest.DOCUMENT);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override PathMap.PathMapNodeSet AddToPathMap(PathMap pathMap, PathMap.PathMapNodeSet pathMapNodeSet)
         {
             if (pathMapNodeSet == null)
@@ -287,100 +173,37 @@ namespace OutSmart.DAXon.Expressions
             return pathMapNodeSet.CreateArc(AxisInfo.ANCESTOR_OR_SELF, NodeKindTest.DOCUMENT);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override string ToString()
         {
             return "(/)";
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override void Export(ExpressionPresenter destination)
         {
             destination.StartElement("root", this);
             destination.EndElement();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override ISequenceIterator Iterate(IXPathContext context)
         {
             return SingletonIterator.MakeIterator(GetNode(context));
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override IItem EvaluateItem(IXPathContext context)
         {
             return GetNode(context);
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override bool EffectiveBooleanValue(IXPathContext context)
         {
             return GetNode(context) != null;
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new RootExprElaborator();
         }
 
-        /// <summary>
-        /// Type-check the expression.
-        /// </summary>
-        /// <summary>
-        /// Specify that the expression returns a singleton
-        /// </summary>
-        /// <summary>
-        /// get HashCode for comparing two expressions
-        /// </summary>
         /// <summary>
         /// Elaborator for a root expression ({@code /})
         /// </summary>

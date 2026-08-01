@@ -16,87 +16,23 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Collections
 {
+    // Deliberate triplet with IntHashMap/IntToIntHashMap (C1): same Knuth open-addressing core,
+    // kept as three copies because the empty-slot encoding differs per class — here the values
+    // array doubles as the key array and emptiness is the configurable ndv sentinel. The probe
+    // loops sit on hot paths and must stay monomorphic, without a shared dispatching core.
     public class IntHashSet : IntSet
     {
         private const int NBIT = 30; // MAX_SIZE = 2^NBIT
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        private const int MAX_SIZE = 1 << NBIT; // maximum number of keys mapped
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
+        private const int MAX_SIZE = 1 << NBIT; // maximum number of values held
         private readonly int ndv;
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
         private int _nmax; // 0 <= _nmax = 2^nbit <= 2^NBIT = MAX_SIZE
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
         private int _size; // 0 <= _size <= _nmax <= MAX_SIZE
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
         private int _nlo; // _nmax*_factor (_size<=_nlo, if possible)
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
         private int _nhi; //  MAX_SIZE*_factor (_size< _nhi, if possible)
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
         private int _shift; // _shift = 1 + NBIT - nbit (see function hash() below)
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
         private int _mask; // _mask = _nmax - 1
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
         private int[] _values; // array[_nmax] of values
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public virtual int[] Values
         {
             get
@@ -114,62 +50,20 @@ namespace OutSmart.DAXon.Collections
                 return values;
             }
         }
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public IntHashSet() : this(8, int.MinValue)
         {
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public IntHashSet(int capacity) : this(capacity, int.MinValue)
         {
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public IntHashSet(int capacity, int noDataValue)
         {
             ndv = noDataValue;
-
-            //_factor = 0.25;
             SetCapacity(capacity);
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override IntSet Copy()
         {
             if (_size == 0)
@@ -191,31 +85,11 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override IntSet MutableCopy()
         {
             return Copy();
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override void Clear()
         {
             _size = 0;
@@ -225,61 +99,21 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override int Size()
         {
             return _size;
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override bool IsEmpty()
         {
             return _size == 0;
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override bool Contains(int value)
         {
             return (_values[IndexOf(value)] != ndv);
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override bool Remove(int value)
         {
 
@@ -311,16 +145,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         public override bool Add(int value)
         {
             if (value == ndv)
@@ -333,11 +157,9 @@ namespace OutSmart.DAXon.Collections
             {
                 ++_size;
                 _values[i] = value;
-
-                // Check new size
                 if (_size > MAX_SIZE)
                 {
-                    throw new Exception("Too many elements (> " + MAX_SIZE + ')');
+                    throw new InvalidOperationException("Too many elements (> " + MAX_SIZE + ')');
                 }
 
                 if (_nlo < _size && _size <= _nhi)
@@ -349,20 +171,10 @@ namespace OutSmart.DAXon.Collections
             }
             else
             {
-                return false; // leave set unchanged
+                return false;
             }
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         private int Hash(int key)
         {
 
@@ -372,16 +184,6 @@ namespace OutSmart.DAXon.Collections
             return ((1327217885 * key) >> _shift) & _mask;
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         private int IndexOf(int value)
         {
             int i = Hash(value);
@@ -398,27 +200,16 @@ namespace OutSmart.DAXon.Collections
             return i;
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
         private void SetCapacity(int capacity)
         {
 
-            // Changed MHK in 8.9 to use a constant factor of 0.25, thus avoiding floating point arithmetic
+            // Fixed load factor 0.25, kept in integer arithmetic (nmax < capacity * 4) —
+            // unlike the IntHashMap/IntToIntHashMap siblings there is no configurable factor.
             if (capacity < _size)
             {
                 capacity = _size;
             }
 
-
-            //double factor = 0.25;
             int nbit, nmax;
             for (nbit = 1, nmax = 2; nmax < capacity * 4 && nmax < MAX_SIZE; ++nbit, nmax *= 2)
             {
@@ -438,7 +229,7 @@ namespace OutSmart.DAXon.Collections
             _size = 0;
             int[] values = _values;
             _values = new int[nmax];
-            ArrayTools.Fill(_values, ndv); // empty all values
+            ArrayTools.Fill(_values, ndv);
             if (values != null)
             {
                 for (int i = 0; i < nold; ++i)
@@ -449,7 +240,6 @@ namespace OutSmart.DAXon.Collections
 
                         // Don't use add, because the capacity is necessarily large enough,
                         // and the value is necessarily unique (since in this set already)!
-                        //add(values[i]);
                         ++_size;
                         _values[IndexOf(value)] = value;
                     }
@@ -457,37 +247,11 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public override IIntIterator IIterator()
         {
             return new IntHashSetIterator(this);
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public static bool ContainsSome(IntSet one, IntSet two)
         {
             if (two is IntEmptySet)
@@ -517,24 +281,12 @@ namespace OutSmart.DAXon.Collections
             return false;
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
+        // Any IntSet implementation compares equal by contents (upstream casts to IntSet here;
+        // narrowing to IntHashSet would throw on IntArraySet/IntRangeSet/... arguments).
         public override bool Equals(object other)
         {
-            if (other is IntSet)
+            if (other is IntSet s)
             {
-                IntHashSet s = (IntHashSet)other;
                 return (Size() == s.Count && ContainsAll(s));
             }
             else
@@ -543,19 +295,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public override int GetHashCode()
         {
 
@@ -570,37 +309,11 @@ namespace OutSmart.DAXon.Collections
             return h;
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public override string ToString()
         {
             return Stringify(IIterator());
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public static string Stringify(IIntIterator it)
         {
             StringBuilder sb = new StringBuilder(100);
@@ -619,19 +332,6 @@ namespace OutSmart.DAXon.Collections
             return sb.ToString();
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public static IntHashSet Of(params int[] members)
         {
             IntHashSet @is = new IntHashSet(members.Length);
@@ -643,19 +343,6 @@ namespace OutSmart.DAXon.Collections
             return @is;
         }
 
-        /// <summary>
-        /// The maximum number of elements this container can contain.
-        /// </summary>
-        /// <summary>
-        /// This set's NO-DATA-VALUE.
-        /// </summary>
-        // private
-        /// <summary>
-        /// Initializes a set with a capacity of 8 and a load factor of 0,25.
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         private class IntHashSetIterator : AbstractIntIterator
         {
             private readonly IntHashSet container;

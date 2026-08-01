@@ -119,9 +119,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         public virtual int MaxFunctionArity
         {
             get
@@ -144,22 +141,10 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual IFunctionLibrary PublicFunctions => new PublicStylesheetFunctionLibrary(functionLibrary);
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual Dictionary<SymbolicName, Component> AbstractComponents => abstractComponents;
         public StylesheetPackage(Configuration config) : base(config)
         {
@@ -276,12 +261,12 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual void SetNamedOutputProperties(StructuredQName name, Properties props)
         {
-            namedOutputProperties.Put(name, props);
+            namedOutputProperties[name] = props;
         }
 
         public virtual Properties GetNamedOutputProperties(StructuredQName name)
         {
-            return namedOutputProperties.Get(name);
+            return namedOutputProperties.GetOrDefault(name);
         }
 
         public virtual void SetStripsWhitespace(bool strips)
@@ -311,9 +296,6 @@ namespace OutSmart.DAXon.Xslt
             AllocateBinderySlots();
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         public virtual void AllocateBinderySlots()
         {
             SlotManager slotManager = GetConfiguration().MakeSlotManager();
@@ -330,9 +312,6 @@ namespace OutSmart.DAXon.Xslt
             GlobalSlotManager = slotManager;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         private void RegisterGlobalVariable(Component c, SlotManager slotManager)
         {
             if (c.GetActor() is GlobalVariable)
@@ -346,27 +325,21 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         public virtual void AddComponent(Component component)
         {
             SymbolicName name = component.GetActor().GetSymbolicName();
-            componentIndex.Put(name, component);
+            componentIndex[name] = component;
             if (component.GetVisibility() == Visibility.ABSTRACT && component.ContainingPackage == this)
             {
-                abstractComponents.Put(component.GetActor().GetSymbolicName(), component);
+                abstractComponents[component.GetActor().GetSymbolicName()] = component;
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         public override void AddGlobalVariable(GlobalVariable variable)
         {
             base.AddGlobalVariable(variable);
             SymbolicName name = variable.GetSymbolicName();
-            if (componentIndex.Get(name) == null)
+            if (componentIndex.GetOrDefault(name) == null)
             {
                 Component comp = variable.DeclaringComponent;
                 if (comp == null)
@@ -378,44 +351,29 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         public virtual Component GetComponent(SymbolicName name)
         {
-            return componentIndex.Get(name);
+            return componentIndex.GetOrDefault(name);
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         public virtual void AddHiddenComponent(Component component)
         {
             hiddenComponents.Add(component);
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         public virtual Component GetOverriddenComponent(SymbolicName name)
         {
-            return overriddenComponents.Get(name);
+            return overriddenComponents.GetOrDefault(name);
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         public virtual void AddOverriddenComponent(Component comp)
         {
-            overriddenComponents.Put(comp.GetActor().GetSymbolicName(), comp);
+            overriddenComponents[comp.GetActor().GetSymbolicName()] = comp;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         public virtual void AddComponentsFromUsedPackage(StylesheetPackage usedPackage, IList<XSLAccept> acceptors, HashSet<SymbolicName> overrides)
         {
@@ -426,7 +384,7 @@ namespace OutSmart.DAXon.Xslt
             // Create a mapping from components in the used package to their corresponding components
             // in the using package, so that we can re-bind the component bindings
             Dictionary<Component, Component> correspondence = new Dictionary<Component, Component>();
-            foreach (KeyValuePair<SymbolicName, Component> namedComponentEntry in usedPackage.componentIndex.EntrySet())
+            foreach (KeyValuePair<SymbolicName, Component> namedComponentEntry in usedPackage.componentIndex)
             {
                 SymbolicName name = namedComponentEntry.Key;
                 Component oldC = namedComponentEntry.Value;
@@ -475,7 +433,7 @@ namespace OutSmart.DAXon.Xslt
 
                 Trace(oldC.GetActor().GetSymbolicName() + " (" + Err.DescribeVisibility(oldV) + ") becomes " + Err.DescribeVisibility(newV));
                 Component newC = Component.MakeComponent(oldC.GetActor(), newV, VisibilityProvenance.DERIVED, this, oldC.DeclaringPackage);
-                correspondence.Put(oldC, newC);
+                correspondence[oldC] = newC;
                 newC.BaseComponent = oldC;
                 if (overrides.Contains(name))
                 {
@@ -483,7 +441,7 @@ namespace OutSmart.DAXon.Xslt
                     // Note: overrides is all the overrides, not only those for this xsl:use-package;
                     // but we have already checked that xsl:override declarations match something in the
                     // right package.
-                    overriddenComponents.Put(name, newC);
+                    overriddenComponents.PutAndGetPrevious(name, newC);
                     if (newV != Visibility.ABSTRACT)
                     {
                         abstractComponents.Remove(name);
@@ -494,7 +452,7 @@ namespace OutSmart.DAXon.Xslt
                 {
                     hiddenComponents.Add(newC);
                 }
-                else if (componentIndex.Get(name) != null)
+                else if (componentIndex.GetOrDefault(name) != null)
                 {
                     if (!(oldC.GetActor() is Mode))
                     {
@@ -503,7 +461,7 @@ namespace OutSmart.DAXon.Xslt
                 }
                 else
                 {
-                    componentIndex.Put(name, newC);
+                    componentIndex[name] = newC;
                     if (oldC.GetActor() is Mode && (oldV == Visibility.PUBLIC || oldV == Visibility.FINAL))
                     {
                         Mode existing = GetRuleManager().ObtainMode(name.ComponentName, false);
@@ -544,7 +502,7 @@ namespace OutSmart.DAXon.Xslt
                             {
 
                                 // otherwise we bind to the component in this package that corresponds to the component in the used package
-                                target = correspondence.Get(oldBindings[i].GetTarget());
+                                target = correspondence.GetOrDefault(oldBindings[i].GetTarget());
                                 if (target == null)
                                 {
                                     throw new InvalidOperationException("Saxon can't find the new component corresponding to " + name12);
@@ -573,7 +531,7 @@ namespace OutSmart.DAXon.Xslt
             {
                 Trace(oldC.GetActor().GetSymbolicName() + " (HIDDEN, declared in " + oldC.DeclaringPackage.PackageName + ") becomes HIDDEN");
                 Component newC = Component.MakeComponent(oldC.GetActor(), HIDDEN, VisibilityProvenance.DERIVED, this, oldC.DeclaringPackage);
-                correspondence.Put(oldC, newC);
+                correspondence[oldC] = newC;
                 newC.BaseComponent = oldC;
                 hiddenComponents.Add(newC);
                 AddCompletionAction(() =>
@@ -591,9 +549,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         private void MakeNewComponentBindings(HashSet<SymbolicName> overrides, Dictionary<Component, Component> correspondence, IList<ComponentBinding> oldBindings, IList<ComponentBinding> newBindings)
         {
@@ -615,7 +570,7 @@ namespace OutSmart.DAXon.Xslt
                 {
 
                     // otherwise we bind to the component in this package that corresponds to the component in the used package
-                    target = correspondence.Get(oldBinding.GetTarget());
+                    target = correspondence.GetOrDefault(oldBinding.GetTarget());
                     if (target == null)
                     {
                         throw new InvalidOperationException("Saxon can't find the new component corresponding to " + name);
@@ -627,9 +582,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         private void Trace(string message)
         {
@@ -639,9 +591,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         private Visibility ExplicitAcceptedVisibility(SymbolicName name, IList<XSLAccept> acceptors)
         {
@@ -659,9 +608,6 @@ namespace OutSmart.DAXon.Xslt
             return Visibility.UNDEFINED;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
         private Visibility WildcardAcceptedVisibility(SymbolicName name, IList<XSLAccept> acceptors)
         {
@@ -698,13 +644,7 @@ namespace OutSmart.DAXon.Xslt
             return vis;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void CreateFunctionLibrary()
         {
             FunctionLibraryList functionLibrary = new FunctionLibraryList();
@@ -731,71 +671,35 @@ namespace OutSmart.DAXon.Xslt
             this.functionLibrary = functionLibrary;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         protected virtual void AddIxslFunctionLibrary(FunctionLibraryList functionLibrary)
         {
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         protected virtual void AddIxsl3FunctionLibrary(FunctionLibraryList functionLibrary)
         {
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         protected virtual void AddStubFunctionLibrary(IFunctionLibrary stubFunctions)
         {
             throw new NotSupportedException();
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual FunctionLibraryList GetFunctionLibrary()
         {
             return functionLibrary;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual XQueryFunctionLibrary GetXQueryFunctionLibrary()
         {
             return queryFunctions;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void SetFunctionLibraryDetails(FunctionLibraryList library, ExecutableFunctionLibrary overriding, ExecutableFunctionLibrary underriding)
         {
             if (library != null)
@@ -807,13 +711,7 @@ namespace OutSmart.DAXon.Xslt
             this.underriding = underriding;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual UserFunction GetFunction(SymbolicName.F name)
         {
             if (name.GetArity() == -1)
@@ -836,7 +734,7 @@ namespace OutSmart.DAXon.Xslt
             }
             else
             {
-                Component component = ComponentIndex.Get(name);
+                Component component = ComponentIndex.GetOrDefault(name);
                 if (component != null)
                 {
                     UserFunction uf = (UserFunction)component.GetActor();
@@ -850,49 +748,31 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual bool IsRetainUnusedFunctions()
         {
             return retainUnusedFunctions;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void SetRetainUnusedFunctions()
         {
             this.retainUnusedFunctions = true;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void UpdatePreparedStylesheet(PreparedStylesheet pss)
         {
-            foreach (KeyValuePair<SymbolicName, Component> entry in componentIndex.EntrySet())
+            foreach (KeyValuePair<SymbolicName, Component> entry in componentIndex)
             {
                 if (entry.Value.GetVisibility() == Visibility.ABSTRACT)
                 {
-                    abstractComponents.Put(entry.Key, entry.Value);
+                    abstractComponents[entry.Key] = entry.Value;
                 }
             }
 
             pss.TopLevelPackage = this;
-            if (IsSchemaAware() || !schemaIndex.IsEmpty())
+            if (IsSchemaAware() || schemaIndex.Count > 0)
             {
                 pss.SetSchemaAware(true);
             }
@@ -926,7 +806,7 @@ namespace OutSmart.DAXon.Xslt
             }
 
             pss.SetDefaultOutputProperties(defaultOutputProperties);
-            foreach (KeyValuePair<StructuredQName, Properties> entry in namedOutputProperties.EntrySet())
+            foreach (KeyValuePair<StructuredQName, Properties> entry in namedOutputProperties)
             {
                 pss.SetOutputProperties(entry.Key, entry.Value);
             }
@@ -943,11 +823,6 @@ namespace OutSmart.DAXon.Xslt
 
 
             // Finish off the lists of template rules
-            //        ruleManager.checkConsistency();
-            //        ruleManager.computeRankings();
-            //        ruleManager.invertStreamableTemplates();
-            //            ruleManager.optimizeRules();
-            //        }
             pss.SetRuleManager(ruleManager);
 
             // Add named templates to the prepared stylesheet
@@ -982,13 +857,7 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         private bool MayCreateSecondaryResultDocuments()
         {
             if (createsSecondaryResultDocuments)
@@ -1007,56 +876,38 @@ namespace OutSmart.DAXon.Xslt
             return false;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void MarkNonExportable(string message, string errorCode)
         {
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void Export(ExpressionPresenter presenter)
         {
             throw new XPathException("Exporting a stylesheet requires Saxon-EE");
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void CheckForAbstractComponents()
         {
-            foreach (KeyValuePair<SymbolicName, Component> entry in componentIndex.EntrySet())
+            foreach (KeyValuePair<SymbolicName, Component> entry in componentIndex)
             {
                 if (entry.Value.GetVisibility() == Visibility.ABSTRACT && entry.Value.ContainingPackage == this)
                 {
-                    abstractComponents.Put(entry.Key, entry.Value);
+                    abstractComponents[entry.Key] = entry.Value;
                 }
             }
 
-            if (!abstractComponents.IsEmpty())
+            if (abstractComponents.Count > 0)
             {
                 StringBuilder buff = new StringBuilder(256);
                 ILocation loc = null;
                 int count = 0;
-                foreach (SymbolicName name in abstractComponents.KeySet())
+                foreach (SymbolicName name in abstractComponents.Keys)
                 {
                     if (loc == null)
                     {
-                        loc = abstractComponents.Get(name).GetActor().GetLocation();
+                        loc = abstractComponents.GetOrDefault(name).GetActor().GetLocation();
                     }
 
                     if (count++ > 0)
@@ -1076,25 +927,13 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual bool IsFallbackToNonStreaming()
         {
             return true;
         }
 
-        /// <summary>
-        /// Allocate slots to global variables. Slot numbers are unique within a package
-        /// </summary>
         //    }
-        /// <summary>
-        /// Create the function library containing stylesheet functions declared in this package
-        /// </summary>
         public virtual void SetFallbackToNonStreaming()
         {
         }

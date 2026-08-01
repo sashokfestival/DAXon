@@ -90,7 +90,7 @@ namespace OutSmart.DAXon.Core
 
         public override void CheckSuppliedParameters(GlobalParameterSet @params)
         {
-            foreach (KeyValuePair<StructuredQName, GlobalParam> entry in GlobalParameters.EntrySet())
+            foreach (KeyValuePair<StructuredQName, GlobalParam> entry in GlobalParameters)
             {
                 if (entry.Value.IsRequiredParam())
                 {
@@ -144,7 +144,7 @@ namespace OutSmart.DAXon.Core
                 namedTemplateTable = new Dictionary<StructuredQName, NamedTemplate>(32);
             }
 
-            namedTemplateTable.Put(templateName, template);
+            namedTemplateTable[templateName] = template;
         }
 
         public virtual void SetComponentIndex(Dictionary<SymbolicName, Component> index)
@@ -154,7 +154,7 @@ namespace OutSmart.DAXon.Core
 
         public virtual Component GetComponent(SymbolicName name)
         {
-            return componentIndex.Get(name);
+            return componentIndex.GetOrDefault(name);
         }
 
         public virtual bool IsEligibleInitialMode(Component.M component)
@@ -235,7 +235,7 @@ namespace OutSmart.DAXon.Core
             PreparedStylesheet result = null;
             if (abs != null && nextStylesheetCache != null)
             {
-                result = nextStylesheetCache.Get(abs);
+                result = nextStylesheetCache.GetOrDefault(abs);
             }
 
             return result;
@@ -262,7 +262,7 @@ namespace OutSmart.DAXon.Core
                     nextStylesheetCache = new Dictionary<URI, PreparedStylesheet>(4);
                 }
 
-                nextStylesheetCache.Put(abs, pss);
+                nextStylesheetCache[abs] = pss;
             }
         }
 

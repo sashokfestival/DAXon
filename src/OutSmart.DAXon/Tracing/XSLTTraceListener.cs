@@ -24,9 +24,6 @@ namespace OutSmart.DAXon.Tracing
     public class XSLTTraceListener : AbstractTraceListener
     {
 
-        /// <summary>
-        /// Generate attributes to be included in the opening trace element
-        /// </summary>
         protected override string OpeningAttributes => "xmlns:xsl=\"" + NamespaceConstant.XSLT + '"';
         protected override bool IsApplicable(ITraceable info)
         {
@@ -53,17 +50,11 @@ namespace OutSmart.DAXon.Tracing
             return false;
         }
 
-        /// <summary>
-        /// Generate attributes to be included in the opening trace element
-        /// </summary>
         protected override string Tag(ITraceable info)
         {
             return TagName(info);
         }
 
-        /// <summary>
-        /// Generate attributes to be included in the opening trace element
-        /// </summary>
         public static string TagName(ITraceable info)
         {
             if (info is Expression)

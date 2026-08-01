@@ -221,9 +221,9 @@ namespace OutSmart.DAXon.Api
             {
                 return new XdmAtomicValue((long)value);
             }
-            else if (value is Short)
+            else if (value is short)
             {
-                return new XdmAtomicValue((Short)value);
+                return new XdmAtomicValue((short)value);
             }
             else if (value is char)
             {
@@ -318,7 +318,7 @@ namespace OutSmart.DAXon.Api
                 }
                 catch (FormatException e)
                 {
-                    throw new DAXonApiException(e.GetMessage());
+                    throw new DAXonApiException(e.Message);
                 }
             }
             else

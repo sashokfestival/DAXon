@@ -146,7 +146,7 @@ namespace OutSmart.DAXon.Patterns
                 }
                 catch (XPathException err)
                 {
-                    Grumble(err.GetMessage());
+                    Grumble(err.Message);
                 }
 
                 ItemType req = ParseItemType();
@@ -191,7 +191,7 @@ namespace OutSmart.DAXon.Patterns
                 pat.OriginalText = pattern;
                 if (pat is UnionPattern)
                 {
-                    string[] parts = pattern.Split("\\|");
+                    string[] parts = pattern.SplitRegex("\\|");
                     if (parts.Length == 2)
                     {
                         ((UnionPattern)pat).p1.OriginalText = parts[0];
@@ -228,7 +228,7 @@ namespace OutSmart.DAXon.Patterns
 
         private bool IsTypePattern(string pattern)
         {
-            if (pattern.Matches("^(type|record|map|array|union|atomic)\\s*\\(.+"))
+            if (pattern.MatchesRegex("^(type|record|map|array|union|atomic)\\s*\\(.+"))
             {
                 CheckLanguageVersion40();
                 return true;
@@ -256,16 +256,10 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         protected override void CustomizeTokenizer(Tokenizer t)
         {
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         public override Expression ParseExpression()
         {
             Tokenizer t = GetTokenizer();
@@ -324,9 +318,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         protected override Expression ParseBasicStep(bool firstInPattern)
         {
             if (inPredicate > 0)
@@ -389,9 +380,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         protected override void TestPermittedAxis(int axis, string errorCode)
         {
             base.TestPermittedAxis(axis, errorCode);
@@ -404,9 +392,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         protected override Expression ParsePredicate()
         {
             bool disallow = t.disallowUnionKeyword;
@@ -418,9 +403,6 @@ namespace OutSmart.DAXon.Patterns
             return exp;
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         public override Expression ParseFunctionCall(Expression prefixArgument)
         {
             Expression fn = base.ParseFunctionCall(prefixArgument);
@@ -432,9 +414,6 @@ namespace OutSmart.DAXon.Patterns
             return fn;
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         public override Expression ParseFunctionArgument()
         {
             if (inPredicate > 0)
@@ -460,9 +439,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        /// <summary>
-        /// Callback to tailor the tokenizer
-        /// </summary>
         public override Expression MakeTracer(Expression exp, StructuredQName qName)
         {
 

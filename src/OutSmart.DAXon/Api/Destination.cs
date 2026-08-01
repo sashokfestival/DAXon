@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Serialization;
 using OutSmart.DAXon.Internal.Net;
-using OutSmart.DAXon.Internal.Functional;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,16 +14,16 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Collections;
+using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Api
 {
-    public interface IDestination
+    public interface IDestination : global::System.IDisposable
     {
         URI DestinationBaseURI { get; set; }
         IReceiver GetReceiver(PipelineConfiguration pipe, SerializationProperties @params);
         void OnClose(IAction listener);
         void CloseAndNotify();
-        void Dispose();
+        void Close();
     }
 }

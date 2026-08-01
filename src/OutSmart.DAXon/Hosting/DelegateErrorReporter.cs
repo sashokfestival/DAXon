@@ -30,7 +30,10 @@ namespace OutSmart.DAXon.Lib
 
         public void Report(IXmlProcessingError error)
         {
-            if (_action != null) { _action(error); }
+            if (_action != null)
+            {
+                _action(error);
+            }
         }
     }
 }

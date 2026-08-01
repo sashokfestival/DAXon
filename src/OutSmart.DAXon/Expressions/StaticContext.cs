@@ -35,8 +35,7 @@ namespace OutSmart.DAXon.Expressions
         IFunctionLibrary GetFunctionLibrary();
         string GetDefaultCollationName();
         NamespaceUri GetDefaultElementNamespace();
-        UnprefixedElementMatchingPolicy GetUnprefixedElementMatchingPolicy()
-;
+        UnprefixedElementMatchingPolicy GetUnprefixedElementMatchingPolicy();
 
 
 
@@ -50,8 +49,7 @@ namespace OutSmart.DAXon.Expressions
         int GetXPathVersion();
         KeyManager GetKeyManager();
         Types.ItemType ResolveTypeAlias(StructuredQName typeName);
-        OptimizerOptions GetOptimizerOptions()
-;
+        OptimizerOptions GetOptimizerOptions();
 
 
     }

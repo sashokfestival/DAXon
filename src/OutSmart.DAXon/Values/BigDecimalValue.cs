@@ -43,9 +43,6 @@ namespace OutSmart.DAXon.Values
 
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.DECIMAL;
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
         public override UnicodeString CanonicalLexicalRepresentation
         {
@@ -61,9 +58,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
         public override UnicodeString PrimitiveStringValue => BMPString.Of(DecimalToString(value, new StringBuilder(16)).ToString());
         public BigDecimalValue(BigDecimal value) : base(BuiltInAtomicType.DECIMAL)
@@ -107,7 +101,7 @@ namespace OutSmart.DAXon.Values
             }
             catch (FormatException err)
             {
-                ValidationFailure e = new ValidationFailure("Cannot convert string " + Err.Wrap(@in, Err.VALUE) + " to xs:decimal: " + err.GetMessage());
+                ValidationFailure e = new ValidationFailure("Cannot convert string " + Err.Wrap(@in, Err.VALUE) + " to xs:decimal: " + err.Message);
                 e.SetErrorCode("FORG0001");
                 return e;
             }
@@ -239,7 +233,7 @@ namespace OutSmart.DAXon.Values
             int len = @in.Length;
             for (int i = 0; i < len; i++)
             {
-                char c = @in.CharAt(i);
+                char c = @in[i];
                 switch (c)
                 {
                     case ' ':
@@ -298,8 +292,14 @@ namespace OutSmart.DAXon.Values
                         foundDigit = true;
                         if (!accOvf)
                         {
-                            if (acc > (long.MaxValue - 9) / 10) accOvf = true;
-                            else acc = acc * 10 + (c - '0');
+                            if (acc > (long.MaxValue - 9) / 10)
+                            {
+                                accOvf = true;
+                            }
+                            else
+                            {
+                                acc = acc * 10 + (c - '0');
+                            }
                         }
 
                         break;
@@ -332,9 +332,12 @@ namespace OutSmart.DAXon.Values
             {
                 if (digits[digits.Length - 1] == '0')
                 {
-                    digits.SetLength(digits.Length - 1);
+                    digits.Length = digits.Length - 1;
                     scale--;
-                    if (!accOvf) acc /= 10;   // keep the long magnitude in lock-step with the stripped digits
+                    if (!accOvf)   // keep the long magnitude in lock-step with the stripped digits
+                    {
+                        acc /= 10;
+                    }
                 }
                 else
                 {
@@ -397,17 +400,11 @@ namespace OutSmart.DAXon.Values
             return (long)value.DoubleValue();
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override BigDecimal GetDecimalValue()
         {
             return value;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override int GetHashCode()
         {
             BigDecimal round = value.SetScale(0, RoundingMode.DOWN);
@@ -433,17 +430,11 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         public override bool EffectiveBooleanValue()
         {
             return value.Sign != 0;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
         public static StringBuilder DecimalToString(BigDecimal value, StringBuilder fsb)
         {
@@ -518,9 +509,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
         /// <summary>
         /// Negate the value
@@ -530,9 +518,6 @@ namespace OutSmart.DAXon.Values
             return new BigDecimalValue(-value);
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
         /// <summary>
         /// Implement the XPath floor() function
@@ -542,9 +527,6 @@ namespace OutSmart.DAXon.Values
             return new BigDecimalValue(value.SetScale(0, RoundingMode.FLOOR));
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
         /// <summary>
         /// Implement the XPath ceiling() function
@@ -554,9 +536,6 @@ namespace OutSmart.DAXon.Values
             return new BigDecimalValue(value.SetScale(0, RoundingMode.CEILING));
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
         /// <summary>
         /// Implement the XPath round() function
@@ -576,6 +555,15 @@ namespace OutSmart.DAXon.Values
                 return this;
             }
 
+            // Same trap as the BigIntegerValue twin: this BigDecimal keeps scale >= 0, so
+            // SetScale at 10^-scale coarser than the value materializes a Pow10 that can run
+            // to two billion digits. Once the factor out-digits the value, zero is the
+            // nearest multiple, so answer it without building the power.
+            if (-(long)scale > (long)value.Precision() - value.Scale() + 2)
+            {
+                return ZERO;
+            }
+
             switch (value.Sign)
             {
                 case -1:
@@ -591,21 +579,42 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-half-to-even() and round#3 functions
-        /// </summary>
         public override NumericValue Round(int scale, Round.RoundingRule roundingRule)
         {
             if (scale >= value.Scale())
             {
                 return this;
+            }
+
+            // Mirror of the BigIntegerValue twin: rules that pick a nearest value (or truncate)
+            // answer zero once the factor out-digits the value; the away-from-zero family would
+            // need +/-10^-scale itself, which is the unbuildable power, so it gets FOAR0002.
+            long k = -(long)scale;
+            if (k > (long)value.Precision() - value.Scale() + 2)
+            {
+                switch (roundingRule)
+                {
+                    case Functions.Round.RoundingRule.FLOOR:
+                        if (value.Sign > 0)
+                        {
+                            return ZERO;
+                        }
+                        break;
+                    case Functions.Round.RoundingRule.CEILING:
+                        if (value.Sign < 0)
+                        {
+                            return ZERO;
+                        }
+                        break;
+                    case Functions.Round.RoundingRule.AWAY_FROM_ZERO:
+                        break;
+                    default:
+                        return ZERO;
+                }
+
+                throw new XPathException(
+                    "Rounding away from zero at a precision of 10^" + k + " overflows", "FOAR0002");
             }
 
             BigDecimal scaledValue;
@@ -660,46 +669,19 @@ namespace OutSmart.DAXon.Values
             return new BigDecimalValue(scaledValue.StripTrailingZeros());
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-half-to-even() and round#3 functions
-        /// </summary>
         public override int Signum()
         {
             return value.Sign;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-half-to-even() and round#3 functions
-        /// </summary>
         public override bool IsWholeNumber()
         {
             return value.Scale() == 0 || value.CompareTo(value.SetScale(0, RoundingMode.DOWN)) == 0;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-half-to-even() and round#3 functions
-        /// </summary>
         public override int AsSubscript()
         {
             if (IsWholeNumber() && value.CompareTo(BigDecimal.Zero) > 0 && value.CompareTo(MAX_INT) <= 0)
@@ -719,16 +701,7 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-half-to-even() and round#3 functions
-        /// </summary>
         public override NumericValue Abs()
         {
             if (value.Sign > 0)
@@ -741,31 +714,13 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Implement the XPath round-half-to-even() and round#3 functions
-        /// </summary>
         public override IXPathComparable GetXPathComparable(IStringCollator collator, int implicitTimezone)
         {
             return this;
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Compare the value to another numeric value
-        /// </summary>
         public override int CompareTo(IXPathComparable other)
         {
             if (other is NumericValue)
@@ -802,16 +757,7 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Compare the value to another numeric value
-        /// </summary>
         public override int CompareTo(long other)
         {
             if (other == 0)
@@ -822,16 +768,7 @@ namespace OutSmart.DAXon.Values
             return value.CompareTo(BigDecimal.ValueOf(other));
         }
 
-        /// <summary>
-        /// Get the value
-        /// </summary>
         //    }
-        /// <summary>
-        /// Implement the XPath round() function
-        /// </summary>
-        /// <summary>
-        /// Compare the value to another numeric value
-        /// </summary>
         public override bool IsIdentical(AtomicValue v)
         {
             return (v is DecimalValue) && Equals(v);

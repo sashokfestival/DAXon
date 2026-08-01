@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using OutSmart.DAXon.Model;
 using System.Xml;
 
-// Phase 5 more stubs (CS0103 bare-identifier patterns)
+// More stubs (CS0103 bare-identifier patterns)
 namespace OutSmart.DAXon.Serialization.CharCodes
 {
     public static class XMLCharacterData

@@ -103,7 +103,8 @@ namespace OutSmart.DAXon.Functions
         private sealed class AnonymousSystemFunctionCall : SystemFunctionCall
         {
 
-            private readonly Doc parent; private readonly SystemFunction sf;
+            private readonly Doc parent;
+            private readonly SystemFunction sf;
             public AnonymousSystemFunctionCall(SystemFunction sf, Expression[] arguments) : base(sf, arguments)
             {
                 this.parent = sf as Doc; this.sf = sf;

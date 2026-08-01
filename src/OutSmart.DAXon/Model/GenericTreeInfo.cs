@@ -16,11 +16,11 @@ using System.Text;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Model
 {
     public class GenericTreeInfo : ITreeInfo
     {
+        protected internal readonly object syncLock = new object();
         private Configuration config;
         protected NodeInfo root;
         private string systemId;
@@ -92,7 +92,7 @@ namespace OutSmart.DAXon.Model
             if (documentNumber == -1)
             {
                 DocumentNumberAllocator dna = config.DocumentNumberAllocator;
-                lock (this)
+                lock (syncLock)
                 {
                     if (documentNumber == -1)
                     {
@@ -106,7 +106,7 @@ namespace OutSmart.DAXon.Model
 
         public virtual void SetDocumentNumber(long documentNumber)
         {
-            lock (this)
+            lock (syncLock)
             {
                 this.documentNumber = documentNumber;
             }
@@ -151,7 +151,7 @@ namespace OutSmart.DAXon.Model
                 userData = new Dictionary<string, object>();
             }
 
-            userData.Put(key, value);
+            userData[key] = value;
         }
 
         public virtual object GetUserData(string key)
@@ -162,7 +162,7 @@ namespace OutSmart.DAXon.Model
             }
             else
             {
-                return userData.Get(key);
+                return userData.GetOrDefault(key);
             }
         }
 

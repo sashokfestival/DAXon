@@ -258,8 +258,16 @@ namespace OutSmart.DAXon.Values
         public IEnumerable<IItem> AsIterable() => new IItem[] { this };
         public bool ContainsNode(NodeInfo sought) => sought != null && IsSameNodeInfo(sought);
         public ISequence MakeRepeatable() => this;
-        public IGroundedValue Subsequence(int start, int length) => throw new NotImplementedException();
-        public IGroundedValue Concatenate(IGroundedValue[] others) => throw new NotImplementedException();
+        public IGroundedValue Subsequence(int start, int length) => start <= 0 && (long)start + length > 0 ? (IGroundedValue)this : EmptySequence.GetInstance();
+        public IGroundedValue Concatenate(IGroundedValue[] others)
+        {
+            var chain = new OutSmart.DAXon.Collections.Zeno.ZenoChain<IItem>().AddAll(((IGroundedValue)this).AsIterable());
+            foreach (IGroundedValue v in others)
+            {
+                chain = chain.AddAll(v.AsIterable());
+            }
+            return new OutSmart.DAXon.Collections.Zeno.ZenoSequence(chain);
+        }
 
         IItem IItem.Head() => this;
         IItem IGroundedValue.Head() => this;
@@ -442,8 +450,16 @@ namespace OutSmart.DAXon.Values
             public IEnumerable<IItem> AsIterable() => new IItem[] { this };
             public bool ContainsNode(NodeInfo sought) => sought != null && IsSameNodeInfo(sought);
             public ISequence MakeRepeatable() => this;
-            public IGroundedValue Subsequence(int start, int length) => throw new NotImplementedException();
-            public IGroundedValue Concatenate(IGroundedValue[] others) => throw new NotImplementedException();
+            public IGroundedValue Subsequence(int start, int length) => start <= 0 && (long)start + length > 0 ? (IGroundedValue)this : EmptySequence.GetInstance();
+            public IGroundedValue Concatenate(IGroundedValue[] others)
+        {
+            var chain = new OutSmart.DAXon.Collections.Zeno.ZenoChain<IItem>().AddAll(((IGroundedValue)this).AsIterable());
+            foreach (IGroundedValue v in others)
+            {
+                chain = chain.AddAll(v.AsIterable());
+            }
+            return new OutSmart.DAXon.Collections.Zeno.ZenoSequence(chain);
+        }
 
             IItem IItem.Head() => this;
             IItem IGroundedValue.Head() => this;

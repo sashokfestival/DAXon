@@ -21,13 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     public class Current : SystemFunction
     {
-        /// <summary>
-        /// The name of the Current function
-        /// </summary>
         public static readonly StructuredQName FN_CURRENT = NamespaceUri.FN.QName("current");
-        /// <summary>
-        /// The name of the Current function
-        /// </summary>
         public virtual IFunctionItem BindContext(IXPathContext context)
         {
 
@@ -36,20 +30,10 @@ namespace OutSmart.DAXon.Functions
             //            value = evaluateItem(context);
             //        } catch (final XPathException e) {
             //            // This happens when we do a dynamic lookup of position() or last() when there is no context item
-            //            SymbolicName.F name = new SymbolicName.F(getFunctionName(), getArity());
-            //            ICallable callable = new CallableDelegate((context1, arguments) -> {
             //                throw e;
-            //            });
-            //            return new CallableFunction(name, callable, getFunctionItemType());
-            //        }
-            //        ConstantFunction fn = new ConstantFunction(value);
-            //        return fn;
             return null;
         }
 
-        /// <summary>
-        /// The name of the Current function
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             throw new XPathException("Dynamic evaluation of the current() function is not supported", "XTDE1360");

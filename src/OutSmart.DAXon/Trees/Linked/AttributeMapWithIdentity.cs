@@ -137,7 +137,7 @@ namespace OutSmart.DAXon.Trees.Linked
 
         public virtual IEnumerator<AttributeInfo> IIterator()
         {
-            return attributes.Where((info) => !(info is AttributeInfo.Deleted)).IIterator();
+            return attributes.Where((info) => !(info is AttributeInfo.Deleted)).GetEnumerator();
         }
 
         public virtual List<AttributeInfo> AsList()
@@ -150,15 +150,48 @@ namespace OutSmart.DAXon.Trees.Linked
         {
             return attributes[index];
         }
-        public IEnumerator<AttributeInfo> GetEnumerator() => throw new NotImplementedException();
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        // Non-deleted live entries; the class already tracks deletions via AttributeInfo.Deleted.
+        private IEnumerable<AttributeInfo> Live() => attributes.Where(info => !(info is AttributeInfo.Deleted));
+        public IEnumerator<AttributeInfo> GetEnumerator() => Live().GetEnumerator();
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual string GetValue(NamespaceUri uri, string local) => throw new NotImplementedException();
-        public virtual string GetValue(string local) => throw new NotImplementedException();
-        public virtual IAttributeMap Put(AttributeInfo att) => throw new NotImplementedException();
-        public virtual IAttributeMap Remove(INodeName name) => throw new NotImplementedException();
-        public virtual void Verify() { throw new NotImplementedException(); }
-        public virtual IAttributeMap Apply(Func<AttributeInfo, AttributeInfo> mapper) => throw new NotImplementedException();
+        // Formerly NIE stubs; every one is expressible via the existing Get/Add/Set helpers.
+        public virtual string GetValue(NamespaceUri uri, string local) { AttributeInfo a = Get(uri, local); return a == null ? null : a.Value; }
+        public virtual string GetValue(string local) => GetValue(NamespaceUri.NULL, local);
+        public virtual IAttributeMap Put(AttributeInfo att)
+        {
+            for (int i = 0; i < attributes.Count; i++)
+            {
+                if (!(attributes[i] is AttributeInfo.Deleted) && attributes[i].GetNodeName().Equals(att.GetNodeName()))
+                {
+                    return Set(i, att);
+                }
+            }
+
+            return Add(att);
+        }
+        public virtual IAttributeMap Remove(INodeName name)
+        {
+            for (int i = 0; i < attributes.Count; i++)
+            {
+                if (!(attributes[i] is AttributeInfo.Deleted) && attributes[i].GetNodeName().Equals(name))
+                {
+                    return Remove(i);
+                }
+            }
+
+            return this;
+        }
+        public virtual void Verify() { } // no invariant to check on a plain list-backed map
+        public virtual IAttributeMap Apply(Func<AttributeInfo, AttributeInfo> mapper)
+        {
+            IList<AttributeInfo> mapped = new List<AttributeInfo>(attributes.Count);
+            foreach (AttributeInfo info in attributes)
+            {
+                mapped.Add(info is AttributeInfo.Deleted ? info : mapper(info));
+            }
+
+            return new AttributeMapWithIdentity(mapped);
+        }
     }
 }

@@ -221,9 +221,15 @@ namespace OutSmart.DAXon.Functions
                 while (sources.MoveNext())
                 {
                     IResource r = sources.Current;
-                    if (r == null) { continue; }
+                    if (r == null)
+                    {
+                        continue;
+                    }
                     IItem item = r.Item;
-                    if (item != null) { return item; }
+                    if (item != null)
+                    {
+                        return item;
+                    }
                 }
                 return null;
             }

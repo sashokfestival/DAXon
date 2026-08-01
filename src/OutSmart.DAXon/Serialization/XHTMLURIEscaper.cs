@@ -5,12 +5,12 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using System.Collections.Generic;
+using System.Text;
 using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Text;
 using OutSmart.DAXon.Api;
 
 namespace OutSmart.DAXon.Serialization
@@ -121,7 +121,7 @@ namespace OutSmart.DAXon.Serialization
                                 {
                                     string normalized = IsAllAscii(value)
                                         ? value
-                                        : Normalizer.Normalize(value, Normalizer.Form.NFC);
+                                        : value.Normalize(NormalizationForm.FormC);
                                     return new AttributeInfo(
                                         attName,
                                         att.GetType(),

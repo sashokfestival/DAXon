@@ -24,32 +24,11 @@ namespace OutSmart.DAXon.Collections
         private int _hashCode = -1;
         private int count = 0;
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public virtual int[] StartPoints => startPoints;
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public virtual int[] EndPoints => endPoints;
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public virtual int NumberOfRanges => used;
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public IntRangeSet()
         {
             startPoints = new int[4];
@@ -59,9 +38,6 @@ namespace OutSmart.DAXon.Collections
             _hashCode = -1;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public IntRangeSet(IntRangeSet input)
         {
             startPoints = new int[input.used];
@@ -72,9 +48,6 @@ namespace OutSmart.DAXon.Collections
             _hashCode = input._hashCode;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public IntRangeSet(int[] startPoints, int[] endPoints)
         {
             if (startPoints.Length != endPoints.Length)
@@ -91,9 +64,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override void Clear()
         {
             startPoints = new int[4];
@@ -102,9 +72,6 @@ namespace OutSmart.DAXon.Collections
             _hashCode = -1;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override IntSet Copy()
         {
             IntRangeSet s = new IntRangeSet();
@@ -121,41 +88,26 @@ namespace OutSmart.DAXon.Collections
             return s;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override IntSet MutableCopy()
         {
             return Copy();
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool IsMutable()
         {
             return false;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override int Size()
         {
             return count;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool IsEmpty()
         {
             return count == 0;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool Contains(int value)
         {
             if (used == 0)
@@ -180,11 +132,11 @@ namespace OutSmart.DAXon.Collections
                 int mid = i + (j - i) / 2;
                 if (endPoints[mid] < value)
                 {
-                    i = System.Math.Max(mid, i + 1);
+                    i = Math.Max(mid, i + 1);
                 }
                 else if (startPoints[mid] > value)
                 {
-                    j = System.Math.Min(mid, j - 1);
+                    j = Math.Min(mid, j - 1);
                 }
                 else
                 {
@@ -195,17 +147,11 @@ namespace OutSmart.DAXon.Collections
             return false;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool Remove(int value)
         {
             throw new NotSupportedException("remove");
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         public override bool Add(int value)
         {
             _hashCode = -1;
@@ -261,11 +207,11 @@ namespace OutSmart.DAXon.Collections
                 int mid = i + (j - i) / 2;
                 if (endPoints[mid] < value)
                 {
-                    i = System.Math.Max(mid, i + 1);
+                    i = Math.Max(mid, i + 1);
                 }
                 else if (startPoints[mid] > value)
                 {
-                    j = System.Math.Min(mid, j - 1);
+                    j = Math.Min(mid, j - 1);
                 }
                 else
                 {
@@ -345,9 +291,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
         private void EnsureCapacity(int n)
         {
             if (startPoints.Length < n)
@@ -363,23 +306,11 @@ namespace OutSmart.DAXon.Collections
             used = n;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public override IIntIterator IIterator()
         {
             return new IntRangeSetIterator(this);
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder(used * 8);
@@ -391,12 +322,6 @@ namespace OutSmart.DAXon.Collections
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Get an iterator over the values
-        /// </summary>
         public override bool Equals(object other)
         {
             if (other is IntSet)
@@ -416,12 +341,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public override int GetHashCode()
         {
 
@@ -440,12 +359,6 @@ namespace OutSmart.DAXon.Collections
             return _hashCode;
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         public virtual void AddRange(int low, int high)
         {
             if (low == high)
@@ -509,12 +422,6 @@ namespace OutSmart.DAXon.Collections
             }
         }
 
-        /// <summary>
-        /// Create an empty set
-        /// </summary>
-        /// <summary>
-        /// Construct a hash key that supports the equals() test
-        /// </summary>
         /// <summary>
         /// IIterator class
         /// </summary>

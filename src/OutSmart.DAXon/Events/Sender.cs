@@ -20,7 +20,6 @@ using System.Text;
 using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Events
 {
     /// <summary>
@@ -132,7 +131,7 @@ namespace OutSmart.DAXon.Events
             }
 
             LocationCopier copier = new LocationCopier(top.GetNodeKind() == Types.Type.DOCUMENT, location.GetSystemId());
-            pipe.SetComponent(typeof(ICopyInformee).GetName(), copier);
+            pipe.SetComponent(typeof(ICopyInformee).FullName, copier);
             pipe.CopyInformee = (NodeInfo node) => (object)copier.NotifyElementNode(node);
 
             // start event stream
@@ -155,7 +154,7 @@ namespace OutSmart.DAXon.Events
 
 
             // end event stream
-            receiver.Dispose();
+            receiver.Close();
         }
 
         public static IReceiver MakeValidator(IReceiver receiver, string systemId, ParseOptions options)

@@ -412,9 +412,6 @@ namespace OutSmart.DAXon.Model
                 return true;
             }
 
-            /// <summary>
-            /// Get the last position (that @is, the number of items in the sequence)
-            /// </summary>
             public int GetLength()
             {
                 if (container.state == State.ALL_READ)
@@ -445,17 +442,11 @@ namespace OutSmart.DAXon.Model
                 }
             }
 
-            /// <summary>
-            /// Get the last position (that @is, the number of items in the sequence)
-            /// </summary>
             public bool IsActuallyGrounded()
             {
                 return true;
             }
 
-            /// <summary>
-            /// Get the last position (that @is, the number of items in the sequence)
-            /// </summary>
             public IGroundedValue Materialize()
             {
                 if (container.state == State.ALL_READ)
@@ -486,9 +477,6 @@ namespace OutSmart.DAXon.Model
                 }
             }
 
-            /// <summary>
-            /// Get the last position (that @is, the number of items in the sequence)
-            /// </summary>
             private IGroundedValue MakeExtent()
             {
                 if (container.chunks != null)
@@ -518,9 +506,6 @@ namespace OutSmart.DAXon.Model
                 }
             }
 
-            /// <summary>
-            /// Get the last position (that @is, the number of items in the sequence)
-            /// </summary>
             public IGroundedValue GetResidue()
             {
                 if (container.state == State.EMPTY || position >= container.used || position == -2)
@@ -559,9 +544,6 @@ namespace OutSmart.DAXon.Model
                     : SequenceExtent.MakeSequenceExtent((IList<IItem>)new ArraySegment<IItem>(container.reservoir, from, len));
             }
 
-            /// <summary>
-            /// Get the last position (that @is, the number of items in the sequence)
-            /// </summary>
             public void Dispose()
             {
                 if (container.state == State.ALL_READ)
@@ -570,9 +552,6 @@ namespace OutSmart.DAXon.Model
                 }
             }
 
-            /// <summary>
-            /// Get the last position (that @is, the number of items in the sequence)
-            /// </summary>
             private void ReportCompletion()
             {
 

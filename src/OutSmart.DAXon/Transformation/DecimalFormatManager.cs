@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual DecimalSymbols DefaultDecimalFormat => defaultDFS;
 
-        public virtual IEnumerable<StructuredQName> DecimalFormatNames => formatTable.KeySet();
+        public virtual IEnumerable<StructuredQName> DecimalFormatNames => formatTable.Keys;
         /// <summary>
         /// create a DecimalFormatManager and initialise variables
         /// </summary>
@@ -39,7 +39,7 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual DecimalSymbols GetNamedDecimalFormat(StructuredQName qName)
         {
-            DecimalSymbols ds = formatTable.Get(qName);
+            DecimalSymbols ds = formatTable.GetOrDefault(qName);
             if (ds == null)
             {
                 return null; // following two lines had been added to the code since 9.4, but they break XSLT test error089
@@ -52,11 +52,11 @@ namespace OutSmart.DAXon.Transformation
 
         public virtual DecimalSymbols ObtainNamedDecimalFormat(StructuredQName qName)
         {
-            DecimalSymbols ds = formatTable.Get(qName);
+            DecimalSymbols ds = formatTable.GetOrDefault(qName);
             if (ds == null)
             {
                 ds = new DecimalSymbols(language, languageLevel);
-                formatTable.Put(qName, ds);
+                formatTable[qName] = ds;
             }
 
             return ds;
@@ -65,7 +65,7 @@ namespace OutSmart.DAXon.Transformation
         public virtual void CheckConsistency()
         {
             defaultDFS.CheckConsistency(null);
-            foreach (KeyValuePair<StructuredQName, DecimalSymbols> entry in formatTable.EntrySet())
+            foreach (KeyValuePair<StructuredQName, DecimalSymbols> entry in formatTable)
             {
                 entry.Value.CheckConsistency(entry.Key);
             }

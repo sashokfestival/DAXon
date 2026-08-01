@@ -74,19 +74,8 @@ namespace OutSmart.DAXon.Trees.Tiny
 
         public NodeInfo CopiedFrom { get => this.copiedFrom; set => this.copiedFrom = value; }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public string UniformBaseUri { get => this.uniformBaseUri; set => this.uniformBaseUri = value; }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override IEnumerator<string> UnparsedEntityNames
         {
             get
@@ -97,328 +86,61 @@ namespace OutSmart.DAXon.Trees.Tiny
                 }
                 else
                 {
-                    return entityTable.KeySet().IIterator();
+                    return entityTable.Keys.GetEnumerator();
                 }
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int NumberOfNodes => numberOfNodes;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int NumberOfAttributes => numberOfAttributes;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int NumberOfNamespaces => numberOfNamespaces;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public byte[] NodeKindArray => nodeKind;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public short[] NodeDepthArray => depth;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int[] NameCodeArray => nameCode;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public ISchemaType[] TypeArray => typeArray;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int[] NextPointerArray => next;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int[] AlphaArray => alpha;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int[] BetaArray => beta;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public LargeTextBuffer CharacterBuffer => textBuffer;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public UnicodeString CommentBuffer => commentBuffer;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int[] AttributeNameCodeArray => attCode;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public ISimpleType[] AttributeTypeArray => attType;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public int[] AttributeParentArray => attParent;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public String[] AttributeValueArray => attValue;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public NamespaceBinding[] NamespaceBindings
         {
             get
             {
                 throw new NotSupportedException();
             }
-        } // TODO
+        }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
-        // TODO
         public NamespaceMap[] NamespaceMaps => namespaceMaps;
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
-        // TODO
         public int[] NamespaceParentArray
         {
             get
             {
                 throw new NotSupportedException();
             }
-        } // TODO
+        }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
-        // TODO
-        // TODO
-        ////                        ensureNamespaceCapacity(1);
-        ////                        namespaceMaps[numberOfNamespaces] = source.namespaceMaps[source.beta[nodeNr]];
-        ////                        beta[to] = numberOfNamespaces++;
         //                case global::OutSmart.DAXon.Types.Type.TEXTUAL_ELEMENT: {
         //                    nameCode[to] = (source.nameCode[from] & NamePool.FP_MASK) |
         //                case global::OutSmart.DAXon.Types.Type.TEXT: {
@@ -436,12 +158,11 @@ namespace OutSmart.DAXon.Trees.Tiny
         //                    beta[to] = -1;
         //                default:
         //        numberOfNodes += length;
-        //    }
         public Dictionary<string, IntSet> LocalNameIndex
         {
             get
             {
-                lock (this)
+                lock (syncLock)
                 {
                     if (localNameIndex == null)
                     {
@@ -456,16 +177,16 @@ namespace OutSmart.DAXon.Trees.Tiny
                                 {
                                     string local = GetNamePool().GetLocalName(fp);
                                     indexed.Add(fp);
-                                    IntSet existing = localNameIndex.Get(local);
+                                    IntSet existing = localNameIndex.GetOrDefault(local);
                                     if (existing == null)
                                     {
-                                        localNameIndex.Put(local, new IntSingletonSet(fp));
+                                        localNameIndex[local] = new IntSingletonSet(fp);
                                     }
                                     else
                                     {
                                         IntSet copy = existing.IsMutable() ? existing : existing.MutableCopy();
                                         copy.Add(fp);
-                                        localNameIndex.Put(local, copy);
+                                        localNameIndex[local] = copy;
                                     }
                                 }
                             }
@@ -481,7 +202,7 @@ namespace OutSmart.DAXon.Trees.Tiny
             int nodes = statistics.AverageNodes + 1;
             int attributes = statistics.AverageAttributes + 1;
             int namespaces = statistics.AverageNamespaces + 1;
-            int characters = System.Math.Min(statistics.AverageCharacters + 10, 65536);
+            int characters = Math.Min(statistics.AverageCharacters + 10, 65536);
             nodeKind = new byte[nodes];
             depth = new short[nodes];
             next = new int[nodes];
@@ -509,7 +230,7 @@ namespace OutSmart.DAXon.Trees.Tiny
             if (nodeKind.Length < numberOfNodes + needed)
             {
 
-                int k = kind == Types.Type.STOPPER ? numberOfNodes + 1 : System.Math.Max(numberOfNodes * 2, numberOfNodes + needed);
+                int k = kind == Types.Type.STOPPER ? numberOfNodes + 1 : Math.Max(numberOfNodes * 2, numberOfNodes + needed);
                 Array.Resize(ref nodeKind, k);
                 Array.Resize(ref next, k);
                 Array.Resize(ref depth, k);
@@ -538,7 +259,7 @@ namespace OutSmart.DAXon.Trees.Tiny
         {
             if (attParent.Length < numberOfAttributes + needed)
             {
-                int k = System.Math.Max(numberOfAttributes + needed, numberOfAttributes * 2);
+                int k = Math.Max(numberOfAttributes + needed, numberOfAttributes * 2);
                 if (k == 0)
                 {
                     k = 10 + needed;
@@ -563,7 +284,7 @@ namespace OutSmart.DAXon.Trees.Tiny
         {
             if (namespaceMaps.Length < numberOfNamespaces + needed)
             {
-                int k = System.Math.Max(numberOfNamespaces * 2, numberOfNamespaces + needed);
+                int k = Math.Max(numberOfNamespaces * 2, numberOfNamespaces + needed);
                 if (k == 0)
                 {
                     k = 10;
@@ -573,7 +294,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
         public PrefixPool GetPrefixPool()
         {
             return prefixPool;
@@ -587,6 +307,29 @@ namespace OutSmart.DAXon.Trees.Tiny
 
         public int AddNode(short kind, int depth, int alpha, int beta, int nameCode)
         {
+            // The depth array is short[] - 2 bytes per node, retained for the tree's whole life -
+            // so the implementation cannot represent a tree deeper than short.MaxValue. Before
+            // round BF-2 the narrowing cast below simply WRAPPED to negative, and the wrap was
+            // silent AND lossy: the depth comparisons that drive string-value and the axis walks
+            // (see GetAtomizedValueOfUntypedNode) run while depth[next] > level, so they stopped
+            // dead at the first wrapped node and every descendant below it vanished from the
+            // result with no error at all. count() and ancestor:: kept working, which is what made
+            // it so easy to miss. The limit is enforced HERE, at the cast, so no node-adding path
+            // can bypass it - widening to int[] was the alternative and was rejected: it would
+            // cost 2 bytes per node on every tree in the product to buy depth nobody needs.
+            //   The boundary in terms of INPUT nesting is one level lower than the constant when the
+            // innermost element has text content: a text node is added a level below its parent and
+            // only folded into a TEXTUAL_ELEMENT afterwards, so a 32767-deep element chain with a
+            // text leaf puts a node at 32768. Measured: such a document DID answer correctly before
+            // this guard - but only because the offending node was discarded by that fold, while the
+            // fold itself compares an already-wrapped depth. Depending on that is not a contract, so
+            // the honest rule is the one enforced here: no node may be deeper than short.MaxValue.
+            if (depth > short.MaxValue)
+            {
+                throw new XPathException("Tree depth limit exceeded: this implementation cannot build a tree "
+                    + "nested deeper than " + short.MaxValue + " levels", DAXonErrorCode.SXLM0002);
+            }
+
             EnsureNodeCapacity(kind, 1);
             nodeKind[numberOfNodes] = (byte)kind;
             this.depth[numberOfNodes] = (short)depth;
@@ -605,8 +348,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
 
 
-            //        if (depth == 0 && kind != global::OutSmart.DAXon.Types.Type.STOPPER) {
-            //            if (rootIndexUsed == rootIndex.length) {
             //                int[] r2 = new int[rootIndexUsed * 2];
             //                System.arraycopy(rootIndex, 0, r2, 0, rootIndexUsed);
             //                rootIndex = r2;
@@ -616,7 +357,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return numberOfNodes++;
         }
 
-        //    }
         public void AppendChars(UnicodeString chars)
         {
             textBuffer.AppendUnicodeString(chars); //        chars.supplyContent(textBuffer, 0, chars.length());
@@ -624,7 +364,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             //        textChunks[textChunksUsed++] = chars;
         }
 
-        //    }
         public int AddTextNodeCopy(int depth, int existingNodeNr)
         {
             return AddNode(Types.Type.TEXT, depth, alpha[existingNodeNr], beta[existingNodeNr], -1);
@@ -689,13 +428,10 @@ namespace OutSmart.DAXon.Trees.Tiny
             //                + averageNamespaces + ", " + averageCharacters);
             //        if (charBufferLength * 3 < charBuffer.length ||
             //                charBuffer.length - charBufferLength > 10000) {
-            //            char[] c2 = new char[charBufferLength];
-            //            System.arraycopy(charBuffer,  0, c2, 0, charBufferLength);
             //            charBuffer = c2;
             //        }
         }
 
-        //    }
         public void SetElementAnnotation(int nodeNr, ISchemaType type)
         {
             if (!type.Equals(Untyped.INSTANCE))
@@ -875,7 +611,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
         public int GetNodeKind(int nodeNr)
         {
             int kind = nodeKind[nodeNr];
@@ -904,10 +639,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return prefixPool.GetPrefix(code);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         internal void EnsurePriorIndex()
         {
             if (prior == null || prior.Length < numberOfNodes)
@@ -918,13 +649,9 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         private void MakePriorIndex()
         {
-            lock (this)
+            lock (syncLock)
             {
                 int[] p = new int[numberOfNodes];
                 ArrayTools.Fill(p, 0, numberOfNodes, -1);
@@ -941,10 +668,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public void AddAttribute(NodeInfo root, int parent, int nameCode, ISimpleType type, string attValue, int properties)
         {
             EnsureAttributeCapacity(1);
@@ -978,10 +701,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             numberOfAttributes++;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         private void HandleRootTinyDoc(int parent, ISimpleType type, int nameCode, string attValue, int properties)
         {
             bool isID = false;
@@ -1074,10 +793,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         private void InitializeAttributeTypeCodes()
         {
             if (attType == null)
@@ -1092,10 +807,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public void MarkDefaultedAttribute(int attNr)
         {
             if (defaultedAttributes == null)
@@ -1106,19 +817,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             defaultedAttributes.Add(attNr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public bool IsDefaultedAttribute(int attNr)
         {
             return defaultedAttributes != null && defaultedAttributes.Contains(attNr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public void IndexIDElement(NodeInfo root, int nodeNr)
         {
             string id = Whitespace.Trim(TinyParentNodeImpl.GetStringValue(this, nodeNr).Tidy()).ToString();
@@ -1129,10 +832,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public bool HasXmlSpacePreserveAttribute()
         {
             for (int i = 0; i < numberOfAttributes; i++)
@@ -1146,10 +845,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return false;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public void AddNamespaces(int parent, NamespaceMap nsMap)
         {
             usesNamespaces = true;
@@ -1179,10 +874,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             numberOfNamespaces++;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public TinyNodeImpl GetNode(int nr)
         {
             switch ((short)nodeKind[nr])
@@ -1210,10 +901,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public AtomicValue GetAtomizedValueOfUntypedNode(int nodeNr)
         {
             switch ((short)nodeKind[nodeNr])
@@ -1287,19 +974,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         TinyAttributeImpl GetAttributeNode(int nr)
         {
             return new TinyAttributeImpl(this, nr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         int GetAttributeAnnotation(int nr)
         {
             if (attType == null)
@@ -1312,10 +991,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public ISimpleType GetAttributeType(int nr)
         {
             if (attType == null)
@@ -1328,10 +1003,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public bool IsIdAttribute(int nr)
         {
             try
@@ -1344,19 +1015,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public bool IsIdrefAttribute(int nr)
         {
             return idRefAttributes != null && idRefAttributes.Contains(nr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public bool IsIdElement(int nr)
         {
             try
@@ -1369,10 +1032,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public bool IsIdrefElement(int nr)
         {
             ISchemaType type = GetSchemaType(nr);
@@ -1408,10 +1067,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return false;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public void SetSystemId(int seq, string uri)
         {
             if (uri == null)
@@ -1427,10 +1082,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             systemIdMap.SetSystemId(seq, uri);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public string GetSystemId(int seq)
         {
             if (systemIdMap == null)
@@ -1441,10 +1092,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return systemIdMap.GetSystemId(seq);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
         public override NodeInfo GetRootNode()
         {
             if (GetNodeKind(0) == Types.Type.DOCUMENT)
@@ -1465,13 +1112,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void SetLineNumbering()
         {
             lineNumbers = new int[nodeKind.Length];
@@ -1480,13 +1120,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             ArrayTools.Fill(columnNumbers, -1);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void SetLineNumber(int sequence, int line, int column)
         {
             if (lineNumbers != null)
@@ -1496,13 +1129,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public int GetLineNumber(int sequence)
         {
             if (lineNumbers != null)
@@ -1522,13 +1148,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return -1;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public int GetColumnNumber(int sequence)
         {
             if (columnNumbers != null)
@@ -1548,13 +1167,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return -1;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void SetNilled(int nodeNr)
         {
             if (nilledElements == null)
@@ -1565,25 +1177,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             nilledElements.Add(nodeNr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public bool IsNilled(int nodeNr)
         {
             return nilledElements != null && nilledElements.Contains(nodeNr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         void RegisterID(NodeInfo e, string id)
         {
             if (idTable == null)
@@ -1596,13 +1194,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             idTable.PutIfAbsent(id, e);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override NodeInfo SelectID(string id, bool getParent)
         {
             if (idTable == null)
@@ -1610,7 +1201,7 @@ namespace OutSmart.DAXon.Trees.Tiny
                 return null; // no ID values found
             }
 
-            NodeInfo node = idTable.Get(id);
+            NodeInfo node = idTable.GetOrDefault(id);
             if (node != null && getParent && node.IsId() && node.GetStringValue().Equals(id))
             {
                 node = node.GetParent();
@@ -1619,13 +1210,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return node;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void SetUnparsedEntity(string name, string uri, string publicId)
         {
             if (entityTable == null)
@@ -1636,16 +1220,9 @@ namespace OutSmart.DAXon.Trees.Tiny
             string[] ids = new string[2];
             ids[0] = uri;
             ids[1] = publicId;
-            entityTable.Put(name, ids);
+            entityTable[name] = ids;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public override String[] GetUnparsedEntity(string name)
         {
             if (entityTable == null)
@@ -1653,28 +1230,14 @@ namespace OutSmart.DAXon.Trees.Tiny
                 return null;
             }
 
-            return entityTable.Get(name);
+            return entityTable.GetOrDefault(name);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public NamePool GetNamePool()
         {
             return GetConfiguration().GetNamePool();
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public void MarkTopWithinEntity(int nodeNr)
         {
             if (topWithinEntity == null)
@@ -1685,28 +1248,11 @@ namespace OutSmart.DAXon.Trees.Tiny
             topWithinEntity.Add(nodeNr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
         public bool IsTopWithinEntity(int nodeNr)
         {
             return topWithinEntity != null && topWithinEntity.Contains(nodeNr);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
         public void DiagnosticDump()
         {
             NamePool pool = GetNamePool();
@@ -1742,16 +1288,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
         public static void DiagnosticDump(NodeInfo node)
         {
             lock (typeof(TinyTree))
@@ -1769,73 +1305,22 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
         private static string N8(int val)
         {
             string s = "        " + val;
             return s.Substring(s.Length - 8);
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public void ShowSize(Logger logger)
         {
             logger.Info("Tree size: " + numberOfNodes + " nodes, " + textBuffer.Length() + " characters, " + numberOfAttributes + " attributes");
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
         public override bool IsTyped()
         {
             return typeArray != null;
         }
 
-        //    }
-        /// <summary>
-        /// On demand, make an index for quick access to preceding-sibling nodes
-        /// </summary>
-        /// <summary>
-        /// Set line numbering on
-        /// </summary>
-        /// <summary>
-        /// Produce diagnostic print of main tree arrays
-        /// </summary>
-        /// <summary>
-        /// Output a statistical summary to System.Console.Error
-        /// </summary>
-        // TODO
-        // TODO
         public bool IsUsesNamespaces()
         {
             return usesNamespaces;

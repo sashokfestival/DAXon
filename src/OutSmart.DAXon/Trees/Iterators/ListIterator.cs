@@ -19,29 +19,28 @@ namespace OutSmart.DAXon.Trees.Iterators
 {
     public abstract class ListIterator : ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
     {
-        public virtual bool HasNext => throw new NotImplementedException();
+        public abstract bool HasNext { get; }
         public virtual bool SupportsHasNext()
         {
             return true;
         }
-        public virtual IItem Current() => throw new NotImplementedException();
-        public virtual int Position() => throw new NotImplementedException();
-        public virtual int GetLength() => throw new NotImplementedException();
-        public virtual bool SupportsGetLength() => throw new NotImplementedException();
-        public virtual bool IsActuallyGrounded() => throw new NotImplementedException();
-        public virtual IGroundedValue GetResidue() => throw new NotImplementedException();
-        public virtual ISequenceIterator GetReverseIterator() => throw new NotImplementedException();
-        public virtual IItem Next() => throw new NotImplementedException();
+        public abstract IItem Current();
+        public abstract int Position();
+        public abstract int GetLength();
+        public abstract bool SupportsGetLength();
+        public abstract bool IsActuallyGrounded();
+        public abstract IGroundedValue GetResidue();
+        public abstract ISequenceIterator GetReverseIterator();
+        public abstract IItem Next();
         public virtual void Dispose() { }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public virtual IGroundedValue Materialize() => throw new NotImplementedException();
+        public abstract IGroundedValue Materialize();
 
         public class Of<T> : ListIterator, ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
         {
             private int index = 0;
             protected IList<T> list;
-            bool ILookaheadIterator.HasNext => HasNext();
 
             public Of(IList<T> list)
             {
@@ -49,10 +48,7 @@ namespace OutSmart.DAXon.Trees.Iterators
                 this.list = list;
             }
 
-            public bool HasNext()
-            {
-                return index < list.Count;
-            }
+            public override bool HasNext => index < list.Count;
 
             public override IItem Next()
             {
@@ -112,7 +108,7 @@ namespace OutSmart.DAXon.Trees.Iterators
                 IList<T> l2 = list;
                 if (index != 0)
                 {
-                    l2 = l2.SubList(index, l2.Count);
+                    l2 = l2.GetRange(index, (l2.Count) - (index));
                 }
 
                 if (l2 is IList<IItem> il)

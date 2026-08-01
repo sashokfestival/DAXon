@@ -7,6 +7,7 @@
 
 using System;
 using System.Collections.Generic;
+using OutSmart.DAXon.Expressions.Sorting;
 using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Collections
@@ -23,6 +24,8 @@ namespace OutSmart.DAXon.Collections
         public override bool Contains(int value) => false;
         public override bool Remove(int value) => false;
         public override bool Add(int value) => false;
-        public override IIntIterator IIterator() => throw new NotImplementedException("STUB: IntEmptySet.IIterator not ported (excluded stub)");
+        // Was a hollow NIE stub: IntHashSet.Copy() of an empty set RETURNS this singleton, so any
+        // caller iterating that copy (base ContainsAll among them) crashed instead of seeing 0 items.
+        public override IIntIterator IIterator() => EmptyIntIterator.GetInstance();
     }
 }

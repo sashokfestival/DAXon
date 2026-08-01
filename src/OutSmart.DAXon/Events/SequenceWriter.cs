@@ -141,7 +141,7 @@ namespace OutSmart.DAXon.Events
             builder.EndElement();
             if (--level == 0)
             {
-                builder.Dispose();
+                builder.Close();
                 NodeInfo element = builder.CurrentRoot;
                 Append(element, Loc.NONE, ReceiverOption.ALL_NAMESPACES);
                 builder = null;
@@ -221,12 +221,12 @@ namespace OutSmart.DAXon.Events
             previousAtomic = false;
         }
 
-        public override void Dispose()
+        public override void Close()
         {
             previousAtomic = false;
             if (builder != null)
             {
-                builder.Dispose();
+                builder.Close();
             }
         }
 

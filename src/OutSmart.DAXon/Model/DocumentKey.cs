@@ -93,7 +93,7 @@ namespace OutSmart.DAXon.Model
 
                 if (CASE_BLIND_FILES)
                 {
-                    uri = uri.ToLowerCase();
+                    uri = uri.ToLowerInvariant();
                 }
             }
 

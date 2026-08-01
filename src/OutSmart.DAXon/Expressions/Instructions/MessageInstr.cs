@@ -26,9 +26,8 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
-using OutSmart.DAXon.Internal.Jaxp.Transform.Stream;
 using OutSmart.DAXon.Internal.Streams;
+using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
     /// <summary>
@@ -65,9 +64,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int InstructionNameCode => isAssert ? StandardNames.XSL_ASSERT : StandardNames.XSL_MESSAGE;
         public MessageInstr(Expression select, Expression terminate, Expression errorCode)
         {
@@ -98,57 +94,36 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return exp;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Types.ItemType GetItemType()
         {
             return AnyItemType.GetInstance();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override int GetCardinality()
         {
             return StaticProperty.ALLOWS_ZERO_OR_ONE;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override bool MayCreateNewNodes()
         {
             return true;
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             return base.Optimize(visitor, contextInfo);
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private Message MakeMessage(bool abort, StructuredQName errorCode, NodeInfo content)
         {
             return new Message((XdmNode)XdmNode.Wrap(content), new QName(errorCode), abort, GetLocation());
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
-        private static Result StandardErrorResult()
+        private static IResultTarget StandardErrorResult()
         {
             return new StreamResult(Console.Error);
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("message", this);
@@ -161,17 +136,11 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.EndElement();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         public override Elaborator GetElaborator()
         {
             return new MessageInstrElaborator();
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private class MessageAdapter : ProxyOutputter
         {
             public MessageAdapter(Outputter next) : base(next)
@@ -224,9 +193,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        /// <summary>
-        /// Get the name of this instruction for diagnostic and tracing purposes
-        /// </summary>
         private class MessageInstrElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
@@ -318,12 +284,12 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     }
                     catch (XPathException e)
                     {
-                        rec.Append(new StringValue("Error " + e.ShowErrorCode() + " while evaluating xsl:message at line " + expr.GetLocation().GetLineNumber() + " of " + expr.GetLocation().GetSystemId() + ": " + e.GetMessage()));
+                        rec.Append(new StringValue("Error " + e.ShowErrorCode() + " while evaluating xsl:message at line " + expr.GetLocation().GetLineNumber() + " of " + expr.GetLocation().GetSystemId() + ": " + e.Message));
                     }
 
                     rec.EndDocument();
-                    rec.Dispose();
-                    builder.Dispose();
+                    rec.Close();
+                    builder.Close();
                     NodeInfo content = builder.CurrentRoot;
                     Message message = expr.MakeMessage(abort, errorCode, content);
                     try

@@ -69,7 +69,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             @out.StartElement("origF");
             @out.EmitAttribute("name", GetFunctionName());
             @out.EmitAttribute("arity", "" + GetArity());
-            @out.EmitAttribute("pack", options.packageMap.Get(component.ContainingPackage) + "");
+            @out.EmitAttribute("pack", options.packageMap.GetOrDefault(component.ContainingPackage) + "");
             @out.EndElement();
         }
         SingletonIterator IItem.Iterate() => new SingletonIterator(this);

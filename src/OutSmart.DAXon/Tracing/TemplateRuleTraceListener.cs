@@ -42,7 +42,7 @@ namespace OutSmart.DAXon.Tracing
             builder.Append(" to ").Append(item.ToShortString());
             if (item is NodeInfo && ((NodeInfo)item).GetLineNumber() != -1)
             {
-                builder.Append(" at ").Append(Err.AbbreviateURI(((NodeInfo)item).GetBaseURI())).Append("#").Append(((NodeInfo)item).GetLineNumber());
+                builder.Append(" at ").Append(Err.AbbreviateURI(((NodeInfo)item).GetBaseURI())).Append('#').Append(((NodeInfo)item).GetLineNumber());
             }
 
             builder.Append(" using ");

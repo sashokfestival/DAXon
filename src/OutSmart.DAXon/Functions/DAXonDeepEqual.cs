@@ -25,7 +25,6 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Functions
 {
     public class DAXonDeepEqual : SystemFunction
@@ -40,46 +39,22 @@ namespace OutSmart.DAXon.Functions
         /// Flag indicating that processing instruction nodes are taken into account when comparing element or document nodes
         /// </summary>
         public const int INCLUDE_PROCESSING_INSTRUCTIONS = 1 << 3;
-        /// <summary>
-        /// Flag indicating that whitespace text nodes are ignored when comparing element nodes
-        /// </summary>
         public const int EXCLUDE_WHITESPACE_TEXT_NODES = 1 << 4;
-        /// <summary>
-        /// Flag indicating that whitespace text nodes are ignored when comparing element nodes
-        /// </summary>
         public const int COMPARE_STRING_VALUES = 1 << 5;
-        /// <summary>
-        /// Flag indicating that whitespace text nodes are ignored when comparing element nodes
-        /// </summary>
         public const int COMPARE_ANNOTATIONS = 1 << 6;
-        /// <summary>
-        /// Flag indicating that whitespace text nodes are ignored when comparing element nodes
-        /// </summary>
         public const int WARNING_IF_FALSE = 1 << 7;
         /// <summary>
         /// Flag indicating that adjacent text nodes in the top-level sequence are to be merged
         /// </summary>
         public const int JOIN_ADJACENT_TEXT_NODES = 1 << 8;
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         public const int COMPARE_ID_FLAGS = 1 << 9;
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         public const int EXCLUDE_VARIETY = 1 << 10;
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         /*
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
      */
         public override string StreamerName => "DeepEqual";
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             string flags = arguments[3].Head().GetStringValue();
@@ -89,8 +64,8 @@ namespace OutSmart.DAXon.Functions
                 // undocumented diagnostic option
                 Logger err = context.GetConfiguration().Logger;
                 Properties indent = new Properties();
-                indent.SetProperty(OutputKeys.METHOD, "xml");
-                indent.SetProperty(OutputKeys.INDENT, "yes");
+                indent.SetProperty(DAXonOutputKeys.METHOD, "xml");
+                indent.SetProperty(DAXonOutputKeys.INDENT, "yes");
                 err.Info("DeepEqual: first argument:");
                 QueryResult.Serialize(QueryResult.Wrap(arguments[0].Iterate(), context.GetConfiguration()), err.AsStreamResult(), indent);
                 err.Info("DeepEqual: second argument:");
@@ -167,9 +142,6 @@ namespace OutSmart.DAXon.Functions
             return BooleanValue.Get(result);
         }
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         public static bool DeepEqual(ISequenceIterator op1, ISequenceIterator op2, IAtomicComparer comparer, IXPathContext context, int flags)
         {
             bool result = true;
@@ -300,7 +272,6 @@ namespace OutSmart.DAXon.Functions
 
                 // this will happen if the sequences contain non-comparable values
                 // comparison errors are masked
-                //err.printStackTrace();
                 result = false;
                 reason = "sequences contain non-comparable values";
             }
@@ -315,9 +286,6 @@ namespace OutSmart.DAXon.Functions
             return result;
         }
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         // treat as equal, no action
         /*
      * Determine whether two nodes are deep-equal
@@ -483,14 +451,14 @@ namespace OutSmart.DAXon.Functions
                             }
                             else
                             {
-                                int min = System.Math.Min(v1.Length, v2.Length);
+                                int min = Math.Min(v1.Length, v2.Length);
                                 if (v1.Substring(0, min).Equals(v2.Substring(0, min)))
                                 {
                                     message += " different at char " + min + "(\"" + StringTool.DiagnosticDisplay((v1.Length > v2.Length ? v1 : v2).Substring(min)) + "\")";
                                 }
                                 else if (v1[0] != v2[0])
                                 {
-                                    message += " different at start " + "(\"" + v1.Substring(0, System.Math.Min(v1.Length, 10)) + "\", \"" + v2.Substring(0, System.Math.Min(v2.Length, 10)) + "\")";
+                                    message += " different at start " + "(\"" + v1.Substring(0, Math.Min(v1.Length, 10)) + "\", \"" + v2.Substring(0, Math.Min(v2.Length, 10)) + "\")";
                                 }
                                 else
                                 {
@@ -498,7 +466,7 @@ namespace OutSmart.DAXon.Functions
                                     {
                                         if (!v1.Substring(0, i).Equals(v2.Substring(0, i)))
                                         {
-                                            message += " different at char " + (i - 1) + "(\"" + v1.Substring(i - 1, System.Math.Min(v1.Length, i + 10)) + "\", \"" + v2.Substring(i - 1, System.Math.Min(v2.Length, i + 10)) + "\")";
+                                            message += " different at char " + (i - 1) + "(\"" + v1.Substring(i - 1, Math.Min(v1.Length, i + 10)) + "\", \"" + v2.Substring(i - 1, Math.Min(v2.Length, i + 10)) + "\")";
                                             break;
                                         }
                                     }
@@ -659,9 +627,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         /*
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
@@ -685,9 +650,6 @@ namespace OutSmart.DAXon.Functions
             return false;
         }
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         /*
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
@@ -700,9 +662,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         /*
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
@@ -719,9 +678,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         /*
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
@@ -732,18 +688,15 @@ namespace OutSmart.DAXon.Functions
             foreach (NamespaceBinding binding in bindings)
             {
                 sb.Append(binding.GetPrefix());
-                sb.Append("=");
+                sb.Append('=');
                 sb.Append(binding.GetNamespaceUri());
-                sb.Append(" ");
+                sb.Append(' ');
             }
 
-            sb.SetLength(sb.Length - 1);
+            sb.Length = sb.Length - 1;
             return sb.ToString();
         }
 
-        /// <summary>
-        /// Flag indicating that the is-id and is-idref flags are to be compared
-        /// </summary>
         /*
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not

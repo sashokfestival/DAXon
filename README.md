@@ -77,7 +77,7 @@ hardening and performance work, were carried out with AI assistance — Anthropi
 
 Nothing was taken on the model's word. Every change to the engine had to pass:
 
-- the **W3C QT3 (XPath/XQuery 3.1) and XSLT 3.0 conformance corpora** — 38 537 cases
+- the **W3C QT3 (XPath/XQuery 3.1) and XSLT 3.0 conformance corpora** — 38 554 cases
   passing against a fixed, documented set of 17 known failures (XML 1.1 input documents,
   which the .NET `XmlReader` cannot parse);
 - **byte-identity gates** — selected transform outputs compared byte-for-byte against

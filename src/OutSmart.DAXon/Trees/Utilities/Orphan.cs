@@ -434,30 +434,40 @@ namespace OutSmart.DAXon.Trees.Utilities
         public IGroundedValue Subsequence(int arg0, int arg1) => arg0 <= 0 && (long)arg0 + arg1 > 0 ? (IGroundedValue)this : (IGroundedValue)EmptySequence.GetInstance(); // upstream Item default
         public int GetLength() => 1; // upstream Item default
         public string GetStringValue() => stringValue == null ? "" : stringValue.ToString(); // upstream: the node's string value
-        public int GetLineNumber() => throw new NotImplementedException();
-        public int GetColumnNumber() => throw new NotImplementedException();
-        public void Deliver(IReceiver arg0, ParseOptions arg1) => throw new NotImplementedException();
+        public int GetLineNumber() => -1; // an orphan has no source location
+        public int GetColumnNumber() => -1;
+        public void Deliver(IReceiver @out, ParseOptions options) => Events.Sender.SendDocumentInfo(this, @out, new Expressions.Parsing.Loc(GetSystemId(), -1, -1));
         SingletonIterator IItem.Iterate() => new SingletonIterator(this);
 
-        // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
-        public void RemoveNamespace(string prefix) { throw new NotImplementedException(); }
-        public void AddNamespace(string prefix, NamespaceUri uri) { throw new NotImplementedException(); }
+        // Formerly NIE stubs; an orphan is a parentless leaf, so most answers are fixed.
+        public void RemoveNamespace(string prefix) => throw new InvalidOperationException("Namespaces can only be removed from an element node");
+        public void AddNamespace(string prefix, NamespaceUri uri) => throw new InvalidOperationException("Namespaces can only be added to an element node");
         public Configuration GetConfiguration() => treeInfo.GetConfiguration(); // upstream Orphan: treeInfo.getConfiguration()
-        public bool IsSameNodeInfo(NodeInfo other) => throw new NotImplementedException();
-        public string GetURI() => throw new NotImplementedException();
-        public IEnumerable<NodeInfo> Children() => throw new NotImplementedException();
-        public IEnumerable<NodeInfo> Children(INodePredicate filter) => throw new NotImplementedException();
-        public IAttributeMap Attributes() => throw new NotImplementedException();
+        public bool IsSameNodeInfo(NodeInfo other) => this == other; // node identity
+        public string GetURI() => nodeName == null ? "" : nodeName.GetURI();
+        public IEnumerable<NodeInfo> Children() => Enumerable.Empty<NodeInfo>();
+        public IEnumerable<NodeInfo> Children(INodePredicate filter) => Enumerable.Empty<NodeInfo>();
+        public IAttributeMap Attributes() => EmptyAttributeMap.GetInstance();
         public void Copy(IReceiver @out, int copyOptions, ILocation locationId) => Navigator.Copy(this, @out, copyOptions, locationId); // upstream NodeInfo default
         public IActiveSource AsActiveSource() => new NodeSource(this); // upstream NodeInfo default method
-        public bool IsNilled() => throw new NotImplementedException();
-        public bool IsStreamed() => throw new NotImplementedException();
-        public string ToShortString() => throw new NotImplementedException();
+        public bool IsNilled() => false;
+        public bool IsStreamed() => false;
+        public string ToShortString() => ToString();
         public IGroundedValue Reduce() => this; // upstream GroundedValue default method
         public IGroundedValue Materialize() => this; // upstream GroundedValue default method
         public IEnumerable<IItem> AsIterable() => new IItem[] { this }; // singleton grounded value (upstream GroundedValue default for an Item)
-        public bool ContainsNode(NodeInfo sought) => throw new NotImplementedException();
-        public IGroundedValue Concatenate(IGroundedValue[] others) => throw new NotImplementedException();
+        public bool ContainsNode(NodeInfo sought) => this == sought;
+        public IGroundedValue Concatenate(IGroundedValue[] others)
+        {
+            // upstream GroundedValue default: chain this item with the others
+            var chain = new OutSmart.DAXon.Collections.Zeno.ZenoChain<IItem>().AddAll(AsIterable());
+            foreach (IGroundedValue v in others)
+            {
+                chain = chain.AddAll(v.AsIterable());
+            }
+
+            return new OutSmart.DAXon.Collections.Zeno.ZenoSequence(chain);
+        }
         // A node is a single item - already repeatable.
         public ISequence MakeRepeatable() => this;
     }

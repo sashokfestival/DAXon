@@ -22,16 +22,15 @@ using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
-using OutSmart.DAXon.Internal.Jaxp.Transform;
 namespace OutSmart.DAXon.Serialization
 {
     public class UncommittedSerializer : ProxyReceiver
     {
         private bool committed = false;
         private EventBuffer pending = null;
-        private readonly Result finalResult;
+        private readonly IResultTarget finalResult;
         private readonly SerializationProperties properties;
-        public UncommittedSerializer(Result finalResult, IReceiver next, SerializationProperties @params) : base(next)
+        public UncommittedSerializer(IResultTarget finalResult, IReceiver next, SerializationProperties @params) : base(next)
         {
             this.finalResult = finalResult;
             this.properties = @params;
@@ -45,7 +44,7 @@ namespace OutSmart.DAXon.Serialization
         /// <summary>
         /// End of document
         /// </summary>
-        public override void Dispose()
+        public override void Close()
         {
 
             // empty output: must send a beginDocument()/endDocument() pair to the content handler
@@ -54,12 +53,9 @@ namespace OutSmart.DAXon.Serialization
                 SwitchToMethod("xml");
             }
 
-            NextReceiver.Dispose();
+            NextReceiver.Close();
         }
 
-        /// <summary>
-        /// End of document
-        /// </summary>
         /// <summary>
         /// Produce character output using the current global::System.IO.TextWriter. <BR>
         /// </summary>
@@ -85,9 +81,6 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /// <summary>
-        /// End of document
-        /// </summary>
-        /// <summary>
         /// Processing Instruction
         /// </summary>
         public override void ProcessingInstruction(string target, UnicodeString data, ILocation locationId, int properties)
@@ -107,12 +100,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// End of document
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
             if (committed)
@@ -130,19 +117,13 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// End of document
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             if (!committed)
             {
                 string name = elemName.GetLocalPart();
                 NamespaceUri uri = elemName.GetNamespaceUri();
-                if (name.EqualsIgnoreCase("html") && uri.IsEmpty())
+                if (name.Equals("html", global::System.StringComparison.OrdinalIgnoreCase) && uri.IsEmpty())
                 {
                     SwitchToMethod("html");
                 }
@@ -167,12 +148,6 @@ namespace OutSmart.DAXon.Serialization
             NextReceiver.StartElement(elemName, type, attributes, namespaces, location, properties);
         }
 
-        /// <summary>
-        /// End of document
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void StartDocument(int properties)
         {
             if (committed)
@@ -190,12 +165,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /// <summary>
-        /// End of document
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void EndDocument()
         {
 
@@ -208,16 +177,10 @@ namespace OutSmart.DAXon.Serialization
             NextReceiver.EndDocument();
         }
 
-        /// <summary>
-        /// End of document
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         private void SwitchToMethod(string method)
         {
             Properties newProperties = new Properties(properties.GetProperties());
-            newProperties.SetProperty(OutputKeys.METHOD, method);
+            newProperties.SetProperty(DAXonOutputKeys.METHOD, method);
             SerializerFactory sf = GetConfiguration().SerializerFactory;
             SerializationProperties newParams = new SerializationProperties(newProperties, properties.GetCharacterMapIndex());
             newParams.ValidationFactory = properties.ValidationFactory;
@@ -233,12 +196,6 @@ namespace OutSmart.DAXon.Serialization
             SetUnderlyingReceiver(target);
         }
 
-        /// <summary>
-        /// End of document
-        /// </summary>
-        /// <summary>
-        /// Output a comment
-        /// </summary>
         public override void Append(IItem item, ILocation locationId, int copyNamespaces)
         {
             if (item is NodeInfo)

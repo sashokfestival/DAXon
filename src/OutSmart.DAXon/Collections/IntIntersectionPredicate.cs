@@ -11,10 +11,12 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Collections
 {
-    // Phase 7.8c: IntSetPredicate/IntIntersectionPredicate/IntExceptPredicate stubs - real excluded.
-    // Runtime 2026-06-10: IntSetPredicate hollow stub #2 REMOVED (ALWAYS_TRUE.Test=>false!). Real file re-included.
+    // Predicate testing a AND b, mirroring upstream IntersectionPredicate. The sole caller is
+    // CombinedNodeTest.GetMatcher — dropping `b` here would make the tree-scan fast path match
+    // nodes that satisfy only the first of the combined tests.
     public static class IntIntersectionPredicate
     {
-        public static IIntPredicateProxy MakeIntersection(IIntPredicateProxy a, IIntPredicateProxy b) => a;
+        public static IIntPredicateProxy MakeIntersection(IIntPredicateProxy a, IIntPredicateProxy b)
+            => new IntPredicateLambda(v => a.Test(v) && b.Test(v));
     }
 }
