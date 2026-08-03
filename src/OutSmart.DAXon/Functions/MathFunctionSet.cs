@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
     /// The math: function namespace (math:pi, math:sin, math:pow, math:atan2, ...); registrations plus
     /// the concrete function implementations as nested classes.
     /// </summary>
-    public class MathFunctionSet : BuiltInFunctionSet
+    internal class MathFunctionSet : BuiltInFunctionSet
     {
         private static readonly MathFunctionSet THE_INSTANCE = new MathFunctionSet();
 
@@ -72,7 +72,7 @@ namespace OutSmart.DAXon.Functions
         public override NamespaceUri GetNamespace() => NamespaceUri.MATH;
 
         /// <summary>math:pi</summary>
-        public class PiFn : SystemFunction
+        internal class PiFn : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -81,7 +81,7 @@ namespace OutSmart.DAXon.Functions
         }
 
         /// <summary>Generic superclass for the arity-1 trig functions.</summary>
-        public class TrigFn1 : SystemFunction
+        internal class TrigFn1 : SystemFunction
         {
             private readonly Func<double, double> method;
 
@@ -143,7 +143,7 @@ namespace OutSmart.DAXon.Functions
         }
 
         /// <summary>math:pow</summary>
-        public class PowFn : SystemFunction
+        internal class PowFn : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] args)
             {
@@ -261,7 +261,7 @@ namespace OutSmart.DAXon.Functions
         }
 
         /// <summary>math:atan2</summary>
-        public class Atan2Fn : SystemFunction
+        internal class Atan2Fn : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {

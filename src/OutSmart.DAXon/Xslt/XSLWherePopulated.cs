@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:where-populated element in the stylesheet.
     /// </summary>
-    public sealed class XSLWherePopulated : StyleElement
+    internal sealed class XSLWherePopulated : StyleElement
     {
         private Expression select;
         public override bool IsInstruction()

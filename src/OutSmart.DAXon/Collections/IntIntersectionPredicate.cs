@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Collections
     // Predicate testing a AND b, mirroring upstream IntersectionPredicate. The sole caller is
     // CombinedNodeTest.GetMatcher — dropping `b` here would make the tree-scan fast path match
     // nodes that satisfy only the first of the combined tests.
-    public static class IntIntersectionPredicate
+    internal static class IntIntersectionPredicate
     {
         public static IIntPredicateProxy MakeIntersection(IIntPredicateProxy a, IIntPredicateProxy b)
             => new IntPredicateLambda(v => a.Test(v) && b.Test(v));

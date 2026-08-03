@@ -23,7 +23,7 @@ using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions.Exslt
 {
-    public sealed class Date
+    internal sealed class Date
     {
         /// <summary>
         /// Private constructor to disallow instantiation

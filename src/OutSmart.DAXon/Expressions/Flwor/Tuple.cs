@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// A tuple, as it appears in an XQuery tuple stream handled by extended FLWOR expressions.
     /// </summary>
-    public class Tuple : ObjectValue<ISequence[]>
+    internal class Tuple : ObjectValue<ISequence[]>
     {
         public Tuple(ISequence[] members) : base(members)
         {

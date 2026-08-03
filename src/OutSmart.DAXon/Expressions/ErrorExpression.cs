@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ErrorExpression : Expression
+    internal class ErrorExpression : Expression
     {
         private readonly IXmlProcessingError exception;
         private Expression original;

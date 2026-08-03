@@ -17,7 +17,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Regex
 {
-    public class OpRepeat : Operation
+    internal class OpRepeat : Operation
     {
         public Operation op;
         public int min;

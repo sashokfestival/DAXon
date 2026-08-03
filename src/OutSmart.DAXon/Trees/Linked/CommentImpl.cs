@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Trees.Linked
 {
     // Was a fully hollow shell (content dropped on construction, kind/copy/string-value all NIE):
     // a comment in a linked tree crashed the moment anything asked for its kind or value.
-    public class CommentImpl : NodeImpl
+    internal class CommentImpl : NodeImpl
     {
         private UnicodeString content = EmptyUnicodeString.GetInstance();
 

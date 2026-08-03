@@ -75,7 +75,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             return null;
         }
 
-        public class TemporaryXSLTVariableBinding : ILocalBinding
+        internal class TemporaryXSLTVariableBinding : ILocalBinding
         {
             public SourceBinding declaration;
 

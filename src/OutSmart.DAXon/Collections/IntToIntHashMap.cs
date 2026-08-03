@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Collections
     // as three copies because the empty-slot encoding differs per class — here any int value is
     // valid, so occupancy needs the explicit _filled[] array. The probe loops sit on hot paths
     // and must stay monomorphic, without a shared dispatching core.
-    public class IntToIntHashMap : IIntToIntMap
+    internal class IntToIntHashMap : IIntToIntMap
     {
         private const int NBIT = 30; // NMAX = 2^NBIT
         private const int NMAX = 1 << NBIT; // maximum number of keys mapped

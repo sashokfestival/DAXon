@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex.CharClass
 {
-    public class PredicateCharacterClass : ICharacterClass
+    internal class PredicateCharacterClass : ICharacterClass
     {
         private readonly Func<int, bool> predicate;
         public PredicateCharacterClass(Func<int, bool> predicate)

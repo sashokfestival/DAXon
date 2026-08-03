@@ -97,7 +97,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class RoundElaborator : ItemElaborator
+        internal class RoundElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

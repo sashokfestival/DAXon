@@ -29,7 +29,7 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public class TinyTextualElement : TinyElementImpl
+    internal class TinyTextualElement : TinyElementImpl
     {
         private TinyTextualElementText textNode = null;
 
@@ -188,7 +188,7 @@ namespace OutSmart.DAXon.Trees.Tiny
         /// <summary>
         /// Inner class representing the text node; this is created on demand
         /// </summary>
-        public class TinyTextualElementText : NodeInfo
+        internal class TinyTextualElementText : NodeInfo
         {
             private readonly TinyTextualElement element;
 

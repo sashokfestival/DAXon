@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Types
 {
-    public static class BuiltInType
+    internal static class BuiltInType
     {
         // net472 port: the real OutSmart.DAXon.Types.BuiltInType is excluded; this stub was hollow (Register
         // no-op, GetSchemaType => null), so BuiltInAtomicType.MakeAtomicType's BuiltInType.Register(fp,type)

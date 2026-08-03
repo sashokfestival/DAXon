@@ -31,7 +31,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public sealed class EvaluateInstr : Expression
+    internal sealed class EvaluateInstr : Expression
     {
         private Operand xpathOp;
         private readonly SequenceType requiredType;

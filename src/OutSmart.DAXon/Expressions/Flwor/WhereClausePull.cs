@@ -14,7 +14,7 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Expressions.Flwor
 {
-    public class WhereClausePull : TuplePull
+    internal class WhereClausePull : TuplePull
     {
         private readonly TuplePull @base;
         private readonly IBooleanEvaluator predicate;

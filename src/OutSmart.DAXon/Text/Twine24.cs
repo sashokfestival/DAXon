@@ -25,7 +25,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Text
 {
-    public class Twine24 : UnicodeString
+    internal class Twine24 : UnicodeString
     {
         protected byte[] bytes;
         protected int cachedHash = 0;

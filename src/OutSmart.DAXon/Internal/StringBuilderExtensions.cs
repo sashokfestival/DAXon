@@ -5,7 +5,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace OutSmart.DAXon.Internal
 {
-    public static class StringBuilderExtensions
+    internal static class StringBuilderExtensions
     {
         // Appends a full code point, encoding astral values as a surrogate pair
         // (System.Text.StringBuilder has no code-point-aware append on net472).

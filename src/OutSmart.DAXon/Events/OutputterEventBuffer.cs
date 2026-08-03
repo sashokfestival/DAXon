@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Events
     // Records Outputter events in memory for subsequent replay (used by try/catch, where events must
     // not reach the final serializer until we know no error occurs). Events retain their properties,
     // implementing "sticky disable-output-escaping".
-    public class OutputterEventBuffer : Outputter
+    internal class OutputterEventBuffer : Outputter
     {
         private IList<OutputterEvent> buffer = new List<OutputterEvent>();
 

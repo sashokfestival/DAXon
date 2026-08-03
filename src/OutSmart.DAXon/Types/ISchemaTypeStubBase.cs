@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Types
     // ISchemaType so Untyped/AnyType/AnySimpleType (Java enum-singletons that
     // can't be C# enums implementing interfaces) can satisfy CS0029/CS1503
     // conversions to ISchemaType.
-    public abstract class ISchemaTypeStubBase : ISchemaType
+    internal abstract class ISchemaTypeStubBase : ISchemaType
     {
         // The three subclasses (AnySimpleType / AnyType / Untyped) each override the identity
         // members with their fixed XSD-singleton answers — abstract makes that a compile-time

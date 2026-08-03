@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Types
     // implement it faithfully to upstream net.sf.saxon.type.Untyped (mixed open content model:
     // any child/descendant element allowed ZERO_OR_MORE, attributes untypedAtomic, element wildcard,
     // treated as a restriction of xs:anyType).
-    public sealed class Untyped : ISchemaTypeStubBase, IComplexType
+    internal sealed class Untyped : ISchemaTypeStubBase, IComplexType
     {
         private static readonly Untyped _instance = new Untyped();
         public static readonly Untyped INSTANCE = _instance;

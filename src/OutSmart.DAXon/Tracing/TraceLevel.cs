@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Tracing
 {
-    public class TraceLevel
+    internal class TraceLevel
     {
         /// <summary>
         /// No tracing *

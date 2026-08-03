@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// An implementation of IAtomicSequence that contains no items.
     /// </summary>
-    public class EmptyAtomicSequence : IAtomicSequence
+    internal class EmptyAtomicSequence : IAtomicSequence
     {
 
         private static readonly EmptyAtomicSequence INSTANCE = new EmptyAtomicSequence();

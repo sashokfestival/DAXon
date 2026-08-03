@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     /// <summary>
     /// A comparer specifically for comparing two date, time, or dateTime values
     /// </summary>
-    public class CalendarValueComparer : IAtomicComparer
+    internal class CalendarValueComparer : IAtomicComparer
     {
         private readonly IXPathContext context;
 

@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// The type is never anonymous. Reached when a constructor is referenced dynamically —
     /// `xs:integer#1`, `function-lookup(xs:QName('...','date'),1)`, or passed as a function item.
     /// </summary>
-    public class AtomicConstructorFunction : AbstractFunction
+    internal class AtomicConstructorFunction : AbstractFunction
     {
         private readonly IAtomicType targetType;
         private readonly INamespaceResolver nsResolver;

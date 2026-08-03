@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Events
 {
-    public interface ICopyInformee
+    internal interface ICopyInformee
     {
         object NotifyElementNode(NodeInfo element);
     }

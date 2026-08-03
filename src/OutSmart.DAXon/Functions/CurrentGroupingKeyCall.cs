@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the XSLT function current-grouping-key()
     /// </summary>
-    public class CurrentGroupingKeyCall : Expression, ICallable
+    internal class CurrentGroupingKeyCall : Expression, ICallable
     {
         public override Expression ScopingExpression => CurrentGroupCall.FindControllingInstruction(this);
 

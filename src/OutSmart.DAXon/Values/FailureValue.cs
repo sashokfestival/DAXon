@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Values
     // A memoized FAILED evaluation (global variables/params keep it so a re-read reproduces the
     // original error). The old shell dropped the error in every constructor and threw NIE from
     // half its members while quietly answering "empty" from the other half.
-    public class FailureValue : IGroundedValue
+    internal class FailureValue : IGroundedValue
     {
         private readonly XPathException error;
 

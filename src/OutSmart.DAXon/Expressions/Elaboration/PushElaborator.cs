@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public abstract class PushElaborator : Elaborator
+    internal abstract class PushElaborator : Elaborator
     {
         public override IPullEvaluator ElaborateForPull()
         {

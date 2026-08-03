@@ -77,7 +77,7 @@ namespace OutSmart.DAXon.Regex
  *   recursive depth; the old code had one level of recursion per input character in some cases. In addition
  *   the compiled code for expressions involving large finite counters is much more compact.
  */
-    public class RECompiler
+    internal class RECompiler
     {
         // Node flags
         static readonly int NODE_NORMAL = 0; // No flags (nothing special)

@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Lib
     // Backs fn:environment-variable / fn:available-environment-variables when Feature.ALLOW_EXTERNAL_FUNCTIONS is on.
     // global::System.Environment.GetEnvironmentVariable(name) == System.getenv(name);
     // GetEnvironmentVariables() key set == System.getenv().keySet(). Was a hollow NIE stub.
-    public class StandardEnvironmentVariableResolver : IEnvironmentVariableResolver
+    internal class StandardEnvironmentVariableResolver : IEnvironmentVariableResolver
     {
         public StandardEnvironmentVariableResolver() { }
         public HashSet<string> GetAvailableEnvironmentVariables()

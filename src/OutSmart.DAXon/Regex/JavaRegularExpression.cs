@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Regex
     //                         Unicode-aware by default; bit kept so it participates in the cache key)
     //   q LITERAL          -> emulated by Regex.Escape on the whole pattern before compilation
     //   c CANON_EQ         -> NOT supported by System.Text.RegularExpressions; fails loud (XPathException)
-    public class JavaRegularExpression : IRegularExpression
+    internal class JavaRegularExpression : IRegularExpression
     {
         private readonly JPattern pattern;
         private readonly string javaRegex;

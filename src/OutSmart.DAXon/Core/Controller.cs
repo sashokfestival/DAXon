@@ -788,6 +788,15 @@ namespace OutSmart.DAXon.Core
                     }
                 }
             }
+            else if (contextItem is NodeInfo)
+            {
+                // The caller asserts the tree is already prepared, but nothing verifies that.
+                // PrepareInputTree decides from the tree's own state and is a no-op when the
+                // claim is true, so run it either way: an over-claim used to leave the context
+                // item unstripped while apply-templates saw a stripped tree, and one document
+                // then gave two answers to the same expression in a single transform.
+                contextItem = PrepareInputTree((NodeInfo)contextItem);
+            }
 
             if (contextItem is NodeInfo)
             {

@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class CastableExpression : CastingExpression
+    internal sealed class CastableExpression : CastingExpression
     {
 
         /// <summary>

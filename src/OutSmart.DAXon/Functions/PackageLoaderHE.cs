@@ -17,5 +17,5 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Functions
 {
-    public class PackageLoaderHE { public PackageLoaderHE() { } public PackageLoaderHE(Configuration config) { } }
+    internal class PackageLoaderHE { public PackageLoaderHE() { } public PackageLoaderHE(Configuration config) { } }
 }

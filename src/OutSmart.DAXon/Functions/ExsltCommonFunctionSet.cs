@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the exslt-common function library. This is available in all Saxon versions.
     /// </summary>
-    public class ExsltCommonFunctionSet : BuiltInFunctionSet
+    internal class ExsltCommonFunctionSet : BuiltInFunctionSet
     {
         private static readonly ExsltCommonFunctionSet THE_INSTANCE = new ExsltCommonFunctionSet();
 
@@ -49,7 +49,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Implement exslt:node-set
         /// </summary>
-        public class NodeSetFn : SystemFunction
+        internal class NodeSetFn : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -60,7 +60,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Implement exslt:object-type
         /// </summary>
-        public class ObjectTypeFn : SystemFunction
+        internal class ObjectTypeFn : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {

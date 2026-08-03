@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal.Collections;
 using System.Numerics;
 namespace OutSmart.DAXon.Values
 {
-    public sealed class Int64Value : IntegerValue
+    internal sealed class Int64Value : IntegerValue
     {
         /// <summary>
         /// IntegerValue representing the value -1

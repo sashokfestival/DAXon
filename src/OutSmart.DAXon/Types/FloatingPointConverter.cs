@@ -14,7 +14,7 @@ using System.IO;
 
 namespace OutSmart.DAXon.Types
 {
-    public class FloatingPointConverter
+    internal class FloatingPointConverter
     {
         public static string FloatToString(float f) => f.ToString();
         public static string DoubleToString(double d) => d.ToString();

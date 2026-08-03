@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An xsl:apply-imports or xsl:next-match element in the stylesheet.
     /// </summary>
-    public abstract class ApplyNextMatchingTemplate : Instruction, IITemplateCall
+    internal abstract class ApplyNextMatchingTemplate : Instruction, IITemplateCall
     {
         private WithParam[] actualParams;
         private WithParam[] tunnelParams;

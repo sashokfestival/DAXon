@@ -25,7 +25,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Serialization
 {
-    public class XMLIndenter : ProxyReceiver
+    internal class XMLIndenter : ProxyReceiver
     {
         private int level = 0;
         private bool sameline = false;

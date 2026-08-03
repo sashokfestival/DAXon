@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Values
 {
-    public sealed class AnyURIValue : StringValue
+    internal sealed class AnyURIValue : StringValue
     {
         public static readonly AnyURIValue EMPTY_URI = new AnyURIValue(""); // Used in bytecode
 

@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Internal
     /// namespaces, hence OutSmart.DAXon.Internal (the OutSmart.DAXon.Internal.Math shim forwards here
     /// so both surfaces share one implementation).
     /// </summary>
-    public static class JavaMath
+    internal static class JavaMath
     {
         // Java Math.round(double) is floor(x + 0.5): the midpoint goes TOWARD POSITIVE
         // INFINITY, so round(-2.5) == -2 and round(2.5) == 3. This is NOT equivalent to

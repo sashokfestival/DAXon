@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Collections.Trie
     /// An immutable map implemented as a hash trie. The value stored against each key is retrieved by
     /// descending the trie 5 bits of the key's hash code at a time (32-way fan-out per level).
     /// </summary>
-    public abstract class ImmutableHashTrieMap<K, V> : IImmutableMap<K, V>
+    internal abstract class ImmutableHashTrieMap<K, V> : IImmutableMap<K, V>
     {
         // "shift" denotes how far (in bits) through the hash code we are currently looking. At each level we
         // add BITS to shift.

@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// The XPath 2.0 distinct-values() function, with the collation argument already known
     /// </summary>
-    public class DistinctValues : CollatingFunctionFixed
+    internal class DistinctValues : CollatingFunctionFixed
     {
         public static readonly IAtomicMatchKey NaN_MATCH_KEY = new QNameValue("", NamespaceUri.SAXON, "+NaN+");
         public override string StreamerName => "DistinctValues";
@@ -39,7 +39,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// IIterator class to return the distinct values in a sequence
         /// </summary>
-        public class DistinctIterator : ISequenceIterator
+        internal class DistinctIterator : ISequenceIterator
         {
             private readonly ISequenceIterator @base;
             private readonly IStringCollator collator;

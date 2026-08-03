@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// Non-instantiable class to define options for the {@link NodeInfo#copy} method
     /// </summary>
-    public abstract class CopyOptions
+    internal abstract class CopyOptions
     {
         public const int ALL_NAMESPACES = 2;
         public const int TYPE_ANNOTATIONS = 4;

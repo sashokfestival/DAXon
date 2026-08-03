@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Values
 {
-    public abstract class Closure : ISequence, IContextOriginator
+    internal abstract class Closure : ISequence, IContextOriginator
     {
         protected IPullEvaluator inputEvaluator;
         protected XPathContextMajor savedXPathContext;

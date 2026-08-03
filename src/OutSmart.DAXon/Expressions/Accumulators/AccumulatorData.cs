@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Accumulators
     /// <summary>
     /// Holds the values of an accumulator function for one non-streamed document
     /// </summary>
-    public class AccumulatorData : IIAccumulatorData
+    internal class AccumulatorData : IIAccumulatorData
     {
         private readonly Accumulator accumulator;
         private readonly IList<DataPoint> values = new List<DataPoint>();

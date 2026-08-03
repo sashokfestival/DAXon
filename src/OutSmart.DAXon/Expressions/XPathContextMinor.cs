@@ -33,7 +33,7 @@ namespace OutSmart.DAXon.Expressions
         public IXPathContext caller = null;
         public StackFrame stackFrame;
         public string currentDestination = "";
-        public int temporaryOutputState = 0;
+        internal int temporaryOutputState = 0;   // TemporaryOutputState is the public spelling
 
         public XPathContextMajor MajorContext
         {

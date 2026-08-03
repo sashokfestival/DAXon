@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class AtomicSequenceConverter : UnaryExpression
+    internal class AtomicSequenceConverter : UnaryExpression
     {
         public static ToStringMappingFunction TO_STRING_MAPPER = new ToStringMappingFunction();
         protected IPlainType requiredItemType;
@@ -448,7 +448,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Mapping function wrapped around a converter
         /// </summary>
-        public class AtomicSequenceMappingFunction : IItemMappingFunction
+        internal class AtomicSequenceMappingFunction : IItemMappingFunction
         {
             private Converter converter;
             private string errorCode;
@@ -482,7 +482,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Mapping function that converts every item in a sequence to a string
         /// </summary>
-        public class ToStringMappingFunction : IItemMappingFunction
+        internal class ToStringMappingFunction : IItemMappingFunction
         {
             public virtual IItem MapItem(IItem item) /* net472: no covariant returns -> declare IItem (was StringValue) */
             {
@@ -491,7 +491,7 @@ namespace OutSmart.DAXon.Expressions
             IItem IItemMappingFunction.MapItem(IItem arg0) => MapItem(arg0);
         }
 
-        public class AtomicSequenceConverterElaborator : PullElaborator
+        internal class AtomicSequenceConverterElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class AxisAtomizingIterator : ISequenceIterator
+    internal sealed class AxisAtomizingIterator : ISequenceIterator
     {
         private readonly IAtomizedValueIterator @base;
         private IAtomicSequence results = null;

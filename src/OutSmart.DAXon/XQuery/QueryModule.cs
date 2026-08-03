@@ -161,7 +161,7 @@ namespace OutSmart.DAXon.XQuery
 
                 NamespaceMap result = NamespaceMap.EmptyMap();
                 HashSet<string> prefixes = new HashSet<string>(10);
-                for (int n = activeNamespaces.size() - 1; n >= 0; n--)
+                for (int n = activeNamespaces.Size() - 1; n >= 0; n--)
                 {
                     NamespaceBinding an = activeNamespaces[n];
                     if (!prefixes.Contains(an.GetPrefix()))
@@ -182,6 +182,11 @@ namespace OutSmart.DAXon.XQuery
         public QueryModule(StaticQueryContext sqc)
         {
             config = sqc.GetConfiguration();
+
+            // Main module only - this is where a query compilation episode begins, so the shared
+            // reporter's error and warning budgets start here. The importer overload below is a
+            // module WITHIN an episode and must keep counting (round 10).
+            (sqc.ErrorReporter as StandardErrorReporter)?.StartCompilationEpisode();
             moduleIsMainModule = true;
             topModule = this;
             languageLevel = sqc.LanguageVersion;
@@ -969,7 +974,7 @@ namespace OutSmart.DAXon.XQuery
             // Search the active namespaces first, then the passive ones.
             if (activeNamespaces != null)
             {
-                for (int i = activeNamespaces.size() - 1; i >= 0; i--)
+                for (int i = activeNamespaces.Size() - 1; i >= 0; i--)
                 {
                     if (activeNamespaces[i].GetPrefix().Equals(prefix))
                     {
@@ -1057,7 +1062,7 @@ namespace OutSmart.DAXon.XQuery
             }
 
             HashSet<string> prefixes = new HashSet<string>(10);
-            for (int n = activeNamespaces.size() - 1; n >= 0; n--)
+            for (int n = activeNamespaces.Size() - 1; n >= 0; n--)
             {
                 NamespaceBinding an = activeNamespaces[n];
                 if (!prefixes.Contains(an.GetPrefix()))

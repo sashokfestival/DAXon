@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public abstract class ComplexNodePushElaborator : FallbackElaborator
+    internal abstract class ComplexNodePushElaborator : FallbackElaborator
     {
         public override IPullEvaluator ElaborateForPull()
         {

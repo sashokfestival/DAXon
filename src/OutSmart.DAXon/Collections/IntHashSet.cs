@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Collections
     // kept as three copies because the empty-slot encoding differs per class — here the values
     // array doubles as the key array and emptiness is the configurable ndv sentinel. The probe
     // loops sit on hot paths and must stay monomorphic, without a shared dispatching core.
-    public class IntHashSet : IntSet
+    internal class IntHashSet : IntSet
     {
         private const int NBIT = 30; // MAX_SIZE = 2^NBIT
         private const int MAX_SIZE = 1 << NBIT; // maximum number of values held

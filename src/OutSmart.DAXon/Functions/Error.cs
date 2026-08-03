@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement XPath function fn:error()
     /// </summary>
-    public class Error : SystemFunction, ICallable
+    internal class Error : SystemFunction, ICallable
     {
         public override int GetSpecialProperties(Expression[] arguments)
         {
@@ -137,7 +137,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class UserDefinedXPathException : XPathException
+        internal class UserDefinedXPathException : XPathException
         {
             public UserDefinedXPathException(string message) : base(message)
             {

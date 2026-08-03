@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation
 {
-    public class NoDynamicContextException : XPathException
+    internal class NoDynamicContextException : XPathException
     {
         public NoDynamicContextException(string message) : base("Dynamic context missing: " + message)
         {

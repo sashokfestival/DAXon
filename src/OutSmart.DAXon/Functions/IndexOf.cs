@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// The XPath 2.0 index-of() function, with the collation already known
     /// </summary>
-    public class IndexOf : CollatingFunctionFixed
+    internal class IndexOf : CollatingFunctionFixed
     {
         public override IntegerValue[] IntegerBounds => new IntegerValue[]
             {

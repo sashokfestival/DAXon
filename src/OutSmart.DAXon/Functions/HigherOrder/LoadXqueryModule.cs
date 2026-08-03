@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// then reflecting the compiled library module's public functions and global variables into the
     /// map{'functions', 'variables'} result.
     /// </summary>
-    public class LoadXqueryModule : SystemFunction, ICallable
+    internal class LoadXqueryModule : SystemFunction, ICallable
     {
         public static OptionsParameter MakeOptionsParameter()
         {

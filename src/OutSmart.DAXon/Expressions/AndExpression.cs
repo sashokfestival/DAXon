@@ -21,7 +21,7 @@ using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public class AndExpression : BooleanExpression
+    internal class AndExpression : BooleanExpression
     {
 
         public override double Cost => GetLhsExpression().Cost + GetRhsExpression().Cost / 2;
@@ -140,7 +140,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for an AndExpression (P and Q)
         /// </summary>
-        public class AndElaborator : BooleanElaborator
+        internal class AndElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

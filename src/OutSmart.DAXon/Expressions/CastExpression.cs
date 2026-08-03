@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class CastExpression : CastingExpression, ICallable
+    internal class CastExpression : CastingExpression, ICallable
     {
 
         public override IntegerValue[] IntegerBounds
@@ -393,7 +393,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for {@code cast as} expression, or the equivalent constructor function call
         /// </summary>
-        public class CastExprElaborator : ItemElaborator
+        internal class CastExprElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

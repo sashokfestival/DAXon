@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// XPath 2.0 unordered() function
     /// </summary>
-    public class Unordered : SystemFunction
+    internal class Unordered : SystemFunction
     {
 
         public static Func<Unordered> New() => () => new Unordered();

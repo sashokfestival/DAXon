@@ -40,7 +40,7 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Regex
 {
-    public class REMatcher
+    internal class REMatcher
     {
         // Limits
         static readonly int MAX_PAREN = 16; // Number of paren pairs
@@ -967,7 +967,7 @@ namespace OutSmart.DAXon.Regex
             _captureState = new State(state);
         }
 
-        public class State
+        internal class State
         {
             public int parenCount; // Number of subexpressions matched (num open parens + 1)
             public int[] startn; // Lazily-allocated array of sub-expression starts

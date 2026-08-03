@@ -21,7 +21,7 @@ using OutSmart.DAXon.Collections.Trie;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class AtomicArray : IAtomicSequence
+    internal class AtomicArray : IAtomicSequence
     {
         private static readonly IList<AtomicValue> emptyAtomicList = new List<AtomicValue>();
         public static AtomicArray EMPTY_ATOMIC_ARRAY = new AtomicArray(emptyAtomicList);

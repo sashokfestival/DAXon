@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Expressions
     // The transpiled upstream SharedAppendEvaluator assigns lambdas to the Block.IChainAction *interface* —
     // invalid C#. Faithful port with named IChainAction classes (EagerAction/PullAction) capturing the
     // per-child evaluator instead of lambdas.
-    public class SharedAppendEvaluator : ISequenceEvaluator
+    internal class SharedAppendEvaluator : ISequenceEvaluator
     {
         private readonly Block.IChainAction[] actions;
         public SharedAppendEvaluator(object expr)

@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Values.Arrays
 {
-    public class Parcel
+    internal class Parcel
     {
         public Parcel() { }
         public Parcel(object value) { }

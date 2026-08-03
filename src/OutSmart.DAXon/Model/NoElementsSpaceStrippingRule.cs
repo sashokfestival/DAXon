@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// A whitespace stripping rule that retains all whitespace text nodes
     /// </summary>
-    public class NoElementsSpaceStrippingRule : ISpaceStrippingRule
+    internal class NoElementsSpaceStrippingRule : ISpaceStrippingRule
     {
         private static readonly NoElementsSpaceStrippingRule THE_INSTANCE = new NoElementsSpaceStrippingRule();
         public static NoElementsSpaceStrippingRule GetInstance()

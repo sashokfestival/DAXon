@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class IntegerRangeTest : Expression
+    internal class IntegerRangeTest : Expression
     {
         private readonly Operand valueOp;
         private readonly Operand minOp;
@@ -238,7 +238,7 @@ namespace OutSmart.DAXon.Expressions
             return new IntegerRangeTestElaborator();
         }
 
-        public class IntegerRangeTestElaborator : BooleanElaborator
+        internal class IntegerRangeTestElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

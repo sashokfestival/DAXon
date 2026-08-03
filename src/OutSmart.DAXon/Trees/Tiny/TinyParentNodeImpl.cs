@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public abstract class TinyParentNodeImpl : TinyNodeImpl
+    internal abstract class TinyParentNodeImpl : TinyNodeImpl
     {
 
         public override UnicodeString UnicodeStringValue => GetStringValue(tree, nodeNr);

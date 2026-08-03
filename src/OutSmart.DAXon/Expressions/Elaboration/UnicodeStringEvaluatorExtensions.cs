@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Expressions.Elaboration
 {
 
     // Extension method so existing call sites $evaluator.Eval(context) continue to work.
-    public static class UnicodeStringEvaluatorExtensions
+    internal static class UnicodeStringEvaluatorExtensions
     {
         public static UnicodeString Eval(this IUnicodeStringEvaluator self, IXPathContext context) => self == null ? null : self(context);
     }

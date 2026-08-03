@@ -7,5 +7,5 @@
 
 namespace OutSmart.DAXon.Events
 {
-    public class PushToReceiver { public PushToReceiver() { } public PushToReceiver(object r) { } }
+    internal class PushToReceiver { public PushToReceiver() { } public PushToReceiver(object r) { } }
 }

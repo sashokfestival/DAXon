@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An exception thrown by xsl:message terminate="yes".
     /// </summary>
-    public class TerminationException : XPathException
+    internal class TerminationException : XPathException
     {
         public TerminationException(string message) : base(message, "XTMM9000")
         {

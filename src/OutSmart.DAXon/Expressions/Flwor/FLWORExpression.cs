@@ -36,7 +36,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
         private static readonly OperandRole REPEATED_RETURN = new OperandRole(OperandRole.HIGHER_ORDER, OperandUsage.TRANSMISSION, SequenceType.ANY_SEQUENCE);
         public IList<Clause> clauses;
         public Operand returnClauseOp;
-        public IPushEvaluator returnPushEvaluator; // needed if generating push bytecode
+        internal volatile IPushEvaluator returnPushEvaluator; // needed if generating push bytecode; ReturnPushEvaluator is the public spelling
 
         public virtual IList<Clause> ClauseList => clauses;
 

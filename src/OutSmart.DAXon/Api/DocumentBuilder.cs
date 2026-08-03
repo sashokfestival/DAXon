@@ -33,7 +33,7 @@ namespace OutSmart.DAXon.Api
         private bool lineNumbering;
         private TreeModel treeModel = TreeModel.TINY_TREE;
         private WhitespaceStrippingPolicy whitespacePolicy = WhitespaceStrippingPolicy.UNSPECIFIED;
-        private URI baseURI;
+        private Uri baseUri;
         private XQueryExecutable projectionQuery;
 
         public virtual SchemaValidator SchemaValidator
@@ -41,19 +41,6 @@ namespace OutSmart.DAXon.Api
             get => schemaValidator; set
             {
                 schemaValidator = value;
-            }
-        }
-
-        public virtual URI BaseURI
-        {
-            get => baseURI; set
-            {
-                if (!value.IsAbsolute())
-                {
-                    throw new ArgumentException("Supplied base URI must be absolute");
-                }
-
-                baseURI = value;
             }
         }
 
@@ -204,9 +191,9 @@ namespace OutSmart.DAXon.Api
         // AugmentedSource's own options. The core (above) is shared with the Source-free build path.
         private ParseOptions GetParseOptions(ResolvedResource source)
         {
-            if (source.SystemId == null && baseURI != null)
+            if (source.SystemId == null && BaseUri != null)
             {
-                source.SystemId = baseURI.ToString();
+                source.SystemId = BaseUri.AbsoluteUri;
             }
 
             ParseOptions options = GetParseOptions();
@@ -226,7 +213,8 @@ namespace OutSmart.DAXon.Api
             if (input == null)
                 throw new NullReferenceException("input");
             bool ws = StripsIgnorableWhitespace();
-            return BuildFromXmlReader(global::OutSmart.DAXon.Events.XmlReaderToReceiver.CreateXmlReader(null, input, systemId, null, ws, ws), systemId);
+            return BuildFromXmlReader(() => global::OutSmart.DAXon.Events.XmlReaderToReceiver.CreateXmlReader(
+                null, InputSizeLimit.Apply(input, MaxInput, systemId, "FODC0002"), systemId, null, ws, ws), systemId);
         }
 
         public virtual XdmNode Build(global::System.IO.TextReader input, string systemId)
@@ -234,18 +222,42 @@ namespace OutSmart.DAXon.Api
             if (input == null)
                 throw new NullReferenceException("input");
             bool ws = StripsIgnorableWhitespace();
-            return BuildFromXmlReader(global::OutSmart.DAXon.Events.XmlReaderToReceiver.CreateXmlReader(input, null, systemId, null, ws, ws), systemId);
+            return BuildFromXmlReader(() => global::OutSmart.DAXon.Events.XmlReaderToReceiver.CreateXmlReader(
+                InputSizeLimit.Apply(input, MaxInput, systemId, "FODC0002"), null, systemId, null, ws, ws), systemId);
         }
 
+        // Round B1: MaxInputBytes reads as a Processor-wide cap, but only resolver-routed fetches
+        // and DocumentCache honoured it - a host feeding the builder directly had no cap at all.
+        private long MaxInput => InputSizeLimit.MaxFor(config);
+
         // Saxonica .NET-API compat: base URI set as a property, then Build with just the reader.
-        public virtual Uri BaseUri { get; set; }
+        // This used to have a Java-derived twin, BaseURI, with its own backing field: the two names
+        // differ only by case, which makes the whole type unusable from a case-insensitive binder
+        // (PowerShell refuses to bind DocumentBuilder at all), and each store was read by a
+        // different Build overload, so setting one and calling the other silently did nothing.
+        public virtual Uri BaseUri
+        {
+            get => baseUri;
+            set
+            {
+                if (value != null && !value.IsAbsoluteUri)
+                {
+                    throw new ArgumentException("Supplied base URI must be absolute");
+                }
+
+                baseUri = value;
+            }
+        }
 
         public virtual XdmNode Build(global::System.IO.TextReader input)
             => Build(input, BaseUri != null ? BaseUri.AbsoluteUri : "urn:input");
 
         // Source-free document build: parse the reader straight into a tree (Configuration.BuildDocumentTree
         // -> Sender.Send(XmlReader) -> XmlReaderToReceiver), without constructing a JAXP StreamSource/Source.
-        private XdmNode BuildFromXmlReader(global::System.Xml.XmlReader reader, string systemId)
+        // The reader is built by a factory rather than passed in: creating it already reads from
+        // the input (encoding sniff, prolog), so the input cap can fire there - inside the guard
+        // that turns an engine XPathException into the API's own exception type.
+        private XdmNode BuildFromXmlReader(Func<global::System.Xml.XmlReader> makeReader, string systemId)
         {
             ParseOptions options = GetParseOptions();
             // A standalone build runs outside any transformation, but the parse loop honours the
@@ -254,7 +266,7 @@ namespace OutSmart.DAXon.Api
             OutSmart.DAXon.Core.Controller.DeadlineToken prevDeadline = OutSmart.DAXon.Core.Controller.ArmThreadDeadline(config);
             try
             {
-                using (reader)
+                using (global::System.Xml.XmlReader reader = makeReader())
                 {
                     ITreeInfo doc = config.BuildDocumentTree(reader, systemId, options);
                     return new XdmNode(doc.GetRootNode());
@@ -278,7 +290,7 @@ namespace OutSmart.DAXon.Api
         {
             // P5: build via the native XmlReader path (a bare systemId opens through XmlReader.Create), no JAXP Source.
             bool ws = StripsIgnorableWhitespace();
-            return BuildFromXmlReader(global::OutSmart.DAXon.Events.XmlReaderToReceiver.CreateXmlReader(null, null, file, null, ws, ws), file);
+            return BuildFromXmlReader(() => global::OutSmart.DAXon.Events.XmlReaderToReceiver.CreateXmlReader(null, null, file, null, ws, ws), file);
         }
 
         private IReceiver InjectValidator(IReceiver r, Builder builder)

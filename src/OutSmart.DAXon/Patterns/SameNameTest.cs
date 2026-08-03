@@ -21,7 +21,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Patterns
 {
-    public class SameNameTest : NodeTest, IQNameTest
+    internal class SameNameTest : NodeTest, IQNameTest
     {
         private readonly NodeInfo origin;
 

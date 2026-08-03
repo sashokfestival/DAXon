@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// An implementation of IAttributeMap for use when there is exactly one attribute
     /// </summary>
-    public class SingletonAttributeMap : AttributeInfo, IAttributeMap
+    internal class SingletonAttributeMap : AttributeInfo, IAttributeMap
     {
         internal SingletonAttributeMap(INodeName nodeName, ISimpleType type, string value, ILocation location, int properties) : base(nodeName, type, value, location, properties)
         {

@@ -14,7 +14,7 @@ using OutSmart.DAXon.Model;
 // call sites (StandardInvalidityHandler / StandardDiagnostics both live in this ns).
 namespace OutSmart.DAXon.Lib
 {
-    public interface DOMLocator
+    internal interface DOMLocator
     {
         int GetLineNumber();
         int GetColumnNumber();

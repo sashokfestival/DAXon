@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public class UntypedAtomizingIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
+    internal class UntypedAtomizingIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
     {
         private readonly ISequenceIterator @base;
 

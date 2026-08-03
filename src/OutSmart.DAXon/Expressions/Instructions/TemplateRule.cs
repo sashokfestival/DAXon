@@ -32,7 +32,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     {
         protected Mode mode;
         protected Expression body;
-        protected IPushEvaluator bodyEvaluator;
+        protected volatile IPushEvaluator bodyEvaluator;   // volatile: published once, read hot (round 11)
         protected Patterns.Pattern matchPattern;
         private Values.SequenceType requiredType;
         private bool declaredStreamable;
@@ -45,7 +45,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private int columnNumber;
         private readonly IList<Rule> rules = new List<Rule>();
 
-        private IPushEvaluator atomicBodyEvaluator = null;
+        private volatile IPushEvaluator atomicBodyEvaluator = null;
 
         public virtual int ComponentKind => StandardNames.XSL_TEMPLATE;
 

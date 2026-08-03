@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Tracing
     /// <summary>
     /// A code injector designed to support the -T tracing option in XQuery
     /// </summary>
-    public class XQueryTraceCodeInjector : TraceCodeInjector
+    internal class XQueryTraceCodeInjector : TraceCodeInjector
     {
         public XQueryTraceCodeInjector()
         {

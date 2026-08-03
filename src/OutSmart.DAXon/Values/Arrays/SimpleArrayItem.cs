@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Values.Arrays
     /// <summary>
     /// A simple implementation of XDM array items, in which the array is backed by a Java List.
     /// </summary>
-    public class SimpleArrayItem : AbstractArrayItem
+    internal class SimpleArrayItem : AbstractArrayItem
     {
         public static readonly SimpleArrayItem EMPTY_ARRAY = new SimpleArrayItem(new List<IGroundedValue>());
         private readonly IList<IGroundedValue> _members;

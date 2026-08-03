@@ -24,7 +24,7 @@ using OutSmart.DAXon.Values.Maps;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Transformation.Rules
 {
-    public class ShallowCopyAllRuleSet : ShallowCopyRuleSet
+    internal class ShallowCopyAllRuleSet : ShallowCopyRuleSet
     {
         private static readonly ShallowCopyAllRuleSet THE_INSTANCE = new ShallowCopyAllRuleSet();
 

@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the function namespace-uri-for-prefix()
     /// </summary>
-    public class NamespaceForPrefix : SystemFunction, ICallable
+    internal class NamespaceForPrefix : SystemFunction, ICallable
     {
 
         public static Func<NamespaceForPrefix> New() => () => new NamespaceForPrefix();

@@ -22,7 +22,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Patterns
 {
-    public abstract class VennPattern : Pattern
+    internal abstract class VennPattern : Pattern
     {
         public Pattern p1, p2;
 

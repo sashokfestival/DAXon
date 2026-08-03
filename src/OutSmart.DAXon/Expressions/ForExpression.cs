@@ -27,7 +27,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ForExpression : Assignation
+    internal class ForExpression : Assignation
     {
         private int actionCardinality = StaticProperty.ALLOWS_MANY;
 
@@ -400,7 +400,7 @@ namespace OutSmart.DAXon.Expressions
             return new ForExprElaborator();
         }
 
-        public class MappingAction : IMappingFunction, IItemMappingFunction
+        internal class MappingAction : IMappingFunction, IItemMappingFunction
         {
             protected IXPathContext context;
             private readonly int slotNumber;
@@ -425,7 +425,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ForExprElaborator : PullElaborator
+        internal class ForExprElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

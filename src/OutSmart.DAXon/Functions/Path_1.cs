@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement the fn:path function with one argument
     /// </summary>
-    public class Path_1 : ScalarSystemFunction
+    internal class Path_1 : ScalarSystemFunction
     {
 
         public static Func<Path_1> New() => () => new Path_1();

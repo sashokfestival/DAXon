@@ -27,7 +27,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class ForEach : Instruction, IContextSwitchingExpression
+    internal class ForEach : Instruction, IContextSwitchingExpression
     {
         protected bool containsTailCall;
         protected Operand selectOp;
@@ -421,7 +421,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new ForEachElaborator();
         }
 
-        public class ForEachElaborator : PullElaborator
+        internal class ForEachElaborator : PullElaborator
         {
             private NodeInfo MakeSeparator(IUnicodeStringEvaluator evaluator, IXPathContext context)
             {

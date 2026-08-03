@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Functions
     // Faithful port of net.sf.saxon.functions.UnparsedEntity (Saxon 12.9). Was a hollow stub, so
     // unparsed-entity-uri()/unparsed-entity-public-id() were unregistered (XPST0017 at stylesheet compile).
     // Implements unparsed-entity-uri() (XSLT 1.0) and unparsed-entity-public-id() (XSLT 2.0).
-    public abstract class UnparsedEntity : SystemFunction, ICallable
+    internal abstract class UnparsedEntity : SystemFunction, ICallable
     {
         public const int URI = 0;
         public const int PUBLIC_ID = 1;
@@ -67,12 +67,12 @@ namespace OutSmart.DAXon.Functions
             return operation == URI ? (ISequence)new AnyURIValue(result) : new StringValue(result);
         }
 
-        public class UnparsedEntityUri : UnparsedEntity
+        internal class UnparsedEntityUri : UnparsedEntity
         {
             public override int Op => URI;
         }
 
-        public class UnparsedEntityPublicId : UnparsedEntity
+        internal class UnparsedEntityPublicId : UnparsedEntity
         {
             public override int Op => PUBLIC_ID;
         }

@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Represents an xsl:expose element in an XSLT 3.0 package manifest.
     /// </summary>
-    public class XSLExpose : XSLAcceptExpose
+    internal class XSLExpose : XSLAcceptExpose
     {
         protected virtual void CheckCompatibility(SymbolicName name, Visibility declared, Visibility exposed)
         {

@@ -16,7 +16,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Collections
 {
-    public class IntArraySet : IntSet
+    internal class IntArraySet : IntSet
     {
         public static readonly int[] EMPTY_INT_ARRAY = new int[0];
         /// <summary>
@@ -326,7 +326,7 @@ namespace OutSmart.DAXon.Collections
         /// <summary>
         /// IIterator class: iterate over an array of integers
         /// </summary>
-        public class IntArrayIterator : AbstractIntIterator
+        internal class IntArrayIterator : AbstractIntIterator
         {
             private readonly int[] contents;
             private readonly int limit;

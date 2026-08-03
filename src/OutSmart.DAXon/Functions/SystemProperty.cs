@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the XSLT system-property() function
     /// </summary>
-    public class SystemProperty : SystemFunction, ICallable
+    internal class SystemProperty : SystemFunction, ICallable
     {
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {

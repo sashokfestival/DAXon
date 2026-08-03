@@ -13,7 +13,7 @@ using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Trees.Iterators
 {
     /// <summary>An iterator over a pair of items.</summary>
-    public class TwoItemIterator : ISequenceIterator, ILookaheadIterator, IGroundedIterator, ILastPositionFinder
+    internal class TwoItemIterator : ISequenceIterator, ILookaheadIterator, IGroundedIterator, ILastPositionFinder
     {
         private readonly IItem one;
         private readonly IItem two;

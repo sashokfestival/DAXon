@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the 3-argument matches() function for regular expression matching
     /// </summary>
-    public class Matches : RegexFunction
+    internal class Matches : RegexFunction
     {
 
         public static Func<Matches> New() => () => new Matches();
@@ -75,7 +75,7 @@ namespace OutSmart.DAXon.Functions
             return new MatchesFnElaborator();
         }
 
-        public class MatchesFnElaborator : BooleanElaborator
+        internal class MatchesFnElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

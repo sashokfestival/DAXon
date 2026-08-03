@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal.Collections;
 using System.Numerics;
 namespace OutSmart.DAXon.Values
 {
-    public sealed class BigIntegerValue : IntegerValue
+    internal sealed class BigIntegerValue : IntegerValue
     {
         private static readonly BigInteger MAX_INT = new BigInteger(int.MaxValue);
         private static readonly BigInteger MIN_INT = new BigInteger(int.MinValue);

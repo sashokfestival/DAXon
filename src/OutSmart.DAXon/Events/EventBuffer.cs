@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 
 namespace OutSmart.DAXon.Events
 {
-    public class EventBuffer : SequenceReceiver
+    internal class EventBuffer : SequenceReceiver
     {
         private readonly IList<object> buffer = new List<object>();
         public EventBuffer(PipelineConfiguration pipe) : base(pipe)

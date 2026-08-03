@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Handler for xsl:accumulator-rule elements in a stylesheet (XSLT 3.0).
     /// </summary>
-    public class XSLAccumulatorRule : StyleElement
+    internal class XSLAccumulatorRule : StyleElement
     {
         private Patterns.Pattern match;
         private bool postDescent;

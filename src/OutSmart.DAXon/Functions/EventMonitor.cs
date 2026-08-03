@@ -18,7 +18,7 @@ using OutSmart.DAXon.Types;
 // (its historic home here) — TryCatch is the sole caller.
 namespace OutSmart.DAXon.Functions
 {
-    public class EventMonitor : Outputter
+    internal class EventMonitor : Outputter
     {
         private bool written = false;
         private readonly Outputter next;

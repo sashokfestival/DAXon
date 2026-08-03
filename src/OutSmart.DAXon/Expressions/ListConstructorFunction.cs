@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// A function item representing a constructor function for a list type
     /// </summary>
-    public class ListConstructorFunction : AbstractFunction
+    internal class ListConstructorFunction : AbstractFunction
     {
         protected IListType targetType;
         protected INamespaceResolver nsResolver;

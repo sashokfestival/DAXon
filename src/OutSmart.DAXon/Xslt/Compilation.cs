@@ -37,6 +37,11 @@ namespace OutSmart.DAXon.Xslt
         private readonly CompilerInfo compilerInfo;
         private PrincipalStylesheetModule principalStylesheetModule;
         private int errorCount = 0;
+        // Round C1: the reported diagnostics are also kept here so MakeCompilationFailure can
+        // hand them to the caller. Capped - a stylesheet can report thousands, and the exception
+        // is a diagnostic, not a transcript; errorCount stays the true total.
+        private const int MaxRetainedErrors = 20;
+        private readonly IList<IXmlProcessingError> reportedErrors = new List<IXmlProcessingError>();
         private bool schemaAware;
         private readonly QNameParser qNameParser;
         private readonly Dictionary<StructuredQName, ValueAndPrecedence> staticVariables = new Dictionary<StructuredQName, ValueAndPrecedence>();
@@ -65,9 +70,26 @@ namespace OutSmart.DAXon.Xslt
         public virtual HashSet<StructuredQName> AllKnownModeNames => referencedModes;
 
         public Compilation(Configuration config, CompilerInfo info)
+            : this(config, info, false)
+        {
+        }
+
+        // nestedInEpisode: a package compiled mid-compile (PackageLibrary.ObtainLoadedPackage) is
+        // part of the CALLING compilation's episode, like an imported query module - it must keep
+        // counting on the shared reporter, not reset it (round 12).
+        internal Compilation(Configuration config, CompilerInfo info, bool nestedInEpisode)
         {
             this.config = config;
             this.compilerInfo = info;
+
+            // The error/warning budgets belong to this compilation, not to the Processor. The
+            // reporter is shared by every compiler made from one Configuration, so without this
+            // the counts accumulated for the process's life and a late compile aborted on its
+            // first error with "Too many errors reported" (round 10).
+            if (!nestedInEpisode)
+            {
+                (info.ErrorReporter as StandardErrorReporter)?.StartCompilationEpisode();
+            }
             schemaAware = info.IsSchemaAware();
             preScan = info.IsJustInTimeCompilation();
             suppliedParameters = compilerInfo.Parameters;
@@ -441,6 +463,7 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual void ReportError(IXmlProcessingError err)
         {
+            Retain(err);
             IErrorReporter reporter = compilerInfo.ErrorReporter;
             if (reporter != null)
             {
@@ -466,19 +489,101 @@ namespace OutSmart.DAXon.Xslt
             if (!err.HasBeenReported())
             {
                 errorCount++;
+                XmlProcessingException error = new XmlProcessingException(err);
+                Retain(error);
                 try
                 {
-                    el.Report(new XmlProcessingException(err));
+                    el.Report(error);
                     err.SetHasBeenReported(true);
                 }
-                catch (Exception err2)
+                catch (Exception)
                 {
+                    // A reporter is a diagnostic sink: if the host's own one throws, that must
+                    // not replace the error being reported.
                 }
             }
-            else if (errorCount == 0)
+            else
             {
-                errorCount++;
+                // Already emitted by whoever first caught it - the XPath parser reports through
+                // its own reporter and marks the exception. Retain it anyway: the failure thrown
+                // at the end of the compile is the caller's only channel.
+                Retain(new XmlProcessingException(err));
+                if (errorCount == 0)
+                {
+                    errorCount++;
+                }
             }
+        }
+
+        private void Retain(IXmlProcessingError err)
+        {
+            if (reportedErrors.Count >= MaxRetainedErrors)
+            {
+                return;
+            }
+
+            // One failure can arrive twice - reported once, then again as it unwinds. Keep the first.
+            XPathException cause = (err as XmlProcessingException)?.GetXPathException();
+            if (cause != null)
+            {
+                foreach (IXmlProcessingError seen in reportedErrors)
+                {
+                    if ((seen as XmlProcessingException)?.GetXPathException() == cause)
+                    {
+                        return;
+                    }
+                }
+            }
+
+            reportedErrors.Add(err);
+        }
+
+        /// <summary>
+        /// The failure to throw when the compile reported errors. Carries the diagnostics -
+        /// message, code, line, column, module - so a host that installs no reporter still gets
+        /// a usable error instead of the bare fact that compilation failed (round C1).
+        /// </summary>
+        public virtual XPathException MakeCompilationFailure()
+        {
+            if (reportedErrors.Count == 0)
+            {
+                return new XPathException("Errors were reported during stylesheet compilation");
+            }
+
+            StandardErrorReporter formatter = new StandardErrorReporter();
+            StringBuilder text = new StringBuilder();
+            foreach (IXmlProcessingError e in reportedErrors)
+            {
+                if (text.Length > 0)
+                {
+                    text.Append('\n');
+                }
+
+                text.Append(formatter.DescribeError(e));
+            }
+
+            if (errorCount > reportedErrors.Count)
+            {
+                text.Append("\n...and ").Append(errorCount - reportedErrors.Count).Append(" further error(s)");
+            }
+
+            XsltCompilationFailure failure = new XsltCompilationFailure(
+                text.ToString(), new ReadOnlyCollection<IXmlProcessingError>(reportedErrors), errorCount);
+            IXmlProcessingError first = reportedErrors[0];
+            QName code = first.GetErrorCode();
+            if (code != null)
+            {
+                failure.WithErrorCode(code.GetStructuredQName());
+            }
+
+            if (first.GetLocation() != null)
+            {
+                failure.SetLocator(first.GetLocation());
+            }
+
+            // Already emitted through the reporter; this object exists to reach the caller.
+            failure.SetHasBeenReported(true);
+            return failure;
         }
 
         public virtual void ReportWarning(XPathException err)

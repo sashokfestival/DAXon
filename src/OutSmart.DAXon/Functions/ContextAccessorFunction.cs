@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class ContextAccessorFunction : SystemFunction
+    internal abstract class ContextAccessorFunction : SystemFunction
     {
         public abstract IFunctionItem BindContext(IXPathContext context);
         public override ISequence Call(IXPathContext context, ISequence[] arguments)

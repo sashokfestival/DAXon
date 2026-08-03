@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// A function library that recognizes the function name "xsl:original", which may appear within xsl:@override
     /// </summary>
-    public class XSLOriginalLibrary : IFunctionLibrary
+    internal class XSLOriginalLibrary : IFunctionLibrary
     {
         private static readonly XSLOriginalLibrary THE_INSTANCE = new XSLOriginalLibrary();
 

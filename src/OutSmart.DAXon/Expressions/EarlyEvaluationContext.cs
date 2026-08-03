@@ -25,7 +25,7 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public class EarlyEvaluationContext : IXPathContext
+    internal class EarlyEvaluationContext : IXPathContext
     {
         private readonly Configuration config;
 

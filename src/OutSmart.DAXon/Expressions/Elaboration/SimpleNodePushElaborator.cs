@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public abstract class SimpleNodePushElaborator : Elaborator
+    internal abstract class SimpleNodePushElaborator : Elaborator
     {
         public override ISequenceEvaluator Eagerly()
         {

@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public interface IPushableFunction
+    internal interface IPushableFunction
     {
         void Process(Outputter destination, IXPathContext context, ISequence[] arguments);
     }

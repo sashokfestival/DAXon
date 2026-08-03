@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public interface IAtomizedValueIterator : ISequenceIterator
+    internal interface IAtomizedValueIterator : ISequenceIterator
     {
         IAtomicSequence NextAtomizedValue();
     }

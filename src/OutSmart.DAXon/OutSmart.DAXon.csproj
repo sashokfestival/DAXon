@@ -28,10 +28,10 @@
   <PropertyGroup>
     <!-- Assembly identity. AssemblyVersion is the binding identity: bump only on a breaking
          change, so consumers are not forced to re-bind on every patch. -->
-    <Version>1.1.0</Version>
-    <AssemblyVersion>1.1.0.0</AssemblyVersion>
-    <FileVersion>1.1.0.0</FileVersion>
-    <InformationalVersion>1.1.0 (port of Saxon-HE 12.9)</InformationalVersion>
+    <Version>1.2.0</Version>
+    <AssemblyVersion>1.2.0.0</AssemblyVersion>
+    <FileVersion>1.2.0.0</FileVersion>
+    <InformationalVersion>1.2.0 (port of Saxon-HE 12.9)</InformationalVersion>
     <!-- Off: the SDK would otherwise append the building repository's commit SHA to
          InformationalVersion, putting an internal revision id into a public artifact. -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>

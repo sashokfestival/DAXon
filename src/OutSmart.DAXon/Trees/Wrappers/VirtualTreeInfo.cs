@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Trees.Wrappers
     /// <summary>
     /// Implementation of TreeInfo for a Virtual Copy tree
     /// </summary>
-    public class VirtualTreeInfo : GenericTreeInfo
+    internal class VirtualTreeInfo : GenericTreeInfo
     {
         private bool copyAccumulators;
 

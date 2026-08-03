@@ -15,7 +15,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public abstract class StandardNames
+    internal abstract class StandardNames
     {
         private const int DFLT_NS = 0;
         private const int XSL_NS = 1;

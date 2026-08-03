@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Values.Arrays
     /// <summary>
     /// Implementation of the extension function array:sort(array, function) =&gt; array
     /// </summary>
-    public class ArraySort : ArrayFunctionSet.ArrayGeneratingFunction
+    internal class ArraySort : ArrayFunctionSet.ArrayGeneratingFunction
     {
 
         public override ISequence Call(IXPathContext context, ISequence[] arguments)

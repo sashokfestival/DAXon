@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Tracing
     /// <summary>
     /// A Simple trace listener for XSLT that writes messages (by default) to System.Console.Error
     /// </summary>
-    public class XSLTTraceListener : AbstractTraceListener
+    internal class XSLTTraceListener : AbstractTraceListener
     {
 
         protected override string OpeningAttributes => "xmlns:xsl=\"" + NamespaceConstant.XSLT + '"';

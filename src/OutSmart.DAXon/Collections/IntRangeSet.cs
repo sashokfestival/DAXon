@@ -16,7 +16,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Collections
 {
-    public class IntRangeSet : IntSet
+    internal class IntRangeSet : IntSet
     {
         private int[] startPoints;
         private int[] endPoints;

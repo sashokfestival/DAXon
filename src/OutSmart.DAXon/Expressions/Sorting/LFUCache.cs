@@ -14,7 +14,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class LFUCache<K, V>
+    internal class LFUCache<K, V>
     {
         private int targetSize;
         private int retentionThreshold = 1;

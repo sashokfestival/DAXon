@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ItemMapper : IItemMappingFunction
+    internal class ItemMapper : IItemMappingFunction
     {
 
         private readonly ILambda lambda;
@@ -35,6 +35,6 @@ namespace OutSmart.DAXon.Expressions
             return lambda(item);
         }
         // ILambda interface->delegate for lambda assignability.
-        public delegate IItem ILambda(IItem item);
+        internal delegate IItem ILambda(IItem item);
     }
 }

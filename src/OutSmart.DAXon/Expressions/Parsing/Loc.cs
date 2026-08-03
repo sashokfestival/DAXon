@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Expressions.Parsing
 {
-    public class Loc : ILocation
+    internal class Loc : ILocation
     {
         public static Loc NONE = new Loc(null, -1, -1);
         private readonly string systemId;

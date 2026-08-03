@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Expressions
 {
-    public class DifferenceIterator : ISequenceIterator
+    internal class DifferenceIterator : ISequenceIterator
     {
         private readonly ISequenceIterator p1;
         private readonly ISequenceIterator p2;

@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement the fn:doc-available() function
     /// </summary>
-    public class DocAvailable : SystemFunction
+    internal class DocAvailable : SystemFunction
     {
 
         public static Func<DocAvailable> New() => () => new DocAvailable();

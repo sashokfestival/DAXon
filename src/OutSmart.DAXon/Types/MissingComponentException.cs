@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Types
 {
-    public abstract class MissingComponentException : Exception
+    internal abstract class MissingComponentException : Exception
     {
         public MissingComponentException(string @ref) : base(@ref)
         {

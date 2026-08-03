@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Functions
 {
-    public class Count
+    internal class Count
     {
         public Count() { }
         // Java's static Count.count(iter) -> static method (same name as class).

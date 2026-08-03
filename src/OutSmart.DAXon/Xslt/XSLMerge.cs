@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Handler for xsl:merge elements in stylesheet. <br>
     /// </summary>
-    public class XSLMerge : StyleElement
+    internal class XSLMerge : StyleElement
     {
         private int numberOfMergeSources = 0;
         public override bool IsInstruction()

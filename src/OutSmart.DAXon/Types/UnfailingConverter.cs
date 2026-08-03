@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Types
     // UnfailingConverter sibling stub. In real Saxon this is a nested abstract
     // class inside Converter. (Its Promoter* nested copies were dead duplicates — the live
     // promoters TypeChecker instantiates are the top-level Values.PromoterTo* classes.)
-    public abstract class UnfailingConverter : Converter
+    internal abstract class UnfailingConverter : Converter
     {
         protected UnfailingConverter() { }
         protected UnfailingConverter(object rules) : base(rules) { }
@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Types
         // NRE'd CastExpression.PreEvaluate for downcasts like xs:integer -> xs:positiveInteger). Checks that a
         // value belonging to a supertype is a valid instance of the subtype, returning the subtype instance or
         // a ValidationFailure.
-        public class DownCastingConverter : Converter
+        internal class DownCastingConverter : Converter
         {
             private readonly IAtomicType newType;
             private readonly string errorCode = null;

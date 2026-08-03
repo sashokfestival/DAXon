@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Types
 {
-    public interface IComplexType : ISchemaType
+    internal interface IComplexType : ISchemaType
     {
         ComplexVariety Variety { get; }
         bool IsAbstract();

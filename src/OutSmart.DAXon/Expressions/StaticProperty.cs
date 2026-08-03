@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public abstract class StaticProperty
+    internal abstract class StaticProperty
     {
         /// <summary>
         /// Bit setting: Expression depends on current() item

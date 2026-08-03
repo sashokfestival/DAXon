@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the XSLT function current-group()
     /// </summary>
-    public class CurrentGroup : ContextAccessorFunction
+    internal class CurrentGroup : ContextAccessorFunction
     {
         public override Expression MakeFunctionCall(params Expression[] arguments)
         {

@@ -23,7 +23,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public class TinyBuilder : Builder
+    internal class TinyBuilder : Builder
     {
 
         private const int PARENT_POINTER_INTERVAL = 10;

@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public class NodeSource : IActiveSource
+    internal class NodeSource : IActiveSource
     {
         private readonly NodeInfo node;
         private string systemId;

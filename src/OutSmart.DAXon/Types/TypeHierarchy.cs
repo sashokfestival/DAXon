@@ -26,25 +26,41 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Caching;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Types
 {
     public class TypeHierarchy
     {
-        // Concurrent (java.util.concurrent.ConcurrentHashMap upstream, and it has to be): there is
-        // ONE TypeHierarchy per Configuration, i.e. per Processor, and Relationship() writes to it
-        // from every compile. Compiles do run concurrently on a shared Processor - the documented
-        // host wrapper's Sheets.GetOrAdd can call the factory on two threads at once, and
-        // xsl:evaluate / fn:transform compile mid-transform - so a plain Dictionary was open to a
-        // torn resize, whose net472 symptom is not a crash but an endless loop inside FindEntry.
-        private readonly ConcurrentDictionary<ItemTypePair, Affinity> map;
+        // Bounded and concurrent. Concurrent because there is ONE TypeHierarchy per Configuration,
+        // i.e. per Processor, and Relationship() writes to it from every compile - compiles do run
+        // concurrently on a shared Processor (the documented host wrapper's Sheets.GetOrAdd can
+        // call the factory on two threads at once, and xsl:evaluate / fn:transform compile
+        // mid-transform), so a plain Dictionary was open to a torn resize, whose net472 symptom is
+        // not a crash but an endless loop inside FindEntry. Bounded (round A4) because it is a memo
+        // of a PURE function: a miss only costs a recompute, never a wrong answer, and dropping an
+        // XsltExecutable did not release its entries - so a host compiling throwaway variants grew
+        // this map for the Processor's life.
+        private readonly ClockCache<ItemTypePair, Affinity> map;
         protected Configuration config;
 
         public virtual ItemType GenericFunctionItemType => AnyFunctionType.GetInstance();
+
+        /// <summary>
+        /// Cap on memoized type-pair relationships. The memo is compile-driven - a realistic
+        /// stylesheet queries a few dozen distinct pairs - so this holds the whole working set
+        /// of any plausible run and only bites a host that compiles thousands of DISTINCT sheets,
+        /// which is exactly the case that used to accumulate for the Processor's life.
+        /// </summary>
+        public const int MemoCapacity = 4096;
+
+        /// <summary>Memoized type-pair relationships currently held. Diagnostic.</summary>
+        public int MemoCount => map.Count;
+
         public TypeHierarchy(Configuration config)
         {
             this.config = config;
-            map = new ConcurrentDictionary<ItemTypePair, Affinity>();
+            map = new ClockCache<ItemTypePair, Affinity>(MemoCapacity);
         }
 
         public static ISchemaType GetNearestNamedType(ISchemaType type)
@@ -322,7 +338,7 @@ namespace OutSmart.DAXon.Types
             }
 
             ItemTypePair pair = new ItemTypePair(t1, t2);
-            if (map.TryGetValue(pair, out Affinity cached))
+            if (map.TryGet(pair, out Affinity cached))
             {
                 return cached;
             }
@@ -330,7 +346,7 @@ namespace OutSmart.DAXon.Types
             // Two threads may compute the same pair at once; ComputeRelationship is a pure function
             // of the pair, so either result is the same and last-write-wins is correct.
             Affinity affinity = ComputeRelationship(t1, t2);
-            map[pair] = affinity;
+            map.Set(pair, affinity);
             return affinity;
         }
 

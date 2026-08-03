@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ValueTailIterator : ISequenceIterator, IGroundedIterator, ILookaheadIterator
+    internal class ValueTailIterator : ISequenceIterator, IGroundedIterator, ILookaheadIterator
     {
         private readonly IGroundedValue baseValue;
         private readonly int start; // zero-based

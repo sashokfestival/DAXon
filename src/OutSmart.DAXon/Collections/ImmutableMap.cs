@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Collections.Trie
 {
     // Original author: Michael Froh (published on Github). Released under MPL 2.0
     // by Saxonica Limited with permission from the author
-    public interface IImmutableMap<K, V> : IEnumerable<TrieKVP<K, V>>
+    internal interface IImmutableMap<K, V> : IEnumerable<TrieKVP<K, V>>
     {
         IImmutableMap<K, V> Put(K key, V value);
         IImmutableMap<K, V> Remove(K key);

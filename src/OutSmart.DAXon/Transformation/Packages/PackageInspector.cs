@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Transformation.Packages
 {
-    public class PackageInspector : ProxyReceiver
+    internal class PackageInspector : ProxyReceiver
     {
         private bool isSefFile;
         private string packageName;

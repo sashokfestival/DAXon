@@ -427,7 +427,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
         }
         public class PathMapNode
         {
-            public IList<PathMapArc> arcs;
+            internal IList<PathMapArc> arcs;   // Arcs is the public spelling
             private bool returnable;
             private bool atomized;
             private bool _hasUnknownDependencies;

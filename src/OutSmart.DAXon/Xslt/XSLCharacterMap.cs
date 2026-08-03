@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:character-map declaration in the stylesheet. <br>
     /// </summary>
-    public class XSLCharacterMap : StyleElement
+    internal class XSLCharacterMap : StyleElement
     {
         string use;
         IList<XSLCharacterMap> characterMapElements = null;

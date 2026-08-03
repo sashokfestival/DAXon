@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class UntypedNumericComparer : IAtomicComparer
+    internal class UntypedNumericComparer : IAtomicComparer
     {
         private static readonly double[][] bounds = new double[][]
         {

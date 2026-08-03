@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
 
-    public static class ActionExtensions
+    internal static class ActionExtensions
     {
         public static void DoAction(this IAction action) { action?.Invoke(); }
         public static void Act(this IAction action) { action?.Invoke(); }

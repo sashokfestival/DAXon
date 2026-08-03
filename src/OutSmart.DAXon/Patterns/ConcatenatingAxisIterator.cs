@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Patterns
     // builds an element-or-attribute stream by concatenating self + attribute axes and casts the result to
     // IAxisIterator, so the stub InvalidCast'd — breaking the built-in idref key index (fn:idref) and any
     // pattern over the attribute axis. Faithful port of net.sf.saxon.tree.iter.ConcatenatingAxisIterator.
-    public class ConcatenatingAxisIterator : IAxisIterator
+    internal class ConcatenatingAxisIterator : IAxisIterator
     {
         private readonly IAxisIterator first;
         private readonly IAxisIterator second;

@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Lib
     /// transpiled <c>SetErrorReporter(err =&gt; errorList.Add(err))</c> fails CS1660.
     /// Used by XsltCompiler.SetErrorList and XQueryCompiler.SetErrorList.
     /// </summary>
-    public sealed class DelegateErrorReporter : IErrorReporter
+    internal sealed class DelegateErrorReporter : IErrorReporter
     {
         private readonly Action<IXmlProcessingError> _action;
 

@@ -18,7 +18,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLGlobalParam : XSLGlobalVariable
+    internal class XSLGlobalParam : XSLGlobalVariable
     {
 
         Expression conversion = null;

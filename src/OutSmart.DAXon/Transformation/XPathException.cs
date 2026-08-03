@@ -435,7 +435,7 @@ namespace OutSmart.DAXon.Transformation
         /// <summary>
         /// Subclass of XPathException used to report circularities
         /// </summary>
-        public class Circularity : XPathException
+        internal class Circularity : XPathException
         {
             public Circularity(string message) : base(message)
             {
@@ -445,7 +445,7 @@ namespace OutSmart.DAXon.Transformation
         /// <summary>
         /// Subclass of XPathException used to report stack overflow
         /// </summary>
-        public class StackOverflow : XPathException
+        internal class StackOverflow : XPathException
         {
             public StackOverflow(string message, string errorCode, ILocation location) : base(message, errorCode, location)
             {

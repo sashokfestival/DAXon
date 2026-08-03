@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
 
-    public static class ContextMappingFunctionExtensions
+    internal static class ContextMappingFunctionExtensions
     {
         public static ISequenceIterator IMap(this IContextMappingFunction f, IXPathContext context) => f?.Invoke(context);
     }

@@ -20,7 +20,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLWithParam : XSLGeneralVariable
+    internal class XSLWithParam : XSLGeneralVariable
     {
         private readonly HashSet<SourceBinding.BindingProperty> allowedAttributes = new HashSet<SourceBinding.BindingProperty> { SourceBinding.BindingProperty.SELECT, SourceBinding.BindingProperty.AS, SourceBinding.BindingProperty.TUNNEL };
         public override void PrepareAttributes()

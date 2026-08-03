@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Values
 {
-    public sealed class YearMonthDurationValue : DurationValue, IXPathComparable, IContextFreeAtomicValue
+    internal sealed class YearMonthDurationValue : DurationValue, IXPathComparable, IContextFreeAtomicValue
     {
 
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.YEAR_MONTH_DURATION;

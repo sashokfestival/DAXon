@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Expressions
     // Ported from upstream net/sf/saxon/expr/TreatExpression.java: a CardinalityChecker
     // wrapping an ItemChecker, both carrying a RoleDiagnostic with error code XPDY0050,
     // so the operand's type is checked at runtime.
-    public abstract class TreatExpression
+    internal abstract class TreatExpression
     {
         private TreatExpression() { }
 

@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// A ATokenIterator is an iterator over the strings that result from tokenizing a string using a regular expression
     /// </summary>
-    public class ATokenIterator : IAtomicIterator
+    internal class ATokenIterator : IAtomicIterator
     {
         private readonly UnicodeString input;
         private readonly REMatcher matcher;

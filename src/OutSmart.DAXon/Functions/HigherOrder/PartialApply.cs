@@ -25,7 +25,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions.HigherOrder
 {
-    public class PartialApply : Expression
+    internal class PartialApply : Expression
     {
         private readonly Operand baseOp;
         private readonly Operand[] boundArgumentsOp; // contains null where the question marks appear

@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:attribute-set element in the stylesheet. <br>
     /// </summary>
-    public class XSLAttributeSet : StyleElement, IStylesheetComponent
+    internal class XSLAttributeSet : StyleElement, IStylesheetComponent
     {
         private string nameAtt;
         private string useAtt;

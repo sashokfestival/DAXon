@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation.Rules
 {
-    public class FailRuleSet : IBuiltInRuleSet
+    internal class FailRuleSet : IBuiltInRuleSet
     {
         private static readonly FailRuleSet THE_INSTANCE = new FailRuleSet();
 

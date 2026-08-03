@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// xsl:attribute element in stylesheet. <br>
     /// </summary>
-    public sealed class XSLAttribute : XSLLeafNodeConstructor
+    internal sealed class XSLAttribute : XSLLeafNodeConstructor
     {
         private Expression attributeName;
         private Expression separator;

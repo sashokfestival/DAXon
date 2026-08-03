@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Values
     /// <summary>
     /// This class provides helper methods and constants for handling whitespace
     /// </summary>
-    public class Whitespace
+    internal class Whitespace
     {
 
         public const int PRESERVE = 0;
@@ -575,7 +575,7 @@ namespace OutSmart.DAXon.Values
         /// <summary>
         /// An iterator that splits a string on whitespace boundaries, corresponding to the XPath 3.1 function tokenize#1
         /// </summary>
-        public class Tokenizer : IAtomicIterator
+        internal class Tokenizer : IAtomicIterator
         {
             private readonly UnicodeString input;
             private long position;

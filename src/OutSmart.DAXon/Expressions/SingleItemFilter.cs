@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// A SingleItemFilter is an expression that selects zero or one items from a supplied sequence
     /// </summary>
-    public abstract class SingleItemFilter : UnaryExpression
+    internal abstract class SingleItemFilter : UnaryExpression
     {
         public SingleItemFilter(Expression @base) : base(@base)
         {

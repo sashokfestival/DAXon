@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ItemTypeCheckingFunction : IItemMappingFunction
+    internal class ItemTypeCheckingFunction : IItemMappingFunction
     {
         private readonly Types.ItemType requiredItemType;
         private readonly Func<RoleDiagnostic> roleSupplier;

@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:assert element in an XSLT 3.0 stylesheet.
     /// </summary>
-    public sealed class XSLAssert : StyleElement
+    internal sealed class XSLAssert : StyleElement
     {
         private Expression test = null;
         private Expression select = null;

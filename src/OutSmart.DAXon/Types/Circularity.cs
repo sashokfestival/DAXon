@@ -11,5 +11,5 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Types
 {
-    public class Circularity : Exception { public Circularity() { } public Circularity(string m) : base(m) { } }
+    internal class Circularity : Exception { public Circularity() { } public Circularity(string m) : base(m) { } }
 }

@@ -23,7 +23,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class GroupAdjacentIterator : IGroupIterator, ILastPositionFinder, ILookaheadIterator
+    internal class GroupAdjacentIterator : IGroupIterator, ILastPositionFinder, ILookaheadIterator
     {
         private readonly IPullEvaluator select;
         private readonly IFocusIterator population;

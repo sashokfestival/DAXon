@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
 
-    public static class PushEvaluatorExtensions
+    internal static class PushEvaluatorExtensions
     {
         public static ITailCall ProcessLeavingTail(this IPushEvaluator e, Outputter @out, IXPathContext context) => e == null ? default : e(@out, context);
     }

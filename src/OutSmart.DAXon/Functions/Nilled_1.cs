@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the nilled() function
     /// </summary>
-    public class Nilled_1 : SystemFunction, ICallable
+    internal class Nilled_1 : SystemFunction, ICallable
     {
 
         public static Func<Nilled_1> New() => () => new Nilled_1();

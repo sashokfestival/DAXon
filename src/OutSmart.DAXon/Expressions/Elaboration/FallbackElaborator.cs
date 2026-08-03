@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public class FallbackElaborator : Elaborator
+    internal class FallbackElaborator : Elaborator
     {
         public FallbackElaborator()
         {

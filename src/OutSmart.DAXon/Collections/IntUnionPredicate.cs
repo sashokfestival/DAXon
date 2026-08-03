@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Collections
 {
-    public class IntUnionPredicate : IIntPredicateProxy
+    internal class IntUnionPredicate : IIntPredicateProxy
     {
         private readonly IIntPredicateProxy p1;
         private readonly IIntPredicateProxy p2;

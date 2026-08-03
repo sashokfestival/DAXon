@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Parsing
 {
 
-    public static class ExpressionActionExtensions
+    internal static class ExpressionActionExtensions
     {
         public static bool Process(this IExpressionAction a, Expression expression, object result) => a == null ? false : a(expression, result);
     }

@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Lib
 {
     // StandardMessageHandler stub — paulirwin emitted as plain class but should
     // be Action<Message>. Use implicit operator (Action<T> is a delegate, so we wrap).
-    public class StandardMessageHandler
+    internal class StandardMessageHandler
     {
         public StandardMessageHandler(object factory) { }
         public void Accept(Message msg) { }

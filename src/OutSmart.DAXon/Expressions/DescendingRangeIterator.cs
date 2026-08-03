@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class DescendingRangeIterator : RangeIterator, IAtomicIterator, IReversibleIterator, ILastPositionFinder, ILookaheadIterator
+    internal class DescendingRangeIterator : RangeIterator, IAtomicIterator, IReversibleIterator, ILastPositionFinder, ILookaheadIterator
     {
         long start;
         long step;

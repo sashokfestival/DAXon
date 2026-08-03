@@ -17,7 +17,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions.HigherOrder
 {
-    public class Sort_3 : Sort_2
+    internal class Sort_3 : Sort_2
     {
 
         public static Func<Sort_3> New() => () => new Sort_3();

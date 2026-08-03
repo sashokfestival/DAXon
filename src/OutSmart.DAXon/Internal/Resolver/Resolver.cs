@@ -9,7 +9,7 @@ namespace OutSmart.DAXon.Internal.Resolver
     /// <summary>Stub for org.xmlresolver.Resolver (XML Catalog resolver).
     /// CatalogResourceResolver.cs references this; it's an optional
     /// catalog-based URI resolution feature. The full library is not ported.</summary>
-    public class Resolver
+    internal class Resolver
     {
         public Resolver() { }
         public Resolver(object config) { }

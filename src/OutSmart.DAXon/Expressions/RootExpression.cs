@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class RootExpression : Expression
+    internal class RootExpression : Expression
     {
         private bool contextMaybeUndefined = true;
         private bool doneWarnings = false;
@@ -207,7 +207,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a root expression ({@code /})
         /// </summary>
-        public class RootExprElaborator : ItemElaborator
+        internal class RootExprElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

@@ -26,7 +26,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Serialization
 {
-    public class SerializationParamsHandler
+    internal class SerializationParamsHandler
     {
         public static readonly NamespaceUri NAMESPACE = NamespaceUri.OUTPUT;
         Properties properties;

@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class NumericComparer : IAtomicComparer
+    internal class NumericComparer : IAtomicComparer
     {
         private static readonly NumericComparer THE_INSTANCE = new NumericComparer();
         protected StringToDouble converter = StringToDouble.GetInstance();

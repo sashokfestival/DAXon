@@ -13,7 +13,7 @@ using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Types
 {
-    public class StringToAnyURI : StringConverter
+    internal class StringToAnyURI : StringConverter
     {
         private readonly StringConverter inner;
         public StringToAnyURI() { }

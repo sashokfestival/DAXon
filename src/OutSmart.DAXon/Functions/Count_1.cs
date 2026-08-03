@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     // GetElaborator() (CountFnElaborator) intentionally omitted (String_1/Tokenize_1 pattern): correctness from Call
     // (interpreter path); the optimizer elaborator is deferred. The grounded fast-path uses IGroundedValue.GetLength();
     // otherwise count by iterating (faithful to the real SteppingCount loop). UO/INS upstream flags are non-correctness.
-    public class Count_1 : SystemFunction
+    internal class Count_1 : SystemFunction
     {
         public Count_1() { }
         public static Func<Count_1> New() => () => new Count_1();

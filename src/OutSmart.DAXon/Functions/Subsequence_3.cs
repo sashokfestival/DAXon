@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the XPath 2.0 subsequence() function with three arguments
     /// </summary>
-    public class Subsequence_3 : SystemFunction, ICallable
+    internal class Subsequence_3 : SystemFunction, ICallable
     {
 
         public override string StreamerName => "Subsequence";

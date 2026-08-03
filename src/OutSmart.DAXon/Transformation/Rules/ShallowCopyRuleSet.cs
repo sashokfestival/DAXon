@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Transformation.Rules
     /// <summary>
     /// The built-in rule set introduced in XSLT 3.0, which is effectively an identity template.
     /// </summary>
-    public class ShallowCopyRuleSet : IBuiltInRuleSet
+    internal class ShallowCopyRuleSet : IBuiltInRuleSet
     {
         private static readonly ShallowCopyRuleSet THE_INSTANCE = new ShallowCopyRuleSet();
 

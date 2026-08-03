@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the XSLT function-available functions.
     /// </summary>
-    public class FunctionAvailable : SystemFunction
+    internal class FunctionAvailable : SystemFunction
     {
         public override Expression MakeFunctionCall(params Expression[] arguments)
         {

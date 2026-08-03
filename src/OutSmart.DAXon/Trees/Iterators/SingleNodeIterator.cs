@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Trees.Iterators
     /// <summary>
     /// SingleNodeIterator: an iterator over a sequence of zero or one nodes
     /// </summary>
-    public class SingleNodeIterator : IAxisIterator, IReversibleIterator, ILastPositionFinder, IGroundedIterator, ILookaheadIterator
+    internal class SingleNodeIterator : IAxisIterator, IReversibleIterator, ILastPositionFinder, IGroundedIterator, ILookaheadIterator
     {
         private readonly NodeInfo item;
         private int position = 0;

@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Trees.Linked
 {
-    public class DescendantAxisIterator
+    internal class DescendantAxisIterator
     {
         public DescendantAxisIterator() { }
         public DescendantAxisIterator(object a, object b, object c) { }

@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Patterns
     /// <summary>
     /// Represents a pattern with a predicate, for example item[@value=3] or .[. instance of map(*)]
     /// </summary>
-    public interface IPatternWithPredicate
+    internal interface IPatternWithPredicate
     {
         Expression Predicate { get; }
     }

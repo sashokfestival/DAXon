@@ -21,7 +21,7 @@ using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLGlobalVariable : StyleElement, IStylesheetComponent
+    internal class XSLGlobalVariable : StyleElement, IStylesheetComponent
     {
         private SlotManager slotManager; // used to manage local variables declared inside this global variable
         protected SourceBinding sourceBinding;

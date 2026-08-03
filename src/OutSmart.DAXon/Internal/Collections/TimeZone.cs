@@ -12,7 +12,7 @@ using System.IO;
 namespace OutSmart.DAXon.Internal.Collections
 {
 
-    public class TimeZone
+    internal class TimeZone
     {
 
         private static readonly Dictionary<string, string> IanaToWindows =

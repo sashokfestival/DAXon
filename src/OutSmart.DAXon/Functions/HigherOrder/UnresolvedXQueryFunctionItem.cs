@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions.HigherOrder
 {
-    public class UnresolvedXQueryFunctionItem : AbstractFunction
+    internal class UnresolvedXQueryFunctionItem : AbstractFunction
     {
         private readonly XQueryFunction fd;
         private readonly SymbolicName.F functionName;

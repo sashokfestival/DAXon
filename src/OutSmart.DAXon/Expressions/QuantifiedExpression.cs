@@ -270,7 +270,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a quantified expression ({@code some|every X in Y satisfies Z})
         /// </summary>
-        public class QuantifiedExprElaborator : BooleanElaborator
+        internal class QuantifiedExprElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// A sequence that wraps an iterator, without being materialized. It can only be used once.
     /// </summary>
-    public class LazySequence : ISequence
+    internal class LazySequence : ISequence
     {
         ISequenceIterator iterator;
         bool used = false;

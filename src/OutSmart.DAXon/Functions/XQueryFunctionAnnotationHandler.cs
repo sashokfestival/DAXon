@@ -19,7 +19,7 @@ using OutSmart.DAXon.Types;
 
 namespace OutSmart.DAXon.Functions
 {
-    public class XQueryFunctionAnnotationHandler : IFunctionAnnotationHandler
+    internal class XQueryFunctionAnnotationHandler : IFunctionAnnotationHandler
     {
         // Must match the real impl: Configuration.Init registers this handler keyed by its assertion
         // namespace, and a null key throws ArgumentNullException from the backing Dictionary. The XQuery

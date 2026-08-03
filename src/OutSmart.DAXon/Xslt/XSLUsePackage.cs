@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Handler for xsl:use-package elements in stylesheet.
     /// </summary>
-    public class XSLUsePackage : StyleElement
+    internal class XSLUsePackage : StyleElement
     {
         private string nameAtt = null;
         private PackageVersionRanges versionRanges = null;

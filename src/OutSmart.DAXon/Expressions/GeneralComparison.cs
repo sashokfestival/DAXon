@@ -701,7 +701,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a general comparison expression such as (A = B).
         /// </summary>
-        public class GeneralComparisonElaborator : BooleanElaborator
+        internal class GeneralComparisonElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

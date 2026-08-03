@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions
     /// values. Note that the input may be a sequence of nodes or atomic values, even though the result must
     /// contain at most one atomic value.
     /// </summary>
-    public sealed class SingletonAtomizer : UnaryExpression
+    internal sealed class SingletonAtomizer : UnaryExpression
     {
         private readonly bool allowEmpty;
         private readonly Func<RoleDiagnostic> roleSupplier;
@@ -266,7 +266,7 @@ namespace OutSmart.DAXon.Expressions
         // Java-parity elaborator (SingletonAtomizer$SingletonAtomizerElaborator). Composes the base pull
         // evaluator ONCE; the interpreted EvaluateItem calls BaseExpression.Iterate per evaluation, which
         // re-runs MakeElaborator (lock) + the whole ElaborateForPull closure rebuild on every HOF-lambda call.
-        public class SingletonAtomizerElaborator : ItemElaborator
+        internal class SingletonAtomizerElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

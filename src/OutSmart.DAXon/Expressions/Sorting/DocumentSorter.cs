@@ -263,7 +263,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         /// <summary>
         /// Elaborator for a docOrder expression - sorts nodes into document order and eliminates duplicates
         /// </summary>
-        public class DocumentSorterElaborator : PullElaborator
+        internal class DocumentSorterElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Values.Maps
     /// shared by every map with the same layout (an array of similar JSON records repeats one
     /// layout per row, so the index is built once instead of once per map).
     /// </summary>
-    public sealed class TabularShape
+    internal sealed class TabularShape
     {
         public readonly string[] keys;
         public readonly Dictionary<string, int> index;
@@ -41,7 +41,7 @@ namespace OutSmart.DAXon.Values.Maps
     /// live in a shared TabularShape and whose values are a plain slot array. Modification
     /// (AddEntry/Remove) converts to a HashTrieMap, exactly like DictionaryMap.
     /// </summary>
-    public class TabularMap : MapItem
+    internal class TabularMap : MapItem
     {
         private readonly TabularShape shape;
         private readonly IGroundedValue[] values;

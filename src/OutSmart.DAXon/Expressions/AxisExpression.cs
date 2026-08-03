@@ -31,7 +31,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Api;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class AxisExpression : Expression
+    internal sealed class AxisExpression : Expression
     {
         private int axis;
         private NodeTest test;
@@ -1310,7 +1310,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for an AxisExpression
         /// </summary>
-        public class AxisExpressionElaborator : PullElaborator
+        internal class AxisExpressionElaborator : PullElaborator
         {
             private void ReportDoesNotExist(Expression expression, IXPathContext context)
             {

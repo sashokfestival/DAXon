@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// A compiled xsl:where-populated instruction (formerly xsl:conditional-content).
     /// </summary>
-    public class WherePopulated : UnaryExpression, IItemMappingFunction
+    internal class WherePopulated : UnaryExpression, IItemMappingFunction
     {
 
         public override int ImplementationMethod => ITERATE_METHOD | PROCESS_METHOD;

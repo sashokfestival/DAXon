@@ -29,9 +29,8 @@ namespace OutSmart.DAXon.Api
 {
     public class Processor : Configuration.IApiProvider
     {
-        // Host-level resource limits, fixed at construction. Everything created from this
-        // Processor inherits them: every transformation (XsltTransformer / Xslt30Transformer)
-        // runs under TransformTimeout, and DocumentCache rejects inputs over MaxInputBytes.
+        // Host-level resource limits, fixed at construction, inherited by everything created from
+        // this Processor. Both are PER ENGINE CALL, not per host request - see the doc comments.
         public static readonly TimeSpan DefaultTransformTimeout = TimeSpan.FromMinutes(1);
 
         // A parsed tree retains roughly 3x the source text, so one 150 MB input alone holds
@@ -39,14 +38,23 @@ namespace OutSmart.DAXon.Api
         public const long DefaultMaxInputBytes = 150L * 1024 * 1024;
 
         /// <summary>
-        /// Wall-clock limit per transformation; exceeded runs abort with SXTO0001.
+        /// Wall-clock limit for ONE engine call; exceeded calls abort with SXTO0001.
         /// TimeSpan.Zero (or negative) means no limit.
+        /// <para>
+        /// Per CALL, not per host request: a compile, a document build, a JSON parse and a
+        /// transformation each claim the full budget for their own scope. A host that runs all
+        /// four for one message therefore has a worst case of ~4x this value, and if it needs a
+        /// bound on the whole request it must impose that itself. The alternative - one budget
+        /// shared across the phases - would abort legitimate work on a cold cache, where the
+        /// compile is the expensive part and the transform is not.
+        /// </para>
         /// </summary>
         public TimeSpan TransformTimeout { get; }
 
         /// <summary>
-        /// Largest input DocumentCache accepts: file length in bytes, or string length in
-        /// chars for content entries. long.MaxValue effectively disables the check.
+        /// Largest input accepted, in BYTES, on every entry point: DocumentBuilder, JsonBuilder,
+        /// XsltCompiler, DocumentCache, and everything the resolver fetches (doc/document/
+        /// collection/unparsed-text/json-doc, compile-time includes). long.MaxValue disables it.
         /// </summary>
         public long MaxInputBytes { get; }
 
@@ -92,6 +100,15 @@ namespace OutSmart.DAXon.Api
         }
 
         public virtual Configuration UnderlyingConfiguration => config;
+
+        // A constructor whose parameters are all optional is invisible to a binder that works
+        // through reflection - Activator.CreateInstance and PowerShell's New-Object both look for
+        // a zero-parameter one and do not fill defaults in. This is that constructor; C# overload
+        // resolution prefers it for `new Processor()` because it substitutes no defaults.
+        public Processor()
+            : this(null, DefaultMaxInputBytes)
+        {
+        }
 
         /// <param name="transformTimeout">Wall-clock limit per transformation; null for the
         /// default (1 minute), TimeSpan.Zero (or negative) for no limit.</param>

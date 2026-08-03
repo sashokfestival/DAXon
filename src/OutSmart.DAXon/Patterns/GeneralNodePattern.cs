@@ -25,13 +25,13 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Patterns
 {
-    public sealed class GeneralNodePattern : Pattern
+    internal sealed class GeneralNodePattern : Pattern
     {
         private Expression equivalentExpr;
         private readonly NodeTest itemType;
         private Expression topNodeEquivalent = null;
-        private IPullEvaluator equivalentExprEvaluator;
-        private IPullEvaluator equivalentTopNodeEvaluator;
+        private volatile IPullEvaluator equivalentExprEvaluator;   // volatile: published once, read hot (round 11)
+        private volatile IPullEvaluator equivalentTopNodeEvaluator;
         private Pattern precondition = null;
 
         public override int Dependencies => equivalentExpr.Dependencies & (StaticProperty.DEPENDS_ON_LOCAL_VARIABLES | StaticProperty.DEPENDS_ON_USER_FUNCTIONS);

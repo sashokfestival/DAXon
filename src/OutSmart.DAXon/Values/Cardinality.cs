@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Values
 {
-    public sealed class Cardinality
+    internal sealed class Cardinality
     {
         /// <summary>
         /// Private constructor: no instances allowed

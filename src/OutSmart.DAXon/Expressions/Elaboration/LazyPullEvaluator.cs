@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public class LazyPullEvaluator : ISequenceEvaluator
+    internal class LazyPullEvaluator : ISequenceEvaluator
     {
         readonly IPullEvaluator puller;
         public LazyPullEvaluator(IPullEvaluator select)

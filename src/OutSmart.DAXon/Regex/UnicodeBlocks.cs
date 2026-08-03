@@ -26,7 +26,7 @@ using System.Globalization;
 using System.IO;
 namespace OutSmart.DAXon.Regex
 {
-    public class UnicodeBlocks
+    internal class UnicodeBlocks
     {
         private readonly Dictionary<string, IntSet> blocks = new Dictionary<string, IntSet>(250);
         private UnicodeBlocks()

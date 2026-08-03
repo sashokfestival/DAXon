@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLImportSchema : StyleElement
+    internal class XSLImportSchema : StyleElement
     {
         public override bool IsDeclaration()
         {

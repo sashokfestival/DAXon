@@ -7,7 +7,7 @@ namespace OutSmart.DAXon.Internal
 {
     // String helpers whose argument is a REGEX pattern (java.lang.String.split/matches/replaceFirst
     // heritage) — named *Regex so they cannot be mistaken for the literal-argument BCL methods.
-    public static class RegexStringExtensions
+    internal static class RegexStringExtensions
     {
         public static string[] SplitRegex(this string s, string regex)
             => s == null ? new string[0] : global::System.Text.RegularExpressions.Regex.Split(s, regex);

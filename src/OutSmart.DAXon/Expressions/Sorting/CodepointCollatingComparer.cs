@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class CodepointCollatingComparer : IAtomicComparer
+    internal class CodepointCollatingComparer : IAtomicComparer
     {
         private static readonly CodepointCollator collator = CodepointCollator.GetInstance();
         private static readonly CodepointCollatingComparer THE_INSTANCE = new CodepointCollatingComparer();

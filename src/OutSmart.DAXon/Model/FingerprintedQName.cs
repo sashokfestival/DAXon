@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public class FingerprintedQName : INodeName
+    internal class FingerprintedQName : INodeName
     {
         private readonly StructuredQName qName;
         private int fingerprint = -1;

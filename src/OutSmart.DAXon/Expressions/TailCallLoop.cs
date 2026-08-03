@@ -148,7 +148,7 @@ namespace OutSmart.DAXon.Expressions
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        public class TailCallComponent : ITailCallInfo
+        internal class TailCallComponent : ITailCallInfo
         {
             public Component component;
             public UserFunction function;
@@ -157,7 +157,7 @@ namespace OutSmart.DAXon.Expressions
         /*TailCallLoop e2 = new TailCallLoop(containingFunction);
         e2.setBaseExpression(getBaseExpression().copy());
         return e2;*/
-        public class TailCallFunction : ITailCallInfo
+        internal class TailCallFunction : ITailCallInfo
         {
             public UserFunction function;
         }

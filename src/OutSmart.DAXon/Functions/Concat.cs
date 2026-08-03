@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the fn:concat() function
     /// </summary>
-    public class Concat : SystemFunction, IPushableFunction
+    internal class Concat : SystemFunction, IPushableFunction
     {
 
         public override IFunctionItemType FunctionItemType

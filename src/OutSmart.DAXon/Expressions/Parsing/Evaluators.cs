@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
     /// <summary>
     /// Constants for different mechanisms of expression evaluation
     /// </summary>
-    public class Evaluators
+    internal class Evaluators
     {
         // These numeric constants must be stable as they are held in the SEF file
         public const int UNDECIDED = -1;

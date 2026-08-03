@@ -1043,7 +1043,7 @@ namespace OutSmart.DAXon.Expressions
       *     The expression must return a string or (); if the value of the
       *     expression is (), this method returns "".
       */
-        public class LiteralElaborator : PullElaborator
+        internal class LiteralElaborator : PullElaborator
         {
             public override ISequenceEvaluator Eagerly()
             {

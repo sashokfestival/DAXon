@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class HTML5CaseBlindCollator : IStringCollator, ISubstringMatcher
+    internal class HTML5CaseBlindCollator : IStringCollator, ISubstringMatcher
     {
         private static readonly HTML5CaseBlindCollator theInstance = new HTML5CaseBlindCollator();
 

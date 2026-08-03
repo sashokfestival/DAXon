@@ -66,7 +66,10 @@ namespace OutSmart.DAXon.Types
         public static readonly BuiltInAtomicType NORMALIZED_STRING = MakeAtomicType(StandardNames.XS_NORMALIZED_STRING, STRING, "ASN", true);
         public static readonly BuiltInAtomicType TOKEN = MakeAtomicType(StandardNames.XS_TOKEN, NORMALIZED_STRING, "ASNT", true);
         public static readonly BuiltInAtomicType LANGUAGE = MakeAtomicType(StandardNames.XS_LANGUAGE, TOKEN, "ASNTL", true);
-        public static readonly BuiltInAtomicType NAME = MakeAtomicType(StandardNames.XS_NAME, TOKEN, "ASNTN", true);
+        // Internal, alone among these singletons: it collides by case with the Name property
+        // below, which implements ISchemaType.Name and so cannot move. A case-insensitive
+        // binder rejects the whole type over the pair, and the property is the one hosts read.
+        internal static readonly BuiltInAtomicType NAME = MakeAtomicType(StandardNames.XS_NAME, TOKEN, "ASNTN", true);
         public static readonly BuiltInAtomicType NMTOKEN = MakeAtomicType(StandardNames.XS_NMTOKEN, TOKEN, "ASNTK", true);
         public static readonly BuiltInAtomicType NCNAME = MakeAtomicType(StandardNames.XS_NCNAME, NAME, "ASNTNC", true);
         public static readonly BuiltInAtomicType ID = MakeAtomicType(StandardNames.XS_ID, NCNAME, "ASNTNCI", true);

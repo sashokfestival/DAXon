@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions.Registry
 {
-    public class XSLT30FunctionSet : BuiltInFunctionSet
+    internal class XSLT30FunctionSet : BuiltInFunctionSet
     {
         private static readonly XSLT30FunctionSet THE_INSTANCE = new XSLT30FunctionSet();
 

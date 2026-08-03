@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Trees.Utilities
     // within processing instructions per "Associating Style Sheets with XML Documents".
     // Java wraps the PI data as "<e ...data.../>" and parses it with a SAX reader; the port does the
     // same with System.Xml.XmlReader (quotes and character references handled by the XML parser).
-    public static class ProcInstParser
+    internal static class ProcInstParser
     {
         /// <summary>
         /// Get a pseudo-attribute value from PI content, or null if not present.

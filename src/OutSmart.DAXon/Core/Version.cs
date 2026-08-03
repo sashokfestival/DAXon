@@ -13,7 +13,7 @@ namespace OutSmart.DAXon.Core
 {
     // Version stub -- the original Version.cs is excluded but ~120 callers depend on
     // Version.platform field and other constants.
-    public static class Version
+    internal static class Version
     {
         public static IPlatform platform = new DotNetPlatform();
         public static string softwareEdition = "HE";

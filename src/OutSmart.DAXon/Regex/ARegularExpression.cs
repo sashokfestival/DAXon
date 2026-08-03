@@ -20,7 +20,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Regex
 {
-    public class ARegularExpression : IRegularExpression
+    internal class ARegularExpression : IRegularExpression
     {
         UnicodeString rawPattern;
         string rawFlags;

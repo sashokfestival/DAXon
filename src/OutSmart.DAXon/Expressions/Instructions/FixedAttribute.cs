@@ -28,7 +28,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public sealed class FixedAttribute : AttributeCreator
+    internal sealed class FixedAttribute : AttributeCreator
     {
         private readonly INodeName nodeName;
 

@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Internal
     /// half of a default 1 MB thread — which would reject recursion depths that in fact
     /// complete comfortably.
     /// </summary>
-    public static class StackGuard
+    internal static class StackGuard
     {
         // Headroom kept in reserve when RecursionDepthError is raised. Must cover the deepest
         // single engine descent between two probes PLUS the error path itself: unwinding a

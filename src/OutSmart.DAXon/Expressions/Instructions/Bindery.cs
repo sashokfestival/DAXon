@@ -80,7 +80,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return globals[slot];
         }
 
-        public class FailureValue : ObjectValue<XPathException>
+        internal class FailureValue : ObjectValue<XPathException>
         {
             public FailureValue(XPathException err) : base(new XPathException(err?.Message))
             {

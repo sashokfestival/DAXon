@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Resources
     /// entities / an external DTD subset resolve through the Configuration's ResourceResolver (wrapped as
     /// a System.Xml.XmlResolver); DTD-STRICT validation maps to <c>ValidationType.DTD</c>.
     /// </summary>
-    public class ActiveStreamSource : IActiveSource
+    internal class ActiveStreamSource : IActiveSource
     {
         private readonly Stream byteStream;
         private readonly TextReader charStream;

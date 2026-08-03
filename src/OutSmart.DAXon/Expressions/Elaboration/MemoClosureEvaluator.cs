@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public class MemoClosureEvaluator : ISequenceEvaluator
+    internal class MemoClosureEvaluator : ISequenceEvaluator
     {
         readonly Expression input;
         readonly IPullEvaluator inputEvaluator;

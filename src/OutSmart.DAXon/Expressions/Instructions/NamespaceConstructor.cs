@@ -32,7 +32,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// A namespace constructor instruction. (xsl:namespace in XSLT 2.0, or namespace{}{} in XQuery 1.1)
     /// </summary>
-    public class NamespaceConstructor : SimpleNodeConstructor
+    internal class NamespaceConstructor : SimpleNodeConstructor
     {
         private readonly Operand nameOp;
 

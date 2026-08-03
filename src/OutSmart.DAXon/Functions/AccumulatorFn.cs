@@ -137,7 +137,7 @@ namespace OutSmart.DAXon.Functions
             UNSPECIFIED
         }
 
-        public class AccumulatorBefore : AccumulatorFn
+        internal class AccumulatorBefore : AccumulatorFn
         {
             public AccumulatorBefore()
             {
@@ -151,7 +151,7 @@ namespace OutSmart.DAXon.Functions
 
         //
         //
-        public class AccumulatorAfter : AccumulatorFn
+        internal class AccumulatorAfter : AccumulatorFn
         {
 
             public override string StreamerName => "AccumulatorAfter";

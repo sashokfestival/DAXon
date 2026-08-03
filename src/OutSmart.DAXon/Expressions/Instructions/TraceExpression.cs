@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// A wrapper expression used to trace expressions in XSLT and XQuery.
     /// </summary>
-    public class TraceExpression : Instruction
+    internal class TraceExpression : Instruction
     {
         private readonly Operand baseOp;
         private Dictionary<string, object> properties = new Dictionary<string, object>(10);

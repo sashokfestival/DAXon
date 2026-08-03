@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class SubscriptExpression : SingleItemFilter
+    internal class SubscriptExpression : SingleItemFilter
     {
         private readonly Operand subscriptOp;
 
@@ -159,7 +159,7 @@ namespace OutSmart.DAXon.Expressions
             return new SubscriptExprElaborator();
         }
 
-        public class SubscriptExprElaborator : ItemElaborator
+        internal class SubscriptExprElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

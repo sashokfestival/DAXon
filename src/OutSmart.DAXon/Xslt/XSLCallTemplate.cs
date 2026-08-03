@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:call-template element in the stylesheet
     /// </summary>
-    public class XSLCallTemplate : StyleElement
+    internal class XSLCallTemplate : StyleElement
     {
         private static readonly StructuredQName ERROR_TEMPLATE_NAME = new StructuredQName("saxon", NamespaceUri.SAXON, "error-template");
         private StructuredQName calledTemplateName; // the name of the called template

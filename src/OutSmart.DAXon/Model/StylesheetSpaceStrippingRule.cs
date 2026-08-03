@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// A whitespace stripping rule that strips whitespace according to the rules defined for XSLT stylesheets
     /// </summary>
-    public class StylesheetSpaceStrippingRule : ISpaceStrippingRule
+    internal class StylesheetSpaceStrippingRule : ISpaceStrippingRule
     {
         //    Any child of one of the following elements is removed from the tree,
         //    regardless of any xml:space attributes. Note that this array must be in numeric

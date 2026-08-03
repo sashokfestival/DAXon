@@ -31,7 +31,7 @@ using OutSmart.DAXon.Internal;
 using System.IO;
 namespace OutSmart.DAXon.Expressions.Parsing
 {
-    public class ExpressionTool
+    internal class ExpressionTool
     {
 
         public static string CurrentDirectory

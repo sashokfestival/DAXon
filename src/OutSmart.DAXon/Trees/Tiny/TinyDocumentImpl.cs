@@ -26,7 +26,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public sealed class TinyDocumentImpl : TinyParentNodeImpl
+    internal sealed class TinyDocumentImpl : TinyParentNodeImpl
     {
         private IntHashMap<IList<NodeInfo>> elementList;
         private string baseURI;

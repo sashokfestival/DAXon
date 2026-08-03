@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// InstanceOf Expression: implements "Expr instance of data-type"
     /// </summary>
-    public sealed class InstanceOfExpression : UnaryExpression
+    internal sealed class InstanceOfExpression : UnaryExpression
     {
         ItemType targetType;
         int targetCardinality;
@@ -226,7 +226,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for an {@code instance of} expression
         /// </summary>
-        public class InstanceOfElaborator : BooleanElaborator
+        internal class InstanceOfElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

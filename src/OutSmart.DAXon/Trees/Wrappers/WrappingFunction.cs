@@ -11,7 +11,7 @@ namespace OutSmart.DAXon.Trees.Wrappers
     /// <summary>
     /// Callback to create a VirtualNode that wraps a given NodeInfo
     /// </summary>
-    public interface IWrappingFunction
+    internal interface IWrappingFunction
     {
         /// <summary>
         /// Factory method to wrap a node with a wrapper that implements the Saxon NodeInfo interface.

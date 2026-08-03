@@ -26,7 +26,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public class TinyElementImpl : TinyParentNodeImpl
+    internal class TinyElementImpl : TinyParentNodeImpl
     {
 
         public override NamespaceMap AllNamespaces => tree.namespaceMaps[tree.beta[nodeNr]];

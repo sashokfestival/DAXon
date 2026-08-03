@@ -15,7 +15,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Regex
 {
-    public class History
+    internal class History
     {
         private readonly Dictionary<Operation, IntSet> zeroLengthMatches = new Dictionary<Operation, IntSet>();
         public virtual bool IsDuplicateZeroLengthMatch(Operation op, int position)

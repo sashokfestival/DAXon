@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public class AllElementsSpaceStrippingRule : ISpaceStrippingRule
+    internal class AllElementsSpaceStrippingRule : ISpaceStrippingRule
     {
         private static readonly AllElementsSpaceStrippingRule THE_INSTANCE = new AllElementsSpaceStrippingRule();
         public static AllElementsSpaceStrippingRule GetInstance()

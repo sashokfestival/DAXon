@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// An axis, that is a direction of navigation in the document structure.
     /// </summary>
-    public sealed class AxisInfo
+    internal sealed class AxisInfo
     {
         /// <summary>
         /// Constant representing the ancestor axis

@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Expressions.Accumulators
     /// <summary>
     /// This class represents one of the rules making up the definition of an accumulator
     /// </summary>
-    public class AccumulatorRule : IRuleTarget, ITraceableComponent
+    internal class AccumulatorRule : IRuleTarget, ITraceableComponent
     {
         private Expression newValueExpression;
         private readonly SlotManager stackFrameMap;

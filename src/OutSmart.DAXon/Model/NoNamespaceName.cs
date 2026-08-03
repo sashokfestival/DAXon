@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// An implementation of INodeName for the common case of a name in no namespace
     /// </summary>
-    public sealed class NoNamespaceName : INodeName
+    internal sealed class NoNamespaceName : INodeName
     {
         private readonly string localName;
         private int nameCode = -1;

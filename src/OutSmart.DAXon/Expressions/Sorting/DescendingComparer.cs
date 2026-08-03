@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class DescendingComparer : IAtomicComparer
+    internal class DescendingComparer : IAtomicComparer
     {
         private readonly IAtomicComparer baseComparer;
 

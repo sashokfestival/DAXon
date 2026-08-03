@@ -14,7 +14,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Collections.Zeno
 {
-    public class ZenoChainIterator<U> : IEnumerator<U>
+    internal class ZenoChainIterator<U> : IEnumerator<U>
     {
         private int majorIndex = 0;
         private int minorIndex = 0;

@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Text
     /// <summary>
     /// IIterator over a string to produce a sequence of single character strings
     /// </summary>
-    public class CodepointIterator : IAtomicIterator
+    internal class CodepointIterator : IAtomicIterator
     {
         readonly IIntIterator codepoints;
         public CodepointIterator(IIntIterator codepoints)

@@ -32,7 +32,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// Non-streamable implementation of the xsl:source-document instruction
     /// </summary>
-    public class SourceDocument : Instruction
+    internal class SourceDocument : Instruction
     {
         protected Operand hrefOp;
         protected Operand bodyOp;

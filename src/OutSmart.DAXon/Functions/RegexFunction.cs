@@ -20,7 +20,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class RegexFunction : SystemFunction, IStatefulSystemFunction
+    internal abstract class RegexFunction : SystemFunction, IStatefulSystemFunction
     {
         private IRegularExpression staticRegex;
         public virtual IRegularExpression StaticRegex => staticRegex;

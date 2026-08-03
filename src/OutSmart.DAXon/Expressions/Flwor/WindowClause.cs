@@ -30,7 +30,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// Implements an XQuery 3.0 sliding or tumbling window clause within a FLWOR expression
     /// </summary>
-    public class WindowClause : Clause
+    internal class WindowClause : Clause
     {
         public const int WINDOW_VAR = 0;
         public const int START_ITEM = 1;

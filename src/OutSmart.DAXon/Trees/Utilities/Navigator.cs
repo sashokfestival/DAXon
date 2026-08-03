@@ -28,7 +28,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Utilities
 {
-    public sealed class Navigator
+    internal sealed class Navigator
     {
 
         private static readonly int[] nodeCategories = new[]
@@ -1186,7 +1186,7 @@ namespace OutSmart.DAXon.Trees.Utilities
         /// <summary>
         /// A class that delivers the children of a node as a Java Iterable
         /// </summary>
-        public class ChildrenAsIterable : IEnumerable<NodeInfo>
+        internal class ChildrenAsIterable : IEnumerable<NodeInfo>
         {
             private readonly NodeInfo parent;
             private INodePredicate filter = null;
@@ -1222,7 +1222,7 @@ namespace OutSmart.DAXon.Trees.Utilities
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-        public class AxisFilter : IAxisIterator
+        internal class AxisFilter : IAxisIterator
         {
             private readonly IAxisIterator @base;
             private readonly INodePredicate nodeTest;
@@ -1252,7 +1252,7 @@ namespace OutSmart.DAXon.Trees.Utilities
             public virtual void Dispose() { }
         }
 
-        public class EmptyTextFilter : IAxisIterator
+        internal class EmptyTextFilter : IAxisIterator
         {
             private readonly IAxisIterator @base;
             public EmptyTextFilter(IAxisIterator @base)
@@ -1283,7 +1283,7 @@ namespace OutSmart.DAXon.Trees.Utilities
         /// <summary>
         /// General-purpose implementation of the ancestor and ancestor-or-self axes
         /// </summary>
-        public sealed class AncestorEnumeration : IAxisIterator
+        internal sealed class AncestorEnumeration : IAxisIterator
         {
             private readonly bool includeSelf;
             private bool atStart;
@@ -1318,7 +1318,7 @@ namespace OutSmart.DAXon.Trees.Utilities
         /// cost one stack frame per tree level on EVERY Next(), so a deep document was quadratic
         /// in time and unbounded in stack - and the depth is the input's, not the stylesheet's.
         /// </summary>
-        public sealed class DescendantEnumeration : IAxisIterator
+        internal sealed class DescendantEnumeration : IAxisIterator
         {
             // Backwards, a node is emitted AFTER its descendants, so each open level remembers the
             // node it still owes. Forwards nothing is owed - the node was emitted on the way down.
@@ -1404,7 +1404,7 @@ namespace OutSmart.DAXon.Trees.Utilities
             public void Dispose() { }
         } // end of class DescendantEnumeration
 
-        public sealed class FollowingEnumeration : IAxisIterator
+        internal sealed class FollowingEnumeration : IAxisIterator
         {
             private readonly IAxisIterator ancestorEnum;
             private IAxisIterator siblingEnum;
@@ -1503,7 +1503,7 @@ namespace OutSmart.DAXon.Trees.Utilities
             public void Dispose() { }
         } // end of class FollowingEnumeration
 
-        public sealed class PrecedingEnumeration : IAxisIterator
+        internal sealed class PrecedingEnumeration : IAxisIterator
         {
             private readonly IAxisIterator ancestorEnum;
             private IAxisIterator siblingEnum;

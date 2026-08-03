@@ -509,7 +509,7 @@ namespace OutSmart.DAXon.Expressions
             return false;
         }
 
-        public abstract class FunctionCallElaborator : PullElaborator
+        internal abstract class FunctionCallElaborator : PullElaborator
         {
             protected ISequenceEvaluator[] argumentEvaluators;
             protected virtual void AllocateArgumentEvaluators(FunctionCall expr, bool allowRepeatedUse)

@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// A match of a single character in the input against a set of permitted characters
     /// </summary>
-    public class OpCharClass : Operation
+    internal class OpCharClass : Operation
     {
         private readonly IIntPredicateProxy predicate;
 

@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public class SingleItemEvaluator : ISequenceEvaluator
+    internal class SingleItemEvaluator : ISequenceEvaluator
     {
         readonly IItemEvaluator evaluator;
         public SingleItemEvaluator(IItemEvaluator eval)

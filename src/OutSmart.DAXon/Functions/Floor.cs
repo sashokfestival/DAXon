@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the fn:floor() function
     /// </summary>
-    public sealed class Floor : ScalarSystemFunction
+    internal sealed class Floor : ScalarSystemFunction
     {
 
         public static Func<Floor> New() => () => new Floor();
@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Functions
             return new FloorElaborator();
         }
 
-        public class FloorElaborator : ItemElaborator
+        internal class FloorElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

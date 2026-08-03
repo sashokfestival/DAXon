@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Lib
     /// org.xml.sax EntityResolver bridge: a ResourceRequest is built for the requested URI, resolved to a
     /// Source, and the Source's stream is handed back to the XmlReader.
     /// </summary>
-    public sealed class ResourceResolverXmlResolver : XmlResolver
+    internal sealed class ResourceResolverXmlResolver : XmlResolver
     {
         private readonly IResourceResolver resolver;
 

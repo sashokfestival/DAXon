@@ -13,7 +13,7 @@ using OutSmart.DAXon.Collections;
 namespace OutSmart.DAXon.Text
 {
 
-    public class BMPString : UnicodeString
+    internal class BMPString : UnicodeString
     {
         private readonly string _s;
         private sbyte latin1; // 0 = unknown, 1 = every char <= 0xFF, 2 = wider (benign race: recompute is idempotent)

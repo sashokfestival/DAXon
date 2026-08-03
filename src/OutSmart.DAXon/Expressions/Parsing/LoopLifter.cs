@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Expressions.Parsing
 {
     // LoopLifter excluded; provide static factory used by XPathEvaluator etc.
-    public static class LoopLifter
+    internal static class LoopLifter
     {
         public static Expression Process(Expression exp, ExpressionVisitor visitor, ContextItemStaticInfo contextInfo) => exp;
     }

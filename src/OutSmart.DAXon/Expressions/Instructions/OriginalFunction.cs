@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// This class represents a function invoked using xsl:original from within an xs:override element.
     /// </summary>
-    public class OriginalFunction : AbstractFunction, IFunctionItem, IContextOriginator
+    internal class OriginalFunction : AbstractFunction, IFunctionItem, IContextOriginator
     {
         private readonly UserFunction userFunction;
         private readonly Component component;

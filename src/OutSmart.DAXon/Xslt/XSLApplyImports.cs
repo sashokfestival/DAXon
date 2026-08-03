@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:apply-imports element in the stylesheet
     /// </summary>
-    public class XSLApplyImports : StyleElement
+    internal class XSLApplyImports : StyleElement
     {
         public override bool IsInstruction()
         {

@@ -11,7 +11,7 @@ using System;
 namespace OutSmart.DAXon.Trees.Linked
 {
     // Implement IAxisIterator interface so assignment to IAxisIterator works.
-    public class AttributeAxisIterator : IAxisIterator
+    internal class AttributeAxisIterator : IAxisIterator
     {
         public AttributeAxisIterator() { }
         public AttributeAxisIterator(object node, object test) { }

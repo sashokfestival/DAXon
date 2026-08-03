@@ -9,7 +9,7 @@ namespace OutSmart.DAXon.Internal.Net
 {
 
     // Resource connection: file: opens the local file; other schemes go through WebRequest/WebResponse.
-    public class URLConnection
+    internal class URLConnection
     {
         protected readonly global::System.Uri _url;
         protected global::System.Net.WebResponse _resp;

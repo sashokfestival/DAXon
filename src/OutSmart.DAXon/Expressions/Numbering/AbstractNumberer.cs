@@ -18,7 +18,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Numbering
 {
-    public abstract class AbstractNumberer : INumberer
+    internal abstract class AbstractNumberer : INumberer
     {
         public const int UPPER_CASE = 0;
         public const int LOWER_CASE = 1;

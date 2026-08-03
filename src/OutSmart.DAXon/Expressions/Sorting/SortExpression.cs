@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class SortExpression : Expression, ISortKeyEvaluator
+    internal class SortExpression : Expression, ISortKeyEvaluator
     {
         private readonly Operand selectOp;
         private readonly Operand sortOp;
@@ -384,7 +384,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         /// <summary>
         /// Elaborator for a sort expression - sorts nodes into order based on a user-supplied sort key
         /// </summary>
-        public class SortExprElaborator : PullElaborator
+        internal class SortExprElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

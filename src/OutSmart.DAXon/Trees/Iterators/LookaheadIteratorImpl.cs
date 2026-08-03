@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public class LookaheadIteratorImpl : ILookaheadIterator
+    internal class LookaheadIteratorImpl : ILookaheadIterator
     {
         private readonly ISequenceIterator @base;
         private IItem _next;

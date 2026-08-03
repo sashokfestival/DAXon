@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Collections
     /// <summary>
     /// An Func<int, bool> that matches a single specific integer
     /// </summary>
-    public class IntValuePredicate : IIntPredicateProxy
+    internal class IntValuePredicate : IIntPredicateProxy
     {
         private readonly int target;
         public IntValuePredicate(int target)

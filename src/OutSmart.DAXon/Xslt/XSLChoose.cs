@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:choose element in the stylesheet.
     /// </summary>
-    public class XSLChoose : XSLChooseOrSwitch
+    internal class XSLChoose : XSLChooseOrSwitch
     {
         protected override void CompileConditions(Compilation exec, ComponentDeclaration decl, Expression[] conditions)
         {

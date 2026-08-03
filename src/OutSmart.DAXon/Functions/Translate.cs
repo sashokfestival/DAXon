@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement the XPath translate() function
     /// </summary>
-    public class Translate : SystemFunction, ICallable, IStatefulSystemFunction
+    internal class Translate : SystemFunction, ICallable, IStatefulSystemFunction
     {
         private IIntToIntMap staticMap = null;
 
@@ -151,7 +151,7 @@ namespace OutSmart.DAXon.Functions
         // SystemFunctionCall.Copy when the optimizer rebound a tree containing fn:translate).
         SystemFunction IStatefulSystemFunction.Copy() => Copy();
 
-        public class TranslateFnElaborator : ItemElaborator
+        internal class TranslateFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

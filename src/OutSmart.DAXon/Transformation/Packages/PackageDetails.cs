@@ -38,6 +38,11 @@ namespace OutSmart.DAXon.Transformation.Packages
         public ResolvedResource exportLocation;
         public int priority = int.MinValue;
         public Dictionary<StructuredQName, IGroundedValue> staticParams;
-        public Thread beingProcessed;
+
+        // The "being processed" cycle marker used to live here, as one Thread field on an object
+        // the PackageLibrary shares. One field cannot mark N threads: two concurrent compiles of
+        // the same package overwrite and then clear each other, and a marker cleared out from
+        // under a thread means its real import cycle is not detected and recurses instead of
+        // raising XTSE3005. It is a per-thread set in PackageLibrary now (round 11).
     }
 }

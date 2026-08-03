@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Collections.Trie
 {
-    public sealed class TrieKVP<K, V>
+    internal sealed class TrieKVP<K, V>
     {
         public readonly K key;
         public readonly V value;

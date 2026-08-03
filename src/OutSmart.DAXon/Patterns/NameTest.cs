@@ -20,7 +20,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Patterns
 {
-    public class NameTest : NodeTest, IQNameTest
+    internal class NameTest : NodeTest, IQNameTest
     {
         private readonly int nodeKind;
         private readonly int fingerprint;

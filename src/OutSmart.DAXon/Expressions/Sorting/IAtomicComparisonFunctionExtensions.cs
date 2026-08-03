@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 {
 
     // Extension methods at namespace level (extensions can't live in nested classes).
-    public static class IAtomicComparisonFunctionExtensions
+    internal static class IAtomicComparisonFunctionExtensions
     {
         public static bool Compare(this GenericAtomicComparer.IAtomicComparisonFunction f, AtomicValue v0, AtomicValue v1, IXPathContext context)
             => f == null ? false : f(v0, v1, context);

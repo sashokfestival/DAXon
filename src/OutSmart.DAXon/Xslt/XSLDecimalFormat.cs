@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Handler for xsl:decimal-format elements in stylesheet. <br>
     /// </summary>
-    public class XSLDecimalFormat : StyleElement
+    internal class XSLDecimalFormat : StyleElement
     {
         bool prepared = false;
         string name;

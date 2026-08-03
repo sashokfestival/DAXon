@@ -77,11 +77,11 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
         private static ILocalBinding FindOuterXPathRangeVariable(StructuredQName qName, IndexedStack<InlineFunctionDetails> inlineFunctionStack)
         {
-            for (int s = inlineFunctionStack.size() - 1; s >= 0; s--)
+            for (int s = inlineFunctionStack.Size() - 1; s >= 0; s--)
             {
                 InlineFunctionDetails details = inlineFunctionStack[s];
                 IndexedStack<ILocalBinding> outerVariables = details.outerVariables;
-                for (int v = outerVariables.size() - 1; v >= 0; v--)
+                for (int v = outerVariables.Size() - 1; v >= 0; v--)
                 {
                     ILocalBinding b2 = outerVariables[v];
                     if (b2.GetVariableQName().Equals(qName))
@@ -338,7 +338,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
 
         protected virtual ILocalBinding FindRangeVariable(StructuredQName qName)
         {
-            for (int v = rangeVariables.size() - 1; v >= 0; v--)
+            for (int v = rangeVariables.Size() - 1; v >= 0; v--)
             {
                 ILocalBinding b = rangeVariables[v];
                 if (b.GetVariableQName().Equals(qName))
@@ -603,7 +603,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             Expression Parse(Tokenizer t, IStaticContext env, string expression, int start, int terminator);
         }
 
-        public class NestedLocation : ILocation
+        internal class NestedLocation : ILocation
         {
             private readonly ILocation containingLocation;
             private readonly int localLineNumber;

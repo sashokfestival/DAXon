@@ -15,7 +15,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Collections.Zeno
 {
-    public class ZenoChain<T> : IEnumerable<T>
+    internal class ZenoChain<T> : IEnumerable<T>
     {
         private readonly List<List<T>> masterList;
 

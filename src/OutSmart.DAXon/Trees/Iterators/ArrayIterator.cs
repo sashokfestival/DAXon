@@ -18,7 +18,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public abstract class ArrayIterator : ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
+    internal abstract class ArrayIterator : ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
     {
         protected int index; // position in array of current item, zero-based
         protected int start; // position of first item to be returned, zero-based
@@ -54,7 +54,7 @@ namespace OutSmart.DAXon.Trees.Iterators
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public abstract IGroundedValue Materialize();
 
-        public class Of<T> : ArrayIterator where T : class, IItem
+        internal class Of<T> : ArrayIterator where T : class, IItem
         {
             protected T[] items;
 
@@ -190,7 +190,7 @@ namespace OutSmart.DAXon.Trees.Iterators
             }
         }
 
-        public class OfNodes<N> : Of<N>, IAxisIterator where N : class, NodeInfo
+        internal class OfNodes<N> : Of<N>, IAxisIterator where N : class, NodeInfo
         {
             public OfNodes(N[] nodes) : base(nodes)
             {

@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class TreatFn : SystemFunction, ICallable
+    internal abstract class TreatFn : SystemFunction, ICallable
     {
         public abstract override string ErrorCodeForTypeErrors { get; }
         public abstract int RequiredCardinality { get; }
@@ -37,21 +37,21 @@ namespace OutSmart.DAXon.Functions
             return new RoleDiagnostic(RoleDiagnostic.FUNCTION, GetFunctionName().DisplayName, 0, ErrorCodeForTypeErrors);
         }
 
-        public class ExactlyOne : TreatFn
+        internal class ExactlyOne : TreatFn
         {
             public override int RequiredCardinality => StaticProperty.EXACTLY_ONE;
 
             public override string ErrorCodeForTypeErrors => "FORG0005";
         }
 
-        public class OneOrMore : TreatFn
+        internal class OneOrMore : TreatFn
         {
             public override int RequiredCardinality => StaticProperty.ALLOWS_ONE_OR_MORE;
 
             public override string ErrorCodeForTypeErrors => "FORG0004";
         }
 
-        public class ZeroOrOne : TreatFn
+        internal class ZeroOrOne : TreatFn
         {
             public override int RequiredCardinality => StaticProperty.ALLOWS_ZERO_OR_ONE;
 

@@ -30,7 +30,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An instruction representing an xsl:comment element in the stylesheet.
     /// </summary>
-    public sealed class Comment : SimpleNodeConstructor
+    internal sealed class Comment : SimpleNodeConstructor
     {
 
         private static readonly UnicodeString TWO_HYPHENS = new Twine8(StringConstants.TWO_HYPHENS);

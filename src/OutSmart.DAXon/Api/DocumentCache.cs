@@ -64,7 +64,7 @@ namespace OutSmart.DAXon.Api
             if (info.Length > maxInputBytes)
             {
                 throw new DAXonApiException(
-                    $"Input document too large: {full} is {info.Length / (1024 * 1024)} MB, limit is {maxInputBytes / (1024 * 1024)} MB");
+                    $"Input document too large: {full} is {info.Length} bytes, exceeds the Processor's MaxInputBytes limit of {maxInputBytes} bytes");
             }
 
             // Windows paths: normalize case in the key so the same file hits the same entry
@@ -89,10 +89,15 @@ namespace OutSmart.DAXon.Api
                 throw new ArgumentNullException(nameof(content));
             }
 
-            if (content.Length > maxInputBytes)
+            // Round B2: the limit is in BYTES. Comparing content.Length (characters) against it
+            // let multi-byte UTF-8 through at 2-3x the declared cap.
+            long bytes = content.Length > maxInputBytes
+                ? content.Length
+                : System.Text.Encoding.UTF8.GetByteCount(content);
+            if (bytes > maxInputBytes)
             {
                 throw new DAXonApiException(
-                    $"Input document too large: content is {content.Length / (1024 * 1024)} M chars, limit is {maxInputBytes / (1024 * 1024)} MB");
+                    $"Input document too large: content is {bytes} bytes, exceeds the Processor's MaxInputBytes limit of {maxInputBytes} bytes");
             }
 
             var key = Key.ForContent(content, baseUri);

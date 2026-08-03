@@ -17,7 +17,7 @@ using OutSmart.DAXon.Values;
 
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class IdentityComparison : BinaryExpression
+    internal sealed class IdentityComparison : BinaryExpression
     {
         // Set for an "X is Y" comparison emulating generate-id(X) = generate-id(Y): the empty-sequence
         // handling differs (both empty -> true for generate-id, () for is).
@@ -193,7 +193,7 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>Elaborator for an identity comparison (operators is, &lt;&lt;, &gt;&gt;).</summary>
-        public class IdentityComparisonElaborator : ItemElaborator
+        internal class IdentityComparisonElaborator : ItemElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

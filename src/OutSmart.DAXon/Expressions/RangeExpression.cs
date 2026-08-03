@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal.Collections;
 using System.Numerics;
 namespace OutSmart.DAXon.Expressions
 {
-    public class RangeExpression : Expression
+    internal class RangeExpression : Expression
     {
         private readonly Operand start;
         private readonly Operand end;
@@ -238,7 +238,7 @@ namespace OutSmart.DAXon.Expressions
             return new RangeElaborator();
         }
 
-        public class RangeElaborator : PullElaborator
+        internal class RangeElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

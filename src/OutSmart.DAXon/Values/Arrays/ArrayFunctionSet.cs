@@ -30,7 +30,7 @@ namespace OutSmart.DAXon.Values.Arrays
     /// <summary>
     /// Function signatures (and pointers to implementations) of the functions defined in XPath 3.1
     /// </summary>
-    public class ArrayFunctionSet : BuiltInFunctionSet
+    internal class ArrayFunctionSet : BuiltInFunctionSet
     {
         private static readonly ArrayFunctionSet instance31 = new ArrayFunctionSet(31);
         private static readonly ArrayFunctionSet instance40 = new ArrayFunctionSet(40);
@@ -100,7 +100,7 @@ namespace OutSmart.DAXon.Values.Arrays
             return index;
         }
 
-        public abstract class ArrayGeneratingFunction : SystemFunction, IPingable
+        internal abstract class ArrayGeneratingFunction : SystemFunction, IPingable
         {
             private double numberOfCalls = 0;
             private double numberOfConversions = 0;
@@ -137,7 +137,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:append(array, item()*) =&gt; array
         /// </summary>
-        public class ArrayAppend : SystemFunction
+        internal class ArrayAppend : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -149,7 +149,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:filter(array, function) =&gt; array
         /// </summary>
-        public class ArrayFilter : ArrayGeneratingFunction
+        internal class ArrayFilter : ArrayGeneratingFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -171,7 +171,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:flatten =&gt; item()*
         /// </summary>
-        public class ArrayFlatten : SystemFunction
+        internal class ArrayFlatten : SystemFunction
         {
             private void Flatten(ISequence arg, IList<IItem> @out)
             {
@@ -204,7 +204,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:fold-left(array, item()*, function) =&gt; array
         /// </summary>
-        public class ArrayFoldLeft : SystemFunction
+        internal class ArrayFoldLeft : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -225,7 +225,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:fold-left(array, item()*, function) =&gt; array
         /// </summary>
-        public class ArrayFoldRight : SystemFunction
+        internal class ArrayFoldRight : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -245,7 +245,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the proposed 4.0 function array:exists(array)
         /// </summary>
-        public class ArrayExists : SystemFunction
+        internal class ArrayExists : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -258,7 +258,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the proposed 4.0 function array:empty(array)
         /// </summary>
-        public class ArrayEmpty : SystemFunction
+        internal class ArrayEmpty : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -271,7 +271,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the proposed 4.0 function array:foot(array) =&gt; item()*
         /// </summary>
-        public class ArrayFoot : SystemFunction
+        internal class ArrayFoot : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -289,7 +289,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:for-each(array, function) =&gt; array
         /// </summary>
-        public class ArrayForEach : ArrayGeneratingFunction
+        internal class ArrayForEach : ArrayGeneratingFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -308,7 +308,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:for-each-pair(array, array, function) =&gt; array
         /// </summary>
-        public class ArrayForEachPair : ArrayGeneratingFunction
+        internal class ArrayForEachPair : ArrayGeneratingFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -329,7 +329,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:get(array, xs:integer) =&gt; item()*
         /// </summary>
-        public class ArrayGet : SystemFunction
+        internal class ArrayGet : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -358,7 +358,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:head(array) =&gt; item()*
         /// </summary>
-        public class ArrayHead : SystemFunction
+        internal class ArrayHead : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -375,7 +375,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:insert-before(array, xs:integer, item()*) =&gt; array
         /// </summary>
-        public class ArrayInsertBefore : SystemFunction
+        internal class ArrayInsertBefore : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -394,7 +394,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:join(arrays) =&gt; array
         /// </summary>
-        public class ArrayJoin : SystemFunction
+        internal class ArrayJoin : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -413,7 +413,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:put(arrays, index, newValue) =&gt; array
         /// </summary>
-        public class ArrayPut : SystemFunction
+        internal class ArrayPut : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -427,7 +427,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:remove(array, xs:integer) =&gt; array
         /// </summary>
-        public class ArrayRemove : SystemFunction
+        internal class ArrayRemove : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -453,7 +453,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:replace(array, position, action) =&gt; array
         /// </summary>
-        public class ArrayReplace : SystemFunction
+        internal class ArrayReplace : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -470,7 +470,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:reverse(array, xs:integer, xs:integer) =&gt; array
         /// </summary>
-        public class ArrayReverse : ArrayGeneratingFunction
+        internal class ArrayReverse : ArrayGeneratingFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -489,7 +489,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:size(array) =&gt; integer
         /// </summary>
-        public class ArraySize : SystemFunction
+        internal class ArraySize : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -501,7 +501,7 @@ namespace OutSmart.DAXon.Values.Arrays
         /// <summary>
         /// Implementation of the function array:subarray(array, xs:integer, xs:integer) =&gt; array
         /// </summary>
-        public class ArraySubarray : SystemFunction
+        internal class ArraySubarray : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -550,7 +550,7 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        public class ArrayTail : SystemFunction
+        internal class ArrayTail : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -564,7 +564,7 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        public class ArrayToSequence : SystemFunction
+        internal class ArrayToSequence : SystemFunction
         {
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
@@ -584,7 +584,7 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        public class ArrayFromSequence : FoldingFunction, IPingable
+        internal class ArrayFromSequence : FoldingFunction, IPingable
         {
             private double numberOfCalls = 0;
             private double numberOfConversions = 0;

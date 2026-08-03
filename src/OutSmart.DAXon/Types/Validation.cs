@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Lib
 {
-    public sealed class Validation
+    internal sealed class Validation
     {
         /// <summary>
         /// Code indicating that the value of a validation request was invalid

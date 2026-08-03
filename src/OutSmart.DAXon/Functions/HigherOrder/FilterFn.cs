@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// <summary>
     /// This class implements the function fn:filter(), which is a standard function in XQuery 3.0
     /// </summary>
-    public class FilterFn : SystemFunction
+    internal class FilterFn : SystemFunction
     {
 
         public override string StreamerName => "FilterFn";

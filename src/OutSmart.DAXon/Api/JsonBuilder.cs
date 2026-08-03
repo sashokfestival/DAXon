@@ -20,6 +20,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Api
 {
@@ -44,6 +45,10 @@ namespace OutSmart.DAXon.Api
 
         public virtual XdmValue ParseJson(TextReader jsonReader)
         {
+            // A standalone parse runs outside any transformation, so it must claim the Processor's
+            // budget for itself - every other API entry does (see Controller.ArmThreadDeadline).
+            // Without this the JSON path was the one entry point with no time limit at all.
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(config);
             try
             {
                 IXPathContext context = new Controller(config).NewXPathContext();
@@ -52,7 +57,9 @@ namespace OutSmart.DAXon.Api
                 Dictionary<string, IGroundedValue> options = new Dictionary<string, IGroundedValue>();
                 options["liberal"] = BooleanValue.Get(liberal);
                 options["escape"] = BooleanValue.TRUE;
-                IItem result = ParseJsonFn.Parse(content.ToString(), options, context);
+                string json = content.ToString();
+                InputSizeLimit.CheckString(json, InputSizeLimit.MaxFor(config), "urn:json-input", "FODC0002");
+                IItem result = ParseJsonFn.Parse(json, options, context);
                 return XdmValue.Wrap(result);
             }
             catch (XPathException e)
@@ -67,17 +74,30 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            finally
+            {
+                Controller.RestoreThreadDeadline(prevDeadline);
+            }
         }
 
         public virtual XdmValue ParseJson(string json)
         {
-            IXPathContext context = new Controller(config).NewXPathContext();
-            Dictionary<string, IGroundedValue> options = new Dictionary<string, IGroundedValue>();
-            options["liberal"] = BooleanValue.Get(liberal);
-            options["escape"] = BooleanValue.TRUE;
-            try { return XdmValue.Wrap(ParseJsonFn.Parse(json, options, context)); }
+            Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(config);
+            try
+            {
+                IXPathContext context = new Controller(config).NewXPathContext();
+                Dictionary<string, IGroundedValue> options = new Dictionary<string, IGroundedValue>();
+                options["liberal"] = BooleanValue.Get(liberal);
+                options["escape"] = BooleanValue.TRUE;
+                InputSizeLimit.CheckString(json, InputSizeLimit.MaxFor(config), "urn:json-input", "FODC0002");
+                return XdmValue.Wrap(ParseJsonFn.Parse(json, options, context));
+            }
             catch (XPathException e) { throw new DAXonApiException(e); }
             catch (RecursionDepthError e) { throw new DAXonApiException(e.ToXPathException()); }
+            finally
+            {
+                Controller.RestoreThreadDeadline(prevDeadline);
+            }
         }
 
         // Consumer-compat alias: a JSON document is always one item (map/array/atomic).

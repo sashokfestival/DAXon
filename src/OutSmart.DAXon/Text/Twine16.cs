@@ -12,7 +12,7 @@ using OutSmart.DAXon.Collections;
 
 namespace OutSmart.DAXon.Text
 {
-    public class Twine16 : UnicodeString
+    internal class Twine16 : UnicodeString
     {
         private readonly string _s;
         public virtual char[] CharArray => _s.ToCharArray(); // batch6: real UTF8Writer fast path

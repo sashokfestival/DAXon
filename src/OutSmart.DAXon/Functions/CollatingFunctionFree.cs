@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class CollatingFunctionFree : SystemFunction
+    internal class CollatingFunctionFree : SystemFunction
     {
         protected virtual int CollationArgument => GetArity() - 1;
 

@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     // with an InvalidCast the moment grouping started.
     // Groups the result of merging several xsl:merge input streams, identifying groups of adjacent items
     // having the same merge key value.
-    public class MergeGroupingIterator : IGroupIterator, ILookaheadIterator, ILastPositionFinder
+    internal class MergeGroupingIterator : IGroupIterator, ILookaheadIterator, ILastPositionFinder
     {
         private readonly ISequenceIterator baseItr;
         private ObjectValue<ItemWithMergeKeys> currenti = null;

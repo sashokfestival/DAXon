@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class SimpleStepExpression : SlashExpression
+    internal sealed class SimpleStepExpression : SlashExpression
     {
 
         private static readonly OperandRole STEP_ROLE = new OperandRole(OperandRole.USES_NEW_FOCUS | OperandRole.HIGHER_ORDER, OperandUsage.TRANSMISSION, SequenceType.ANY_SEQUENCE);
@@ -120,7 +120,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a simple step expression, that is X/axis.Y where X evaluates to a singleton
         /// </summary>
-        public class SimpleStepExprElaborator : PullElaborator
+        internal class SimpleStepExprElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class IntegratedFunctionCall : FunctionCall, ICallable
+    internal class IntegratedFunctionCall : FunctionCall, ICallable
     {
         private readonly StructuredQName name;
         private readonly ExtensionFunctionCall function;
@@ -297,7 +297,7 @@ namespace OutSmart.DAXon.Functions
             return function.Call(context, arguments);
         }
 
-        public class ConfigurationCheckingFunction : IItemMappingFunction
+        internal class ConfigurationCheckingFunction : IItemMappingFunction
         {
             private readonly Configuration config;
             public ConfigurationCheckingFunction(Configuration config)

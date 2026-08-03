@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Lib
 {
-    public interface ISubstringMatcher : IStringCollator
+    internal interface ISubstringMatcher : IStringCollator
     {
         bool Contains(UnicodeString s1, UnicodeString s2);
         bool StartsWith(UnicodeString s1, UnicodeString s2);

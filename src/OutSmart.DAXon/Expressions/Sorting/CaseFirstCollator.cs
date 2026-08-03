@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     /// <para>Case is irrelevant, unless the strings are equal ignoring
     /// case, in which case lowercase comes first.</para>
     /// </summary>
-    public class CaseFirstCollator : IStringCollator
+    internal class CaseFirstCollator : IStringCollator
     {
         private readonly IStringCollator baseCollator;
         private readonly bool upperFirst;

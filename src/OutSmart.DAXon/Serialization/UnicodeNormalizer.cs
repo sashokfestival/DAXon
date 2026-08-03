@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Serialization
 {
-    public class UnicodeNormalizer : ProxyReceiver
+    internal class UnicodeNormalizer : ProxyReceiver
     {
         private readonly NormalizationForm normForm;
 

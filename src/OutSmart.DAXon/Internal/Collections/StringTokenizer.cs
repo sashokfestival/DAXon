@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Internal.Collections
     ///   - When returnDelims=true, delimiters are themselves returned as tokens
     ///   - Empty tokens are NOT produced (consecutive delimiters collapse)
     /// </summary>
-    public class StringTokenizer
+    internal class StringTokenizer
     {
         private readonly string _str;
         private readonly string _delims;

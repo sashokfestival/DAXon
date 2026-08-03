@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation.Rules
 {
-    public class RuleSetWithWarnings : IBuiltInRuleSet
+    internal class RuleSetWithWarnings : IBuiltInRuleSet
     {
         private readonly IBuiltInRuleSet baseRuleSet;
 

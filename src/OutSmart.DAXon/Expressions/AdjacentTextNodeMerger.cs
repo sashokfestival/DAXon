@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Expressions
     // adjacent text nodes into one. Was never ported — the XSLLeafNodeConstructor call was
     // commented out ("streaming not used"), but the class carries spec semantics: xsl:value-of
     // over a sequence containing zero-length text nodes kept the empty items (message-0304).
-    public class AdjacentTextNodeMerger : UnaryExpression
+    internal class AdjacentTextNodeMerger : UnaryExpression
     {
 
         public override int ImplementationMethod => Expression.PROCESS_METHOD | Expression.ITERATE_METHOD | ITEM_FEED_METHOD | WATCH_METHOD;
@@ -193,7 +193,7 @@ namespace OutSmart.DAXon.Expressions
             return new AdjacentTextNodeMergerElaborator();
         }
 
-        public class AdjacentTextNodeMergerElaborator : PullElaborator
+        internal class AdjacentTextNodeMergerElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

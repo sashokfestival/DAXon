@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public abstract class XSLLeafNodeConstructor : StyleElement
+    internal abstract class XSLLeafNodeConstructor : StyleElement
     {
         protected Expression select = null;
 

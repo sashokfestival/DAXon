@@ -51,7 +51,7 @@ namespace OutSmart.DAXon.Functions
             return new ScalarFunctionElaborator();
         }
 
-        public class ScalarFunctionElaborator : ItemElaborator
+        internal class ScalarFunctionElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

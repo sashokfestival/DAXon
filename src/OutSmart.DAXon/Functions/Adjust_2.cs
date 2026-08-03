@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class Adjust_2 : SystemFunction
+    internal class Adjust_2 : SystemFunction
     {
 
         public static Func<Adjust_2> New() => () => new Adjust_2();

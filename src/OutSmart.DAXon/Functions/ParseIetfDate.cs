@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the function parse-ietf-date(), which is a standard function in XPath 3.1
     /// </summary>
-    public class ParseIetfDate : SystemFunction, ICallable
+    internal class ParseIetfDate : SystemFunction, ICallable
     {
 
         /* what should this return? */

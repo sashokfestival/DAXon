@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Json
     /// <summary>
     /// Implement the XML to JSON conversion as a built-in function - fn:xml-to-json()
     /// </summary>
-    public class XMLToJsonFn : SystemFunction, IPushableFunction
+    internal class XMLToJsonFn : SystemFunction, IPushableFunction
     {
         private static readonly IFunctionItemType formatterFunctionType = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_STRING }, SequenceType.SINGLE_STRING);
 

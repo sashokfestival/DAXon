@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Abstract class containing functionality common to xsl:break and xsl:next-iteration
     /// </summary>
-    public abstract class XSLBreakOrContinue : StyleElement
+    internal abstract class XSLBreakOrContinue : StyleElement
     {
         protected XSLIterate xslIterate = null;
         public override bool IsInstruction()

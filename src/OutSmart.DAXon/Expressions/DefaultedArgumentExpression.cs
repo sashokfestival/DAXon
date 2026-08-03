@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class DefaultedArgumentExpression : PseudoExpression
+    internal class DefaultedArgumentExpression : PseudoExpression
     {
 
         public override string ExpressionName => "defaultValue";
@@ -41,7 +41,7 @@ namespace OutSmart.DAXon.Expressions
             throw new NotSupportedException();
         }
 
-        public class DefaultCollationArgument : DefaultedArgumentExpression
+        internal class DefaultCollationArgument : DefaultedArgumentExpression
         {
             public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
             {

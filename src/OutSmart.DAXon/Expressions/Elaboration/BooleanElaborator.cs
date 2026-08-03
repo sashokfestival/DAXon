@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public abstract class BooleanElaborator : Elaborator
+    internal abstract class BooleanElaborator : Elaborator
     {
         public override IPullEvaluator ElaborateForPull()
         {

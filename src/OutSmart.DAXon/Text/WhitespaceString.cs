@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Text
 {
-    public abstract class WhitespaceString : UnicodeString
+    internal abstract class WhitespaceString : UnicodeString
     {
         public override int Width => 7;
         public abstract UnicodeString Uncompress();

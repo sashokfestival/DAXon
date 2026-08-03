@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
 {
-    public sealed class UTF8Writer : TextWriter, IUnicodeWriter
+    internal sealed class UTF8Writer : TextWriter, IUnicodeWriter
     {
         private const int MIN_BUF_LEN = 32;
         private const int DEFAULT_BUF_LEN = 4096;

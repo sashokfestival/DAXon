@@ -13,7 +13,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class Aggregate : SystemFunction
+    internal abstract class Aggregate : SystemFunction
     {
     }
 }

@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Values
 {
-    public class MemoClosure : Closure, IContextOriginator
+    internal class MemoClosure : Closure, IContextOriginator
     {
         private ISequence sequence;
 

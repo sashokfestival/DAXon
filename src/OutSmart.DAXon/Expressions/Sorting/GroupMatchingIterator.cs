@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     /// <summary>
     /// A GroupMatchingIterator contains code shared between GroupStartingIterator and GroupEndingIterator
     /// </summary>
-    public abstract class GroupMatchingIterator : ILookaheadIterator, ILastPositionFinder, IGroupIterator
+    internal abstract class GroupMatchingIterator : ILookaheadIterator, ILastPositionFinder, IGroupIterator
     {
         protected IPullEvaluator select;
         protected IFocusIterator population;

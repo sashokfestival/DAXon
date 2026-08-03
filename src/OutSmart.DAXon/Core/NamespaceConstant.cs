@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Lib
 {
-    public class NamespaceConstant
+    internal class NamespaceConstant
     {
         /// <summary>
         /// A URI representing the null namespace (actually, an empty string)

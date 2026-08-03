@@ -32,7 +32,7 @@ using OutSmart.DAXon.Internal;
 using System.IO;
 namespace OutSmart.DAXon.Text
 {
-    public class Twine8 : UnicodeString
+    internal class Twine8 : UnicodeString
     {
 
         private static readonly bool CHECKING = Configuration.IsAssertionsEnabled();

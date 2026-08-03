@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Values
     /// <summary>
     /// A numeric (double precision floating point) value
     /// </summary>
-    public sealed class DoubleValue : NumericValue
+    internal sealed class DoubleValue : NumericValue
     {
         public static readonly DoubleValue ZERO = new DoubleValue(0);
         public static readonly DoubleValue NEGATIVE_ZERO = new DoubleValue(-0.0);

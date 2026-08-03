@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// <summary>
     /// This class implements the function fn:fold-right(), which is a standard function in XQuery 1.1
     /// </summary>
-    public class FoldRightFn : SystemFunction
+    internal class FoldRightFn : SystemFunction
     {
 
         public static Func<FoldRightFn> New() => () => new FoldRightFn();

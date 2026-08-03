@@ -16,7 +16,7 @@ using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Linked
 {
-    public class SystemIdMap
+    internal class SystemIdMap
     {
         private int[] sequenceNumbers;
         private string[] uris;

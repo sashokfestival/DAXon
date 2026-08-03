@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Internal.Collections
     /// semantics). The BCL-backed operations (Sort, BinarySearch, and the
     /// reassign-in-place copy via Array.Resize) call System.Array directly at their sites.
     /// </summary>
-    public static class ArrayTools
+    internal static class ArrayTools
     {
 
         public static T[] CopyOf<T>(T[] src, int newLength)

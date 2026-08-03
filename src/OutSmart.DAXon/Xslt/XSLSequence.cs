@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:sequence element in the stylesheet.
     /// </summary>
-    public class XSLSequence : StyleElement
+    internal class XSLSequence : StyleElement
     {
         private Expression select;
 

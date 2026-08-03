@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Trees.Wrappers
     // Faithful port of net.sf.saxon.tree.wrapper.SpaceStrippedDocument (Saxon 12.9). Was a hollow stub whose
     // Wrap threw, so ANY stylesheet with xsl:strip-space crashed in Controller.PrepareInputTree.
     // A view of a real document in which selected whitespace text nodes are treated as stripped.
-    public class SpaceStrippedDocument : GenericTreeInfo
+    internal class SpaceStrippedDocument : GenericTreeInfo
     {
         private readonly ISpaceStrippingRule strippingRule;
         private readonly bool preservesSpace;

@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLWhen : StyleElement
+    internal class XSLWhen : StyleElement
     {
         private Expression test;
         private Expression select;

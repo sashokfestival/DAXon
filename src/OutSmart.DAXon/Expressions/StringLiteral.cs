@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// Subclass of Literal used specifically for string literals, as this is a common case
     /// </summary>
-    public class StringLiteral : Literal
+    internal class StringLiteral : Literal
     {
 
         public new StringValue GroundedValue => (StringValue)base.GroundedValue;

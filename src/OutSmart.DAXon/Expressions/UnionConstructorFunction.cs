@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// Function to perform a cast to a union type
     /// </summary>
-    public class UnionConstructorFunction : AbstractFunction
+    internal class UnionConstructorFunction : AbstractFunction
     {
         protected IUnionType targetType;
         protected INamespaceResolver resolver;

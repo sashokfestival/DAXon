@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:context-item element in the stylesheet. <br>
     /// </summary>
-    public class XSLContextItem : StyleElement
+    internal class XSLContextItem : StyleElement
     {
         private ItemType requiredType = AnyItemType.GetInstance();
         private bool mayBeOmitted = true;

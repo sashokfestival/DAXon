@@ -13,7 +13,7 @@ using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Types
 {
-    public class StringToGYear : StringConverter
+    internal class StringToGYear : StringConverter
     {
         private readonly StringConverter inner;
         public StringToGYear() { }

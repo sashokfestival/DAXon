@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ArithmeticExpression : BinaryExpression
+    internal class ArithmeticExpression : BinaryExpression
     {
         protected Calculator calculator;
         private IPlainType itemType;
@@ -444,7 +444,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for an ArithmeticExpression (for example P + Q)
         /// </summary>
-        public class ArithmeticElaborator : ItemElaborator
+        internal class ArithmeticElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

@@ -20,7 +20,7 @@ using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLCatch : StyleElement
+    internal class XSLCatch : StyleElement
     {
         private Expression select;
         private IQNameTest nameTest;

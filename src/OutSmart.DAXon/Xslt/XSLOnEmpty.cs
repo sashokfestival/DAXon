@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:on-empty element in the stylesheet. The rules are identical to xsl:sequence.
     /// </summary>
-    public sealed class XSLOnEmpty : XSLSequence
+    internal sealed class XSLOnEmpty : XSLSequence
     {
         public override void Validate(ComponentDeclaration decl)
         {

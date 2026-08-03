@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLMatchingSubstring : StyleElement
+    internal class XSLMatchingSubstring : StyleElement
     {
         private Expression select = null;
         public override void PrepareAttributes()

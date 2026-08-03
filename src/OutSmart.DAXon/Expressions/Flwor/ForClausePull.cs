@@ -14,7 +14,7 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Expressions.Flwor
 {
-    public class ForClausePull : TuplePull
+    internal class ForClausePull : TuplePull
     {
         protected TuplePull @base;
         protected ForClause forClause;

@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Functions.Registry
 {
     // ParamKeywords -- function parameter naming maps (used by BuiltInFunctionSet.GetParamMap).
-    public static class ParamKeywords
+    internal static class ParamKeywords
     {
         public static readonly Dictionary<string, string> fnParamNames = new Dictionary<string, string>();
         public static readonly Dictionary<string, string> mapParamNames = new Dictionary<string, string>();

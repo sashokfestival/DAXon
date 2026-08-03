@@ -26,7 +26,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class ItemChecker : UnaryExpression
+    internal sealed class ItemChecker : UnaryExpression
     {
         private readonly ItemType requiredItemType;
         private readonly Func<RoleDiagnostic> roleSupplier;
@@ -318,7 +318,7 @@ namespace OutSmart.DAXon.Expressions
             return new ItemCheckerElaborator();
         }
 
-        public class ItemCheckerElaborator : PullElaborator
+        internal class ItemCheckerElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

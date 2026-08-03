@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:copy-of element in the stylesheet. <br>
     /// </summary>
-    public sealed class XSLCopyOf : StyleElement
+    internal sealed class XSLCopyOf : StyleElement
     {
         private Expression select;
         private bool copyNamespaces;

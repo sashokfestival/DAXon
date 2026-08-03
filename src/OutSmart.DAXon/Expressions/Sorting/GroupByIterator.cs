@@ -24,7 +24,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class GroupByIterator : IGroupIterator, ILastPositionFinder, ILookaheadIterator
+    internal class GroupByIterator : IGroupIterator, ILastPositionFinder, ILookaheadIterator
     {
         private readonly object syncLock = new object();
         private ISequenceIterator population;

@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
 
-    public static class UpdateEvaluatorExtensions
+    internal static class UpdateEvaluatorExtensions
     {
         public static void RegisterUpdates(this IUpdateEvaluator e, IXPathContext context, IPendingUpdateList updates) { e?.Invoke(context, updates); }
     }

@@ -15,7 +15,7 @@ using OutSmart.DAXon.Patterns;
 // so we put the extension there too. Callers already have `using OutSmart.DAXon.Types;`.
 namespace OutSmart.DAXon.Types
 {
-    public static class DAXonItemTypeUTypeExt
+    internal static class DAXonItemTypeUTypeExt
     {
         // runtime 2026-06-04: dispatch via IItemTypeWithSequenceTypeCache (was the hollow `=> UType.VOID`).
         // Extension methods bind to the receiver's COMPILE-TIME type; the Fix-PhaseB-ItemType-GetUType-Dispatch

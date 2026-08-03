@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:namespace-alias element in the stylesheet. <br>
     /// </summary>
-    public class XSLNamespaceAlias : StyleElement
+    internal class XSLNamespaceAlias : StyleElement
     {
         private NamespaceUri stylesheetURI;
         private NamespaceBinding resultNamespaceBinding;

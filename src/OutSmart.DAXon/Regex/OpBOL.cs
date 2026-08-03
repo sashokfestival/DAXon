@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// Beginning of Line (^) in a regular expression
     /// </summary>
-    public class OpBOL : Operation
+    internal class OpBOL : Operation
     {
         public override int MatchLength => 0;
 

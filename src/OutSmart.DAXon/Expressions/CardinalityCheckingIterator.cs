@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class CardinalityCheckingIterator : ISequenceIterator
+    internal sealed class CardinalityCheckingIterator : ISequenceIterator
     {
         private readonly ISequenceIterator @base;
         private readonly ILocation locator;

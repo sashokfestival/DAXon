@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class TextComparer : IAtomicComparer
+    internal class TextComparer : IAtomicComparer
     {
         private readonly IAtomicComparer baseComparer;
 

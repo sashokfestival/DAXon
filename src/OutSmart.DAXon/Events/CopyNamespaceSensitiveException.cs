@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Events
 {
-    public class CopyNamespaceSensitiveException : XPathException
+    internal class CopyNamespaceSensitiveException : XPathException
     {
         public CopyNamespaceSensitiveException(string message) : base(message)
         {

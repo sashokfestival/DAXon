@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Types
 {
     // Derivation enum-like constants (from XSD schema processing).
-    public static class Derivation
+    internal static class Derivation
     {
         public const int DERIVATION_RESTRICTION = 1;
         public const int DERIVATION_EXTENSION = 2;

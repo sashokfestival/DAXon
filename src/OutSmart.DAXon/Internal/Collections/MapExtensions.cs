@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Internal.Collections
     ///
     /// This class adds only what was still missing from that surface.
     /// </summary>
-    public static class MapExtensions
+    internal static class MapExtensions
     {
         /// <summary>
         /// java.util.Map.remove(Object) - removes the mapping and RETURNS THE OLD VALUE

@@ -7,7 +7,7 @@
 
 namespace OutSmart.DAXon.Expressions.Flwor
 {
-    public class DiagnosticClausePull
+    internal class DiagnosticClausePull
     {
         public DiagnosticClausePull() { }
         public DiagnosticClausePull(object a, object b) { }

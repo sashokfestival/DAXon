@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// A back-reference in a regular expression
     /// </summary>
-    public class OpBackReference : Operation
+    internal class OpBackReference : Operation
     {
         int groupNr;
         public OpBackReference(int groupNr)

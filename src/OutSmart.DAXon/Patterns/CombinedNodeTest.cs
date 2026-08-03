@@ -22,7 +22,7 @@ using OutSmart.DAXon.Collections;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Patterns
 {
-    public class CombinedNodeTest : NodeTest
+    internal class CombinedNodeTest : NodeTest
     {
         private readonly NodeTest nodetest1;
         private readonly NodeTest nodetest2;

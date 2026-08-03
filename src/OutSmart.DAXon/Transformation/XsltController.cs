@@ -507,8 +507,15 @@ namespace OutSmart.DAXon.Transformation
                         }
                     }
 
+                    // Whether the tree still needs stripping is decided by the tree itself - it is
+                    // either a stripped wrapper or its TreeInfo already carries this rule. An
+                    // identity test against globalContextItem used to stand in for that, which
+                    // held only while callers were honest: SetGlobalContextItem(node, true) stores
+                    // the node unstripped, so the guard matched and xsl:strip-space was lost for
+                    // the whole transform. The type-annotation test above keeps its identity check
+                    // - typed trees need a schema-aware processor, so it has no reachable trigger.
                     ISpaceStrippingRule spaceStrippingRule = SpaceStrippingRule;
-                    if (IsStylesheetContainingStripSpace() && IsStripSourceTree() && !(node is SpaceStrippedNode) && node != globalContextItem && node.GetTreeInfo().SpaceStrippingRule != spaceStrippingRule)
+                    if (IsStylesheetContainingStripSpace() && IsStripSourceTree() && !(node is SpaceStrippedNode) && node.GetTreeInfo().SpaceStrippingRule != spaceStrippingRule)
                     {
                         SpaceStrippedDocument strippedDoc = new SpaceStrippedDocument(node.GetTreeInfo(), spaceStrippingRule);
 

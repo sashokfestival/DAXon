@@ -24,7 +24,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class ComponentTracer : Instruction
+    internal class ComponentTracer : Instruction
     {
         private Operand baseOp;
         private Dictionary<string, object> properties = new Dictionary<string, object>(10);

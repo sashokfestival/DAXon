@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Trees
     // fn-outermost/innermost namespace cases, in-scope-prefixes, etc. all raised a code-less ERR). Implements the
     // full NodeInfo surface for a namespace node; a namespace node's string value is the namespace URI and its name
     // is the prefix (an NCName in no namespace).
-    public class NamespaceNode : NodeInfo
+    internal class NamespaceNode : NodeInfo
     {
         internal NodeInfo element;
         internal NamespaceBinding nsBinding;

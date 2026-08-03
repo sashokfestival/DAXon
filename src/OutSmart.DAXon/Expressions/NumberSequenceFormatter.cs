@@ -30,7 +30,7 @@ using OutSmart.DAXon.Internal;
 using System.Numerics;
 namespace OutSmart.DAXon.Expressions
 {
-    public class NumberSequenceFormatter : Expression
+    internal class NumberSequenceFormatter : Expression
     {
         private Operand valueOp;
         private Operand formatOp;

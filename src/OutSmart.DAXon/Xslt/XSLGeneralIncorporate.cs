@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Xslt
 {
-    public abstract class XSLGeneralIncorporate : StyleElement
+    internal abstract class XSLGeneralIncorporate : StyleElement
     {
         private string href;
         private DocumentImpl targetDoc;

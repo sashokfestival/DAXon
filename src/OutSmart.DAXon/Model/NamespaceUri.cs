@@ -22,8 +22,25 @@ namespace OutSmart.DAXon.Model
         // A map from strings to NamespaceUris. Concurrent (as in the Java original): Of() is called
         // while parsing source documents, and two threads first meeting new URIs at once would race
         // an unsynchronized Dictionary's resize. Grows with distinct URIs for the process lifetime.
+        //
+        // NOT a cache, and deliberately NOT bounded (round A3). NamespaceUri overrides neither
+        // Equals nor GetHashCode nor ==, so every comparison in the engine - IsEmpty() against NULL,
+        // IsReserved() against XSLT/FN/..., the built-in function-set dispatch, ~15 explicit
+        // `== NamespaceUri.X` sites - is REFERENCE equality. This table is what makes that sound.
+        // Evicting an entry would let the same URI be interned twice and silently compare unequal
+        // to itself: the null namespace stops being empty, XSLT stops being reserved, built-ins
+        // stop resolving. Scoping it per-Configuration fails for the same reason (the well-known
+        // singletons are static). Bounding becomes possible only after equality is made value-based,
+        // which would put a string compare on the hottest path in the engine. Watch InternedCount
+        // instead; see docs/HOSTING.md.
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, NamespaceUri> stringToNamespaceUri
             = new System.Collections.Concurrent.ConcurrentDictionary<string, NamespaceUri>();
+
+        /// <summary>
+        /// Distinct namespace URIs interned process-wide. Only ever grows, and is NOT released by
+        /// disposing a Processor - this table outlives every Configuration. Diagnostic.
+        /// </summary>
+        public static int InternedCount => stringToNamespaceUri.Count;
 
         /// <summary>
         /// A URI representing the null namespace (actually, an empty string)

@@ -23,7 +23,7 @@ using System;
 
 namespace OutSmart.DAXon.Transformation
 {
-    public static class FunctionStreamabilityExtensions
+    internal static class FunctionStreamabilityExtensions
     {
         // Java FunctionStreamability.isStreaming() returns true for all values except UNCLASSIFIED.
         public static bool IsStreaming(this FunctionStreamability s)

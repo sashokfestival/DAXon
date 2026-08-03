@@ -15,7 +15,7 @@ using OutSmart.DAXon.Types;
 
 namespace OutSmart.DAXon.Patterns
 {
-    public class AnchorPattern : Pattern
+    internal class AnchorPattern : Pattern
     {
         private static readonly AnchorPattern _instance = new AnchorPattern();
         public static AnchorPattern GetInstance() => _instance;

@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
 
-    public static class PullEvaluatorExtensions
+    internal static class PullEvaluatorExtensions
     {
         public static ISequenceIterator Iterate(this IPullEvaluator e, IXPathContext context) => e == null ? default : e(context);
     }

@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the XSLT function current-group()
     /// </summary>
-    public class CurrentGroupCall : Expression, ICallable
+    internal class CurrentGroupCall : Expression, ICallable
     {
         private bool inHigherOrderOperand = false;
         private ItemType itemType = AnyItemType.GetInstance();

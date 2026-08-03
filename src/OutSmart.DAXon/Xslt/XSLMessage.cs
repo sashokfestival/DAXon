@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:message element in the stylesheet. <br>
     /// </summary>
-    public sealed class XSLMessage : StyleElement
+    internal sealed class XSLMessage : StyleElement
     {
         private Expression terminate = null;
         private Expression select = null;

@@ -31,7 +31,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class MergeInstr : Instruction
+    internal class MergeInstr : Instruction
     {
 
         private static readonly OperandRole ROW_SELECT = new OperandRole(OperandRole.USES_NEW_FOCUS | OperandRole.HIGHER_ORDER, OperandUsage.INSPECTION, Values.SequenceType.ANY_SEQUENCE);
@@ -586,7 +586,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         {
             return new MergeInstrElaborator();
         }
-        public class MergeSource
+        internal class MergeSource
         {
             private readonly MergeInstr instruction;
             public ILocation location;
@@ -792,7 +792,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        public class MergeKeyMappingFunction
+        internal class MergeKeyMappingFunction
         {
             private readonly MergeSource ms;
             private readonly IXPathContext keyContext;

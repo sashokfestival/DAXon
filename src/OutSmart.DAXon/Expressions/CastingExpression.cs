@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// Casting Expression: abstract superclass for "cast as X" and "castable as X", which share a good deal of logic
     /// </summary>
-    public abstract class CastingExpression : UnaryExpression
+    internal abstract class CastingExpression : UnaryExpression
     {
         private IAtomicType targetType;
         private readonly IAtomicType targetPrimitiveType;

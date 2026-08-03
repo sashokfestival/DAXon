@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ContextItemExpression : Expression
+    internal class ContextItemExpression : Expression
     {
         private ContextItemStaticInfo staticInfo = ContextItemStaticInfo.DEFAULT;
         private string errorCodeForAbsentContext = "XPDY0002";
@@ -236,7 +236,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for the context item expression, "dot".
         /// </summary>
-        public class ContextItemElaborator : ItemElaborator
+        internal class ContextItemElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

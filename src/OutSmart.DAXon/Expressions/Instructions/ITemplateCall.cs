@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public interface IITemplateCall : IContextOriginator
+    internal interface IITemplateCall : IContextOriginator
     {
         WithParam[] GetActualParams();
         WithParam[] GetTunnelParams();

@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLIf : StyleElement
+    internal class XSLIf : StyleElement
     {
         private Expression test;
         private Expression thenExp;

@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Types
     /// <summary>
     /// This class has a singleton instance which represents the XML Schema 1.1 built-in type xs:error.
     /// </summary>
-    public sealed class ErrorType : NodeTest, IAtomicType, IUnionType, IPlainType
+    internal sealed class ErrorType : NodeTest, IAtomicType, IUnionType, IPlainType
     {
         private static readonly ErrorType theInstance = new ErrorType();
 

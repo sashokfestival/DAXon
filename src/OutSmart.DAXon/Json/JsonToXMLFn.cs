@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Json
     /// <summary>
     /// Implements the json-to-xml function defined in XSLT 3.0.
     /// </summary>
-    public class JsonToXMLFn : SystemFunction
+    internal class JsonToXMLFn : SystemFunction
     {
         public static OptionsParameter OPTION_DETAILS;
         static JsonToXMLFn()

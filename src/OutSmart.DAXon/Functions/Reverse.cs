@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement XPath function fn:reverse()
     /// </summary>
-    public class Reverse : SystemFunction
+    internal class Reverse : SystemFunction
     {
 
         public override string StreamerName => "Reverse";
@@ -153,7 +153,7 @@ namespace OutSmart.DAXon.Functions
             return new ReverseListIterator(Enumerable.ToList(Enumerable.Select(list, x => (IItem)(object)x)));
         }
 
-        public class ReverseListIterator : ISequenceIterator, ILastPositionFinder, IReversibleIterator
+        internal class ReverseListIterator : ISequenceIterator, ILastPositionFinder, IReversibleIterator
         {
             private int pos;
             private readonly IList<IItem> list;
@@ -187,7 +187,7 @@ namespace OutSmart.DAXon.Functions
 
         // Reversed view over a same-tree node-number extent; interface surface mirrors
         // ReverseListIterator (length + reversal), wrappers are created per Next() call.
-        public sealed class ReverseNodeNumberIterator : ISequenceIterator, ILastPositionFinder, IReversibleIterator
+        internal sealed class ReverseNodeNumberIterator : ISequenceIterator, ILastPositionFinder, IReversibleIterator
         {
             private readonly TinyTree tree;
             private readonly int[] nrs;
@@ -226,7 +226,7 @@ namespace OutSmart.DAXon.Functions
         }
 
         // Forward twin of ReverseNodeNumberIterator (produced by re-reversing).
-        public sealed class NodeNumberIterator : ISequenceIterator, ILastPositionFinder, IReversibleIterator
+        internal sealed class NodeNumberIterator : ISequenceIterator, ILastPositionFinder, IReversibleIterator
         {
             private readonly TinyTree tree;
             private readonly int[] nrs;

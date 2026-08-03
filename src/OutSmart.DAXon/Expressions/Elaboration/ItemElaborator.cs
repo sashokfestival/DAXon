@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public abstract class ItemElaborator : Elaborator
+    internal abstract class ItemElaborator : Elaborator
     {
         public override ISequenceEvaluator Eagerly()
         {

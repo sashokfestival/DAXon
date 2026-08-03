@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class ComparisonException : InvalidCastException
+    internal class ComparisonException : InvalidCastException
     {
         XPathException reason;
         public ComparisonException(XPathException reason) : base(reason.Message)

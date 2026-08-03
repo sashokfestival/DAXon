@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class TailExpression : UnaryExpression
+    internal class TailExpression : UnaryExpression
     {
         int start; // 1-based offset of first item from base expression
 
@@ -149,7 +149,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a tail expression
         /// </summary>
-        public class TailExprElaborator : PullElaborator
+        internal class TailExprElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

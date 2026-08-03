@@ -22,7 +22,7 @@ using OutSmart.DAXon.Patterns;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class SelectedElementsSpaceStrippingRule : ISpaceStrippingRule
+    internal class SelectedElementsSpaceStrippingRule : ISpaceStrippingRule
     {
         private Rule anyElementRule = null;
         private Rule unnamedElementRuleChain = null;

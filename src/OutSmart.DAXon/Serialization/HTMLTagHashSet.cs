@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Serialization
 {
-    public class HTMLTagHashSet
+    internal class HTMLTagHashSet
     {
         string[] strings;
         int size;

@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Serialization
 {
-    public class HTMLURIEscaper : ProxyReceiver
+    internal class HTMLURIEscaper : ProxyReceiver
     {
         private static readonly HTMLTagHashSet urlAttributes = new HTMLTagHashSet(47);
         private static readonly HTMLTagHashSet urlCombinations = new HTMLTagHashSet(101);

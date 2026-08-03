@@ -18,7 +18,7 @@ using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Expressions
 {
     /// <summary>Returns the first item of a sequence — the rewrite target of the predicate [1] / [last()].</summary>
-    public sealed class FirstItemExpression : SingleItemFilter
+    internal sealed class FirstItemExpression : SingleItemFilter
     {
 
         public override int ImplementationMethod => EVALUATE_METHOD;
@@ -92,7 +92,7 @@ namespace OutSmart.DAXon.Expressions
             return new FirstItemElaborator();
         }
 
-        public class FirstItemElaborator : ItemElaborator
+        internal class FirstItemElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

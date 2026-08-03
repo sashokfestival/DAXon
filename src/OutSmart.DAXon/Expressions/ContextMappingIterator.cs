@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class ContextMappingIterator : ISequenceIterator
+    internal sealed class ContextMappingIterator : ISequenceIterator
     {
         private readonly IFocusIterator @base;
         private readonly IContextMappingFunction action;
@@ -102,7 +102,7 @@ namespace OutSmart.DAXon.Expressions
     /// sub-iterator (the generic path allocates a SingletonIterator per focus item just to
     /// drain it once). A null result is an empty step, exactly like an empty sub-iterator.
     /// </summary>
-    public sealed class SingletonContextMappingIterator : ISequenceIterator
+    internal sealed class SingletonContextMappingIterator : ISequenceIterator
     {
         private readonly IFocusIterator @base;
         private readonly Elaboration.IItemEvaluator action;

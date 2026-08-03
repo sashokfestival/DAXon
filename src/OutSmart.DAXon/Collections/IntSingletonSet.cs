@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Collections
     /// <summary>
     /// An immutable integer set containing a single integer
     /// </summary>
-    public class IntSingletonSet : IntSet
+    internal class IntSingletonSet : IntSet
     {
         private readonly int value;
 

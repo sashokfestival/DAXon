@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// A SubsequenceIterator selects a subsequence of a sequence
     /// </summary>
-    public class SubsequenceIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
+    internal class SubsequenceIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
     {
         private readonly ISequenceIterator @base;
         private int basePosition = 0;

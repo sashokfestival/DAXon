@@ -30,7 +30,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An xsl:analyze-string element in the stylesheet. New at XSLT 2.0
     /// </summary>
-    public class AnalyzeString : Instruction, IContextOriginator
+    internal class AnalyzeString : Instruction, IContextOriginator
     {
         private static readonly OperandRole ACTION = new OperandRole(OperandRole.USES_NEW_FOCUS | OperandRole.HIGHER_ORDER, OperandUsage.NAVIGATION);
         private static readonly OperandRole SELECT = new OperandRole(OperandRole.SETS_NEW_FOCUS, OperandUsage.ABSORPTION, SequenceType.SINGLE_STRING);
@@ -348,7 +348,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private delegate IRegularExpression IRegexEvaluator(IXPathContext context); /*Java SAM interface -> delegate (lambda call sites)*/
 
         /// <returns>the compiled regular expression, if it was known statically</returns>
-        public class AnalyzeStringElaborator : PullElaborator
+        internal class AnalyzeStringElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

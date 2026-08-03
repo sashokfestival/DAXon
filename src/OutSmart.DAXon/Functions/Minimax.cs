@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the min() and max() functions, with the collation argument already known.
     /// </summary>
-    public abstract class Minimax : CollatingFunctionFixed
+    internal abstract class Minimax : CollatingFunctionFixed
     {
         private IPlainType argumentType = BuiltInAtomicType.ANY_ATOMIC;
         private bool ignoreNaN = false;
@@ -401,7 +401,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Concrete subclass to define the fn:min() function
         /// </summary>
-        public class Min : Minimax
+        internal class Min : Minimax
         {
             public override bool IsMaxFunction()
             {
@@ -412,7 +412,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Concrete subclass to define the fn:max() function
         /// </summary>
-        public class Max : Minimax
+        internal class Max : Minimax
         {
 
             public static Func<Max> New() => () => new Max();

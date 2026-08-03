@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An xsl:next-match element in the stylesheet
     /// </summary>
-    public class NextMatch : ApplyNextMatchingTemplate
+    internal class NextMatch : ApplyNextMatchingTemplate
     {
         bool useTailRecursion;
 

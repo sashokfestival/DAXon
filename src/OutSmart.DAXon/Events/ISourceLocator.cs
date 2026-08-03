@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Events
     /// Implemented by the native locator of <see cref="XmlReaderToReceiver"/> (the direct System.Xml.XmlReader
     /// path). Tree builders depend on this abstraction rather than on any concrete parser class.
     /// </remarks>
-    public interface ISourceLocator : ILocation
+    internal interface ISourceLocator : ILocation
     {
         /// <summary>
         /// The element-nesting depth of this location within the current entity (0 at the top level of the

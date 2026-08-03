@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Expressions
     /// <summary>
     /// A function item representing a castability test for a list type
     /// </summary>
-    public class ListCastableFunction : ListConstructorFunction
+    internal class ListCastableFunction : ListConstructorFunction
     {
 
         public override IFunctionItemType FunctionItemType => new SpecificFunctionType(new SequenceType[] { SequenceType.ANY_SEQUENCE }, SequenceType.SINGLE_BOOLEAN);

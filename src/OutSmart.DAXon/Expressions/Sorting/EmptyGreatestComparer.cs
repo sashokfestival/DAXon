@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     // value. Was a hollow one-line stub that did not implement IAtomicComparer, so
     // SortKeyDefinition.MakeComparator cast it to IAtomicComparer -> InvalidCastException for any
     // `empty greatest` order-by.
-    public class EmptyGreatestComparer : IAtomicComparer
+    internal class EmptyGreatestComparer : IAtomicComparer
     {
         private readonly IAtomicComparer baseComparer;
 

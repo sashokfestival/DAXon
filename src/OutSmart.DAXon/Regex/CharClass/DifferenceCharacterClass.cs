@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Regex.CharClass
     /// fresh allocation per character tested - and nested subtractions stacked a frame per
     /// level; the nesting depth is bounded by the parse-time probe in ParseCharacterClass.
     /// </summary>
-    public sealed class DifferenceCharacterClass : ICharacterClass
+    internal sealed class DifferenceCharacterClass : ICharacterClass
     {
         private readonly ICharacterClass include;
         private readonly ICharacterClass exclude;

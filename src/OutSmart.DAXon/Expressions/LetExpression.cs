@@ -618,7 +618,7 @@ namespace OutSmart.DAXon.Expressions
             return new LetExprElaborator();
         }
 
-        public class LetExprElaborator : PullElaborator
+        internal class LetExprElaborator : PullElaborator
         {
             private ISequenceEvaluator MakeSequenceEvaluator(LetExpression let)
             {

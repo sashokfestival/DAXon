@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the namespace-uri() function
     /// </summary>
-    public class NamespaceUriFn_1 : ScalarSystemFunction
+    internal class NamespaceUriFn_1 : ScalarSystemFunction
     {
 
         public static Func<NamespaceUriFn_1> New() => () => new NamespaceUriFn_1();
@@ -44,7 +44,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Elaborator for the namespace-uri() function
         /// </summary>
-        public class NamespaceUriFnElaborator : ItemElaborator
+        internal class NamespaceUriFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

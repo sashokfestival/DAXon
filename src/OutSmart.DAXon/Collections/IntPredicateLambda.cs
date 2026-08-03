@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Collections
 {
     // IntPredicateLambda now implements IIntPredicateProxy (20 callsites assign to IIntPredicateProxy field).
-    public class IntPredicateLambda : IIntPredicateProxy
+    internal class IntPredicateLambda : IIntPredicateProxy
     {
         private readonly Func<int, bool> _f;
         public IntPredicateLambda(Func<int, bool> f) { _f = f; }

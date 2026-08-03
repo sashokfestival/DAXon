@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class SuperId : SystemFunction
+    internal abstract class SuperId : SystemFunction
     {
         public const int ID = 0;
         public const int ELEMENT_WITH_ID = 1;
@@ -113,12 +113,12 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class Id : SuperId
+        internal class Id : SuperId
         {
             public override int Op => ID;
         }
 
-        public class ElementWithId : SuperId
+        internal class ElementWithId : SuperId
         {
             public override int Op => ELEMENT_WITH_ID;
 

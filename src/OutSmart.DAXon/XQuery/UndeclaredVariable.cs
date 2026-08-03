@@ -20,7 +20,7 @@ using OutSmart.DAXon.Collections.Trie;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.XQuery
 {
-    public class UndeclaredVariable : GlobalVariable
+    internal class UndeclaredVariable : GlobalVariable
     {
         public UndeclaredVariable()
         {

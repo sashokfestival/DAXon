@@ -14,5 +14,5 @@ using OutSmart.DAXon.Model;
 // call sites (StandardInvalidityHandler / StandardDiagnostics both live in this ns).
 namespace OutSmart.DAXon.Lib
 {
-    public interface IDOMNode { string GetNodeName(); }
+    internal interface IDOMNode { string GetNodeName(); }
 }

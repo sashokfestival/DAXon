@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation
 {
-    public class DAXonErrorCode
+    internal class DAXonErrorCode
     {
         /// <summary>
         /// SXLM0001: stylesheet or query appears to be looping/recursing indefinitely

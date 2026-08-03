@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Events
 {
 
-    public static class FilterFactoryExtensions
+    internal static class FilterFactoryExtensions
     {
         public static IReceiver MakeFilter(this IFilterFactory f, IReceiver next) => f?.Invoke(next);
     }

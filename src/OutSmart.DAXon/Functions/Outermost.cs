@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the function fn:outermost(), which is a standard function in XPath 3.0
     /// </summary>
-    public class Outermost : SystemFunction
+    internal class Outermost : SystemFunction
     {
         bool presorted = false;
 

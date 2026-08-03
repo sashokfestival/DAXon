@@ -20,7 +20,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class GroupStartingIterator : GroupMatchingIterator, ILookaheadIterator, IGroupIterator
+    internal class GroupStartingIterator : GroupMatchingIterator, ILookaheadIterator, IGroupIterator
     {
         public GroupStartingIterator(IPullEvaluator select, Patterns.Pattern startPattern, IXPathContext context)
         {

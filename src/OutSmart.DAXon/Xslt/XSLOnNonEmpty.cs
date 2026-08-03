@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:on-non-empty element in the stylesheet. The rules are identical to xsl:sequence
     /// </summary>
-    public sealed class XSLOnNonEmpty : XSLSequence
+    internal sealed class XSLOnNonEmpty : XSLSequence
     {
         public override Expression Compile(Compilation exec, ComponentDeclaration decl)
         {

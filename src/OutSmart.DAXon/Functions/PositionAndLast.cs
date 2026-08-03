@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class PositionAndLast : ContextAccessorFunction
+    internal abstract class PositionAndLast : ContextAccessorFunction
     {
         private bool contextPossiblyUndefined = true;
         public override int NetCost => 0;
@@ -81,7 +81,7 @@ namespace OutSmart.DAXon.Functions
             return EvaluateItem(context);
         }
 
-        public class Position : PositionAndLast
+        internal class Position : PositionAndLast
         {
             public override Int64Value EvaluateItem(IXPathContext c)
             {
@@ -99,7 +99,7 @@ namespace OutSmart.DAXon.Functions
                 return new PositionFnElaborator();
             }
 
-            public class PositionFnElaborator : ItemElaborator
+            internal class PositionFnElaborator : ItemElaborator
             {
                 public override IItemEvaluator ElaborateForItem()
                 {
@@ -126,7 +126,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class Last : PositionAndLast
+        internal class Last : PositionAndLast
         {
 
             public override string StreamerName => "Last";
@@ -147,7 +147,7 @@ namespace OutSmart.DAXon.Functions
                 return new LastFnElaborator();
             }
 
-            public class LastFnElaborator : ItemElaborator
+            internal class LastFnElaborator : ItemElaborator
             {
                 public override IItemEvaluator ElaborateForItem()
                 {

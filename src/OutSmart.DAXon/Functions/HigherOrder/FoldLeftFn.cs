@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// <summary>
     /// This class implements the function fn:fold-left(), which is a standard function in XPath 3.0
     /// </summary>
-    public class FoldLeftFn : FoldingFunction
+    internal class FoldLeftFn : FoldingFunction
     {
 
         public static Func<FoldLeftFn> New() => () => new FoldLeftFn();
@@ -49,7 +49,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
         }
 
-        public class FoldLeftFold : IFold
+        internal class FoldLeftFold : IFold
         {
             private readonly IXPathContext context;
             private readonly IFunctionItem function;

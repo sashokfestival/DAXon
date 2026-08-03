@@ -14,7 +14,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class SmallAttributeMap : IAttributeMap
+    internal class SmallAttributeMap : IAttributeMap
     {
         public const int LIMIT = 8;
         private readonly List<AttributeInfo> attributes;

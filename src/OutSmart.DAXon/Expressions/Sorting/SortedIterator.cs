@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     /// <summary>
     /// Class to do a sorted iteration
     /// </summary>
-    public class SortedIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
+    internal class SortedIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
     {
         private readonly ISequenceIterator @base;
         protected ISortKeyEvaluator sortKeyEvaluator;

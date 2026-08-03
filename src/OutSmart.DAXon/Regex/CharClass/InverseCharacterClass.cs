@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex.CharClass
 {
-    public class InverseCharacterClass : ICharacterClass
+    internal class InverseCharacterClass : ICharacterClass
     {
         private readonly ICharacterClass complement;
 

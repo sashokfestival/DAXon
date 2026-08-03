@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Types
     /// Ported from upstream (was a hollow excluded stub that did not implement ItemType, so the (ItemType)
     /// cast in XPathParser.ParseFunctionItemType threw InvalidCastException).
     /// </summary>
-    public class AnyFunctionTypeWithAssertions : AnyFunctionType
+    internal class AnyFunctionTypeWithAssertions : AnyFunctionType
     {
         private readonly AnnotationList assertions;
         private readonly Configuration config;

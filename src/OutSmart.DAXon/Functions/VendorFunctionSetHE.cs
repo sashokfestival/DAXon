@@ -30,13 +30,13 @@ using OutSmart.DAXon.Lib;
 
 namespace OutSmart.DAXon.Functions
 {
-    public static class VendorFunctionSetHE
+    internal static class VendorFunctionSetHE
     {
         private static readonly VendorFunctionSetHE_Inner _instance = new VendorFunctionSetHE_Inner();
         public static VendorFunctionSetHE_Inner GetInstance() => _instance;
 
         // Implements IFunctionLibrary via BuiltInFunctionSet for AddFunctionLibrary call sites.
-        public class VendorFunctionSetHE_Inner : BuiltInFunctionSet
+        internal class VendorFunctionSetHE_Inner : BuiltInFunctionSet
         {
             public VendorFunctionSetHE_Inner()
             {
@@ -49,7 +49,7 @@ namespace OutSmart.DAXon.Functions
 
         // Ported verbatim from the (excluded) real VendorFunctionSetHE.DynamicErrorInfoFn.
         // Evaluates an xsl:catch error variable such as $err:code from the current caught exception.
-        public class DynamicErrorInfoFn : SystemFunction
+        internal class DynamicErrorInfoFn : SystemFunction
         {
             public static Func<DynamicErrorInfoFn> New() => () => new DynamicErrorInfoFn();
 

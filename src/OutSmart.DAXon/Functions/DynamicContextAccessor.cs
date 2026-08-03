@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class DynamicContextAccessor : SystemFunction
+    internal abstract class DynamicContextAccessor : SystemFunction
     {
         private AtomicValue boundValue;
         public virtual void BindContext(IXPathContext context)
@@ -62,7 +62,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class ImplicitTimezone : DynamicContextAccessor
+        internal class ImplicitTimezone : DynamicContextAccessor
         {
             public override AtomicValue Evaluate(IXPathContext context)
             {
@@ -71,7 +71,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class CurrentDateTime : DynamicContextAccessor
+        internal class CurrentDateTime : DynamicContextAccessor
         {
             public override AtomicValue Evaluate(IXPathContext context)
             {
@@ -79,7 +79,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class CurrentDate : DynamicContextAccessor
+        internal class CurrentDate : DynamicContextAccessor
         {
             public override AtomicValue Evaluate(IXPathContext context)
             {
@@ -88,7 +88,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class CurrentTime : DynamicContextAccessor
+        internal class CurrentTime : DynamicContextAccessor
         {
             public override AtomicValue Evaluate(IXPathContext context)
             {
@@ -97,7 +97,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class DefaultLanguage : DynamicContextAccessor
+        internal class DefaultLanguage : DynamicContextAccessor
         {
 
             public static Func<DefaultLanguage> New() => () => new DefaultLanguage();

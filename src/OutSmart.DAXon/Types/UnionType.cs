@@ -20,7 +20,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Types
 {
-    public interface IUnionType : ItemType, ICastingTarget
+    internal interface IUnionType : ItemType, ICastingTarget
     {
         StructuredQName TypeName { get; }
         StructuredQName GetStructuredQName();

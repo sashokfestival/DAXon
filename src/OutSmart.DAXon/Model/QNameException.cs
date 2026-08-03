@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public class QNameException : Exception
+    internal class QNameException : Exception
     {
         string message;
         public QNameException(string message)

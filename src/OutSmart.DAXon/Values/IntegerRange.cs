@@ -20,7 +20,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Values
 {
-    public class IntegerRange : IAtomicSequence
+    internal class IntegerRange : IAtomicSequence
     {
         public long start;
         public long step;

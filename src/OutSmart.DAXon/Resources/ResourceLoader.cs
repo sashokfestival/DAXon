@@ -22,7 +22,7 @@ using System.IO;
 using System.IO.Compression;
 namespace OutSmart.DAXon.Resources
 {
-    public class ResourceLoader
+    internal class ResourceLoader
     {
         public static int MAX_REDIRECTS = 20;
         public static URLConnection UrlConnection(Uri url)

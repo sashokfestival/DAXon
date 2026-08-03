@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:choose or xsl:switch element in the stylesheet.
     /// </summary>
-    public abstract class XSLChooseOrSwitch : StyleElement
+    internal abstract class XSLChooseOrSwitch : StyleElement
     {
         private StyleElement otherwise;
         private int numberOfWhens = 0;

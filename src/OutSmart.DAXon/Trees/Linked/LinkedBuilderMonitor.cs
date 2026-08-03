@@ -10,7 +10,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Trees.Linked
 {
     // Inherit BuilderMonitor (impl 2 abstract members) so callsites compile.
-    public class LinkedBuilderMonitor : BuilderMonitor
+    internal class LinkedBuilderMonitor : BuilderMonitor
     {
         public override NodeInfo MarkedNode => null;
         public LinkedBuilderMonitor() : base(null) { }

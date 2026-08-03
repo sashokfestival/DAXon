@@ -21,7 +21,7 @@ using System.IO;
 using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Lib
 {
-    public class StandardLogger : Logger
+    internal class StandardLogger : Logger
     {
         private TextWriter writer = Console.Error;
         private int threshold = Logger.INFO;

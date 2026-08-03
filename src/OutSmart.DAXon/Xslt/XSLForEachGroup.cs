@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public sealed class XSLForEachGroup : StyleElement
+    internal sealed class XSLForEachGroup : StyleElement
     {
         private Expression select = null;
         private Expression groupBy = null;

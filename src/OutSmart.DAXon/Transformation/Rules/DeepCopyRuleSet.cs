@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Transformation.Rules
     /// <summary>
     /// The built-in rule set introduced in XSLT 3.0, which performs a deep copy of any unmatched node.
     /// </summary>
-    public class DeepCopyRuleSet : IBuiltInRuleSet
+    internal class DeepCopyRuleSet : IBuiltInRuleSet
     {
         private static readonly DeepCopyRuleSet THE_INSTANCE = new DeepCopyRuleSet();
 

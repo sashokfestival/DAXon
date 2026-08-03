@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Trees.Tiny
     /// <summary>
     /// A node in the XML parse tree representing character content
     /// </summary>
-    public sealed class TinyTextImpl : TinyNodeImpl
+    internal sealed class TinyTextImpl : TinyNodeImpl
     {
 
         public override UnicodeString UnicodeStringValue => GetStringValue(tree, nodeNr);

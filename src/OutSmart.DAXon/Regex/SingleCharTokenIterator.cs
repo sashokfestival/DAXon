@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Regex
     /// token sequence is identical to ATokenIterator's, including leading/trailing/adjacent
     /// separators producing zero-length tokens.
     /// </summary>
-    public class SingleCharTokenIterator : IAtomicIterator
+    internal class SingleCharTokenIterator : IAtomicIterator
     {
         private readonly UnicodeString input;
         private readonly int separator;

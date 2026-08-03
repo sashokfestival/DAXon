@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Expressions
     /// expected (e.g. new ItemMappingIterator(base, item -&gt; ...)); C# rejects the lambda
     /// (CS1660). Used by ForExpression's per-item evaluator.
     /// </summary>
-    public sealed class DelegateItemMappingFunction : IItemMappingFunction
+    internal sealed class DelegateItemMappingFunction : IItemMappingFunction
     {
         private readonly Func<IItem, IItem> _f;
 

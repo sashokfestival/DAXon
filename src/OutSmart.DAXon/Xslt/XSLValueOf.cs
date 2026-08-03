@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public sealed class XSLValueOf : XSLLeafNodeConstructor
+    internal sealed class XSLValueOf : XSLLeafNodeConstructor
     {
         private bool disable = false;
         private Expression separator;

@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Streams;
 namespace OutSmart.DAXon.Lib
 {
-    public class StandardModuleURIResolver : IModuleURIResolver
+    internal class StandardModuleURIResolver : IModuleURIResolver
     {
         Configuration config = null;
         public StandardModuleURIResolver()

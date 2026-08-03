@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Expressions.Elaboration
     /// <summary>
     /// A {@link IPingable} represents an object that can receive an event with no associated information.
     /// </summary>
-    public interface IPingable
+    internal interface IPingable
     {
         /// <summary>
         /// Notify that an event has occurred; the recipient is expected to know what this means.

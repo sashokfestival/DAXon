@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Types
     /// document-node(element(X,Y)), so it is not invoked in such cases. This isn't a big problem, because most
     /// instructions that return document nodes materialize them anyway.</para>
     /// </summary>
-    public class TypeCheckingFilter : ProxyOutputter
+    internal class TypeCheckingFilter : ProxyOutputter
     {
         private ItemType itemType;
         private int cardinality;

@@ -21,7 +21,7 @@ using OutSmart.DAXon.Expressions.Sorting;
 using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Expressions
 {
-    public abstract class CompareToConstant : UnaryExpression, IComparisonExpression
+    internal abstract class CompareToConstant : UnaryExpression, IComparisonExpression
     {
         protected int @operator;
 

@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Collections
     /// (MoveNext/Current) onto the concrete HasNext()/Next() peek-advance pair (R5.2).
     /// Implementors override HasNext()/Next() only; MoveNext/Current come from here.
     /// </summary>
-    public abstract class AbstractIntIterator : IIntIterator
+    internal abstract class AbstractIntIterator : IIntIterator
     {
         public int Current { get; private set; }
 

@@ -18,7 +18,7 @@ using System.Collections.Generic;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Json
 {
-    public class JsonHandlerMap : JsonHandler
+    internal class JsonHandlerMap : JsonHandler
     {
         // ArrayItem | MapBuilder frames under construction; the finished value at the bottom
         Stack<object> stack;

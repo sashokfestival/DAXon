@@ -27,7 +27,7 @@ using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Regex.CharClass
 {
-    public class Categories
+    internal class Categories
     {
 
         public static readonly ICharacterClass ESCAPE_s = new IntSetCharacterClass(IntArraySet.Make(new int[] { 9, 10, 13, 32 }, 4));
@@ -120,7 +120,7 @@ namespace OutSmart.DAXon.Regex.CharClass
                 return GetInstance().CATEGORIES.GetOrDefault(cat);
             }
         }
-        public class Category : ICharacterClass
+        internal class Category : ICharacterClass
         {
             private readonly string label;
             private readonly IIntPredicateProxy predicate;

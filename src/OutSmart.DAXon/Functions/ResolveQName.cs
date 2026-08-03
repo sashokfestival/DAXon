@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the resolve-QName function in XPath 2.0
     /// </summary>
-    public class ResolveQName : SystemFunction
+    internal class ResolveQName : SystemFunction
     {
 
         public static Func<ResolveQName> New() => () => new ResolveQName();

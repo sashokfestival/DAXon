@@ -10,7 +10,7 @@ namespace OutSmart.DAXon.Internal.Resolver
     /// <summary>Stub for org.xmlresolver.ResolverFeature&lt;T&gt;. The named feature constants are
     /// declared on a non-generic base so call sites can reference them as ResolverFeature.X without a
     /// type argument (Java accesses these statics via the raw type).</summary>
-    public class ResolverFeature
+    internal class ResolverFeature
     {
         public static readonly ResolverFeature<object> CATALOG_FILES = new ResolverFeature<object>("catalog-files");
         public static readonly ResolverFeature<object> ACCESS_EXTERNAL_DOCUMENT = new ResolverFeature<object>("access-external-document");
@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Internal.Resolver
         public string Name { get; }
         public ResolverFeature(string name) { Name = name; }
     }
-    public class ResolverFeature<T> : ResolverFeature
+    internal class ResolverFeature<T> : ResolverFeature
     {
         public ResolverFeature(string name) : base(name) { }
     }

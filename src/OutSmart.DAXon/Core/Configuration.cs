@@ -806,6 +806,15 @@ namespace OutSmart.DAXon.Core
             {
                 lock (syncLock)
                 {
+                    // Re-check: the null test above is outside the lock, so two threads that both
+                    // saw null both get here and the second used to build a second rule set and
+                    // overwrite the first - a duplicated converter cache, and two callers holding
+                    // rule sets that are equal but not identical.
+                    if (theConversionRules != null)
+                    {
+                        return theConversionRules;
+                    }
+
                     ConversionRules cv = new ConversionRules();
                     cv.SetTypeHierarchy(GetTypeHierarchy());
                     cv.SetNotationSet(this);
@@ -1488,8 +1497,25 @@ namespace OutSmart.DAXon.Core
             return namePool;
         }
 
-        public virtual void SetNamePool(NamePool targetNamePool)
+        /// <summary>
+        /// Replace the name pool. Refused once the current pool has allocated a user-defined
+        /// name: fingerprints are baked into compiled patterns (NameTest) and into each Mode's
+        /// rule-chain index, so after a swap the same names allocate DIFFERENT fingerprints and
+        /// every compiled rule stops matching - silently, with no error (round A2). Internal,
+        /// but the NAME_POOL feature reaches it from public code, which is why the guard is here
+        /// rather than on the API surface.
+        /// </summary>
+        internal virtual void SetNamePool(NamePool targetNamePool)
         {
+            if (namePool != null && namePool != targetNamePool && namePool.UserDefinedNameCount > 0)
+            {
+                throw new InvalidOperationException(
+                    "Cannot replace the NamePool of a Configuration that has already allocated "
+                    + namePool.UserDefinedNameCount + " user-defined name(s): those fingerprints are baked into"
+                    + " every stylesheet and document compiled or built against it, and a swap would make"
+                    + " compiled template rules stop matching without any error. Use a new Processor instead.");
+            }
+
             namePool = targetNamePool;
         }
 
@@ -3054,7 +3080,7 @@ namespace OutSmart.DAXon.Core
             }
         }
 
-        public class LicenseFeature
+        internal class LicenseFeature
         {
             public const int SCHEMA_VALIDATION = 1;
             public const int ENTERPRISE_XSLT = 2;

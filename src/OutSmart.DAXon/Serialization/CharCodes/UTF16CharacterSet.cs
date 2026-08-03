@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Serialization.CharCodes
     /// <summary>
     /// A class to hold some static constants and methods associated with processing UTF16 and surrogate pairs
     /// </summary>
-    public class UTF16CharacterSet : ICharacterSet
+    internal class UTF16CharacterSet : ICharacterSet
     {
 
         public const int NONBMP_MIN = 0x10000;

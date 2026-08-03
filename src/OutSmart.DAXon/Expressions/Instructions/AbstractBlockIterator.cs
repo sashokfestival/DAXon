@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public abstract class AbstractBlockIterator : ISequenceIterator
+    internal abstract class AbstractBlockIterator : ISequenceIterator
     {
         protected int size;
         protected int currentOperand;

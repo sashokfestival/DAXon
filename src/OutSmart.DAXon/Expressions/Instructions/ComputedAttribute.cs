@@ -29,7 +29,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public sealed class ComputedAttribute : AttributeCreator
+    internal sealed class ComputedAttribute : AttributeCreator
     {
         private readonly Operand nameOp;
         private Operand namespaceOp;

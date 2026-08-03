@@ -27,7 +27,7 @@ using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public abstract class TinyNodeImpl : NodeInfo
+    internal abstract class TinyNodeImpl : NodeInfo
     {
 
         public static readonly char[] NODE_LETTER = new[]

@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Resources
     /// with optional URI query parameters. Port deviations: JarCollection (.jar/.zip archives) and
     /// CatalogCollection (an XML catalog of URIs) are not yet ported — those URIs raise FODC0002.
     /// </summary>
-    public class StandardCollectionFinder : ICollectionFinder
+    internal class StandardCollectionFinder : ICollectionFinder
     {
         public virtual IResourceCollection FindCollection(IXPathContext context, string collectionURI)
         {

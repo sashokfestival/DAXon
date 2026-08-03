@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class ObjectToBeSorted
+    internal class ObjectToBeSorted
     {
         public IItem value;
         public AtomicValue[] sortKeyValues;

@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public abstract class RangeIterator : IGroundedIterator
+    internal abstract class RangeIterator : IGroundedIterator
     {
         public abstract IntegerValue First { get; }
         public abstract IGroundedValue GetResidue();

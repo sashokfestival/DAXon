@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An xsl:apply-imports element in the stylesheet.
     /// </summary>
-    public class ApplyImports : ApplyNextMatchingTemplate, IITemplateCall
+    internal class ApplyImports : ApplyNextMatchingTemplate, IITemplateCall
     {
 
         public override int InstructionNameCode => StandardNames.XSL_APPLY_IMPORTS;

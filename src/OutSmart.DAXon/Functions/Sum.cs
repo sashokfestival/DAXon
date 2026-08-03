@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the fn:sum function
     /// </summary>
-    public class Sum : FoldingFunction
+    internal class Sum : FoldingFunction
     {
 
         public static Func<Sum> New() => () => new Sum();
@@ -144,7 +144,7 @@ namespace OutSmart.DAXon.Functions
             return new SumFnElaborator();
         }
 
-        public class SumFold : IFold
+        internal class SumFold : IFold
         {
             private readonly IXPathContext context;
             private readonly AtomicValue zeroValue; // null means empty sequence
@@ -361,7 +361,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class SumFnElaborator : ItemElaborator
+        internal class SumFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

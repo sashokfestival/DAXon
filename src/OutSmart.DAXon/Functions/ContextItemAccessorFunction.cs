@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class ContextItemAccessorFunction : ContextAccessorFunction
+    internal class ContextItemAccessorFunction : ContextAccessorFunction
     {
 
         public static Func<ContextItemAccessorFunction> New() => () => new ContextItemAccessorFunction();
@@ -92,7 +92,7 @@ namespace OutSmart.DAXon.Functions
             return SystemFunction.MakeCall(GetFunctionName().GetLocalPart(), GetRetainedStaticContext(), args);
         }
 
-        public class StringAccessor : ContextItemAccessorFunction
+        internal class StringAccessor : ContextItemAccessorFunction
         {
             public override Expression MakeFunctionCall(Expression[] arguments)
             {
@@ -109,7 +109,7 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public class Number_0 : ContextItemAccessorFunction
+        internal class Number_0 : ContextItemAccessorFunction
         {
             public override Expression MakeFunctionCall(Expression[] arguments)
             {

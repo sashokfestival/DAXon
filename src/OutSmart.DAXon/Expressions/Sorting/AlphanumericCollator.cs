@@ -23,7 +23,7 @@ using System.IO;
 using System.Numerics;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class AlphanumericCollator : IStringCollator
+    internal class AlphanumericCollator : IStringCollator
     {
         public const string PREFIX = "http://saxon.sf.net/collation/alphaNumeric?base=";
         private static readonly ARegularExpression pattern = ARegularExpression.Compile("\\d+", "");

@@ -25,7 +25,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Flwor
 {
-    public class TupleExpression : Expression
+    internal class TupleExpression : Expression
     {
         private OperandArray operanda;
 

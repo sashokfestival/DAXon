@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// A text node in an XSLT 3.0 stylesheet that may or may not contain a text value template
     /// </summary>
-    public class TextValueTemplateNode : TextImpl
+    internal class TextValueTemplateNode : TextImpl
     {
         private Expression contentExp;
         private TextValueTemplateContext staticContext;

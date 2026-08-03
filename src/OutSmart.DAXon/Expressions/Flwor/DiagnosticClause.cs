@@ -27,10 +27,10 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// A "let" clause in a FLWOR expression
     /// </summary>
-    public class DiagnosticClause : Clause
+    internal class DiagnosticClause : Clause
     {
         private Operand sequenceOp;
-        private IPullEvaluator evaluator;
+        private volatile IPullEvaluator evaluator;   // volatile: published once, read hot (round 11)
         public override ClauseName ClauseKey => DIAG;
 
         //    }

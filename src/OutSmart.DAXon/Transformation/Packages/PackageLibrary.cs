@@ -254,7 +254,7 @@ namespace OutSmart.DAXon.Transformation.Packages
                 // Cleared in finally: a load that throws must not leave the marker set, or every
                 // same-thread retry reports a false XTSE3005 cycle (and pins the Thread object
                 // in a library that lives as long as the Configuration).
-                details.beingProcessed = Thread.CurrentThread;
+                BeginProcessing(details);
                 try
                 {
                     ResolvedResource input = details.exportLocation;
@@ -266,16 +266,18 @@ namespace OutSmart.DAXon.Transformation.Packages
                 }
                 finally
                 {
-                    details.beingProcessed = null;
+                    EndProcessing(details);
                 }
             }
             else if (details.sourceLocation != null)
             {
                 TestForCycles(details, disallowed);
-                details.beingProcessed = Thread.CurrentThread;
+                BeginProcessing(details);
                 try
                 {
-                    Compilation compilation = new Compilation(config, compilerInfo);
+                    // nestedInEpisode: this compile runs INSIDE the compilation that asked for the
+                    // package, so the shared reporter's budgets must survive it (round 12).
+                    Compilation compilation = new Compilation(config, compilerInfo, true);
                     compilation.SetUsingPackages(disallowed);
                     compilation.SetExpectedNameAndVersion(details.nameAndVersion);
                     compilation.ClearParameters();
@@ -301,7 +303,7 @@ namespace OutSmart.DAXon.Transformation.Packages
                 }
                 finally
                 {
-                    details.beingProcessed = null;
+                    EndProcessing(details);
                 }
             }
             else
@@ -310,9 +312,38 @@ namespace OutSmart.DAXon.Transformation.Packages
             }
         }
 
+        // Packages this thread is loading right now. Per-thread by construction: the marker asks
+        // "am I already inside this package's load?", which is a question only the asking thread
+        // can answer, and the single shared field it replaces was clobbered by concurrent loads.
+        // Nulled when the set empties so a pool thread retains nothing between compilations.
+        [ThreadStatic]
+        private static HashSet<PackageDetails> inFlight;
+
+        private static void BeginProcessing(PackageDetails details)
+        {
+            if (inFlight == null)
+            {
+                inFlight = new HashSet<PackageDetails>();
+            }
+
+            inFlight.Add(details);
+        }
+
+        private static void EndProcessing(PackageDetails details)
+        {
+            if (inFlight != null)
+            {
+                inFlight.Remove(details);
+                if (inFlight.Count == 0)
+                {
+                    inFlight = null;
+                }
+            }
+        }
+
         private void TestForCycles(PackageDetails details, IList<VersionedPackageName> disallowed)
         {
-            if (details.beingProcessed == Thread.CurrentThread)
+            if (inFlight != null && inFlight.Contains(details))
             {
 
                 // Report a cycle of package dependencies

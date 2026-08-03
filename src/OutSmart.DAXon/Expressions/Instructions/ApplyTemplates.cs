@@ -31,7 +31,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An instruction representing an xsl:apply-templates element in the stylesheet
     /// </summary>
-    public class ApplyTemplates : Instruction, IITemplateCall, IComponentInvocation
+    internal class ApplyTemplates : Instruction, IITemplateCall, IComponentInvocation
     {
         private Operand selectOp;
         private Operand separatorOp;
@@ -381,7 +381,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public class ApplyTemplatesElaborator : PushElaborator
+        internal class ApplyTemplatesElaborator : PushElaborator
         {
             private NodeInfo MakeSeparator(IUnicodeStringEvaluator sep, IXPathContext context)
             {

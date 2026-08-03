@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation
 {
-    public class XmlProcessingAbort : Exception
+    internal class XmlProcessingAbort : Exception
     {
         public XmlProcessingAbort(string message) : base(message)
         {

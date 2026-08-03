@@ -26,7 +26,7 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Tracing
 {
-    public abstract class AbstractTraceListener : StandardDiagnostics, ITraceListener
+    internal abstract class AbstractTraceListener : StandardDiagnostics, ITraceListener
     {
         protected int indent = 0;
         protected int detail = TraceLevel.NORMAL;

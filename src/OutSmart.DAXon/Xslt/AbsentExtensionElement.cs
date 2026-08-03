@@ -22,7 +22,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class AbsentExtensionElement : StyleElement
+    internal class AbsentExtensionElement : StyleElement
     {
         CallTemplate instruction;
         bool useTailRecursion;

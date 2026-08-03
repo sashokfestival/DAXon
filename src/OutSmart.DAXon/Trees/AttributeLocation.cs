@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Trees
     /// <summary>
     /// A ILocation corresponding to an attribute in a document (often a stylesheet)
     /// </summary>
-    public class AttributeLocation : ILocation
+    internal class AttributeLocation : ILocation
     {
         private readonly string systemId;
         private readonly int lineNumber;

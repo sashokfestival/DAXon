@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the dateTime($date, $time) function
     /// </summary>
-    public class DateTimeConstructor : SystemFunction
+    internal class DateTimeConstructor : SystemFunction
     {
 
         public static Func<DateTimeConstructor> New() => () => new DateTimeConstructor();
@@ -42,7 +42,7 @@ namespace OutSmart.DAXon.Functions
             return new DateTimeFnElaborator();
         }
 
-        public class DateTimeFnElaborator : ItemElaborator
+        internal class DateTimeFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal;
 using System.IO;
 namespace OutSmart.DAXon.Functions
 {
-    public class ParseXmlFragment : SystemFunction, ICallable
+    internal class ParseXmlFragment : SystemFunction, ICallable
     {
 
         public static Func<ParseXmlFragment> New() => () => new ParseXmlFragment();

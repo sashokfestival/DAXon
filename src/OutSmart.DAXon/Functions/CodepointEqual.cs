@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class CodepointEqual : SystemFunction, ICallable
+    internal class CodepointEqual : SystemFunction, ICallable
     {
 
         public static Func<CodepointEqual> New() => () => new CodepointEqual();

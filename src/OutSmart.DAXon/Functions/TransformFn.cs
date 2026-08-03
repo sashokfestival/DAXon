@@ -32,7 +32,7 @@ namespace OutSmart.DAXon.Functions
     /// FOXT0001), no saxon:configuration vendor option (ignored), and a stylesheet supplied as a node is
     /// re-serialized and compiled from text (the Source hierarchy was removed from this port).
     /// </summary>
-    public class TransformFn : SystemFunction
+    internal class TransformFn : SystemFunction
     {
 
         private const string DummyBaseOutputUriScheme = "dummy";

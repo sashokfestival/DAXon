@@ -13,7 +13,7 @@ using OutSmart.DAXon.Collections;
 namespace OutSmart.DAXon.Text
 {
 
-    public sealed class EmptyUnicodeString : UnicodeString
+    internal sealed class EmptyUnicodeString : UnicodeString
     {
         private static readonly EmptyUnicodeString _instance = new EmptyUnicodeString();
         public static readonly EmptyUnicodeString INSTANCE = _instance;

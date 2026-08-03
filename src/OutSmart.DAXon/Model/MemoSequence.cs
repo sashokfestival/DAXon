@@ -22,7 +22,7 @@ using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class MemoSequence : ISequence
+    internal class MemoSequence : ISequence
     {
         private readonly ISequenceIterator inputIterator;
         private IItem[] reservoir = null;
@@ -340,7 +340,7 @@ namespace OutSmart.DAXon.Model
         /// <summary>
         /// Release unused space in the reservoir (provided the amount of unused space is worth reclaiming)
         /// </summary>
-        public sealed class ProgressiveIterator : ISequenceIterator, ILastPositionFinder, IGroundedIterator
+        internal sealed class ProgressiveIterator : ISequenceIterator, ILastPositionFinder, IGroundedIterator
         {
             private readonly MemoSequence container;
             private int position = -1; // zero-based position in the reservoir of the

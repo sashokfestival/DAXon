@@ -30,7 +30,7 @@ namespace OutSmart.DAXon.Transformation
     /// <summary>
     /// Class containing utility methods for handling error messages
     /// </summary>
-    public class Err
+    internal class Err
     {
         public const int ELEMENT = 1;
         public const int ATTRIBUTE = 2;

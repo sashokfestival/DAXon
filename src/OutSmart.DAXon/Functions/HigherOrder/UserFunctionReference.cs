@@ -28,7 +28,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions.HigherOrder
 {
-    public class UserFunctionReference : Expression, IComponentInvocation, IUserFunctionResolvable, ICallable
+    internal class UserFunctionReference : Expression, IComponentInvocation, IUserFunctionResolvable, ICallable
     {
         private readonly SymbolicName.F functionName;
         private UserFunction nominalTarget;
@@ -268,7 +268,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
         }
 
-        public class BoundUserFunction : AbstractFunction, IContextOriginator
+        internal class BoundUserFunction : AbstractFunction, IContextOriginator
         {
             private readonly IExportAgent agent;
             private readonly IFunctionItem function;

@@ -24,7 +24,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Linked
 {
-    public class LinkedTreeBuilder : Builder
+    internal class LinkedTreeBuilder : Builder
     {
         private ParentNodeImpl currentNode;
         private INodeFactory nodeFactory;

@@ -30,12 +30,12 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// A "for" clause in a FLWOR expression
     /// </summary>
-    public class ForClause : Clause
+    internal class ForClause : Clause
     {
         protected LocalVariableBinding rangeVariable;
         protected LocalVariableBinding positionVariable;
         protected Operand sequenceOp;
-        protected IPullEvaluator sequenceOperandEvaluator;
+        protected volatile IPullEvaluator sequenceOperandEvaluator;   // volatile: published once, read hot (round 11)
         protected bool allowsEmpty;
 
 

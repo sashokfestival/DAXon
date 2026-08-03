@@ -35,7 +35,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An xsl:copy-of element in the stylesheet.
     /// </summary>
-    public class CopyOf : Instruction, IValidatingInstruction
+    internal class CopyOf : Instruction, IValidatingInstruction
     {
         private readonly Operand selectOp;
         private readonly bool copyNamespaces;

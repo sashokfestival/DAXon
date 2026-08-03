@@ -13,7 +13,7 @@ namespace OutSmart.DAXon.Collections
 {
     // IntSet.Count extension method -- paulirwin bulk-rewrote .Size() -> .Count for
     // collections but Saxon's IntSet has Size() method, not Count property.
-    public static class IntSetExt
+    internal static class IntSetExt
     {
         public static int Count(this IntSet self) => self?.Size() ?? 0;
     }

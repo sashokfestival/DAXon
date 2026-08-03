@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement the XPath 3.0 fn:environment-variable() function
     /// </summary>
-    public class EnvironmentVariable : SystemFunction
+    internal class EnvironmentVariable : SystemFunction
     {
 
         public static Func<EnvironmentVariable> New() => () => new EnvironmentVariable();

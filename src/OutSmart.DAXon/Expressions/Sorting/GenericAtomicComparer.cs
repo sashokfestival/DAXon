@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Patterns;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class GenericAtomicComparer : IAtomicComparer
+    internal class GenericAtomicComparer : IAtomicComparer
     {
         private IStringCollator collator;
         private readonly IXPathContext context;
@@ -350,6 +350,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
         IAtomicComparer IAtomicComparer.ProvideContext(IXPathContext arg0) => ProvideContext(arg0);
 
         // IAtomicComparisonFunction interface->delegate for lambda assignability.
-        public delegate bool IAtomicComparisonFunction(AtomicValue v0, AtomicValue v1, IXPathContext context);
+        internal delegate bool IAtomicComparisonFunction(AtomicValue v0, AtomicValue v1, IXPathContext context);
     }
 }

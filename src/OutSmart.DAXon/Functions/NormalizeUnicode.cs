@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement the XPath normalize-unicode() function (both the 1-argument and 2-argument versions)
     /// </summary>
-    public class NormalizeUnicode : SystemFunction
+    internal class NormalizeUnicode : SystemFunction
     {
 
         public static Func<NormalizeUnicode> New() => () => new NormalizeUnicode();

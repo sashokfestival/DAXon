@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// An integer that can be incremented atomically with thread safety
     /// </summary>
-    public class AtomicCounter
+    internal class AtomicCounter
     {
         // Note, this class is extracted into a separate module to allow different Java and C# implementations
         private long counter;

@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class FixedElement : ElementCreator
+    internal class FixedElement : ElementCreator
     {
         private readonly INodeName elementName;
         protected NamespaceMap namespaceBindings;
@@ -464,7 +464,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         /// <summary>
         /// Elaborator for a FixedElement (literal result element) expression.
         /// </summary>
-        public class FixedElementElaborator : ComplexNodePushElaborator
+        internal class FixedElementElaborator : ComplexNodePushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
             {

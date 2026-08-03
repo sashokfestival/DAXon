@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Values.Arrays
     /// <summary>
     /// An abstract implementation of XDM array items, containing methods that can be implemented generically.
     /// </summary>
-    public abstract class AbstractArrayItem : ArrayItem
+    internal abstract class AbstractArrayItem : ArrayItem
     {
         private SequenceType memberType = null; // computed on demand
         public override OperandRole[] OperandRoles => new OperandRole[]

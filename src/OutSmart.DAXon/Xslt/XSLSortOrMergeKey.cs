@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public abstract class XSLSortOrMergeKey : StyleElement
+    internal abstract class XSLSortOrMergeKey : StyleElement
     {
         protected SortKeyDefinition sortKeyDefinition;
         protected Expression select;

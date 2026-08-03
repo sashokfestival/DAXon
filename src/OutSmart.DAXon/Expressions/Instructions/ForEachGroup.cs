@@ -28,7 +28,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class ForEachGroup : Instruction, ISortKeyEvaluator, IContextSwitchingExpression
+    internal class ForEachGroup : Instruction, ISortKeyEvaluator, IContextSwitchingExpression
     {
         public const int GROUP_BY = 0;
         public const int GROUP_ADJACENT = 1;
@@ -665,7 +665,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new ForEachGroupElaborator();
         }
 
-        public class ForEachGroupElaborator : PushElaborator
+        internal class ForEachGroupElaborator : PushElaborator
         {
             private IPullEvaluator GroupIteratorProvider
             {

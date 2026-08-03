@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     // Faithful port of net.sf.saxon.expr.sort.MergeIterator (Saxon 12.9). Was a hollow stub that didn't
     // even implement ISequenceIterator — every multi-source xsl:merge cast it and crashed (InvalidCast).
     // The sorted merge of two merge inputs, retaining all duplicates; no grouping of adjacent items.
-    public class MergeIterator : ISequenceIterator, ILookaheadIterator
+    internal class MergeIterator : ISequenceIterator, ILookaheadIterator
     {
         private readonly ISequenceIterator e1;
         private readonly ISequenceIterator e2;

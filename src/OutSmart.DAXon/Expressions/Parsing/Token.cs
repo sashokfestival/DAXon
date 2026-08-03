@@ -14,7 +14,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Parsing
 {
-    public abstract class Token
+    internal abstract class Token
     {
         /*
      * Token numbers. Those in the range 0 to LAST_OPERATOR are tokens that can be followed

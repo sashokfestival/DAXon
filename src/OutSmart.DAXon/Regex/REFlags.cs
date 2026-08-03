@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex
 {
-    public class REFlags
+    internal class REFlags
     {
         private bool caseIndependent;
         private bool multiLine;

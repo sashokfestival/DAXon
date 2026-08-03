@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Trees.Tiny
     using global::OutSmart.DAXon.Model;
     // BuilderMonitor inheritance trips CS0534 (abstract MarkNextNode/GetMarkedNode). Keep bare for now.
     // Inherit BuilderMonitor (impl 2 abstract members).
-    public class TinyBuilderMonitor : BuilderMonitor
+    internal class TinyBuilderMonitor : BuilderMonitor
     {
         public override NodeInfo MarkedNode => throw new NotImplementedException("STUB: TinyBuilderMonitor.GetMarkedNode not ported (excluded stub)");
         public TinyBuilderMonitor() : base(null) { }

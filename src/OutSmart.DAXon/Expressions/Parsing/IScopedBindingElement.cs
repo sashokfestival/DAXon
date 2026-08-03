@@ -15,5 +15,5 @@ namespace OutSmart.DAXon.Expressions.Parsing
     // Real ScopedBindingElement.cs (excluded) is a marker interface with one method;
     // the hollow stub lacked it, so ExpressionTool's ((IScopedBindingElement)exp).AllocateSlots(..)
     // failed CS1061. No compiled class implements this interface, so adding the method cannot cascade.
-    public interface IScopedBindingElement { int AllocateSlots(SlotManager slotManager, int nextFree); }
+    internal interface IScopedBindingElement { int AllocateSlots(SlotManager slotManager, int nextFree); }
 }

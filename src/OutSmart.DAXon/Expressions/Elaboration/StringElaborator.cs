@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public abstract class StringElaborator : Elaborator
+    internal abstract class StringElaborator : Elaborator
     {
         public virtual bool ReturnZeroLengthWhenAbsent()
         {

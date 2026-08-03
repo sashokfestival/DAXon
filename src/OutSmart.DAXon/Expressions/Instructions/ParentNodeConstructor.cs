@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public abstract class ParentNodeConstructor : Instruction, IValidatingInstruction, IInstructionWithComplexContent
+    internal abstract class ParentNodeConstructor : Instruction, IValidatingInstruction, IInstructionWithComplexContent
     {
         private static readonly OperandRole SAME_FOCUS_CONTENT = new OperandRole(0, OperandUsage.ABSORPTION, SequenceType.ANY_SEQUENCE);
         protected Operand contentOp;

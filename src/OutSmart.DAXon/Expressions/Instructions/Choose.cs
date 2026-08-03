@@ -868,7 +868,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new ChooseExprElaborator();
         }
 
-        public class ChooseExprElaborator : PullElaborator
+        internal class ChooseExprElaborator : PullElaborator
         {
             private IBooleanEvaluator[] conditions;
             private readonly object conditionsLock = new object();

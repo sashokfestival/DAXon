@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// Represents the set of xsl:param elements at the start of an xsl:iterate instruction
     /// </summary>
-    public class LocalParamBlock : Instruction
+    internal class LocalParamBlock : Instruction
     {
         Operand[] operanda;
 
@@ -94,7 +94,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new LocalParamBlockElaborator();
         }
 
-        public class LocalParamBlockElaborator : PushElaborator
+        internal class LocalParamBlockElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
             {

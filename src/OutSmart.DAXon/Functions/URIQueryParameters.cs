@@ -269,7 +269,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// A FilenameFilter that tests file names against a regular expression
         /// </summary>
-        public class RegexFilter
+        internal class RegexFilter
         {
             private readonly IRegularExpression pattern;
             public RegexFilter(IRegularExpression regex)

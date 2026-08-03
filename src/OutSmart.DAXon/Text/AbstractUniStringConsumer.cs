@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Text
 {
-    public abstract class AbstractUniStringConsumer : IUniStringConsumer
+    internal abstract class AbstractUniStringConsumer : IUniStringConsumer
     {
         public abstract IUniStringConsumer Accept(UnicodeString arg0);
 

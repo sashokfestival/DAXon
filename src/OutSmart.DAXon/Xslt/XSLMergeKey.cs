@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:merge-key element in the stylesheet. <br>
     /// </summary>
-    public class XSLMergeKey : XSLSortOrMergeKey
+    internal class XSLMergeKey : XSLSortOrMergeKey
     {
 
         //    protected boolean seesAvuncularVariables() {

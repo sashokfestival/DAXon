@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Functions
     // Faithful port of net.sf.saxon.functions.CopyOfFn (Saxon 12.9). The class was missing from the port,
     // so fn:copy-of() was unregistered (XPST0017).
     // XSLT 3.0 function copy-of(): compiles into an xsl:copy-of instruction, except when called dynamically.
-    public class CopyOfFn : SystemFunction
+    internal class CopyOfFn : SystemFunction
     {
         public override int GetCardinality(Expression[] arguments)
         {

@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Serialization
 {
-    public class HTMLIndenter : ProxyReceiver
+    internal class HTMLIndenter : ProxyReceiver
     {
         /*"link" -- excluded, see bug 3877,*/
         private const int IS_INLINE = 1;

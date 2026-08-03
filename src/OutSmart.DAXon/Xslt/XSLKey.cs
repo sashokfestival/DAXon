@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Handler for xsl:key elements in stylesheet. <br>
     /// </summary>
-    public class XSLKey : StyleElement, IStylesheetComponent
+    internal class XSLKey : StyleElement, IStylesheetComponent
     {
 
         private static readonly Func<Expression, bool> containsGlobalVariable = (e) => (e is GlobalVariableReference || e is UserFunctionCall || e is CallTemplate || e is ApplyTemplates);

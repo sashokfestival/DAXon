@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Regex
 {
-    public class CaseVariants
+    internal class CaseVariants
     {
 
         /// <summary>

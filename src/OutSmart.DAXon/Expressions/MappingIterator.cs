@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class MappingIterator : ISequenceIterator
+    internal class MappingIterator : ISequenceIterator
     {
         private readonly ISequenceIterator @base;
         private readonly IMappingFunction action;

@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public class CodedName : INodeName
+    internal class CodedName : INodeName
     {
         private readonly int fingerprint;
         private readonly string prefix;

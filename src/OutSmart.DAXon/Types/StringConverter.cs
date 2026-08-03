@@ -55,7 +55,7 @@ namespace OutSmart.DAXon.Types
             return Convert((AtomicValue)value);
         }
 
-        public class StringToNonStringDerivedType : StringConverter
+        internal class StringToNonStringDerivedType : StringConverter
         {
             private readonly StringConverter phaseOne;
             private readonly UnfailingConverter.DownCastingConverter phaseTwo;
@@ -137,7 +137,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string or xs:untypedAtomic to xs:String
         /// </summary>
-        public class StringToString : StringConverter
+        internal class StringToString : StringConverter
         {
             public static readonly StringToString INSTANCE = new StringToString();
             public override IConversionResult Convert(AtomicValue input)
@@ -164,7 +164,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string or xs:untypedAtomic to xs:untypedAtomic
         /// </summary>
-        public class StringToUntypedAtomic : StringConverter
+        internal class StringToUntypedAtomic : StringConverter
         {
             public static readonly StringToUntypedAtomic INSTANCE = new StringToUntypedAtomic();
             public override IConversionResult Convert(AtomicValue input)
@@ -191,7 +191,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string to xs:normalizedString
         /// </summary>
-        public class StringToNormalizedString : StringConverter
+        internal class StringToNormalizedString : StringConverter
         {
             public static readonly StringToNormalizedString INSTANCE = new StringToNormalizedString();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -213,7 +213,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string to xs:token
         /// </summary>
-        public class StringToToken : StringConverter
+        internal class StringToToken : StringConverter
         {
             public static readonly StringToToken INSTANCE = new StringToToken();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -235,7 +235,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string to xs:language
         /// </summary>
-        public class StringToLanguage : StringConverter
+        internal class StringToLanguage : StringConverter
         {
             private static ARegularExpression _regexLazy;
             public static readonly StringToLanguage INSTANCE = new StringToLanguage();
@@ -267,7 +267,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string to xs:NCName, xs:ID, xs:IDREF, or xs:ENTITY
         /// </summary>
-        public class StringToNCName : StringConverter
+        internal class StringToNCName : StringConverter
         {
             // Lazy: eager initializers here can run DURING BuiltInAtomicType's own static init (the two
             // classes are mutually referencing), capturing a still-null ID/ENTITY/IDREF and later NRE-ing
@@ -312,7 +312,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string to xs:NMTOKEN
         /// </summary>
-        public class StringToNMTOKEN : StringConverter
+        internal class StringToNMTOKEN : StringConverter
         {
             public static readonly StringToNMTOKEN INSTANCE = new StringToNMTOKEN();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -344,7 +344,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string to xs:Name
         /// </summary>
-        public class StringToName : StringToNCName
+        internal class StringToName : StringToNCName
         {
             public static readonly StringToName INSTANCE = new StringToName();
             public StringToName() : base(BuiltInAtomicType.NAME)
@@ -390,7 +390,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs:string to a user-defined type derived directly from xs:string
         /// </summary>
-        public class StringToStringSubtype : StringConverter
+        internal class StringToStringSubtype : StringConverter
         {
             IAtomicType targetType;
             int whitespaceAction;
@@ -442,7 +442,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts from xs;string to a user-defined type derived from a built-in subtype of xs:string
         /// </summary>
-        public class StringToDerivedStringSubtype : StringConverter
+        internal class StringToDerivedStringSubtype : StringConverter
         {
             IAtomicType targetType;
             StringConverter builtInValidator;
@@ -487,7 +487,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to xs:float
         /// </summary>
-        public class StringToFloat : StringConverter
+        internal class StringToFloat : StringConverter
         {
             public StringToFloat(ConversionRules rules) : base(rules ?? throw new NullReferenceException())
             {
@@ -512,7 +512,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to an xs:decimal
         /// </summary>
-        public class StringToDecimal : StringConverter
+        internal class StringToDecimal : StringConverter
         {
             public static readonly StringToDecimal INSTANCE = new StringToDecimal();
 
@@ -565,7 +565,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to an integer
         /// </summary>
-        public class StringToInteger : StringConverter
+        internal class StringToInteger : StringConverter
         {
             public static readonly StringToInteger INSTANCE = new StringToInteger();
             public virtual IConversionResult Convert(StringValue input)
@@ -587,7 +587,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a duration
         /// </summary>
-        public class StringToDuration : StringConverter
+        internal class StringToDuration : StringConverter
         {
             public static readonly StringToDuration INSTANCE = new StringToDuration();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -599,7 +599,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a dayTimeDuration
         /// </summary>
-        public class StringToDayTimeDuration : StringConverter
+        internal class StringToDayTimeDuration : StringConverter
         {
             public static readonly StringToDayTimeDuration INSTANCE = new StringToDayTimeDuration();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -611,7 +611,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a yearMonthDuration
         /// </summary>
-        public class StringToYearMonthDuration : StringConverter
+        internal class StringToYearMonthDuration : StringConverter
         {
             public static readonly StringToYearMonthDuration INSTANCE = new StringToYearMonthDuration();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -623,7 +623,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a dateTime
         /// </summary>
-        public class StringToDateTime : StringConverter
+        internal class StringToDateTime : StringConverter
         {
             public StringToDateTime(ConversionRules rules) : base(rules)
             {
@@ -638,7 +638,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a dateTimeStamp
         /// </summary>
-        public class StringToDateTimeStamp : StringConverter
+        internal class StringToDateTimeStamp : StringConverter
         {
             public StringToDateTimeStamp(ConversionRules rules) : base(rules)
             {
@@ -666,7 +666,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a date
         /// </summary>
-        public class StringToDate : StringConverter
+        internal class StringToDate : StringConverter
         {
             public StringToDate(ConversionRules rules) : base(rules)
             {
@@ -681,7 +681,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a gMonth
         /// </summary>
-        public class StringToGMonth : StringConverter
+        internal class StringToGMonth : StringConverter
         {
             public static readonly StringToGMonth INSTANCE = new StringToGMonth();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -693,7 +693,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a gYearMonth
         /// </summary>
-        public class StringToGYearMonth : StringConverter
+        internal class StringToGYearMonth : StringConverter
         {
             public StringToGYearMonth(ConversionRules rules) : base(rules)
             {
@@ -708,7 +708,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a gYear
         /// </summary>
-        public class StringToGYear : StringConverter
+        internal class StringToGYear : StringConverter
         {
             public StringToGYear(ConversionRules rules) : base(rules)
             {
@@ -723,7 +723,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a gMonthDay
         /// </summary>
-        public class StringToGMonthDay : StringConverter
+        internal class StringToGMonthDay : StringConverter
         {
             public static readonly StringToGMonthDay INSTANCE = new StringToGMonthDay();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -735,7 +735,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a gDay
         /// </summary>
-        public class StringToGDay : StringConverter
+        internal class StringToGDay : StringConverter
         {
             public static readonly StringToGDay INSTANCE = new StringToGDay();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -747,7 +747,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a time
         /// </summary>
-        public class StringToTime : StringConverter
+        internal class StringToTime : StringConverter
         {
             public static readonly StringToTime INSTANCE = new StringToTime();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -759,7 +759,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to a boolean
         /// </summary>
-        public class StringToBoolean : StringConverter
+        internal class StringToBoolean : StringConverter
         {
             public static readonly StringToBoolean INSTANCE = new StringToBoolean();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -771,7 +771,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts a string to hexBinary
         /// </summary>
-        public class StringToHexBinary : StringConverter
+        internal class StringToHexBinary : StringConverter
         {
             public static readonly StringToHexBinary INSTANCE = new StringToHexBinary();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -790,7 +790,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts string to base64
         /// </summary>
-        public class StringToBase64Binary : StringConverter
+        internal class StringToBase64Binary : StringConverter
         {
             public static readonly StringToBase64Binary INSTANCE = new StringToBase64Binary();
             public override IConversionResult ConvertString(UnicodeString input)
@@ -809,7 +809,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts String to QName
         /// </summary>
-        public class StringToQName : StringConverter
+        internal class StringToQName : StringConverter
         {
             private INamespaceResolver nsResolver;
             public StringToQName(ConversionRules rules) : base(rules)
@@ -868,7 +868,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts String to NOTATION
         /// </summary>
-        public class StringToNotation : StringConverter
+        internal class StringToNotation : StringConverter
         {
             private INamespaceResolver nsResolver;
             public StringToNotation(ConversionRules rules) : base(rules)
@@ -930,7 +930,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converts string to anyURI
         /// </summary>
-        public class StringToAnyURI : StringConverter
+        internal class StringToAnyURI : StringConverter
         {
             public StringToAnyURI(ConversionRules rules) : base(rules)
             {
@@ -964,7 +964,7 @@ namespace OutSmart.DAXon.Types
         /// <summary>
         /// Converter from string to plain union types
         /// </summary>
-        public class StringToUnionConverter : StringConverter
+        internal class StringToUnionConverter : StringConverter
         {
             IPlainType targetType;
             ConversionRules rules;

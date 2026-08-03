@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class UnparsedTextFunction : SystemFunction
+    internal abstract class UnparsedTextFunction : SystemFunction
     {
         public override int GetSpecialProperties(Expression[] arguments)
         {

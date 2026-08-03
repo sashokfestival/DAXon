@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the XPath substring() function
     /// </summary>
-    public class Substring : SystemFunction, ICallable
+    internal class Substring : SystemFunction, ICallable
     {
 
         public static Func<Substring> New() => () => new Substring();
@@ -243,7 +243,7 @@ namespace OutSmart.DAXon.Functions
         }
         ISequence ICallable.Call(IXPathContext arg0, ISequence[] arg1) => Call(arg0, arg1);
 
-        public class SubstringFnElaborator : ItemElaborator
+        internal class SubstringFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

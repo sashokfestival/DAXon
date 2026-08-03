@@ -511,6 +511,10 @@ namespace OutSmart.DAXon.Api
             return CompileFromXmlReader(input, null, systemId);
         }
 
+        // Round B1: a stylesheet arriving directly on the API is subject to the Processor's cap
+        // just like one fetched by the resolver (xsl:include/import already were).
+        private long MaxInput => InputSizeLimit.MaxFor(config);
+
         // Saxonica .NET-API compat: compile with just the reader (BaseUri property, else a pseudo-URI).
         public virtual Uri BaseUri { get; set; }
 
@@ -526,6 +530,8 @@ namespace OutSmart.DAXon.Api
             Controller.DeadlineToken prevDeadline = Controller.ArmThreadDeadline(config);
             try
             {
+                charStream = InputSizeLimit.Apply(charStream, MaxInput, systemId, "FODC0002");
+                byteStream = InputSizeLimit.Apply(byteStream, MaxInput, systemId, "FODC0002");
                 CompilerInfo ci2 = new CompilerInfo(compilerInfo);
                 using (System.Xml.XmlReader reader = global::OutSmart.DAXon.Events.XmlReaderToReceiver.CreateXmlReader(charStream, byteStream, systemId, resolver))
                 {

@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Patterns
 {
-    public sealed class AnyNodeTest : NodeTest, IQNameTest
+    internal sealed class AnyNodeTest : NodeTest, IQNameTest
     {
         private static readonly AnyNodeTest THE_INSTANCE = new AnyNodeTest();
 

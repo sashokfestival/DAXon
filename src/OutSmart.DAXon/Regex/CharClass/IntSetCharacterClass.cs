@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex.CharClass
 {
-    public class IntSetCharacterClass : ICharacterClass
+    internal class IntSetCharacterClass : ICharacterClass
     {
         private readonly IntSet intSet;
         public IntSetCharacterClass(IntSet intSet)

@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public abstract class ElementCreator : ParentNodeConstructor
+    internal abstract class ElementCreator : ParentNodeConstructor
     {
 
         public bool bequeathNamespacesToChildren = true;
@@ -241,7 +241,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
         {
             throw new NotSupportedException();
         }
-        public abstract class ElementCreationDetails
+        internal abstract class ElementCreationDetails
         {
             public virtual INodeName GetNodeName(IXPathContext context) => null;
             public virtual string GetSystemId(IXPathContext context) => null;

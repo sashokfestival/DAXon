@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Collections
     /// <summary>
     /// Interface defining a map from integers to integers
     /// </summary>
-    public interface IIntToIntMap
+    internal interface IIntToIntMap
     {
         int DefaultValue { get; set; }
         /// <summary>

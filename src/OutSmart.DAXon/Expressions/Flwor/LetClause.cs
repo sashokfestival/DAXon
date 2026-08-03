@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// A "let" clause in a FLWOR expression
     /// </summary>
-    public class LetClause : Clause
+    internal class LetClause : Clause
     {
         private LocalVariableBinding rangeVariable;
         private Operand sequenceOp;

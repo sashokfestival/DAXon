@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the function fn:codepoints-to-string()
     /// </summary>
-    public class CodepointsToString : SystemFunction, ICallable
+    internal class CodepointsToString : SystemFunction, ICallable
     {
 
         public override string StreamerName => "CodepointsToString";

@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class Tokenize_3 : RegexFunction
+    internal class Tokenize_3 : RegexFunction
     {
 
         public static Func<Tokenize_3> New() => () => new Tokenize_3();

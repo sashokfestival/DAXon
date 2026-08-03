@@ -7,5 +7,5 @@
 
 namespace OutSmart.DAXon.Tracing
 {
-    public class ContextStackIterator { public ContextStackIterator() { } public ContextStackIterator(object ctx) { } }
+    internal class ContextStackIterator { public ContextStackIterator() { } public ContextStackIterator(object ctx) { } }
 }

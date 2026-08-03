@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public class NameOfNode : INodeName
+    internal class NameOfNode : INodeName
     {
         private readonly NodeInfo node;
 

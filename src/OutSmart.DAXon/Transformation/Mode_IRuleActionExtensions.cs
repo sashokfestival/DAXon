@@ -29,7 +29,7 @@ using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Transformation
 {
 
-    public static class Mode_IRuleActionExtensions
+    internal static class Mode_IRuleActionExtensions
     {
         public static void ProcessRule(this Mode.IRuleAction a, Rule r) { a?.Invoke(r); }
     }

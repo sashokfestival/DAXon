@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Numbering
 {
-    public class Alphanumeric
+    internal class Alphanumeric
     {
         private static readonly int[] zeroDigits = new[]
         {

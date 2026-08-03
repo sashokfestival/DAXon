@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
 {
     public class FunctionLibraryList : IFunctionLibrary, IXQueryFunctionBinder
     {
-        public IList<IFunctionLibrary> libraryList = new List<IFunctionLibrary>(8);
+        internal IList<IFunctionLibrary> libraryList = new List<IFunctionLibrary>(8);   // LibraryList is the public spelling
 
         // PHASE7_FLL_INDEXER
         public IFunctionLibrary this[int n] { get { return Get(n); } }

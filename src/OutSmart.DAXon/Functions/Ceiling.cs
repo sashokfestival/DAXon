@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the ceiling() function
     /// </summary>
-    public sealed class Ceiling : ScalarSystemFunction
+    internal sealed class Ceiling : ScalarSystemFunction
     {
 
         public static Func<Ceiling> New() => () => new Ceiling();
@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Functions
             return new CeilingElaborator();
         }
 
-        public class CeilingElaborator : ItemElaborator
+        internal class CeilingElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

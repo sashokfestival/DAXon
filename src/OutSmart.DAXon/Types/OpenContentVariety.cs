@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Types
     /// <summary>
     /// The different varieties of open content for complex types
     /// </summary>
-    public enum OpenContentVariety
+    internal enum OpenContentVariety
     {
         ABSENT,
         NONE,

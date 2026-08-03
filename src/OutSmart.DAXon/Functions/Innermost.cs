@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the function fn:has-children(), which is a standard function in XPath 3.0
     /// </summary>
-    public class Innermost : SystemFunction
+    internal class Innermost : SystemFunction
     {
         bool presorted = false;
 

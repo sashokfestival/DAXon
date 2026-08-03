@@ -15,7 +15,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class PrefixPool
+    internal class PrefixPool
     {
         private const int LIMIT = 2047;
         string[] prefixes = new string[8];

@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex
 {
-    public abstract class Operation
+    internal abstract class Operation
     {
         protected const int MATCHES_ZLS_AT_START = 1;
         protected const int MATCHES_ZLS_AT_END = 2;

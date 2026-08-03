@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class DecimalSortComparer : IAtomicComparer
+    internal class DecimalSortComparer : IAtomicComparer
     {
         private static readonly DecimalSortComparer THE_INSTANCE = new DecimalSortComparer();
         public static DecimalSortComparer DecimalSortComparerInstance => THE_INSTANCE;

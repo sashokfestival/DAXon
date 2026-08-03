@@ -29,7 +29,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public class DynamicFunctionCall : Expression
+    internal class DynamicFunctionCall : Expression
     {
         private readonly Operand targetFunction;
         private readonly OperandArray suppliedArguments;

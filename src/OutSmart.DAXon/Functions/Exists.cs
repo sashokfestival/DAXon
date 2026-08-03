@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the fn:exists function
     /// </summary>
-    public class Exists : Aggregate
+    internal class Exists : Aggregate
     {
 
         public override string StreamerName => "Exists";

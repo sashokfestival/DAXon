@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Tracing
 {
-    public static class TraceEventMulticaster
+    internal static class TraceEventMulticaster
     {
         public static object Add(object a, object b) => a ?? b;
         public static object Remove(object a, object b) => a;

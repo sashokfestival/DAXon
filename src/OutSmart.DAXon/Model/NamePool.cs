@@ -104,7 +104,17 @@ namespace OutSmart.DAXon.Model
                 long nextUnique = unique.AndIncrement;
                 if (nextUnique > MAX_FINGERPRINT)
                 {
-                    throw new NamePoolLimitException("Too many distinct names in NamePool");
+                    // Terminal, not transient: nothing can be evicted (fingerprints are baked into
+                    // compiled patterns), so every later new name on this Processor fails the same
+                    // way. The message has to say that, or the host reads it as a one-off.
+                    throw new NamePoolLimitException(
+                        "NamePool exhausted: " + qNameToInteger.Count + " distinct names allocated, ceiling is "
+                        + MAX_FINGERPRINT + ". Fingerprints are permanent - they are baked into compiled patterns"
+                        + " and into each mode's rule-chain index, so none can be evicted and every further new"
+                        + " name on this Processor will fail the same way. Replace the Processor, together with"
+                        + " any cached XsltExecutable built from it. Workloads that mint names per message"
+                        + " (data-derived element names, a GUID in a namespace) walk into this ceiling; watch"
+                        + " NamePool.UserDefinedNameCount and see docs/HOSTING.md.");
                 }
 
                 int next = (int)nextUnique;
@@ -125,6 +135,13 @@ namespace OutSmart.DAXon.Model
         {
             return result == 0;
         }
+
+        /// <summary>
+        /// Distinct user-defined names this pool has allocated. Fingerprints are permanent -
+        /// nothing evicts them, because they are baked into compiled patterns - so this only
+        /// grows, up to the MAX_FINGERPRINT ceiling. See docs/HOSTING.md.
+        /// </summary>
+        public int UserDefinedNameCount => qNameToInteger.Count;
 
         public NamespaceUri GetURI(int nameCode)
         {
@@ -205,7 +222,7 @@ namespace OutSmart.DAXon.Model
         /// <summary>
         /// Unchecked Exception raised when some limit in the design of the name pool is exceeded
         /// </summary>
-        public class NamePoolLimitException : Exception
+        internal class NamePoolLimitException : Exception
         {
             public NamePoolLimitException(string message) : base(message)
             {

@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Trees.Iterators
     // Faithful port of upstream AncestorIterator: walk GetParent() applying the NodeTest. IAxisIterator
     // redeclares `new NodeInfo Next()`, so the explicit ISequenceIterator.Next() bridges to it
     // (covariant-redirect idiom, mirrors DocumentOrderIterator).
-    public sealed class AncestorIterator : IAxisIterator
+    internal sealed class AncestorIterator : IAxisIterator
     {
         private readonly NodeInfo startNode;
         private NodeInfo current;

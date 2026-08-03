@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Patterns
 {
 
     // Stub IAtomicComparer that wraps generic equality (compile-only).
-    public sealed class GenericObjectEqualityAtomicComparer : IAtomicComparer
+    internal sealed class GenericObjectEqualityAtomicComparer : IAtomicComparer
     {
         public static readonly GenericObjectEqualityAtomicComparer Instance = new GenericObjectEqualityAtomicComparer();
         public IStringCollator Collator => null; // object-equality comparer uses no collation (sibling comparers expose their collator or null)

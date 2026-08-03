@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Types
     // always-empty -> FinDim/Trans produced []. Declare IComplexType and implement it faithfully to
     // upstream net.sf.saxon.type.AnyType (open content model: any child/descendant element allowed
     // ZERO_OR_MORE, attributes allowed, element wildcard).
-    public sealed class AnyType : ISchemaTypeStubBase, IComplexType
+    internal sealed class AnyType : ISchemaTypeStubBase, IComplexType
     {
         private static readonly AnyType _instance = new AnyType();
         public static readonly AnyType INSTANCE = _instance;

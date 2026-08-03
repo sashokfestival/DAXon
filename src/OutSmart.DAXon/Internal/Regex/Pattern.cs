@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Internal.Regex
     /// feed user-supplied pattern text; an unbounded cache could accumulate process-wide. On eviction a
     /// later Compile of the same text just rebuilds an equivalent immutable Pattern, as Java would.
     /// </summary>
-    public sealed class Pattern
+    internal sealed class Pattern
     {
         public const int CASE_INSENSITIVE = 1;
         public const int MULTILINE = 2;

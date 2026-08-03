@@ -16,7 +16,7 @@ using OutSmart.DAXon.Expressions;
 // DummyNamespaceResolver, LoopLifter Ã¢â‚¬â€ frequently-referenced helper classes.
 namespace OutSmart.DAXon.Patterns
 {
-    public static class PatternMaker
+    internal static class PatternMaker
     {
         // Runtime: real FromExpression (the prior `=> null` hollow stub made every expression->Pattern
         // conversion return null -> NRE at PatternParser.ParsePattern pat.SetOriginalText, the moment any

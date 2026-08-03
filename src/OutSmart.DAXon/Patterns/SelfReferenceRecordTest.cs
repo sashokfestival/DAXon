@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Patterns
 {
-    public class SelfReferenceRecordTest
+    internal class SelfReferenceRecordTest
     {
         private static readonly SelfReferenceRecordTest _instance = new SelfReferenceRecordTest();
         public SelfReferenceRecordTest() { }

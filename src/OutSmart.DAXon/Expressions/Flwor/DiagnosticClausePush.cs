@@ -7,7 +7,7 @@
 
 namespace OutSmart.DAXon.Expressions.Flwor
 {
-    public class DiagnosticClausePush
+    internal class DiagnosticClausePush
     {
         public DiagnosticClausePush() { }
         public DiagnosticClausePush(object a, object b, object c) { }

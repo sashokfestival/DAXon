@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     /// Implements the fn:idref function. Returns the nodes in a document that have an IDREF/IDREFS
     /// attribute (or element) referencing one of the supplied id values.
     /// </summary>
-    public class Idref : SystemFunction
+    internal class Idref : SystemFunction
     {
         public override int GetSpecialProperties(Expression[] arguments)
         {

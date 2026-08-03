@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// A sequence of multiple pieces in a regular expression
     /// </summary>
-    public class OpSequence : Operation
+    internal class OpSequence : Operation
     {
         protected readonly IList<Operation> operations;
 

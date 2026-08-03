@@ -24,7 +24,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLMergeSource : StyleElement
+    internal class XSLMergeSource : StyleElement
     {
         private Expression forEachItem;
         private Expression forEachSource;

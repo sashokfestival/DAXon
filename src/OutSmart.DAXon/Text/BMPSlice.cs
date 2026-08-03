@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Text
     /// a token keeps a view of its line instead of a copied substring, which is what
     /// matters when millions of tokens are retained at once (array{tokenize(...)}).
     /// </summary>
-    public sealed class BMPSlice : UnicodeString
+    internal sealed class BMPSlice : UnicodeString
     {
         private readonly string _s;
         private readonly int _start;

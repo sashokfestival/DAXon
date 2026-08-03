@@ -27,7 +27,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class CardinalityChecker : UnaryExpression
+    internal sealed class CardinalityChecker : UnaryExpression
     {
         private int requiredCardinality = -1;
         private readonly Func<RoleDiagnostic> roleSupplier;
@@ -333,7 +333,7 @@ namespace OutSmart.DAXon.Expressions
             return new CardinalityCheckerElaborator();
         }
 
-        public class CardinalityCheckerElaborator : PullElaborator
+        internal class CardinalityCheckerElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

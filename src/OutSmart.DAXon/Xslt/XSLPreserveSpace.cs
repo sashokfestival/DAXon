@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:preserve-space or xsl:strip-space elements in stylesheet. <br>
     /// </summary>
-    public class XSLPreserveSpace : StyleElement
+    internal class XSLPreserveSpace : StyleElement
     {
         private string elements;
         public override bool IsDeclaration()

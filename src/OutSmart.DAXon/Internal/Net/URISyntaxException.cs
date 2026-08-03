@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Internal.Net
     /// (we throw it where Saxon code expects it).
     /// </summary>
     // Extend Throwable so callers passing this to XPathException(Throwable err) ctor bind.
-    public class URISyntaxException : global::System.Exception
+    internal class URISyntaxException : global::System.Exception
     {
         public string Input { get; }
         public string Reason { get; }

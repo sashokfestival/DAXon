@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Internal.Caching
     /// captures every result-affecting input (see REFACTORING-PLAN Appendix B,
     /// "Correctness rules").
     /// </summary>
-    public sealed class ClockCache<TKey, TValue>
+    internal sealed class ClockCache<TKey, TValue>
     {
         private readonly ConcurrentDictionary<TKey, Entry> _map;
         private readonly object _writeLock = new object();

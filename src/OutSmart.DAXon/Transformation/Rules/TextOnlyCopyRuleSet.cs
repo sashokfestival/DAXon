@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation.Rules
 {
-    public class TextOnlyCopyRuleSet : IBuiltInRuleSet
+    internal class TextOnlyCopyRuleSet : IBuiltInRuleSet
     {
         private static readonly TextOnlyCopyRuleSet THE_INSTANCE = new TextOnlyCopyRuleSet();
 

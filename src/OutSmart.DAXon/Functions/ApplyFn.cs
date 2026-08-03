@@ -24,7 +24,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions
 {
-    public class ApplyFn : SystemFunction
+    internal class ApplyFn : SystemFunction
     {
         private string dynamicFunctionCall;
         public ApplyFn()

@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Types
     // constructor functions (which need IListType.GetItemType + ValidateContent + GetTypedValue) raised
     // XPST0017, and casting these to ISimpleType (DTD attribute typing) InvalidCast'd. The three built-in list
     // types register themselves in BuiltInType via MakeListType (called from the static field initialisers).
-    public class BuiltInListType : IListType
+    internal class BuiltInListType : IListType
     {
         public static readonly BuiltInListType ENTITIES = MakeListType(NamespaceUri.SCHEMA, "ENTITIES");
         public static readonly BuiltInListType IDREFS = MakeListType(NamespaceUri.SCHEMA, "IDREFS");

@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Lib
     /// A string is accepted if the URI class parses it, or if it parses after IRI-to-URI escaping —
     /// otherwise it is rejected (e.g. a fragment containing a second '#').
     /// </summary>
-    public class StandardURIChecker : IURIChecker
+    internal class StandardURIChecker : IURIChecker
     {
         private static readonly StandardURIChecker _instance = new StandardURIChecker();
         public static StandardURIChecker GetInstance() => _instance;

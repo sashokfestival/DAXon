@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public sealed class TinyAttributeImpl : TinyNodeImpl
+    internal sealed class TinyAttributeImpl : TinyNodeImpl
     {
 
         public override NodeInfo Root

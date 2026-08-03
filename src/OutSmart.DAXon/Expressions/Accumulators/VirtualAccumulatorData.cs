@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Accumulators
 {
-    public class VirtualAccumulatorData : IIAccumulatorData
+    internal class VirtualAccumulatorData : IIAccumulatorData
     {
         private readonly IIAccumulatorData realData;
         public VirtualAccumulatorData(IIAccumulatorData realData)

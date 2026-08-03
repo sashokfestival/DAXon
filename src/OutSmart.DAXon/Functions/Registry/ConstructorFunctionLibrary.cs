@@ -21,7 +21,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions.Registry
 {
-    public class ConstructorFunctionLibrary : IFunctionLibrary
+    internal class ConstructorFunctionLibrary : IFunctionLibrary
     {
         private readonly Configuration config;
         public ConstructorFunctionLibrary(Configuration config)

@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the fn:ends-with() function, with the collation already fixed
     /// </summary>
-    public class EndsWith : CollatingFunctionFixed
+    internal class EndsWith : CollatingFunctionFixed
     {
 
         public static Func<EndsWith> New() => () => new EndsWith();

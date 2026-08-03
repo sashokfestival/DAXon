@@ -12,7 +12,7 @@ using OutSmart.DAXon.Lib;
 
 namespace OutSmart.DAXon.Resources
 {
-    public class UnparsedTextResource
+    internal class UnparsedTextResource
     {
         public static readonly IResourceFactory FACTORY = new GenericResourceFactory();
         public string Content => string.Empty;

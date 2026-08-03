@@ -9,7 +9,7 @@ using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class RuleBasedSubstringMatcher : IStringCollator
+    internal class RuleBasedSubstringMatcher : IStringCollator
     {
         public string CollationURI => null;
         public RuleBasedSubstringMatcher() { }

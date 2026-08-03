@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex
 {
-    public class OpReluctantFixed : OpRepeat
+    internal class OpReluctantFixed : OpRepeat
     {
         private readonly int len;
 

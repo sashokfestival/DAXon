@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class ContainsToken : CollatingFunctionFixed
+    internal class ContainsToken : CollatingFunctionFixed
     {
 
         public static Func<ContainsToken> New() => () => new ContainsToken();

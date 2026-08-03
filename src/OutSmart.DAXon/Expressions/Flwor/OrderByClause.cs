@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// This class represents an "order by" clause in a FLWOR expression
     /// </summary>
-    public class OrderByClause : Clause
+    internal class OrderByClause : Clause
     {
         public static readonly OperandRole SORT_KEYS_ROLE = new OperandRole(OperandRole.HIGHER_ORDER | OperandRole.CONSTRAINED_CLASS, OperandUsage.NAVIGATION, SequenceType.ANY_SEQUENCE, (expr) => expr is SortKeyDefinitionList);
         Operand sortKeysOp; // Holds a SortKeyDefinitionList

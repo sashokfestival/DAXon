@@ -120,7 +120,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for an "or" expression ({@code A or B})
         /// </summary>
-        public class OrElaborator : BooleanElaborator
+        internal class OrElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

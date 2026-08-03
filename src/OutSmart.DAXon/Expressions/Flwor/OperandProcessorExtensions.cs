@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Flwor
 {
 
-    public static class OperandProcessorExtensions
+    internal static class OperandProcessorExtensions
     {
         public static void ProcessOperand(this IOperandProcessor p, Operand expr) { p?.Invoke(expr); }
     }

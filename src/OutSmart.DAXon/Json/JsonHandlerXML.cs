@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Json
     /// <summary>
     /// Handler to generate an XML representation of JSON from a series of events
     /// </summary>
-    public class JsonHandlerXML : JsonHandler
+    internal class JsonHandlerXML : JsonHandler
     {
         public const string PREFIX = "";
         private static readonly string SCHEMA_URI = "http://www.w3.org/2005/xpath-functions.xsd";

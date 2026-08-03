@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class SuppliedParameterReference : Expression
+    internal class SuppliedParameterReference : Expression
     {
         private readonly int slotNumber;
         private SequenceType type;
@@ -142,7 +142,7 @@ namespace OutSmart.DAXon.Expressions
             return new SuppliedParameterReferenceElaborator();
         }
 
-        public class SuppliedParameterReferenceElaborator : PullElaborator
+        internal class SuppliedParameterReferenceElaborator : PullElaborator
         {
             public override ISequenceEvaluator Eagerly()
             {

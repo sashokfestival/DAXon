@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Serialization.CharCodes
     /// <summary>
     /// This class defines properties of the US-ASCII character set
     /// </summary>
-    public class ASCIICharacterSet : ICharacterSet
+    internal class ASCIICharacterSet : ICharacterSet
     {
         public static readonly ASCIICharacterSet theInstance = new ASCIICharacterSet();
 

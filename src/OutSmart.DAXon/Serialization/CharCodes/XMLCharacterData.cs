@@ -13,7 +13,7 @@ using System.Xml;
 // More stubs (CS0103 bare-identifier patterns)
 namespace OutSmart.DAXon.Serialization.CharCodes
 {
-    public static class XMLCharacterData
+    internal static class XMLCharacterData
     {
         // NCName classification. The `11` variants implement the XML 1.1 / XML 1.0-5th-edition NameStartChar
         // and NameChar productions DIRECTLY (matching upstream Saxon's Name11Checker), NOT via the BCL's

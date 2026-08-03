@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class UntypedSequenceConverter : AtomicSequenceConverter
+    internal sealed class UntypedSequenceConverter : AtomicSequenceConverter
     {
 
         public override string ExpressionName => "convertUntyped";
@@ -188,7 +188,7 @@ namespace OutSmart.DAXon.Expressions
                 => new ValidationFailure("Implicit conversion of untypedAtomic to a union type is not supported in this port build", "XPTY0117");
         }
 
-        public class UntypedConverter : Converter
+        internal class UntypedConverter : Converter
         {
             Converter untypedConverter = null;
             public UntypedConverter(ConversionRules rules, Converter converter) : base(rules)
@@ -231,7 +231,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for an UntypedSequenceConverter
         /// </summary>
-        public class UntypedSequenceConverterElaborator : PullElaborator
+        internal class UntypedSequenceConverterElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

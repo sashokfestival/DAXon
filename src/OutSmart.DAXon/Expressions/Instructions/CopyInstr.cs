@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// Handler for xsl:copy elements in stylesheet. This only handles copying of the context item. An xsl:copy
     /// with a select attribute is handled by wrapping the instruction in an xsl:for-each.
     /// </summary>
-    public class CopyInstr : ElementCreator
+    internal class CopyInstr : ElementCreator
     {
         private bool copyNamespaces;
         private ItemType selectItemType = AnyItemType.GetInstance();
@@ -410,7 +410,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new CopyElaborator();
         }
 
-        public class CopyElementDetails : ElementCreationDetails
+        internal class CopyElementDetails : ElementCreationDetails
         {
             private readonly IPushEvaluator contentEvaluator;
             private readonly NodeInfo copiedNode;
@@ -439,7 +439,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public class CopyElaborator : PushElaborator
+        internal class CopyElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
             {

@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Text
     // RequireNonNegativeInt helper used by Twine* / BMPString /
     // Slice16 -- Saxon source assumes a static helper that narrows a long
     // index to int with a bounds check.
-    public static class StrHelpers
+    internal static class StrHelpers
     {
         public static int requireNonNegativeInt(long v)
         {

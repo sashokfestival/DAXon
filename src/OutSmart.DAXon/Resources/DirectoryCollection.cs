@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Resources
     // A resource collection containing all, or selected, files within a filestore directory.
     // Port deviation: metadata resources (?metadata=yes) return the plain content resource — the
     // MetadataResource class is still a shell.
-    public class DirectoryCollection : AbstractResourceCollection
+    internal class DirectoryCollection : AbstractResourceCollection
     {
         private readonly DirectoryInfo dirFile;
         private ISpaceStrippingRule whitespaceRules;

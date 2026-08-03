@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class LocalVariableReference : VariableReference
+    internal class LocalVariableReference : VariableReference
     {
         int slotNumber = -999;
 
@@ -120,7 +120,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a local variable reference, for example {@code $var}.
         /// </summary>
-        public class LocalVariableReferenceElaborator : PullElaborator
+        internal class LocalVariableReferenceElaborator : PullElaborator
         {
             public override void SetExpression(Expression expr)
             {

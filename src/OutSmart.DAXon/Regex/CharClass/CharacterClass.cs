@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex.CharClass
 {
-    public interface ICharacterClass : IIntPredicateProxy
+    internal interface ICharacterClass : IIntPredicateProxy
     {
         bool Test(int value);
         bool IsDisjoint(ICharacterClass other);

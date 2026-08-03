@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:comment elements in the stylesheet. <br>
     /// </summary>
-    public sealed class XSLComment : XSLLeafNodeConstructor
+    internal sealed class XSLComment : XSLLeafNodeConstructor
     {
 
         protected override string ErrorCodeForSelectPlusContent => "XTSE0940";

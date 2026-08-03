@@ -17,7 +17,7 @@ using System.Linq;
 namespace OutSmart.DAXon.Values
 {
 
-    public sealed class EmptySequence : IGroundedValue
+    internal sealed class EmptySequence : IGroundedValue
     {
         private static readonly EmptySequence _instance = new EmptySequence();
         public static readonly EmptySequence INSTANCE = _instance;

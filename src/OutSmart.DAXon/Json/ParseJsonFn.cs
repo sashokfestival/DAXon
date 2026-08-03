@@ -20,7 +20,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Json
 {
-    public class ParseJsonFn : JsonToXMLFn
+    internal class ParseJsonFn : JsonToXMLFn
     {
         public static OptionsParameter OPTION_DETAILS;
         static ParseJsonFn()

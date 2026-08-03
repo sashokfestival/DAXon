@@ -22,7 +22,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Types
 {
-    public class LocalUnionType : IPlainType, IUnionType, IItemTypeWithSequenceTypeCache
+    internal class LocalUnionType : IPlainType, IUnionType, IItemTypeWithSequenceTypeCache
     {
         private IList<IAtomicType> memberTypes;
         private SequenceType _one, _zeroOrOne, _oneOrMore, _zeroOrMore;

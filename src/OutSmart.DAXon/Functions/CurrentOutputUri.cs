@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the XSLT 3.0 function current-output-uri()
     /// </summary>
-    public class CurrentOutputUri : ContextAccessorFunction, ICallable
+    internal class CurrentOutputUri : ContextAccessorFunction, ICallable
     {
         public override int GetSpecialProperties(Expression[] arguments)
         {

@@ -12,8 +12,44 @@ namespace OutSmart.DAXon.Internal.Streams
     /// retrieval-failure code of the requesting function (FODC0002 for documents,
     /// FOUT1170 for text), so xsl:try can catch it like any other fetch failure.
     /// </summary>
-    public static class InputSizeLimit
+    internal static class InputSizeLimit
     {
+        /// <summary>
+        /// The Processor's cap for this configuration, or no cap when the configuration was not
+        /// built by a Processor (the engine's own internal configurations).
+        /// </summary>
+        public static long MaxFor(OutSmart.DAXon.Core.Configuration config)
+        {
+            return config != null && config.GetProcessor() is OutSmart.DAXon.Api.Processor p
+                ? p.MaxInputBytes
+                : long.MaxValue;
+        }
+
+        /// <summary>
+        /// Reject a string that is over the cap. The cap is in BYTES, so a character count is
+        /// only a lower bound: measure UTF-8 once the cheap test passes (round B2 - comparing
+        /// chars against a byte limit let multi-byte text through at 2-3x the declared cap).
+        /// </summary>
+        public static void CheckString(string content, long max, string uri, string errorCode)
+        {
+            if (content == null || max == long.MaxValue)
+            {
+                return;
+            }
+
+            // UTF-8 never uses fewer bytes than chars, so over the limit in chars is over it in bytes
+            long bytes = content.Length > max ? content.Length : System.Text.Encoding.UTF8.GetByteCount(content);
+            if (bytes > max)
+            {
+                throw Oversized(bytes, max, uri, errorCode);
+            }
+        }
+
+        public static System.IO.TextReader Apply(System.IO.TextReader reader, long max, string uri, string errorCode)
+        {
+            return reader == null || max == long.MaxValue ? reader : new CappedTextReader(reader, max, uri, errorCode);
+        }
+
         public static System.IO.Stream Apply(System.IO.Stream stream, long max, string uri, string errorCode)
         {
             if (stream == null || max == long.MaxValue)
@@ -102,6 +138,95 @@ namespace OutSmart.DAXon.Internal.Streams
             public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
             public override void SetLength(long value) => throw new NotSupportedException();
             public override void Write(byte[] buffer, int offset, int length) => throw new NotSupportedException();
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    inner.Dispose();
+                }
+
+                base.Dispose(disposing);
+            }
+        }
+
+        // A TextReader has no length, so the cap is enforced as it is consumed. The budget is in
+        // bytes, so each char is charged its UTF-8 width; a surrogate pair is one 4-byte unit,
+        // charged when the low half arrives.
+        private sealed class CappedTextReader : System.IO.TextReader
+        {
+            private readonly System.IO.TextReader inner;
+            private readonly long max;
+            private readonly string uri;
+            private readonly string errorCode;
+            private long count;
+            private bool pendingHighSurrogate;
+
+            internal CappedTextReader(System.IO.TextReader inner, long max, string uri, string errorCode)
+            {
+                this.inner = inner;
+                this.max = max;
+                this.uri = uri;
+                this.errorCode = errorCode;
+            }
+
+            public override int Peek()
+            {
+                return inner.Peek();
+            }
+
+            public override int Read()
+            {
+                int c = inner.Read();
+                if (c >= 0)
+                {
+                    Charge((char)c);
+                }
+
+                return c;
+            }
+
+            public override int Read(char[] buffer, int index, int count)
+            {
+                int n = inner.Read(buffer, index, count);
+                for (int i = 0; i < n; i++)
+                {
+                    Charge(buffer[index + i]);
+                }
+
+                return n;
+            }
+
+            private void Charge(char c)
+            {
+                if (pendingHighSurrogate)
+                {
+                    pendingHighSurrogate = false;
+                    if (char.IsLowSurrogate(c))
+                    {
+                        // the pair costs 4 bytes; 3 were charged for the high half
+                        count += 1;
+                        Verify();
+                        return;
+                    }
+                }
+
+                if (char.IsHighSurrogate(c))
+                {
+                    pendingHighSurrogate = true;
+                }
+
+                count += c < 0x80 ? 1 : c < 0x800 ? 2 : 3;
+                Verify();
+            }
+
+            private void Verify()
+            {
+                if (count > max)
+                {
+                    throw Oversized(count, max, uri, errorCode);
+                }
+            }
 
             protected override void Dispose(bool disposing)
             {

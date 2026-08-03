@@ -15,7 +15,7 @@ using OutSmart.DAXon.Collections;
 // but the interface doesn't declare it). Returns IIntIterator over string-value code points.
 namespace OutSmart.DAXon.Model
 {
-    public static class IGroundedValueExtensions
+    internal static class IGroundedValueExtensions
     {
         public static IIntIterator CodePoints(this IGroundedValue v)
         {

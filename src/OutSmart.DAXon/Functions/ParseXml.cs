@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Functions
 {
-    public class ParseXml : SystemFunction, ICallable
+    internal class ParseXml : SystemFunction, ICallable
     {
 
         public static Func<ParseXml> New() => () => new ParseXml();

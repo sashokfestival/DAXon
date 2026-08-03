@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An XSLT 3.0 sequence constructor containing xsl:on-empty and/or xsl:on-non-empty instructions
     /// </summary>
-    public class ConditionalBlock : Instruction
+    internal class ConditionalBlock : Instruction
     {
         private readonly Operand[] operanda;
         private bool allNodesUntyped;

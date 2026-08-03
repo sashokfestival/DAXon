@@ -13,7 +13,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Expressions
 {
     using global::OutSmart.DAXon.Model;
-    public static class FilterIterator
+    internal static class FilterIterator
     {
 
         // Ported from Saxon FilterIterator.testPredicateValue: evaluate a predicate value against the

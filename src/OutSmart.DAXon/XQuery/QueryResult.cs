@@ -28,7 +28,7 @@ using Properties = OutSmart.DAXon.Internal.Collections.Properties;
 
 namespace OutSmart.DAXon.XQuery
 {
-    public class QueryResult
+    internal class QueryResult
     {
         public const string RESULT_NS = "http://saxon.sf.net/2009/serialization/result";
         public QueryResult() { }

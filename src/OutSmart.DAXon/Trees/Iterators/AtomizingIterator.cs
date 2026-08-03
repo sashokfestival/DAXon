@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public class AtomizingIterator : ISequenceIterator
+    internal class AtomizingIterator : ISequenceIterator
     {
         private readonly ISequenceIterator @base;
         private IAtomicSequence currentValue = null;

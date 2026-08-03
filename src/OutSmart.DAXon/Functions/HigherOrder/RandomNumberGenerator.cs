@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// xs:double in [0,1)), 'next' (a zero-arg function producing the next generator), and 'permute'
     /// (a function that randomly permutes its argument sequence). Deterministic for a given seed.
     /// </summary>
-    public class RandomNumberGenerator : SystemFunction, ICallable
+    internal class RandomNumberGenerator : SystemFunction, ICallable
     {
         public static readonly MapType RETURN_TYPE = new MapType(BuiltInAtomicType.STRING, SequenceType.SINGLE_ITEM);
 

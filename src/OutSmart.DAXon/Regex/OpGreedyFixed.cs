@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex
 {
-    public class OpGreedyFixed : OpRepeat
+    internal class OpGreedyFixed : OpRepeat
     {
         private readonly int len;
 

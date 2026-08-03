@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Values.Maps
 {
-    public class DictionaryMap : MapItem
+    internal class DictionaryMap : MapItem
     {
         private readonly Dictionary<string, IGroundedValue> hashMap;
 

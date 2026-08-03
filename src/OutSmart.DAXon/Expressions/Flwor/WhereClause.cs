@@ -27,10 +27,14 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// A "where" clause in a FLWOR expression
     /// </summary>
-    public class WhereClause : Clause
+    internal class WhereClause : Clause
     {
         private readonly Operand predicateOp;
-        private IBooleanEvaluator predicateEvaluator;
+        // volatile, not a lock (round 11): this is published once and then read on a hot path, the
+        // same shape UserFunction.bodyEvaluator documents. Construction is a pure function of the
+        // compiled expression, so a lost race just discards an equivalent object; what needs the
+        // barrier is PUBLICATION of a fully built one.
+        private volatile IBooleanEvaluator predicateEvaluator;
 
         public override ClauseName ClauseKey => WHERE;
 

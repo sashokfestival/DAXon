@@ -26,7 +26,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class SwitchCaseComparison : BinaryExpression, IComparisonExpression
+    internal class SwitchCaseComparison : BinaryExpression, IComparisonExpression
     {
         private IAtomicComparer comparer;
         private bool knownToBeComparable = false;

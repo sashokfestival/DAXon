@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Lib
 {
-    public class DirectResourceResolver : IResourceResolver
+    internal class DirectResourceResolver : IResourceResolver
     {
         private readonly Configuration config;
         public DirectResourceResolver(Configuration config)

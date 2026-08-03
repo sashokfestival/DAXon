@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Json
     /// <summary>
     /// Default handler class for accepting the result from parsing JSON strings
     /// </summary>
-    public class JsonHandler
+    internal class JsonHandler
     {
         private static readonly string REPLACEMENT = "�";
         public bool escape;

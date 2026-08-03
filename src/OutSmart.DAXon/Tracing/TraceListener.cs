@@ -11,5 +11,5 @@ using System;
 
 namespace OutSmart.DAXon.Tracing
 {
-    public interface TraceListener { void Open(); void Close(); }
+    internal interface TraceListener { void Open(); void Close(); }
 }

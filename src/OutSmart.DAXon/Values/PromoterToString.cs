@@ -16,7 +16,7 @@ using OutSmart.DAXon.Types;
 // since TypeChecker has `using OutSmart.DAXon.Values`.
 namespace OutSmart.DAXon.Values
 {
-    public class PromoterToString : Converter
+    internal class PromoterToString : Converter
     {
         public PromoterToString() { }
         public PromoterToString(object rules) { }

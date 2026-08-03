@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:output-character element in the stylesheet. <br>
     /// </summary>
-    public class XSLOutputCharacter : StyleElement
+    internal class XSLOutputCharacter : StyleElement
     {
         private int codepoint = -1;
         private string replacementString = null;

@@ -26,7 +26,9 @@ namespace OutSmart.DAXon.Expressions
     {
         private readonly Operand lhs;
         private readonly Operand rhs;
-        public int @operator; // represented by the token number from class Tokenizer
+        // internal, not public: Operator below is the CLS-visible spelling, and a public pair
+        // differing only by case makes the whole type unusable from a case-insensitive binder.
+        internal int @operator; // represented by the token number from class Tokenizer
 
         public virtual Operand Lhs => lhs;
 

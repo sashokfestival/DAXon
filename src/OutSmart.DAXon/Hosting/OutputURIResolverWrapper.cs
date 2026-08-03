@@ -21,7 +21,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Lib
 {
-    public class OutputURIResolverWrapper : IResultDocumentResolver
+    internal class OutputURIResolverWrapper : IResultDocumentResolver
     {
         private readonly IOutputURIResolver outputURIResolver;
         public OutputURIResolverWrapper(IOutputURIResolver resolver)

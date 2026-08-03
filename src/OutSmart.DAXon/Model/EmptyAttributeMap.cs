@@ -13,7 +13,7 @@ using System.Collections;
 namespace OutSmart.DAXon.Model
 {
     // EmptyAttributeMap implements IAttributeMap (20 callers assign to IAttributeMap).
-    public sealed class EmptyAttributeMap : IAttributeMap
+    internal sealed class EmptyAttributeMap : IAttributeMap
     {
         private static readonly EmptyAttributeMap _instance = new EmptyAttributeMap();
         public static readonly EmptyAttributeMap INSTANCE = _instance;

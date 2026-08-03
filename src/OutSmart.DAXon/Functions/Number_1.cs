@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class Number_1 : ScalarSystemFunction
+    internal class Number_1 : ScalarSystemFunction
     {
 
         public static Func<Number_1> New() => () => new Number_1();
@@ -120,7 +120,7 @@ namespace OutSmart.DAXon.Functions
             return new NumberFnElaborator();
         }
 
-        public class NumberFnElaborator : ItemElaborator
+        internal class NumberFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

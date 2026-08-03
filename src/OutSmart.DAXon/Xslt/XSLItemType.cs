@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLItemType : StyleElement
+    internal class XSLItemType : StyleElement
     {
         private StructuredQName itemTypeName;
         private bool resolved = false;

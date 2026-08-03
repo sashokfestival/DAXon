@@ -15,7 +15,7 @@ using OutSmart.DAXon.Collections;
 namespace OutSmart.DAXon.Patterns
 {
     /// <summary>A node test matching nodes of any of a fixed subset of node kinds (e.g. node(), parent::node()).</summary>
-    public sealed class MultipleNodeKindTest : NodeTest
+    internal sealed class MultipleNodeKindTest : NodeTest
     {
         public static readonly MultipleNodeKindTest PARENT_NODE =
             new MultipleNodeKindTest(UType.DOCUMENT.Union(UType.ELEMENT));

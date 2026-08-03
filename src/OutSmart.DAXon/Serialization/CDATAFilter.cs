@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Serialization
     /// CDATAFilter: This ProxyReceiver converts character data to CDATA sections,
     /// if the character data belongs to one of a set of element types to be handled this way.
     /// </summary>
-    public class CDATAFilter : ProxyReceiver
+    internal class CDATAFilter : ProxyReceiver
     {
         private UnicodeBuilder buffer = new UnicodeBuilder();
         private readonly Stack<INodeName> stack = new Stack<INodeName>();

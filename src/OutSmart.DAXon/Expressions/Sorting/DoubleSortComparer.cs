@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class DoubleSortComparer : IAtomicComparer
+    internal class DoubleSortComparer : IAtomicComparer
     {
         private static readonly DoubleSortComparer THE_INSTANCE = new DoubleSortComparer();
 

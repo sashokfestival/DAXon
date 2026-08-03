@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Events
 {
-    public abstract class Event
+    internal abstract class Event
     {
         public virtual void Replay(IReceiver @out)
         {
@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Event representing start of document
         /// </summary>
-        public class StartDocument : Event
+        internal class StartDocument : Event
         {
             int properties;
             public StartDocument(int properties)
@@ -46,7 +46,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Event representing end of document
         /// </summary>
-        public class EndDocument : Event
+        internal class EndDocument : Event
         {
             public EndDocument()
             {
@@ -61,7 +61,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Event representing the start of an element (including attributes or namespaces)
         /// </summary>
-        public class StartElement : Event
+        internal class StartElement : Event
         {
             INodeName name;
             ISchemaType type;
@@ -98,7 +98,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Event representing the end of an element
         /// </summary>
-        public class EndElement : Event
+        internal class EndElement : Event
         {
             public EndElement()
             {
@@ -113,7 +113,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Event representing a text node
         /// </summary>
-        public class Text : Event
+        internal class Text : Event
         {
             UnicodeString content;
             ILocation location;
@@ -134,7 +134,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Event representing a comment node
         /// </summary>
-        public class Comment : Event
+        internal class Comment : Event
         {
             UnicodeString content;
             ILocation location;
@@ -155,7 +155,7 @@ namespace OutSmart.DAXon.Events
         /// <summary>
         /// Event representing a processing instruction node
         /// </summary>
-        public class ProcessingInstruction : Event
+        internal class ProcessingInstruction : Event
         {
             string target;
             UnicodeString content;
@@ -175,7 +175,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class Append : Event
+        internal class Append : Event
         {
             IItem item;
             ILocation location;

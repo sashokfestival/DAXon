@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal.Collections;
 using System.IO;
 namespace OutSmart.DAXon.Serialization
 {
-    public class TEXTEmitter : XMLEmitter
+    internal class TEXTEmitter : XMLEmitter
     {
         private OutSmart.DAXon.Internal.Regex.Pattern newlineMatcher = null;
         private string newlineRepresentation = null;

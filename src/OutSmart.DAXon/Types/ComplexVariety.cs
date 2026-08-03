@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Types
     /// <summary>
     /// The different varieties of complex types
     /// </summary>
-    public enum ComplexVariety
+    internal enum ComplexVariety
     {
         EMPTY,
         SIMPLE,

@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the fn:concat() function as defined in XPath 2.0, 3.0, and 3.1
     /// </summary>
-    public class Concat31 : SystemFunction, IPushableFunction
+    internal class Concat31 : SystemFunction, IPushableFunction
     {
 
         public override IFunctionItemType FunctionItemType

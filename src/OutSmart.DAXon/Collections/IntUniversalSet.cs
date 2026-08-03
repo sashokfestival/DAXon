@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Collections
     /// <summary>
     /// An immutable integer set containing every integer
     /// </summary>
-    public class IntUniversalSet : IntSet
+    internal class IntUniversalSet : IntSet
     {
         private static readonly IntUniversalSet THE_INSTANCE = new IntUniversalSet();
 

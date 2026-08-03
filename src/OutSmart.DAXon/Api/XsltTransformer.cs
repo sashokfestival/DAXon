@@ -274,7 +274,11 @@ namespace OutSmart.DAXon.Api
         {
             if (controller.GlobalContextItem == null)
             {
-                controller.SetGlobalContextItem(item, true);
+                // Not alreadyStripped: MakeSourceTree hands a NodeInfo straight back, so nothing
+                // on this path has applied xsl:strip-space yet. No probe covers this - the branch
+                // needs a null global context item, and the only setter that leaves it null is
+                // SetSource, which has no callers. Corrected so it stays right if that changes.
+                controller.SetGlobalContextItem(item, false);
                 return true;
             }
             else

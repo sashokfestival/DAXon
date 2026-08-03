@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Expressions.Numbering
     /// <summary>
     /// INumberer class for the English language.
     /// </summary>
-    public class Numberer_en : AbstractNumberer
+    internal class Numberer_en : AbstractNumberer
     {
 
         private static readonly string[] englishUnits = new[]

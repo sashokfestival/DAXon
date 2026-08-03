@@ -19,7 +19,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions
 {
-    public class AvailableEnvironmentVariables : SystemFunction
+    internal class AvailableEnvironmentVariables : SystemFunction
     {
 
         public static Func<AvailableEnvironmentVariables> New() => () => new AvailableEnvironmentVariables();

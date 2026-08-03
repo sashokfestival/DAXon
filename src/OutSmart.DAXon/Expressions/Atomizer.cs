@@ -29,7 +29,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class Atomizer : UnaryExpression
+    internal sealed class Atomizer : UnaryExpression
     {
 
         /// <summary>
@@ -603,7 +603,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for an Atomizer
         /// </summary>
-        public class AtomizerElaborator : PullElaborator
+        internal class AtomizerElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

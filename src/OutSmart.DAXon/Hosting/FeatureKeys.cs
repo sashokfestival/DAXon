@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Lib
 {
-    public abstract class FeatureKeys
+    internal abstract class FeatureKeys
     {
         public const string ALLOW_EXTERNAL_FUNCTIONS = "http://saxon.sf.net/feature/allow-external-functions";
         public const string ALLOW_MULTITHREADING = "http://saxon.sf.net/feature/allow-multithreading";

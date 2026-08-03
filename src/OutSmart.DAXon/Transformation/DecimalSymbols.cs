@@ -22,17 +22,19 @@ namespace OutSmart.DAXon.Transformation
 {
     public class DecimalSymbols
     {
-        public const int DECIMAL_SEPARATOR = 0;
-        public const int GROUPING_SEPARATOR = 1;
-        public const int DIGIT = 2;
-        public const int MINUS_SIGN = 3;
-        public const int PERCENT = 4;
-        public const int PER_MILLE = 5;
-        public const int ZERO_DIGIT = 6;
-        public const int EXPONENT_SEPARATOR = 7;
-        public const int PATTERN_SEPARATOR = 8;
-        public const int INFINITY = 9;
-        public const int NAN = 10;
+        // Property slots, not a host contract: internal so INFINITY/NAN stop colliding by case
+        // with the Infinity/NaN properties below, which is what a name binder trips over.
+        internal const int DECIMAL_SEPARATOR = 0;
+        internal const int GROUPING_SEPARATOR = 1;
+        internal const int DIGIT = 2;
+        internal const int MINUS_SIGN = 3;
+        internal const int PERCENT = 4;
+        internal const int PER_MILLE = 5;
+        internal const int ZERO_DIGIT = 6;
+        internal const int EXPONENT_SEPARATOR = 7;
+        internal const int PATTERN_SEPARATOR = 8;
+        internal const int INFINITY = 9;
+        internal const int NAN = 10;
         private const int ERR_NOT_SINGLE_CHAR = 0;
         private const int ERR_NOT_UNICODE_DIGIT = 1;
         private const int ERR_SAME_CHAR_IN_TWO_ROLES = 2;

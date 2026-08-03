@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Types
 
     // Extension method bringing Java's PrimitiveUType.toUType() method to the enum.
     // The original method was commented-out by paulirwin's enum-conversion logic.
-    public static class PrimitiveUTypeExt
+    internal static class PrimitiveUTypeExt
     {
         // toUType() per real Saxon: each primitive maps to a single bit (1 << bit). The hollow `=> UType.ANY`
         // both returned the wrong value AND was a static-init-order trap: UType's own static fields call

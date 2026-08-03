@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class RegexFunctionSansFlags : SystemFunction
+    internal class RegexFunctionSansFlags : SystemFunction
     {
 
         public static Func<RegexFunctionSansFlags> New() => () => new RegexFunctionSansFlags();

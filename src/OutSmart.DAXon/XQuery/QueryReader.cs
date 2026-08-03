@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.XQuery
     /// net.sf.saxon.query.QueryReader; the Source hierarchy is gone from this port, so the primary overload
     /// takes a <see cref="ResolvedResource"/>.)
     /// </summary>
-    public static class QueryReader
+    internal static class QueryReader
     {
         // Read a query module supplied as a ResolvedResource (byte stream, char reader, or systemId).
         public static string ReadSourceQuery(Configuration config, ResolvedResource ss, IIntPredicateProxy charChecker)

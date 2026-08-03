@@ -16,7 +16,7 @@ using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Linked
 {
-    public class LineNumberMap
+    internal class LineNumberMap
     {
         private readonly object syncLock = new object();
         private int[] sequenceNumbers;

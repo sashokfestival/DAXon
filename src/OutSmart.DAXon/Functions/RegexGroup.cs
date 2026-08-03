@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class RegexGroup : ContextAccessorFunction
+    internal class RegexGroup : ContextAccessorFunction
     {
         public override IFunctionItem BindContext(IXPathContext context)
         {

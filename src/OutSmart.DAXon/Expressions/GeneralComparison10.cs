@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Expressions.Compatibility
     /// GeneralComparison10: the operators =, !=, &lt;, &gt; etc under XPath 1.0
     /// backwards-compatibility semantics.
     /// </summary>
-    public class GeneralComparison10 : BinaryExpression, ICallable
+    internal class GeneralComparison10 : BinaryExpression, ICallable
     {
         protected int singletonOperator;
         protected IAtomicComparer comparer;

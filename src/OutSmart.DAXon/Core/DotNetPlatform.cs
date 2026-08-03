@@ -30,7 +30,7 @@ using System.IO;
 
 namespace OutSmart.DAXon.Core
 {
-    public class DotNetPlatform : IPlatform
+    internal class DotNetPlatform : IPlatform
     {
         public virtual string PlatformVersion => ".NET " + Environment.Version;
         public virtual string PlatformSuffix => "N";

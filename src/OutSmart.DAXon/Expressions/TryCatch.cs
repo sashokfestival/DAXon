@@ -28,7 +28,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public class TryCatch : Expression
+    internal class TryCatch : Expression
     {
         private readonly Operand tryOp;
         private readonly IList<CatchClause> catchClauses = new List<CatchClause>();
@@ -217,7 +217,7 @@ namespace OutSmart.DAXon.Expressions
             return new TryCatchElaborator();
         }
 
-        public class CatchClause
+        internal class CatchClause
         {
             public int slotNumber = -1;
             public Operand catchOp;

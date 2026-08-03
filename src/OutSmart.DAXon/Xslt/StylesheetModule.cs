@@ -258,9 +258,7 @@ namespace OutSmart.DAXon.Xslt
                     PrincipalStylesheetModule psm = compilation.CompilePackage(new ResolvedResource { Node = doc });
                     if (compilation.ErrorCount > 0)
                     {
-                        XPathException e = new XPathException("Errors were reported during stylesheet compilation");
-                        e.SetHasBeenReported(true); // only intended as an exception message, not something to report to ErrorListener
-                        throw e;
+                        throw compilation.MakeCompilationFailure();
                     }
 
                     psm.GetStylesheetPackage().CheckForAbstractComponents();
@@ -362,9 +360,7 @@ namespace OutSmart.DAXon.Xslt
                     PrincipalStylesheetModule psm = compilation.CompilePackage(new ResolvedResource { Node = doc });
                     if (compilation.ErrorCount > 0)
                     {
-                        XPathException e = new XPathException("Errors were reported during stylesheet compilation");
-                        e.SetHasBeenReported(true);
-                        throw e;
+                        throw compilation.MakeCompilationFailure();
                     }
 
                     psm.GetStylesheetPackage().CheckForAbstractComponents();

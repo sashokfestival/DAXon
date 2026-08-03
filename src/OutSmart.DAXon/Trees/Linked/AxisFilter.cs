@@ -9,7 +9,7 @@ using System;
 
 namespace OutSmart.DAXon.Trees.Linked
 {
-    public class AxisFilter : IAxisIterator
+    internal class AxisFilter : IAxisIterator
     {
         public AxisFilter() { }
         public AxisFilter(object iter, object filter) { }

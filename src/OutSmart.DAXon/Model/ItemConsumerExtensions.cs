@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
 
-    public static class ItemConsumerExtensions
+    internal static class ItemConsumerExtensions
     {
         public static void Accept<T>(this IItemConsumer<T> consumer, T item) { if (consumer != null) consumer(item); }
         public static IItemConsumer<T> Of<T>(Action<T> fn) => new IItemConsumer<T>(fn);

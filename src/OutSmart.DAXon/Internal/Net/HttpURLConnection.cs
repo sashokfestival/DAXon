@@ -10,7 +10,7 @@ namespace OutSmart.DAXon.Internal.Net
 
     // HTTP flavor for ResourceLoader's redirect/gzip loop. .NET WebRequest auto-follows redirects,
     // so the first response is already the terminal one and the loop's redirect arm never re-enters.
-    public class HttpURLConnection : URLConnection
+    internal class HttpURLConnection : URLConnection
     {
         public const int HTTP_OK = 200;
         public const int HTTP_MOVED_PERM = 301;

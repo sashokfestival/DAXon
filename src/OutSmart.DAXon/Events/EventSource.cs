@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Events
 {
-    public abstract class EventSource : IActiveSource
+    internal abstract class EventSource : IActiveSource
     {
         private string systemId;
         public virtual void SetSystemId(string systemId)

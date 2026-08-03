@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the function fn:sort#2, according to the new XPath 3.1 spec in bug 29792
     /// </summary>
-    public class Sort_2 : Sort_1
+    internal class Sort_2 : Sort_1
     {
 
         public static Func<Sort_2> New() => () => new Sort_2();

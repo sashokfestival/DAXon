@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Events
     /// <summary>
     /// Sender is a helper class that sends events to a IReceiver from any kind of Source object
     /// </summary>
-    public abstract class Sender
+    internal abstract class Sender
     {
         // Converted to an abstract static class in Saxon 9.3
         private Sender()

@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Expressions
     /// The heavy caller is `unparsed-text-lines(...) ! tokenize(.,";")[k]` (csv sort / group over
     /// millions of lines), where the per-line iterator + discarded-token allocations dominate.
     /// </summary>
-    public sealed class TokenizeFieldExpression : SingleItemFilter
+    internal sealed class TokenizeFieldExpression : SingleItemFilter
     {
         private readonly int separator;   // separator codepoint
         private readonly int field;       // 1-based field position N
@@ -196,7 +196,7 @@ namespace OutSmart.DAXon.Expressions
             return input.Substring(from, to);
         }
 
-        public sealed class TokenizeFieldElaborator : ItemElaborator
+        internal sealed class TokenizeFieldElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

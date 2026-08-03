@@ -131,7 +131,7 @@ namespace OutSmart.DAXon.Tracing
             return "";
         }
 
-        public class CallingApplication : ContextStackFrame
+        internal class CallingApplication : ContextStackFrame
         {
             public override void Print(Logger @out)
             {
@@ -141,7 +141,7 @@ namespace OutSmart.DAXon.Tracing
         /// <summary>
         /// Subclass of ContextStackFrame representing a built-in template rule in XSLT
         /// </summary>
-        public class BuiltInTemplateRule : ContextStackFrame
+        internal class BuiltInTemplateRule : ContextStackFrame
         {
             public BuiltInTemplateRule(IXPathContext context)
             {
@@ -181,7 +181,7 @@ namespace OutSmart.DAXon.Tracing
             }
         }
 
-        public class FunctionCall : ContextStackFrame
+        internal class FunctionCall : ContextStackFrame
         {
             StructuredQName functionName;
             public virtual StructuredQName GetFunctionName()
@@ -203,7 +203,7 @@ namespace OutSmart.DAXon.Tracing
         /// <summary>
         /// Subclass of ContextStackFrame representing an xsl:apply-templates call in XSLT
         /// </summary>
-        public class ApplyTemplates : ContextStackFrame
+        internal class ApplyTemplates : ContextStackFrame
         {
             public override void Print(Logger @out)
             {
@@ -219,7 +219,7 @@ namespace OutSmart.DAXon.Tracing
         /// <summary>
         /// Subclass of ContextStackFrame representing an xsl:call-template instruction in XSLT
         /// </summary>
-        public class CallTemplate : ContextStackFrame
+        internal class CallTemplate : ContextStackFrame
         {
 
             StructuredQName templateName;
@@ -240,7 +240,7 @@ namespace OutSmart.DAXon.Tracing
         /// <summary>
         /// Subclass of ContextStackFrame representing the evaluation of a variable (typically a global variable)
         /// </summary>
-        public class VariableEvaluation : ContextStackFrame
+        internal class VariableEvaluation : ContextStackFrame
         {
 
             StructuredQName variableName;

@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Numbering
 {
-    public class RegularGroupFormatter : NumericGroupFormatter
+    internal class RegularGroupFormatter : NumericGroupFormatter
     {
         private readonly int groupSize;
         private readonly string groupSeparator;

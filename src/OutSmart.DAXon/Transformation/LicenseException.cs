@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Transformation
     /// <summary>
     /// Exception thrown when there are problems with the license file
     /// </summary>
-    public class LicenseException : Exception
+    internal class LicenseException : Exception
     {
         public const int EXPIRED = 1;
         public const int INVALID = 2;

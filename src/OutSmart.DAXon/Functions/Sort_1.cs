@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the function fn:sort#1, which is a standard function in XPath 3.1
     /// </summary>
-    public class Sort_1 : SystemFunction
+    internal class Sort_1 : SystemFunction
     {
 
         public static Func<Sort_1> New() => () => new Sort_1();
@@ -103,7 +103,7 @@ namespace OutSmart.DAXon.Functions
 
             return new SequenceExtent.Of<IItem>(outputList);
         }
-        public class ItemToBeSorted
+        internal class ItemToBeSorted
         {
             public IItem value;
             public IGroundedValue sortKey;

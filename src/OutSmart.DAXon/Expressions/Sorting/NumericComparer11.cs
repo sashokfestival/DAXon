@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class NumericComparer11 : NumericComparer
+    internal class NumericComparer11 : NumericComparer
     {
         private static readonly NumericComparer11 THE_INSTANCE = new NumericComparer11();
 

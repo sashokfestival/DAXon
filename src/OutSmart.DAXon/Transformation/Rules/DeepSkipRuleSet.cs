@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation.Rules
 {
-    public class DeepSkipRuleSet : IBuiltInRuleSet
+    internal class DeepSkipRuleSet : IBuiltInRuleSet
     {
         private static readonly DeepSkipRuleSet THE_INSTANCE = new DeepSkipRuleSet();
 

@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public class SequenceIteratorOverJavaIterator<T>
+    internal class SequenceIteratorOverJavaIterator<T>
     {
         public SequenceIteratorOverJavaIterator(IEnumerator<T> iter, Func<T, object> fn) { }
     }

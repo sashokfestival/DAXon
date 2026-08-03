@@ -12,7 +12,7 @@ using OutSmart.DAXon.Lib;
 
 namespace OutSmart.DAXon.Resources
 {
-    public class JSONResource
+    internal class JSONResource
     {
         public static readonly IResourceFactory FACTORY = new GenericResourceFactory();
         public JSONResource() { }

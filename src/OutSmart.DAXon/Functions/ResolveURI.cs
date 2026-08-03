@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the resolve-uri() function in XPath 2.0
     /// </summary>
-    public class ResolveURI : SystemFunction
+    internal class ResolveURI : SystemFunction
     {
 
         public static Func<ResolveURI> New() => () => new ResolveURI();

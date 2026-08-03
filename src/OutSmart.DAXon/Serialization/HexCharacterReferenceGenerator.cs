@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Serialization
 {
-    public class HexCharacterReferenceGenerator : ICharacterReferenceGenerator
+    internal class HexCharacterReferenceGenerator : ICharacterReferenceGenerator
     {
         public static readonly HexCharacterReferenceGenerator THE_INSTANCE = new HexCharacterReferenceGenerator();
         private HexCharacterReferenceGenerator()

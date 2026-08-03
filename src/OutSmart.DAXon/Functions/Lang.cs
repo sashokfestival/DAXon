@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class Lang : SystemFunction
+    internal class Lang : SystemFunction
     {
 
         public static Func<Lang> New() => () => new Lang();

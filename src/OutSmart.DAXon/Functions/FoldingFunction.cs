@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class FoldingFunction : SystemFunction
+    internal abstract class FoldingFunction : SystemFunction
     {
 
         public override string StreamerName => "IFold";

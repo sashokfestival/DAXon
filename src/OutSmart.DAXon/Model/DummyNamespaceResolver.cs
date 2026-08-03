@@ -13,7 +13,7 @@ using System.Linq;
 namespace OutSmart.DAXon.Model
 {
     // DummyNamespaceResolver implements INamespaceResolver (8 callers).
-    public class DummyNamespaceResolver : INamespaceResolver
+    internal class DummyNamespaceResolver : INamespaceResolver
     {
         private static readonly DummyNamespaceResolver _instance = new DummyNamespaceResolver();
         public DummyNamespaceResolver() { }

@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public interface ISortKeyEvaluator
+    internal interface ISortKeyEvaluator
     {
         AtomicValue EvaluateSortKey(int n, IXPathContext context);
     }

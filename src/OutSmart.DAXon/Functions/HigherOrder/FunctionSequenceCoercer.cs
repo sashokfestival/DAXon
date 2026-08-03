@@ -29,7 +29,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions.HigherOrder
 {
-    public sealed class FunctionSequenceCoercer : UnaryExpression
+    internal sealed class FunctionSequenceCoercer : UnaryExpression
     {
         private readonly SpecificFunctionType requiredItemType;
         private readonly Func<RoleDiagnostic> roleSupplier;
@@ -171,7 +171,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
         }
 
-        public class Coercer : IItemMappingFunction
+        internal class Coercer : IItemMappingFunction
         {
             private readonly SpecificFunctionType requiredItemType;
             private readonly Configuration config;

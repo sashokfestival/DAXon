@@ -14,7 +14,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Collections
 {
-    public class IntSetPredicate : IIntPredicateProxy
+    internal class IntSetPredicate : IIntPredicateProxy
     {
 
         /// <summary>

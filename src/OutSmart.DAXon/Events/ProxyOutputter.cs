@@ -21,7 +21,7 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Events
 {
-    public class ProxyOutputter : Outputter
+    internal class ProxyOutputter : Outputter
     {
         private readonly Outputter next;
 

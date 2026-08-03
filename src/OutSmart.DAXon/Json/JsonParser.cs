@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Json
     /// <summary>
     /// Parser for JSON, which notifies parsing events to a JsonHandler
     /// </summary>
-    public class JsonParser
+    internal class JsonParser
     {
         public const int ESCAPE = 1;
         public const int ALLOW_ANY_TOP_LEVEL = 2;
@@ -545,7 +545,7 @@ namespace OutSmart.DAXon.Json
             }
         }
 
-        public enum JsonToken
+        internal enum JsonToken
         {
             LSQB,
             RSQB,
@@ -600,6 +600,12 @@ namespace OutSmart.DAXon.Json
 
             private JsonToken ReadToken()
             {
+                // Invariant D3: the number of tokens is chosen by the INPUT, and this is the single
+                // funnel every one of them passes through. Nothing else on the JSON path looked at
+                // the clock, so a large document ran to completion regardless of the deadline -
+                // both through JsonBuilder and through parse-json()/json-doc() inside a transform.
+                // The check is self-throttling (Controller samples the clock once per stride).
+                Controller.CheckActiveTimeout();
                 if (position >= input.Length)
                 {
                     return JsonToken.EOF;

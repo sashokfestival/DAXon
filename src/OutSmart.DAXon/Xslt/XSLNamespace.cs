@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:namespace element in the stylesheet. (XSLT 2.0)
     /// </summary>
-    public class XSLNamespace : XSLLeafNodeConstructor
+    internal class XSLNamespace : XSLLeafNodeConstructor
     {
         Expression name;
 

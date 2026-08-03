@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of format-number() function. Note this has no dependency on number formatting in the JDK.
     /// </summary>
-    public class FormatNumber : SystemFunction, ICallable, IStatefulSystemFunction
+    internal class FormatNumber : SystemFunction, ICallable, IStatefulSystemFunction
     {
         private StructuredQName decimalFormatName; // null for the default format
         private string picture;
@@ -519,7 +519,7 @@ namespace OutSmart.DAXon.Functions
         ISequence ICallable.Call(IXPathContext arg0, ISequence[] arg1) => Call(arg0, arg1);
         SystemFunction IStatefulSystemFunction.Copy() => Copy();
 
-        public class SubPicture
+        internal class SubPicture
         {
             protected int minWholePartSize = 0;
             protected int maxWholePartSize = 0;

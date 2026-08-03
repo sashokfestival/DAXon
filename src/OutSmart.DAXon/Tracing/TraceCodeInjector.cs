@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Tracing
 {
-    public class TraceCodeInjector : ICodeInjector
+    internal class TraceCodeInjector : ICodeInjector
     {
         protected int traceLevel = TraceLevel.NORMAL;
         public virtual void SetTraceLevel(int traceLevel)

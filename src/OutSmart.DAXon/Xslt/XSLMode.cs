@@ -23,7 +23,7 @@ using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLMode : StyleElement
+    internal class XSLMode : StyleElement
     {
         private SimpleMode mode;
         private HashSet<Accumulator> accumulators;

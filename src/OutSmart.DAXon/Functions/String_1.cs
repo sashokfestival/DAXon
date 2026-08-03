@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     // override (StringFnElaborator : StringElaborator) is intentionally omitted: it would require the
     // StringElaborator compile cluster (the one that explodes the pipeline). The base SystemFunction
     // elaborator default applies; correctness comes from Evaluate, optimization comes later.
-    public class String_1 : ScalarSystemFunction
+    internal class String_1 : ScalarSystemFunction
     {
         public String_1() { }
         public static Func<String_1> New() => () => new String_1();

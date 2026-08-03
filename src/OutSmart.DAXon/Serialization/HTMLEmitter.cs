@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Serialization
     /// <summary>
     /// This class generates HTML output
     /// </summary>
-    public abstract class HTMLEmitter : XMLEmitter
+    internal abstract class HTMLEmitter : XMLEmitter
     {
         private const int REP_NATIVE = 0;
         private const int REP_ENTITY = 1;

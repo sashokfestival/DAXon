@@ -14,7 +14,7 @@ using OutSmart.DAXon.Text;
 namespace OutSmart.DAXon.Types
 {
     // Extend StringConverter so `stringConverter = new StringToX()` assignments work.
-    public class StringToNotation : StringConverter
+    internal class StringToNotation : StringConverter
     {
         private readonly StringConverter inner;
         public StringToNotation() { }

@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Functions
     // to IntegratedFunctionLibrary.makeFunctionCall); reflect the real base so the upcast is valid.
     // The internal saxon:is-idref predicate; registered for the built-in idref key on every compile
     // (KeyManager.RegisterIdrefKey).
-    public class IsIdRef : ExtensionFunctionDefinition
+    internal class IsIdRef : ExtensionFunctionDefinition
     {
         private static readonly StructuredQName _qName =
             new StructuredQName("", NamespaceUri.SAXON, "is-idref");

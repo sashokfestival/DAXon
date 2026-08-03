@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class ContextFreeAtomicComparer : IAtomicComparer
+    internal class ContextFreeAtomicComparer : IAtomicComparer
     {
         private static readonly ContextFreeAtomicComparer THE_INSTANCE = new ContextFreeAtomicComparer();
 

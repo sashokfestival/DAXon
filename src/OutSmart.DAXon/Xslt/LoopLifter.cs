@@ -11,5 +11,5 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Xslt
 {
-    public class LoopLifter { public LoopLifter() { } public static object Process(object expr) => expr; }
+    internal class LoopLifter { public LoopLifter() { } public static object Process(object expr) => expr; }
 }

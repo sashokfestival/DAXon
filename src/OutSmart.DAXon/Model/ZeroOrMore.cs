@@ -21,7 +21,7 @@ using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class ZeroOrMore<T> : IGroundedValue, IEnumerable<T>
+    internal class ZeroOrMore<T> : IGroundedValue, IEnumerable<T>
     {
         private readonly IList<T> value;
 

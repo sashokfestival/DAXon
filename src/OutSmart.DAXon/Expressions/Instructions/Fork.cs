@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// This class implements an xsl:fork expression.
     /// </summary>
-    public class Fork : Instruction
+    internal class Fork : Instruction
     {
         internal Operand[] operanda;
 

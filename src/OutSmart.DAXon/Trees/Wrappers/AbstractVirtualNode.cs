@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Trees.Wrappers
     // Faithful port of net.sf.saxon.tree.wrapper.AbstractVirtualNode (Saxon 12.9). Was a hollow stub, so
     // no wrapping-node view (space-stripped / type-stripped trees) could exist.
     // Abstract superclass for VirtualNode implementations in which the underlying node is itself a NodeInfo.
-    public abstract class AbstractVirtualNode : IVirtualNode
+    internal abstract class AbstractVirtualNode : IVirtualNode
     {
         protected internal NodeInfo node;
         protected internal AbstractVirtualNode parent; // null means unknown

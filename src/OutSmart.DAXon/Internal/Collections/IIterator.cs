@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace OutSmart.DAXon.Internal.Collections
 {
-    public interface IIterator<out T>
+    internal interface IIterator<out T>
     {
         bool HasNext();
         T Next();

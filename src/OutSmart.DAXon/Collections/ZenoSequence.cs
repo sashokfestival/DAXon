@@ -21,7 +21,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Collections.Zeno
 {
-    public class ZenoSequence : IGroundedValue
+    internal class ZenoSequence : IGroundedValue
     {
         private readonly ZenoChain<IItem> chain;
 
@@ -224,7 +224,7 @@ namespace OutSmart.DAXon.Collections.Zeno
         /// <summary>
         /// A ISequenceIterator over a ZenoSequence
         /// </summary>
-        public class ZenoSequenceIterator : IGroundedIterator, ILastPositionFinder, ILookaheadIterator
+        internal class ZenoSequenceIterator : IGroundedIterator, ILastPositionFinder, ILookaheadIterator
         {
             // This class is not a LookAheadIterator on C#, because the underlying C# enumerator has no side-effect-free
             // hasNext() operation.

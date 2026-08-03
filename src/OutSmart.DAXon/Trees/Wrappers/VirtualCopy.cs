@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Trees.Wrappers
     // copy-propagation path could never see an original node.
     // A node that is a virtual copy of another node: same content, different identity, with the parent axis
     // truncated at the copied subtree root.
-    public class VirtualCopy : NodeInfo
+    internal class VirtualCopy : NodeInfo
     {
         protected internal Func<string> systemIdSupplier;
         protected internal NodeInfo original;

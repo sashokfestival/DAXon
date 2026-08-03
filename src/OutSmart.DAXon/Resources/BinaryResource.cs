@@ -15,7 +15,7 @@ using System.Text;
 namespace OutSmart.DAXon.Resources
 {
 
-    public class BinaryResource
+    internal class BinaryResource
     {
         // FACTORY typed as IResourceFactory for RegisterMediaType callers.
         public static readonly IResourceFactory FACTORY = new GenericResourceFactory();

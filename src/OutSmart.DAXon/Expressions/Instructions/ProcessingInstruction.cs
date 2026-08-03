@@ -27,7 +27,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class ProcessingInstruction : SimpleNodeConstructor
+    internal class ProcessingInstruction : SimpleNodeConstructor
     {
 
         private static readonly UnicodeString PI_TERMINATOR = new Twine8(StringConstants.PI_END);

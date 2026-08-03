@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Handler for xsl:copy elements in stylesheet. <br>
     /// </summary>
-    public class XSLCopy : StyleElement
+    internal class XSLCopy : StyleElement
     {
         private string use; // value of use-attribute-sets attribute
         private StructuredQName[] attributeSets = null;

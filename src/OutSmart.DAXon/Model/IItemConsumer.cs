@@ -16,5 +16,5 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
     // IItemConsumer interface->delegate for lambda assignability.
-    public delegate void IItemConsumer<in T>(T item);
+    internal delegate void IItemConsumer<in T>(T item);
 }

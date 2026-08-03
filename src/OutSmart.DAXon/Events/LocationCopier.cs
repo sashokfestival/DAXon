@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Events
 {
-    public class LocationCopier : ICopyInformee
+    internal class LocationCopier : ICopyInformee
     {
         private readonly bool wholeDocument;
         private readonly string systemId;

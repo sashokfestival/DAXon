@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Internal
     /// the BCL little-endian two's-complement form. Java's big-endian toByteArray() is
     /// available as ToJavaByteArray().
     /// </summary>
-    public static class BigIntegers
+    internal static class BigIntegers
     {
         // Java BigInteger.TEN (ZERO/ONE map to SysBigInteger.Zero/One; there is no .Ten).
         public static readonly SysBigInteger Ten = new SysBigInteger(10);

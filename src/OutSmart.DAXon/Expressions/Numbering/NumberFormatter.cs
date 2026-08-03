@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using System.Numerics;
 namespace OutSmart.DAXon.Expressions.Numbering
 {
-    public class NumberFormatter
+    internal class NumberFormatter
     {
 
         private static readonly IIntPredicateProxy alphanumeric = IntUnionPredicate.MakeUnion(Categories.GetCategory("N"), (Categories.GetCategory("L")));

@@ -28,7 +28,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class LookupExpression : BinaryExpression
+    internal class LookupExpression : BinaryExpression
     {
         private bool isClassified = false;
         protected bool isArrayLookup = false;
@@ -350,7 +350,7 @@ namespace OutSmart.DAXon.Expressions
         //
         //
         //    }
-        public class LookupElaborator : PullElaborator
+        internal class LookupElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

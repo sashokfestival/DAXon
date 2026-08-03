@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// Open paren (captured group) within a regular expression
     /// </summary>
-    public class OpCapture : Operation
+    internal class OpCapture : Operation
     {
         internal int groupNr;
         public Operation childOp;

@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     /// <summary>
     /// A collating sequence that uses Unicode codepoint ordering
     /// </summary>
-    public class CodepointCollator : IStringCollator, ISubstringMatcher
+    internal class CodepointCollator : IStringCollator, ISubstringMatcher
     {
         private static readonly CodepointCollator theInstance = new CodepointCollator();
 

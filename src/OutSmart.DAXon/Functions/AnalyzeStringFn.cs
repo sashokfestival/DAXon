@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the fn:analyze-string function defined in XPath 3.0.
     /// </summary>
-    public class AnalyzeStringFn : RegexFunction
+    internal class AnalyzeStringFn : RegexFunction
     {
         private readonly object syncLock = new object();
 

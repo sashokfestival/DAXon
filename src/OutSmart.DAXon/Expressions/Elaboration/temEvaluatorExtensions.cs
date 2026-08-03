@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
 
-    public static class temEvaluatorExtensions
+    internal static class temEvaluatorExtensions
     {
         public static IItem Eval(this IItemEvaluator e, IXPathContext context) => e == null ? default : e(context);
     }

@@ -13,7 +13,7 @@ namespace OutSmart.DAXon.XQuery
 {
     using System.IO;
     // .NET streams are seekable; the Java mark/reset shim reduces to identity.
-    public static class InputStreamMarker
+    internal static class InputStreamMarker
     {
         public static Stream EnsureMarkSupported(Stream s) => s;
     }

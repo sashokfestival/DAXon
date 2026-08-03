@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:sort element in the stylesheet. <br>
     /// </summary>
-    public class XSLSort : XSLSortOrMergeKey
+    internal class XSLSort : XSLSortOrMergeKey
     {
 
         protected internal override Expression Stable => stable;

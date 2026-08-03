@@ -461,7 +461,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public abstract class Optimized : SystemFunctionCall
+        internal abstract class Optimized : SystemFunctionCall
         {
             public Optimized(SystemFunction target, Expression[] arguments) : base(target, arguments)
             {
@@ -476,7 +476,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a system function call, used in cases where the specific function call has no custom support
         /// </summary>
-        public class SystemFunctionCallElaborator : FunctionCallElaborator
+        internal class SystemFunctionCallElaborator : FunctionCallElaborator
         {
             public override void SetExpression(Expression expr)
             {

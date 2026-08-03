@@ -17,7 +17,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLLocalVariable : XSLGeneralVariable
+    internal class XSLLocalVariable : XSLGeneralVariable
     {
         private static readonly HashSet<SourceBinding.BindingProperty> permittedAttributes = new HashSet<SourceBinding.BindingProperty> { SourceBinding.BindingProperty.SELECT, SourceBinding.BindingProperty.AS };
         public override SourceBinding GetBindingInformation(StructuredQName name)

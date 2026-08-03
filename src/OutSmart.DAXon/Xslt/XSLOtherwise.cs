@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// Handler for xsl:otherwise elements in stylesheet.
     /// </summary>
-    public class XSLOtherwise : StyleElement
+    internal class XSLOtherwise : StyleElement
     {
         private Expression select;
         public override void PrepareAttributes()

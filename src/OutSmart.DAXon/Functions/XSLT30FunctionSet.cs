@@ -19,7 +19,7 @@ using OutSmart.DAXon.Values.Arrays;
 
 namespace OutSmart.DAXon.Functions
 {
-    public class XSLT30FunctionSet : BuiltInFunctionSet
+    internal class XSLT30FunctionSet : BuiltInFunctionSet
     {
         private static readonly XSLT30FunctionSet _i = new XSLT30FunctionSet();
         // Runtime bring-up: scoped registration of the bootstrap functions KeyManager.RegisterIdrefKey needs

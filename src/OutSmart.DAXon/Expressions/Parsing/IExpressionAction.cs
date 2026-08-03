@@ -20,5 +20,5 @@ namespace OutSmart.DAXon.Expressions.Parsing
     /// General action class which can be used to process all nodes on an expression tree
     /// </summary>
     // IExpressionAction interface->delegate.
-    public delegate bool IExpressionAction(Expression expression, object result);
+    internal delegate bool IExpressionAction(Expression expression, object result);
 }

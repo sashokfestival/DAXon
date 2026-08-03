@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Values
     /// <summary>
     /// Implementation of the xs:gYear data type
     /// </summary>
-    public class GYearValue : GDateValue
+    internal class GYearValue : GDateValue
     {
         private static readonly OutSmart.DAXon.Internal.Regex.Pattern regex = OutSmart.DAXon.Internal.Regex.Pattern.Compile("(-?[0-9]+)(Z|[+-][0-9][0-9]:[0-9][0-9])?");
 

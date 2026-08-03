@@ -23,7 +23,7 @@ using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Json
 {
-    public class JsonReceiver : IReceiver
+    internal class JsonReceiver : IReceiver
     {
         private static readonly string ERR_INPUT = "FOJS0006";
 

@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the fn:avg function
     /// </summary>
-    public class Average : FoldingFunction
+    internal class Average : FoldingFunction
     {
 
         public static Func<Average> New() => () => new Average();

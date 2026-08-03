@@ -24,7 +24,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions
 {
-    public class KeyFn : SystemFunction, IStatefulSystemFunction
+    internal class KeyFn : SystemFunction, IStatefulSystemFunction
     {
         private KeyDefinitionSet staticKeySet = null;
         public virtual KeyManager GetKeyManager()

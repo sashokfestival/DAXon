@@ -15,7 +15,7 @@ using OutSmart.DAXon.Types;
 
 namespace OutSmart.DAXon.Patterns
 {
-    public class UniversalPattern : Pattern
+    internal class UniversalPattern : Pattern
     {
         private static readonly UniversalPattern _instance = new UniversalPattern();
         public override int ImplementationMethod => 0;

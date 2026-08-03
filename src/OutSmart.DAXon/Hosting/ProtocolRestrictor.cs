@@ -91,7 +91,7 @@ namespace OutSmart.DAXon.Lib
             return uri.SchemeSpecificPart;
         }
 
-        public class RestrictedResourceResolver : IResourceResolver
+        internal class RestrictedResourceResolver : IResourceResolver
         {
             private readonly ProtocolRestrictor protocolRestrictor;
             private readonly IResourceResolver nextResolver;

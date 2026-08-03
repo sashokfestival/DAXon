@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Collections
     /// <summary>
     /// An immutable integer set containing all int values except those in an excluded set
     /// </summary>
-    public class IntComplementSet : IntSet
+    internal class IntComplementSet : IntSet
     {
         private readonly IntSet exclusions;
 

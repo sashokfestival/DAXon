@@ -647,7 +647,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToSequenceIterator : PJConverter
+        internal class ToSequenceIterator : PJConverter
         {
             public static readonly ToSequenceIterator INSTANCE = new ToSequenceIterator();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -656,7 +656,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToNull : PJConverter
+        internal class ToNull : PJConverter
         {
             public static readonly ToNull INSTANCE = new ToNull();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -665,7 +665,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToSequenceExtent : PJConverter
+        internal class ToSequenceExtent : PJConverter
         {
             public static readonly ToSequenceExtent INSTANCE = new ToSequenceExtent();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -674,7 +674,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToCollection : PJConverter
+        internal class ToCollection : PJConverter
         {
             public static readonly ToCollection INSTANCE = new ToCollection();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -727,7 +727,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Converter for use when the target class is an array
         /// </summary>
-        public class ToArray : PJConverter
+        internal class ToArray : PJConverter
         {
             private readonly PJConverter itemConverter;
             public ToArray(PJConverter itemConverter)
@@ -764,7 +764,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToOne : PJConverter
+        internal class ToOne : PJConverter
         {
             public static readonly ToOne INSTANCE = new ToOne();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -775,7 +775,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToZeroOrOne : PJConverter
+        internal class ToZeroOrOne : PJConverter
         {
             public static readonly ToZeroOrOne INSTANCE = new ToZeroOrOne();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -786,7 +786,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToOneOrMore : PJConverter
+        internal class ToOneOrMore : PJConverter
         {
             public static readonly ToOneOrMore INSTANCE = new ToOneOrMore();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -795,7 +795,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ToZeroOrMore : PJConverter
+        internal class ToZeroOrMore : PJConverter
         {
             public static readonly ToZeroOrMore INSTANCE = new ToZeroOrMore();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -804,7 +804,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class Identity : PJConverter
+        internal class Identity : PJConverter
         {
             public static readonly Identity INSTANCE = new Identity();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -858,7 +858,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class UnwrapExternalObject : PJConverter
+        internal class UnwrapExternalObject : PJConverter
         {
             public static readonly UnwrapExternalObject INSTANCE = new UnwrapExternalObject();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -891,7 +891,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class ConditionalUnwrapExternalObject : PJConverter
+        internal class ConditionalUnwrapExternalObject : PJConverter
         {
             public static readonly ConditionalUnwrapExternalObject INSTANCE = new ConditionalUnwrapExternalObject();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -932,7 +932,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class StringItemToString : PJConverter
+        internal class StringItemToString : PJConverter
         {
             public static readonly StringItemToString INSTANCE = new StringItemToString();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -942,7 +942,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class StringItemToUnicodeString : PJConverter
+        internal class StringItemToUnicodeString : PJConverter
         {
             public static readonly StringItemToUnicodeString INSTANCE = new StringItemToUnicodeString();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -952,7 +952,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class StringItemToChar : PJConverter
+        internal class StringItemToChar : PJConverter
         {
             public static readonly StringItemToChar INSTANCE = new StringItemToChar();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -975,7 +975,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class BooleanValueToBoolean : PJConverter
+        internal class BooleanValueToBoolean : PJConverter
         {
             public static readonly BooleanValueToBoolean INSTANCE = new BooleanValueToBoolean();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -985,7 +985,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class IntegerValueToBigInteger : PJConverter
+        internal class IntegerValueToBigInteger : PJConverter
         {
             public static readonly IntegerValueToBigInteger INSTANCE = new IntegerValueToBigInteger();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -995,7 +995,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class IntegerValueToLong : PJConverter
+        internal class IntegerValueToLong : PJConverter
         {
             public static readonly IntegerValueToLong INSTANCE = new IntegerValueToLong();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1005,7 +1005,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class IntegerValueToInt : PJConverter
+        internal class IntegerValueToInt : PJConverter
         {
             public static readonly IntegerValueToInt INSTANCE = new IntegerValueToInt();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1015,7 +1015,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class IntegerValueToShort : PJConverter
+        internal class IntegerValueToShort : PJConverter
         {
             public static readonly IntegerValueToShort INSTANCE = new IntegerValueToShort();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1025,7 +1025,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class IntegerValueToByte : PJConverter
+        internal class IntegerValueToByte : PJConverter
         {
             public static readonly IntegerValueToByte INSTANCE = new IntegerValueToByte();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1035,7 +1035,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class IntegerValueToChar : PJConverter
+        internal class IntegerValueToChar : PJConverter
         {
             public static readonly IntegerValueToChar INSTANCE = new IntegerValueToChar();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1045,7 +1045,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class NumericValueToBigDecimal : PJConverter
+        internal class NumericValueToBigDecimal : PJConverter
         {
             public static readonly NumericValueToBigDecimal INSTANCE = new NumericValueToBigDecimal();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1055,7 +1055,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class NumericValueToDouble : PJConverter
+        internal class NumericValueToDouble : PJConverter
         {
             public static readonly NumericValueToDouble INSTANCE = new NumericValueToDouble();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1065,7 +1065,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class NumericValueToFloat : PJConverter
+        internal class NumericValueToFloat : PJConverter
         {
             public static readonly NumericValueToFloat INSTANCE = new NumericValueToFloat();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1075,7 +1075,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class AnyURIValueToURI : PJConverter
+        internal class AnyURIValueToURI : PJConverter
         {
             public static readonly AnyURIValueToURI INSTANCE = new AnyURIValueToURI();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1092,7 +1092,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class AnyURIValueToSystemUri : PJConverter
+        internal class AnyURIValueToSystemUri : PJConverter
         {
             public static readonly AnyURIValueToSystemUri INSTANCE = new AnyURIValueToSystemUri();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1109,7 +1109,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class QualifiedNameValueToQName : PJConverter
+        internal class QualifiedNameValueToQName : PJConverter
         {
             public static readonly QualifiedNameValueToQName INSTANCE = new QualifiedNameValueToQName();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1119,7 +1119,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class CalendarValueToDateTime : PJConverter
+        internal class CalendarValueToDateTime : PJConverter
         {
             public static readonly CalendarValueToDateTime INSTANCE = new CalendarValueToDateTime();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1129,7 +1129,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class CalendarValueToDateTimeOffset : PJConverter
+        internal class CalendarValueToDateTimeOffset : PJConverter
         {
             public static readonly CalendarValueToDateTimeOffset INSTANCE = new CalendarValueToDateTimeOffset();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1156,7 +1156,7 @@ namespace OutSmart.DAXon.Expressions
         //                return
         //
         //
-        public class Atomic : PJConverter
+        internal class Atomic : PJConverter
         {
             public static readonly Atomic INSTANCE = new Atomic();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
@@ -1175,7 +1175,7 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public class General : PJConverter
+        internal class General : PJConverter
         {
             public static readonly General INSTANCE = new General();
             public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)

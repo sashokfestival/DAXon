@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Transformation
 {
-    public class XmlProcessingException : IXmlProcessingError
+    internal class XmlProcessingException : IXmlProcessingError
     {
         private readonly XPathException exception;
         private bool _isWarning;

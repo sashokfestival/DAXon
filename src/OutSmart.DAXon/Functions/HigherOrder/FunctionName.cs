@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// <summary>
     /// This class implements the function function-name(), which is a standard function in XPath 3.0
     /// </summary>
-    public class FunctionName : SystemFunction
+    internal class FunctionName : SystemFunction
     {
 
         public static Func<FunctionName> New() => () => new FunctionName();

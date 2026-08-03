@@ -1145,7 +1145,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a filter expression
         /// </summary>
-        public class FilterExprElaborator : PullElaborator
+        internal class FilterExprElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {
@@ -1175,7 +1175,7 @@ namespace OutSmart.DAXon.Expressions
                 }
             }
 
-            public class PositionalFilteredIterator : ISequenceIterator
+            internal class PositionalFilteredIterator : ISequenceIterator
             {
                 private readonly IXPathContext outerContext;
                 private readonly IFocusIterator @base;
@@ -1216,7 +1216,7 @@ namespace OutSmart.DAXon.Expressions
                 public virtual void Dispose() { }
             }
 
-            public class SimpleFilteredIterator : ISequenceIterator
+            internal class SimpleFilteredIterator : ISequenceIterator
             {
                 private readonly IXPathContext outerContext;
                 private readonly IFocusIterator @base;

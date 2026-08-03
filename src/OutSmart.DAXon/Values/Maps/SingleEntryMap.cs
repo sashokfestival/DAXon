@@ -19,7 +19,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Values.Maps
 {
-    public class SingleEntryMap : MapItem
+    internal class SingleEntryMap : MapItem
     {
         public AtomicValue key;
         public IGroundedValue value;

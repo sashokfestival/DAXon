@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Functions
     /// wrapper is not ported. The stable-collection caching in Controller UserData IS retained, because
     /// repeated calls (e.g. collection() | collection()) rely on node identity being preserved.
     /// </summary>
-    public class CollectionFn : SystemFunction, ICallable
+    internal class CollectionFn : SystemFunction, ICallable
     {
         /// <summary>URI representing a collection that is always empty.</summary>
         public static string EMPTY_COLLECTION_URI = "http://saxon.sf.net/collection/empty";

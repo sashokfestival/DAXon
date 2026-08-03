@@ -27,7 +27,7 @@ using OutSmart.DAXon.Internal.Collections;
 using System.IO;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    public sealed class TinyTree : GenericTreeInfo, INodeVectorTree
+    internal sealed class TinyTree : GenericTreeInfo, INodeVectorTree
     {
         public const int TYPECODE_IDREF = 1 << 29;
         private static readonly string[] EMPTY_STRING_ARRAY = new string[0];

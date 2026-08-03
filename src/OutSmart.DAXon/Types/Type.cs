@@ -19,7 +19,7 @@ using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Types
 {
     using global::OutSmart.DAXon.Model;
-    public static class Type
+    internal static class Type
     {
         public const int ITEM = 88;
         // NODE is the "any node kind" sentinel = 0 (per real Type.cs, compat JavaInternals, and upstream

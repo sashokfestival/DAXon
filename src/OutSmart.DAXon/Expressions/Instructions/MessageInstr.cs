@@ -33,7 +33,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An xsl:message or xsl:assert element in the stylesheet.
     /// </summary>
-    public class MessageInstr : Instruction
+    internal class MessageInstr : Instruction
     {
         private readonly Operand selectOp;
         private readonly Operand terminateOp;

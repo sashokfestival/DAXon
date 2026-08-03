@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Regex.CharClass
     /// Test call - and a class body of escapes or an alternation list is as long as the
     /// pattern makes it, which for a dynamic pattern means as long as the input makes it.
     /// </summary>
-    public sealed class UnionCharacterClass : ICharacterClass
+    internal sealed class UnionCharacterClass : ICharacterClass
     {
         private readonly ICharacterClass[] members;
         public UnionCharacterClass(ICharacterClass[] members)

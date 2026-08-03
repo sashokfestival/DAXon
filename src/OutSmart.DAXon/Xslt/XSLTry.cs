@@ -18,7 +18,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public class XSLTry : StyleElement
+    internal class XSLTry : StyleElement
     {
         private Expression select;
         private bool rollbackOutput = true;

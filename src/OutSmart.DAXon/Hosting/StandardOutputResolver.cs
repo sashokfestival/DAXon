@@ -20,7 +20,7 @@ using System.IO;
 using OutSmart.DAXon.Serialization;
 namespace OutSmart.DAXon.Lib
 {
-    public class StandardOutputResolver : IOutputURIResolver
+    internal class StandardOutputResolver : IOutputURIResolver
     {
         private static readonly StandardOutputResolver theInstance = new StandardOutputResolver();
         public static StandardOutputResolver GetInstance()

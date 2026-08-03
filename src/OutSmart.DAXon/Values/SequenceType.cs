@@ -6,6 +6,7 @@
 // Misc Java stdlib types Saxon references but we don't yet shim individually.
 
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 
@@ -107,12 +108,12 @@ namespace OutSmart.DAXon.Values
         // so the int cardinality is stored verbatim from the caller.
         private readonly OutSmart.DAXon.Types.ItemType _primaryType;
         private readonly int _cardinality;
-        public static SequenceType ANY_SEQUENCE { get { if (_anySequence == null) { _anySequence = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Types.AnyItemType"), 57344 /* ALLOWS_ZERO_OR_MORE */); } return _anySequence; } }
-        public static SequenceType SINGLE_ITEM { get { if (_singleItem == null) { _singleItem = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Types.AnyItemType"), 16384 /* EXACTLY_ONE */); } return _singleItem; } }
-        public static SequenceType OPTIONAL_ITEM { get { if (_optionalItem == null) { _optionalItem = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Types.AnyItemType"), 24576 /* ALLOWS_ZERO_OR_ONE */); } return _optionalItem; } }
+        public static SequenceType ANY_SEQUENCE => MakeItemSeqType(ref _anySequence, "OutSmart.DAXon.Types.AnyItemType", 57344 /* ALLOWS_ZERO_OR_MORE */);
+        public static SequenceType SINGLE_ITEM => MakeItemSeqType(ref _singleItem, "OutSmart.DAXon.Types.AnyItemType", 16384 /* EXACTLY_ONE */);
+        public static SequenceType OPTIONAL_ITEM => MakeItemSeqType(ref _optionalItem, "OutSmart.DAXon.Types.AnyItemType", 24576 /* ALLOWS_ZERO_OR_ONE */);
         public static SequenceType SINGLE_ATOMIC => MakeAtomicSeqType(ref _singleAtomic, "ANY_ATOMIC", 16384);
         public static SequenceType OPTIONAL_ATOMIC => MakeAtomicSeqType(ref _optionalAtomic, "ANY_ATOMIC", 24576);
-        public static SequenceType ATOMIC_SEQUENCE { get { if (_atomicSequence == null) { _atomicSequence = new SequenceType(ResolveDAXonStaticField("OutSmart.DAXon.Types.BuiltInAtomicType", "ANY_ATOMIC"), 57344); } return _atomicSequence; } }
+        public static SequenceType ATOMIC_SEQUENCE => MakeAtomicSeqType(ref _atomicSequence, "ANY_ATOMIC", 57344 /* ALLOWS_ZERO_OR_MORE */);
         public static SequenceType SINGLE_STRING => MakeAtomicSeqType(ref _singleString, "STRING", 16384);
         public static SequenceType SINGLE_UNTYPED_ATOMIC => MakeAtomicSeqType(ref _singleUntypedAtomic, "UNTYPED_ATOMIC", 16384);
         public static SequenceType OPTIONAL_STRING => MakeAtomicSeqType(ref _optionalString, "STRING", 24576);
@@ -148,13 +149,13 @@ namespace OutSmart.DAXon.Values
         public static SequenceType OPTIONAL_NOTATION => MakeAtomicSeqType(ref _optNotation, "NOTATION", 24576);
         public static SequenceType OPTIONAL_BASE64_BINARY => MakeAtomicSeqType(ref _optBase64, "BASE64_BINARY", 24576);
         public static SequenceType OPTIONAL_HEX_BINARY => MakeAtomicSeqType(ref _optHexBinary, "HEX_BINARY", 24576);
-        public static SequenceType OPTIONAL_NUMERIC { get { if (_optNumeric == null) { _optNumeric = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Types.NumericType"), 24576 /* ALLOWS_ZERO_OR_ONE */); } return _optNumeric; } }
-        public static SequenceType SINGLE_NUMERIC { get { if (_singleNumeric == null) { _singleNumeric = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Types.NumericType"), 16384 /* EXACTLY_ONE */); } return _singleNumeric; } }
-        public static SequenceType OPTIONAL_NODE { get { if (_optionalNode == null) { _optionalNode = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Patterns.AnyNodeTest"), 24576 /* ALLOWS_ZERO_OR_ONE */); } return _optionalNode; } }
-        public static SequenceType SINGLE_NODE { get { if (_singleNode == null) { _singleNode = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Patterns.AnyNodeTest"), 16384 /* EXACTLY_ONE */); } return _singleNode; } }
-        public static SequenceType NODE_SEQUENCE { get { if (_nodeSequence == null) { _nodeSequence = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Patterns.AnyNodeTest"), 57344 /* StaticProperty.ALLOWS_ZERO_OR_MORE */); } return _nodeSequence; } }
+        public static SequenceType OPTIONAL_NUMERIC => MakeItemSeqType(ref _optNumeric, "OutSmart.DAXon.Types.NumericType", 24576 /* ALLOWS_ZERO_OR_ONE */);
+        public static SequenceType SINGLE_NUMERIC => MakeItemSeqType(ref _singleNumeric, "OutSmart.DAXon.Types.NumericType", 16384 /* EXACTLY_ONE */);
+        public static SequenceType OPTIONAL_NODE => MakeItemSeqType(ref _optionalNode, "OutSmart.DAXon.Patterns.AnyNodeTest", 24576 /* ALLOWS_ZERO_OR_ONE */);
+        public static SequenceType SINGLE_NODE => MakeItemSeqType(ref _singleNode, "OutSmart.DAXon.Patterns.AnyNodeTest", 16384 /* EXACTLY_ONE */);
+        public static SequenceType NODE_SEQUENCE => MakeItemSeqType(ref _nodeSequence, "OutSmart.DAXon.Patterns.AnyNodeTest", 57344 /* ALLOWS_ZERO_OR_MORE */);
         public static SequenceType STRING_SEQUENCE => MakeAtomicSeqType(ref _stringSequence, "STRING", 57344);
-        public static SequenceType SINGLE_FUNCTION { get { if (_singleFunction == null) { _singleFunction = new SequenceType(ResolveDAXonItemType("OutSmart.DAXon.Types.AnyFunctionType"), 16384 /* EXACTLY_ONE */); } return _singleFunction; } }
+        public static SequenceType SINGLE_FUNCTION => MakeItemSeqType(ref _singleFunction, "OutSmart.DAXon.Types.AnyFunctionType", 16384 /* EXACTLY_ONE */);
 
         public OutSmart.DAXon.Types.ItemType PrimaryType => _primaryType;
         public SequenceType() { }
@@ -174,8 +175,29 @@ namespace OutSmart.DAXon.Values
         // ATOMIC_SEQUENCE, which bites pervasively in TypeChecker.Strict/StaticTypeCheck (ValueComparison,
         // arithmetic, conditions, function-arg checks, ...). Cardinality: SINGLE_=16384 (EXACTLY_ONE),
         // OPTIONAL_=24576 (ZERO_OR_ONE), *_SEQUENCE=57344 (ZERO_OR_MORE).
+        // Publish-once, lock-free. These stay lazy because the primary types are resolved
+        // reflectively (see below), but the plain `if (cache == null) cache = …` they used to
+        // carry let concurrent first-touch publish one instance per thread, and 8 of these
+        // singletons are compared by REFERENCE (`!= SequenceType.ANY_SEQUENCE` guards "was a
+        // type declared" in LocalParam, NamedTemplate, UserFunction, WithParamPort,
+        // LetExpression, UserFunctionCall, XPathDynamicContext, XSLTemplate). The loser of the
+        // CAS is discarded; every caller ends up with the same object.
+        private static SequenceType Publish(ref SequenceType cache, SequenceType candidate)
+        {
+            return Interlocked.CompareExchange(ref cache, candidate, null) ?? candidate;
+        }
+
         private static SequenceType MakeAtomicSeqType(ref SequenceType cache, string atomicField, int cardinality)
-        { if (cache == null) { cache = new SequenceType(ResolveDAXonStaticField("OutSmart.DAXon.Types.BuiltInAtomicType", atomicField), cardinality); } return cache; }
+        {
+            SequenceType known = Volatile.Read(ref cache);
+            return known ?? Publish(ref cache, new SequenceType(ResolveDAXonStaticField("OutSmart.DAXon.Types.BuiltInAtomicType", atomicField), cardinality));
+        }
+
+        private static SequenceType MakeItemSeqType(ref SequenceType cache, string itemTypeName, int cardinality)
+        {
+            SequenceType known = Volatile.Read(ref cache);
+            return known ?? Publish(ref cache, new SequenceType(ResolveDAXonItemType(itemTypeName), cardinality));
+        }
 
         public static SequenceType MakeSequenceType(OutSmart.DAXon.Types.ItemType primaryType, int cardinality) => new SequenceType((object)primaryType, cardinality);
         public static SequenceType One(OutSmart.DAXon.Types.ItemType itemType) => new SequenceType((object)itemType, 16384 /* StaticProperty.EXACTLY_ONE (Saxon-side, not referenceable from compat) */);

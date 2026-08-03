@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Values
     /// <summary>
     /// An xs:NOTATION value.
     /// </summary>
-    public sealed class NotationValue : QualifiedNameValue
+    internal sealed class NotationValue : QualifiedNameValue
     {
 
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.NOTATION;

@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Values.Maps
     /// <summary>
     /// An immutable map. This implementation, which uses a hash trie, was introduced in Saxon 9.6
     /// </summary>
-    public class HashTrieMap : MapItem
+    internal class HashTrieMap : MapItem
     {
         private IImmutableMap<IAtomicMatchKey, KeyValuePair> imap;
         // type.

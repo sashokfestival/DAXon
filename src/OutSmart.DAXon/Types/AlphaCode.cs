@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Types
 {
-    public static class AlphaCode
+    internal static class AlphaCode
     {
         public static string FromItemType(ItemType t) => "";
         public static ItemType ToItemType(string s) => throw new NotImplementedException("STUB: AlphaCode.ToItemType not ported (excluded stub)");

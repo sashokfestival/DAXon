@@ -7,5 +7,5 @@
 
 namespace OutSmart.DAXon.Patterns
 {
-    public interface ISchemaNodeTest { }
+    internal interface ISchemaNodeTest { }
 }

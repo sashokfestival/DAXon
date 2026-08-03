@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// <summary>
     /// This class implements the function fn:for-each-pair() (formerly fn:map-pairs()), which is a standard function in XQuery 3.0
     /// </summary>
-    public class ForEachPairFn : SystemFunction
+    internal class ForEachPairFn : SystemFunction
     {
 
         public static Func<ForEachPairFn> New() => () => new ForEachPairFn();

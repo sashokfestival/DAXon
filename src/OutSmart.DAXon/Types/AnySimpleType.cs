@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Types
     // ISimpleType; the stub only declared ISchemaTypeStubBase, so (ISimpleType)AnySimpleType.INSTANCE
     // (CastInjector-injected at BuiltInAtomicType) failed CS0030. Declare ISimpleType and stub its
     // members (ISchemaType + IsAtomicType come from the base; ISimpleType adds the rest + IHyperType).
-    public sealed class AnySimpleType : ISchemaTypeStubBase, ISimpleType
+    internal sealed class AnySimpleType : ISchemaTypeStubBase, ISimpleType
     {
         private static readonly AnySimpleType _instance = new AnySimpleType();
         public static readonly AnySimpleType INSTANCE = _instance;

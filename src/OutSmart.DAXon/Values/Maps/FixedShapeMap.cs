@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Values.Maps
     /// HashTrieMap, so this type only needs to be correct for read + serialize; keys are always xs:string.
     /// Iteration order is byte-identical to the equivalent HashTrieMap because Shape derives it from one.
     /// </summary>
-    public sealed class FixedShapeMap : MapItem
+    internal sealed class FixedShapeMap : MapItem
     {
         private readonly Shape shape;
         private readonly IGroundedValue[] values;   // source order, index-aligned with shape.keys
@@ -149,7 +149,7 @@ namespace OutSmart.DAXon.Values.Maps
         /// Immutable, thread-safe layout shared by every instance built from one FixedKeyMapConstructor:
         /// the interned key values, their precomputed match keys, and the HAMT iteration order.
         /// </summary>
-        public sealed class Shape
+        internal sealed class Shape
         {
             internal readonly StringValue[] keys;             // source order
             internal readonly IAtomicMatchKey[] matchKeys;    // keys[i].AsMapKey(), source order

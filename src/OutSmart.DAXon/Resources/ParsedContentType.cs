@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Resources
 {
-    public class ParsedContentType
+    internal class ParsedContentType
     {
         public bool isXmlMediaType;
         public string encoding;

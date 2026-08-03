@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Events
     // path (GetAssociatedStylesheet) could never find an embedded/associated stylesheet.
     // A ProxyReceiver that looks for xml-stylesheet processing instructions matching given criteria;
     // for those that do, it creates a ResolvedResource referring to the relevant stylesheet.
-    public class PIGrabber : ProxyReceiver
+    internal class PIGrabber : ProxyReceiver
     {
         private Configuration config = null;
         private string reqMedia = null;

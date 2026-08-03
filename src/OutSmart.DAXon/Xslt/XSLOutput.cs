@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:output element in the stylesheet.
     /// </summary>
-    public class XSLOutput : StyleElement
+    internal class XSLOutput : StyleElement
     {
         private StructuredQName outputFormatName;
         private readonly string method = null;

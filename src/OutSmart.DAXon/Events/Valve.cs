@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Events
 {
-    public class Valve : ProxyReceiver
+    internal class Valve : ProxyReceiver
     {
         private bool started = false;
         private readonly NamespaceUri testNamespace;

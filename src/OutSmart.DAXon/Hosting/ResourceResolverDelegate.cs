@@ -16,7 +16,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Lib
 {
-    public class ResourceResolverDelegate : IResourceResolver
+    internal class ResourceResolverDelegate : IResourceResolver
     {
         private readonly Func<ResourceRequest, ResolvedResource> lambda;
         public ResourceResolverDelegate(Func<ResourceRequest, ResolvedResource> lambda)

@@ -84,5 +84,37 @@ namespace OutSmart.DAXon.Api
                 return null;
             }
         }
+
+        public virtual int GetColumnNumber()
+        {
+            Exception cause = (Exception)InnerException;
+            if (cause is XPathException)
+            {
+                ILocation loc = ((XPathException)cause).GetLocator();
+                return loc == null ? -1 : loc.GetColumnNumber();
+            }
+            else
+            {
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// The diagnostics collected during a failed stylesheet compilation, oldest first
+        /// (empty for any other failure). Capped - GetErrorCount is the true total. This is
+        /// what a host gets without installing a reporter; SetErrorList remains the opt-in
+        /// for capturing warnings and successful-compile diagnostics too.
+        /// </summary>
+        public virtual IList<IXmlProcessingError> GetErrors()
+        {
+            return InnerException is Xslt.XsltCompilationFailure failure
+                ? failure.Errors
+                : (IList<IXmlProcessingError>)new List<IXmlProcessingError>();
+        }
+
+        public virtual int GetErrorCount()
+        {
+            return InnerException is Xslt.XsltCompilationFailure failure ? failure.TotalErrorCount : 0;
+        }
     }
 }

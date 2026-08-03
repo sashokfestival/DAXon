@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Expressions.Accumulators
 {
-    public class PathMappedAccumulatorData : IIAccumulatorData
+    internal class PathMappedAccumulatorData : IIAccumulatorData
     {
         public PathMappedAccumulatorData() { }
         public PathMappedAccumulatorData(object a) { }

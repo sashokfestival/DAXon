@@ -26,7 +26,7 @@ using OutSmart.DAXon.Collections.Trie;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class UseAttributeSet : Instruction, IComponentInvocation, IContextOriginator
+    internal class UseAttributeSet : Instruction, IComponentInvocation, IContextOriginator
     {
         private readonly StructuredQName targetName;
         private AttributeSet target;
@@ -214,7 +214,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new UseAttributeSetElaborator();
         }
 
-        public class UseAttributeSetElaborator : PushElaborator
+        internal class UseAttributeSetElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
             {

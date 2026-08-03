@@ -29,7 +29,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the XSLT document() function
     /// </summary>
-    public class DocumentFn : SystemFunction, ICallable
+    internal class DocumentFn : SystemFunction, ICallable
     {
         private ILocation location;
         public override int GetCardinality(Expression[] arguments)

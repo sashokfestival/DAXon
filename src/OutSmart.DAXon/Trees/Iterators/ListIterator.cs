@@ -17,7 +17,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public abstract class ListIterator : ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
+    internal abstract class ListIterator : ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
     {
         public abstract bool HasNext { get; }
         public virtual bool SupportsHasNext()
@@ -37,7 +37,7 @@ namespace OutSmart.DAXon.Trees.Iterators
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public abstract IGroundedValue Materialize();
 
-        public class Of<T> : ListIterator, ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
+        internal class Of<T> : ListIterator, ISequenceIterator, IFocusIterator, ILastPositionFinder, ILookaheadIterator, IGroundedIterator, IReversibleIterator
         {
             private int index = 0;
             protected IList<T> list;
@@ -141,7 +141,7 @@ namespace OutSmart.DAXon.Trees.Iterators
             ISequenceIterator IReversibleIterator.GetReverseIterator() => GetReverseIterator();
         }
 
-        public class OfAtomic<A> : Of<A>, IAtomicIterator
+        internal class OfAtomic<A> : Of<A>, IAtomicIterator
         {
             public OfAtomic(IList<A> nodes) : base(nodes)
             {

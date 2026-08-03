@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// xsl:include element in the stylesheet. <br>
     /// </summary>
-    public class XSLInclude : XSLGeneralIncorporate
+    internal class XSLInclude : XSLGeneralIncorporate
     {
         /// <summary>
         /// isImport() returns true if this is an xsl:import statement rather than an xsl:include

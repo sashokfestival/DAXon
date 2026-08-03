@@ -22,7 +22,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Regex
 {
-    public class ARegexIterator : IRegexIterator, ILastPositionFinder
+    internal class ARegexIterator : IRegexIterator, ILastPositionFinder
     {
         private readonly UnicodeString theString; // the input string being matched
         private readonly UnicodeString _regex;

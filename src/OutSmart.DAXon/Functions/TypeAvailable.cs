@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the XSLT fn:type-available() function.
     /// </summary>
-    public class TypeAvailable : SystemFunction
+    internal class TypeAvailable : SystemFunction
     {
         private bool TypeAvailableFn(string lexicalName, Configuration config)
         {

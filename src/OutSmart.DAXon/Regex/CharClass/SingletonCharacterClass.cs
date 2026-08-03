@@ -15,7 +15,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Regex.CharClass
 {
-    public class SingletonCharacterClass : ICharacterClass
+    internal class SingletonCharacterClass : ICharacterClass
     {
         private readonly int codepoint;
 

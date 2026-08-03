@@ -28,7 +28,7 @@ using OutSmart.DAXon.Internal.Collections;
 using System.IO;
 namespace OutSmart.DAXon.Text
 {
-    public class Slice8 : UnicodeString
+    internal class Slice8 : UnicodeString
     {
         private readonly byte[] bytes;
         private readonly int start;

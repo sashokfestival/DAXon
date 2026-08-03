@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Values
 {
-    public class SingletonClosure : Closure, ISequence
+    internal class SingletonClosure : Closure, ISequence
     {
         private bool built = false;
         private IItem value = null;

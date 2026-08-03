@@ -18,7 +18,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Lib
 {
-    public class StandardCollationURIResolver : ICollationURIResolver
+    internal class StandardCollationURIResolver : ICollationURIResolver
     {
         private static readonly StandardCollationURIResolver theInstance = new StandardCollationURIResolver();
         public StandardCollationURIResolver()

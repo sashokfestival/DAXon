@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal.Collections;
 
 namespace OutSmart.DAXon.Events
 {
-    public class NamePoolConverter : ProxyReceiver
+    internal class NamePoolConverter : ProxyReceiver
     {
         NamePool oldPool;
         NamePool newPool;

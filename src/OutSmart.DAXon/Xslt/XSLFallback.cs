@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// xsl:fallback element in stylesheet. <br>
     /// </summary>
-    public class XSLFallback : StyleElement
+    internal class XSLFallback : StyleElement
     {
 
         public override int EffectiveVersion

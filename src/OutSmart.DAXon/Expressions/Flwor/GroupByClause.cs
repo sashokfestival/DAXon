@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Expressions.Flwor
     /// <summary>
     /// This class represents an "group by" clause in a FLWOR expression
     /// </summary>
-    public class GroupByClause : Clause
+    internal class GroupByClause : Clause
     {
         Configuration config;
         LocalVariableBinding[] bindings; // Variables bound in the output tuple stream.
@@ -202,13 +202,13 @@ namespace OutSmart.DAXon.Expressions.Flwor
             throw new NotSupportedException("Cannot use document projection with group-by");
         }
 
-        public class ObjectToBeGrouped
+        internal class ObjectToBeGrouped
         {
             public Tuple groupingValues;
             public Tuple retainedValues;
         }
 
-        public class TupleComparisonKey
+        internal class TupleComparisonKey
         {
             // Note: this is over-engineered. Each grouping value is required to be either a single atomic
             // value or an empty sequence.

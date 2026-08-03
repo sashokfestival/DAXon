@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Core;
 namespace OutSmart.DAXon.Xslt
 {
-    public class StylesheetFunctionLibrary : IFunctionLibrary
+    internal class StylesheetFunctionLibrary : IFunctionLibrary
     {
         private readonly StylesheetPackage pack;
         private readonly bool overrideExtensionFunction;

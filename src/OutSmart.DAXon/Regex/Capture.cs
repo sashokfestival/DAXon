@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// Represents a match of a captured subgroup
     /// </summary>
-    public class Capture
+    internal class Capture
     {
         public int groupNr;
         public int start;

@@ -25,7 +25,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions
 {
-    public class VennExpression : BinaryExpression
+    internal class VennExpression : BinaryExpression
     {
 
         public override string ExpressionName
@@ -721,7 +721,7 @@ namespace OutSmart.DAXon.Expressions
             return new VennElaborator();
         }
 
-        public class VennElaborator : PullElaborator
+        internal class VennElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

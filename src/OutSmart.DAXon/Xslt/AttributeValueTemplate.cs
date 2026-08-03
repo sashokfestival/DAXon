@@ -21,7 +21,7 @@ using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Xslt
 {
-    public abstract class AttributeValueTemplate
+    internal abstract class AttributeValueTemplate
     {
         private AttributeValueTemplate()
         {

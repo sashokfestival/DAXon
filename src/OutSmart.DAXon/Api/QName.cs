@@ -423,11 +423,8 @@ namespace OutSmart.DAXon.Api
             return sqName.GetNamespaceUri().ToString();
         }
 
-        public virtual string GetNamespaceURI()
-        {
-            return sqName.GetNamespaceUri().ToString();
-        }
-
+        // GetNamespaceURI() lived here too, with a body identical to GetNamespace() above. It had no
+        // callers, and differing from GetNamespaceUri only by case made the pair non-CLS-compliant.
         public virtual NamespaceUri GetNamespaceUri()
         {
             return sqName.GetNamespaceUri();

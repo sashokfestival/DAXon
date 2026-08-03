@@ -24,7 +24,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions.HigherOrder
 {
-    public class CoercedFunction : AbstractFunction
+    internal class CoercedFunction : AbstractFunction
     {
         private IFunctionItem targetFunction;
         private readonly SpecificFunctionType requiredType;

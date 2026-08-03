@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class CollatingAtomicComparer : IAtomicComparer
+    internal class CollatingAtomicComparer : IAtomicComparer
     {
         private readonly IStringCollator collator;
 

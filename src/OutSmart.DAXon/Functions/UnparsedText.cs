@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of fn:unparsed-text() - with one argument or two
     /// </summary>
-    public class UnparsedText : UnparsedTextFunction, IPushableFunction
+    internal class UnparsedText : UnparsedTextFunction, IPushableFunction
     {
 
         private const int errorValue = 0;

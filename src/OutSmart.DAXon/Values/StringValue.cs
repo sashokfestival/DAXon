@@ -268,7 +268,7 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        public sealed class CharacterIterator : IAtomicIterator
+        internal sealed class CharacterIterator : IAtomicIterator
         {
             int inpos = 0; // 0-based index of the current Java char
             private readonly string value;
@@ -313,7 +313,7 @@ namespace OutSmart.DAXon.Values
             public void Dispose() { }
         }
 
-        public sealed class Builder : IUniStringConsumer
+        internal sealed class Builder : IUniStringConsumer
         {
             UnicodeBuilder buffer = new UnicodeBuilder();
             public IUniStringConsumer Accept(UnicodeString chars)

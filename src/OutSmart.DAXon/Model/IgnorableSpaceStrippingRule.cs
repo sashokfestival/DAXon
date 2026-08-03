@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public class IgnorableSpaceStrippingRule : ISpaceStrippingRule
+    internal class IgnorableSpaceStrippingRule : ISpaceStrippingRule
     {
         private static readonly IgnorableSpaceStrippingRule THE_INSTANCE = new IgnorableSpaceStrippingRule();
         public static IgnorableSpaceStrippingRule GetInstance()

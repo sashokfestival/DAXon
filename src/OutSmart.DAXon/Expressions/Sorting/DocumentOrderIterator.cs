@@ -18,7 +18,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public sealed class DocumentOrderIterator : ISequenceIterator
+    internal sealed class DocumentOrderIterator : ISequenceIterator
     {
         private readonly ISequenceIterator iterator;
         private readonly List<NodeInfo> sequence; // explicit type ArrayList used so C# List.Sort() is available

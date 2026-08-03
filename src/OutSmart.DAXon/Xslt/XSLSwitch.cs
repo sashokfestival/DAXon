@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:switch element in the stylesheet (XSLT 4.0).
     /// </summary>
-    public class XSLSwitch : XSLChooseOrSwitch
+    internal class XSLSwitch : XSLChooseOrSwitch
     {
         private Expression select;
         private LetExpression switchVar;

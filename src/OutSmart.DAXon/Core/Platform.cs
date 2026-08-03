@@ -27,7 +27,7 @@ using System.IO;
 
 namespace OutSmart.DAXon.Core
 {
-    public interface IPlatform
+    internal interface IPlatform
     {
         void Initialize(Configuration config);
         bool IsJava();

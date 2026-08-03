@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// Instruction representing an xsl:call-template element in the stylesheet.
     /// </summary>
-    public class CallTemplate : Instruction, IITemplateCall, IComponentInvocation
+    internal class CallTemplate : Instruction, IITemplateCall, IComponentInvocation
     {
         private NamedTemplate template; // Null only for saxon:call-template
         private readonly StructuredQName calledTemplateName; // the name of the called template
@@ -345,7 +345,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new CallTemplateElaborator();
         }
 
-        public class CallTemplatePackage : ITailCall
+        internal class CallTemplatePackage : ITailCall
         {
             private readonly Component targetComponent;
             private readonly ParameterSet @params;
@@ -399,7 +399,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public class CallTemplateElaborator : PushElaborator
+        internal class CallTemplateElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
             {

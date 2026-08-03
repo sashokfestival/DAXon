@@ -17,5 +17,5 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
     // IContextMappingFunction interface->delegate for lambda support.
-    public delegate ISequenceIterator IContextMappingFunction(IXPathContext context);
+    internal delegate ISequenceIterator IContextMappingFunction(IXPathContext context);
 }

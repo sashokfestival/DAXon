@@ -22,7 +22,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Events
 {
-    public class TreeReceiver : SequenceReceiver
+    internal class TreeReceiver : SequenceReceiver
     {
         private readonly IReceiver nextReceiver;
         private int level = 0;

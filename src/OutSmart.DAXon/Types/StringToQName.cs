@@ -13,7 +13,7 @@ using OutSmart.DAXon.Text;
 
 namespace OutSmart.DAXon.Types
 {
-    public class StringToQName : StringConverter
+    internal class StringToQName : StringConverter
     {
         private readonly StringConverter inner;
         public StringToQName() { }

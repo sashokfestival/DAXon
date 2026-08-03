@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Xslt
 {
-    public class TextValueTemplateContext : ExpressionContext
+    internal class TextValueTemplateContext : ExpressionContext
     {
         TextValueTemplateNode textNode;
         public TextValueTemplateContext(StyleElement parent, TextValueTemplateNode textNode) : base(parent, null)

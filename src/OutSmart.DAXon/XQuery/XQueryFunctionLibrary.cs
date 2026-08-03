@@ -346,7 +346,7 @@ namespace OutSmart.DAXon.XQuery
             return qfl;
         }
 
-        public class UnresolvedCallable : IUserFunctionResolvable, ICallable
+        internal class UnresolvedCallable : IUserFunctionResolvable, ICallable
         {
             SymbolicName.F symbolicName;
             UserFunction function;

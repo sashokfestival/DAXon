@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the fn:starts-with() function, with the collation already known
     /// </summary>
-    public class StartsWith : CollatingFunctionFixed
+    internal class StartsWith : CollatingFunctionFixed
     {
 
         public static Func<StartsWith> New() => () => new StartsWith();

@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class TailIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
+    internal class TailIterator : ISequenceIterator, ILastPositionFinder, ILookaheadIterator
     {
         private readonly ISequenceIterator @base;
         private readonly int start;

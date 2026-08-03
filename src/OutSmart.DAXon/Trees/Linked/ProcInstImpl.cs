@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Trees.Linked
 {
     // Was a fully hollow shell (target and data dropped on construction, kind/copy/string-value
     // all NIE): a processing-instruction in a linked tree crashed on first real use.
-    public class ProcInstImpl : NodeImpl
+    internal class ProcInstImpl : NodeImpl
     {
         private string target = "";
         private UnicodeString content = EmptyUnicodeString.GetInstance();

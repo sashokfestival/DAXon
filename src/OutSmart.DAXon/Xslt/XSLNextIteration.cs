@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:next-iteration element in the stylesheet
     /// </summary>
-    public class XSLNextIteration : XSLBreakOrContinue
+    internal class XSLNextIteration : XSLBreakOrContinue
     {
         public override void Validate(ComponentDeclaration decl)
         {

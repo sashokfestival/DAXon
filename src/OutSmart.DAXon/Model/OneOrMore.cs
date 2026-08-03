@@ -16,7 +16,7 @@ using System.Text;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class OneOrMore<T> : ZeroOrMore<T>
+    internal class OneOrMore<T> : ZeroOrMore<T>
     {
         public OneOrMore(T[] content) : base(content.ToList())
         {

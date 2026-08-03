@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal.Collections;
 using System.IO;
 namespace OutSmart.DAXon.Text
 {
-    public class Slice16 : UnicodeString
+    internal class Slice16 : UnicodeString
     {
         private char[] chars;
         private int start;

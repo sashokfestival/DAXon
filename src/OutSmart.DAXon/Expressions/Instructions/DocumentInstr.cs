@@ -29,7 +29,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class DocumentInstr : ParentNodeConstructor
+    internal class DocumentInstr : ParentNodeConstructor
     {
         private readonly bool textOnly;
         private readonly UnicodeString constantText;
@@ -245,7 +245,7 @@ UnicodeString ConstantText => constantText;
             return new DocumentInstrElaborator();
         }
 
-        public class DocumentInstrElaborator : PushElaborator
+        internal class DocumentInstrElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
             {

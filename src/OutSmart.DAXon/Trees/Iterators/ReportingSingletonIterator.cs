@@ -9,7 +9,7 @@ using System;
 
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public class ReportingSingletonIterator : ISequenceIterator
+    internal class ReportingSingletonIterator : ISequenceIterator
     {
         public ReportingSingletonIterator() { }
         public ReportingSingletonIterator(object item, object listener) { }

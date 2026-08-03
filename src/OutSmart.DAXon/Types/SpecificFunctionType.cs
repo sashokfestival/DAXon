@@ -25,7 +25,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Types
 {
-    public class SpecificFunctionType : AnyFunctionType
+    internal class SpecificFunctionType : AnyFunctionType
     {
         public static readonly IFunctionItemType COMPONENT_FUNCTION_TYPE = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_STRING }, SequenceType.ANY_SEQUENCE);
         private readonly SequenceType[] argTypes;

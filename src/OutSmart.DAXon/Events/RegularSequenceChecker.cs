@@ -20,7 +20,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Events
 {
-    public class RegularSequenceChecker : ProxyReceiver
+    internal class RegularSequenceChecker : ProxyReceiver
     {
         private static readonly Dictionary<State, Dictionary<Transition, State>> machine = new Dictionary<State, Dictionary<Transition, State>>();
         private readonly Stack<int> stack = new Stack<int>();
@@ -301,7 +301,7 @@ namespace OutSmart.DAXon.Events
                 throw e;
             }
         }
-        public enum State
+        internal enum State
         {
             INITIAL,
             OPEN,

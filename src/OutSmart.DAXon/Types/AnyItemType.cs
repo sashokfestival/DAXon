@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Types
     /// <summary>
     /// An implementation of ItemType that matches any item (node or atomic value)
     /// </summary>
-    public class AnyItemType : IItemTypeWithSequenceTypeCache
+    internal class AnyItemType : IItemTypeWithSequenceTypeCache
     {
 
         private static readonly AnyItemType theInstance = new AnyItemType();

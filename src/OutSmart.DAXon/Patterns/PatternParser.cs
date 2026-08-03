@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Patterns
     /// <summary>
     /// Parser for XSLT patterns. This is created by overriding selected parts of the standard ExpressionParser.
     /// </summary>
-    public class PatternParser : XPathParser
+    internal class PatternParser : XPathParser
     {
         int inPredicate = 0;
         public PatternParser(IStaticContext env) : base(env)

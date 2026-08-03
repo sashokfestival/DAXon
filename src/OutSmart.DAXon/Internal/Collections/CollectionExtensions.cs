@@ -27,7 +27,7 @@ namespace OutSmart.DAXon.Internal.Collections
     /// extension) carry an "AndGet"/"AndReturnTrue" suffix; CollectionsModernizer rewrites
     /// the affected call sites (only where the result is actually consumed) to these names.
     /// </summary>
-    public static class CollectionExtensions
+    internal static class CollectionExtensions
     {
         // ------------------------------------------------------------------ IList<T>
 

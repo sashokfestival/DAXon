@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public sealed class LastItemExpression : SingleItemFilter
+    internal sealed class LastItemExpression : SingleItemFilter
     {
 
         public override int ImplementationMethod => EVALUATE_METHOD;
@@ -97,7 +97,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a "last item expression" (typically {@code SEQ[last()]})
         /// </summary>
-        public class LastItemExprElaborator : ItemElaborator
+        internal class LastItemExprElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

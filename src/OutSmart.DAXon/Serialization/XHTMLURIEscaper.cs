@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Serialization
     /// is the same as the HTML output method, but the way in which attributes are identified for escaping
     /// is different, because XHTML is case-sensitive.
     /// </summary>
-    public class XHTMLURIEscaper : HTMLURIEscaper
+    internal class XHTMLURIEscaper : HTMLURIEscaper
     {
         /// <summary>
         /// Table of attributes whose value is a URL

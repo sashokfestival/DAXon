@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Model
     /// <summary>
     /// A value that is a sequence containing zero or one items.
     /// </summary>
-    public class ZeroOrOne<T> : IGroundedValue
+    internal class ZeroOrOne<T> : IGroundedValue
     {
         private static readonly ZeroOrOne<object> EMPTY = new ZeroOrOne<object>(null);
         private readonly T item; // may be null, to represent an empty sequence

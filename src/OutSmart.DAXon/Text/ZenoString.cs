@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using System.IO;
 namespace OutSmart.DAXon.Text
 {
-    public class ZenoString : UnicodeString
+    internal class ZenoString : UnicodeString
     {
 
         public static readonly ZenoString EMPTY = new ZenoString();

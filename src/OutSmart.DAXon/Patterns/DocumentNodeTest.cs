@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Patterns
     // This is messy because the standard interface for a NodeTest does not allow
     // any navigation from the node in question - it only tests for the node kind,
     // node name, and type annotation of the node.
-    public class DocumentNodeTest : NodeTest
+    internal class DocumentNodeTest : NodeTest
     {
         private readonly NodeTest elementTest;
 

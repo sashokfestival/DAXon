@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal;
 using System.IO;
 namespace OutSmart.DAXon.Lib
 {
-    public class StandardErrorReporter : StandardDiagnostics, IErrorReporter
+    internal class StandardErrorReporter : StandardDiagnostics, IErrorReporter
     {
         private int warningCount = 0;
         private int maximumNumberOfWarnings = 25;
@@ -113,11 +113,53 @@ namespace OutSmart.DAXon.Lib
             return suppressedWarnings != null && suppressedWarnings.Contains(errorCode);
         }
 
+        // ONE instance of this reporter is shared by every XsltCompiler and every compilation made
+        // from a Processor: CompilerInfo's copy constructor copies the reference, and both
+        // `new XsltCompiler(...)` and each Compile() go through it. So everything below is
+        // per-PROCESSOR state being used to make per-COMPILATION decisions, which is why the
+        // counters are reset per episode (StartCompilationEpisode) and mutated under a lock.
+        private readonly object counterLock = new object();
+
+        /// <summary>
+        /// Begin a new compilation episode: the error and warning budgets are per compilation,
+        /// not per Processor lifetime.
+        /// </summary>
+        /// <remarks>
+        /// Without this the budget accumulated forever on a shared reporter. Measured: one
+        /// Processor, the same two-error stylesheet compiled repeatedly, and compile 501 (= 1000
+        /// errors = maximumNumberOfErrors) got "Too many errors reported" attached to its FIRST
+        /// error - which Compilation.ReportError turns into an XmlProcessingAbort, so the host was
+        /// told "too many errors" about a stylesheet with two, and got one diagnostic instead of
+        /// the full list. That undid what round C1 bought on any long-lived Processor.
+        /// </remarks>
+        internal void StartCompilationEpisode()
+        {
+            lock (counterLock)
+            {
+                errorCount = 0;
+                warningCount = 0;
+                latestError = null;
+            }
+
+            lock (warningsIssued)
+            {
+                warningsIssued.Clear();
+            }
+        }
+
         public void Report(IXmlProcessingError processingError)
         {
-            if (processingError != latestError)
+            // The dedup is "do not report the same object twice in a row"; on a shared reporter
+            // another thread's report used to be able to sit between a repeat and its original.
+            bool fresh;
+            lock (counterLock)
             {
-                latestError = processingError;
+                fresh = processingError != latestError;
+                if (fresh) { latestError = processingError; }
+            }
+
+            if (fresh)
+            {
                 if (processingError.IsWarning())
                 {
                     if (processingError.GetErrorCode() == null || !IsSuppressedWarning(processingError.GetErrorCode().GetStructuredQName()))
@@ -141,40 +183,42 @@ namespace OutSmart.DAXon.Lib
 
             string message = ConstructMessage(error, "", "Warning ");
 
-            // Locked (round BG-P3): ONE StandardErrorReporter sits on the Configuration's default
-            // compiler info and every XsltCompiler shares it by reference, so concurrent compiles
-            // used to race a bare HashSet. Cold path - warnings are compile diagnostics.
+            // Locked (round BG-P3): concurrent compiles used to race a bare HashSet on the shared
+            // reporter. Cold path - warnings are compile diagnostics.
+            bool announceCap = false;
+            bool display = false;
             lock (warningsIssued)
             {
                 if (!warningsIssued.Contains(message))
                 {
-                    if (warningCount > MaximumNumberOfWarnings)
+                    lock (counterLock)
                     {
-                        if (warningCount == MaximumNumberOfWarnings + 1)
+                        if (warningCount > maximumNumberOfWarnings)
                         {
-                            logger.Info("No more warnings will be displayed");
+                            announceCap = warningCount == maximumNumberOfWarnings + 1;
                         }
-                    }
-                    else
-                    {
-                        logger.Warning(message);
+                        else
+                        {
+                            display = true;
+                        }
+
+                        warningCount++;
                     }
 
-                    warningCount++;
-
-                    // The set exists to dedup what is DISPLAYED, and this reporter lives as long as
-                    // the Processor - so once display has permanently stopped, remembering further
-                    // texts would only grow the set by one full formatted message per distinct
-                    // warning ever seen (each embeds systemId+line, i.e. per stylesheet compiled)
-                    // for the life of the process. Bounded at the display cap instead; the price is
-                    // that post-cap repeats re-enter this block and inflate NumberOfWarnings, which
-                    // no longer drives any behavior at that point.
-                    if (warningCount <= MaximumNumberOfWarnings + 1)
+                    // The set exists to dedup what is DISPLAYED. Since round 10 it is also cleared
+                    // per compilation episode, so the growth this cap was added to bound is gone on
+                    // the compile path; the cap stays as the backstop for any reporter that is
+                    // never told an episode started.
+                    if (warningCount <= maximumNumberOfWarnings + 1)
                     {
                         warningsIssued.Add(message);
                     }
                 }
             }
+
+            // Outside the lock: logger is host code and may block.
+            if (announceCap) { logger.Info("No more warnings will be displayed"); }
+            else if (display) { logger.Warning(message); }
         }
 
         public virtual bool IsReportingWarnings()
@@ -184,7 +228,13 @@ namespace OutSmart.DAXon.Lib
 
         protected virtual void Error(IXmlProcessingError err)
         {
-            if (errorCount++ > maximumNumberOfErrors)
+            int reported;
+            lock (counterLock)
+            {
+                reported = errorCount++;
+            }
+
+            if (reported > maximumNumberOfErrors)
             {
                 err.TerminationMessage = "Too many errors reported";
             }
@@ -194,7 +244,24 @@ namespace OutSmart.DAXon.Lib
                 logger = new StandardLogger();
             }
 
-            string message;
+            string message = DescribeError(err);
+            logger.Error(message);
+            if (err is XmlProcessingException)
+            {
+                XPathException exception = ((XmlProcessingException)err).GetXPathException();
+                IXPathContext context = exception.XPathContext;
+                if (context != null && !(context is EarlyEvaluationContext))
+                {
+                    OutputStackTrace(logger, context);
+                }
+            }
+        }
+
+        // The full two-line diagnostic the logger emits. Public because a failed compile must
+        // be able to attach the same text to the exception it throws (round C1) - the logger's
+        // own channel is Console.Error by default, which an embedded host cannot read.
+        public virtual string DescribeError(IXmlProcessingError err)
+        {
             HostLanguage lang = err.GetHostLanguage();
             string langText = "";
             if (lang != HostLanguage.UNKNOWN)
@@ -228,17 +295,7 @@ namespace OutSmart.DAXon.Lib
                 kind = "Static error ";
             }
 
-            message = ConstructMessage(err, langText, kind);
-            logger.Error(message);
-            if (err is XmlProcessingException)
-            {
-                XPathException exception = ((XmlProcessingException)err).GetXPathException();
-                IXPathContext context = exception.XPathContext;
-                if (context != null && !(context is EarlyEvaluationContext))
-                {
-                    OutputStackTrace(logger, context);
-                }
-            }
+            return ConstructMessage(err, langText, kind);
         }
 
         public virtual string ConstructMessage(IXmlProcessingError exception, string langText, string kind)

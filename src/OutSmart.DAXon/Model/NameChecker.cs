@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Model
 {
-    public abstract class NameChecker
+    internal abstract class NameChecker
     {
         public static bool IsQName(IIntIterator codePoints)
         {

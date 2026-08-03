@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Trees.Utilities
 {
-    public sealed class Orphan : IMutableNodeInfo
+    internal sealed class Orphan : IMutableNodeInfo
     {
         private short kind;
         private INodeName nodeName = null;

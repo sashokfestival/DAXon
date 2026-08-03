@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Trees.Tiny
     /// <summary>
     /// A node in the XML parse tree representing a text node with compressed whitespace content
     /// </summary>
-    public sealed class WhitespaceTextImpl : TinyNodeImpl
+    internal sealed class WhitespaceTextImpl : TinyNodeImpl
     {
 
         public override UnicodeString UnicodeStringValue

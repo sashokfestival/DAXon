@@ -27,7 +27,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Functions
 {
-    public class Trace : SystemFunction, ITraceable
+    internal class Trace : SystemFunction, ITraceable
     {
         ILocation location = Loc.NONE;
 

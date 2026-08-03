@@ -14,13 +14,13 @@ namespace OutSmart.DAXon.Events
     // Faithful port of net.sf.saxon.event.OutputterEvent (Saxon 12.9). NEW in the port — needed by the
     // real OutputterEventBuffer (xsl:try rollback buffering).
     // Represents one event passed to an Outputter, retaining enough information to be replayed later.
-    public abstract class OutputterEvent
+    internal abstract class OutputterEvent
     {
         public virtual void Replay(Outputter @out)
         {
         }
 
-        public class StartDocument : OutputterEvent
+        internal class StartDocument : OutputterEvent
         {
             internal readonly int properties;
             public StartDocument(int properties)
@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class EndDocument : OutputterEvent
+        internal class EndDocument : OutputterEvent
         {
             public override void Replay(Outputter @out)
             {
@@ -42,7 +42,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class StartElement : OutputterEvent
+        internal class StartElement : OutputterEvent
         {
             internal readonly INodeName name;
             internal readonly ISchemaType type;
@@ -63,7 +63,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class Attribute : OutputterEvent
+        internal class Attribute : OutputterEvent
         {
             internal readonly INodeName name;
             internal readonly ISimpleType type;
@@ -86,7 +86,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class Namespace : OutputterEvent
+        internal class Namespace : OutputterEvent
         {
             internal readonly string prefix;
             internal readonly NamespaceUri uri;
@@ -105,7 +105,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class StartContent : OutputterEvent
+        internal class StartContent : OutputterEvent
         {
             public override void Replay(Outputter @out)
             {
@@ -113,7 +113,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class EndElement : OutputterEvent
+        internal class EndElement : OutputterEvent
         {
             public override void Replay(Outputter @out)
             {
@@ -121,7 +121,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class Text : OutputterEvent
+        internal class Text : OutputterEvent
         {
             internal readonly UnicodeString content;
             internal readonly ILocation location;
@@ -140,7 +140,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class Comment : OutputterEvent
+        internal class Comment : OutputterEvent
         {
             internal readonly UnicodeString content;
             internal readonly ILocation location;
@@ -159,7 +159,7 @@ namespace OutSmart.DAXon.Events
             }
         }
 
-        public class ProcessingInstruction : OutputterEvent
+        internal class ProcessingInstruction : OutputterEvent
         {
             internal readonly string target;
             internal readonly UnicodeString content;
@@ -184,7 +184,7 @@ namespace OutSmart.DAXon.Events
         /// An arbitrary item sent to the event stream in composed form (an atomic value,
         /// or an entire element or document).
         /// </summary>
-        public class Append : OutputterEvent
+        internal class Append : OutputterEvent
         {
             internal readonly IItem item;
             internal readonly ILocation location;

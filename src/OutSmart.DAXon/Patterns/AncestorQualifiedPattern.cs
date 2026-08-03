@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Patterns
     // match pattern -> NRE at PatternParser.ParsePattern:192. Now a real Pattern subclass; csproj keeps the
     // transpiled AncestorQualifiedPattern.cs excluded (re-including it cascades). Depends only on already-
     // compiled types. Construction sites (3-arg): SlashExpression:1383, PackageLoaderHE:6367.
-    public sealed class AncestorQualifiedPattern : Pattern
+    internal sealed class AncestorQualifiedPattern : Pattern
     {
         private Pattern basePattern;
         private Pattern upperPattern;

@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// fn:string-join(string* $sequence, string $separator)
     /// </summary>
-    public class StringJoin : FoldingFunction, IPushableFunction
+    internal class StringJoin : FoldingFunction, IPushableFunction
     {
         private bool returnEmptyIfEmpty;
 

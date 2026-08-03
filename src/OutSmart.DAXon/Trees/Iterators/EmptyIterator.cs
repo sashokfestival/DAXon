@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Iterators
 {
-    public class EmptyIterator : ISequenceIterator, IReversibleIterator, ILastPositionFinder, IGroundedIterator, ILookaheadIterator, IAtomizedValueIterator
+    internal class EmptyIterator : ISequenceIterator, IReversibleIterator, ILastPositionFinder, IGroundedIterator, ILookaheadIterator, IAtomizedValueIterator
     {
         private static readonly EmptyIterator theInstance = new EmptyIterator();
 

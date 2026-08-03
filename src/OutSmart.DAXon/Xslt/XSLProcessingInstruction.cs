@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:processing-instruction element in the stylesheet.
     /// </summary>
-    public class XSLProcessingInstruction : XSLLeafNodeConstructor
+    internal class XSLProcessingInstruction : XSLLeafNodeConstructor
     {
         Expression name;
 

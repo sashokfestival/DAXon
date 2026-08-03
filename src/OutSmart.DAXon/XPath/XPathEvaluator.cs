@@ -23,7 +23,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.XPath
 {
-    public class XPathEvaluator
+    internal class XPathEvaluator
     {
         private IXPathStaticContext staticContext;
 

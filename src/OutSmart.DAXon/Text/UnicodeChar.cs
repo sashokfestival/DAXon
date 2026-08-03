@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Text
     /// <summary>
     /// A UnicodeString containing a single codepoint
     /// </summary>
-    public class UnicodeChar : UnicodeString
+    internal class UnicodeChar : UnicodeString
     {
         private readonly int codepoint;
 

@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Trees.Wrappers
     // WRONG namespace OutSmart.DAXon.Core, root of src) whose IsPreservedNode always returned true.
     // A view of a node in a virtual tree with whitespace text nodes stripped: axis iterations skip
     // whitespace-only text nodes that xsl:strip-space says should be absent.
-    public class SpaceStrippedNode : AbstractVirtualNode, IWrappingFunction
+    internal class SpaceStrippedNode : AbstractVirtualNode, IWrappingFunction
     {
 
         public override UnicodeString UnicodeStringValue

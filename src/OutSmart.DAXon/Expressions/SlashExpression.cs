@@ -979,7 +979,7 @@ namespace OutSmart.DAXon.Expressions
         /// <summary>
         /// Elaborator for a slash expression. (This actually corresponds to the "!" @operator, not to "/")
         /// </summary>
-        public class SlashExprElaborator : PullElaborator
+        internal class SlashExprElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

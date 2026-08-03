@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Collections
     /// <summary>
     /// An iterator over a single integer repeated a fixed number of times
     /// </summary>
-    public class IntRepeatIterator : AbstractIntIterator
+    internal class IntRepeatIterator : AbstractIntIterator
     {
         private readonly int value;
         private int count;

@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Values
     // (decimal/float -> double for a declared xs:double) silently produced no conversion — a function
     // declared `as xs:double` returned the raw xs:decimal (K2-FunctionProlog-7 family). Mirrors upstream
     // Converter.PromoterToDouble (Converter.java:734).
-    public class PromoterToDouble : Converter
+    internal class PromoterToDouble : Converter
     {
         public PromoterToDouble() { }
         public PromoterToDouble(object rules) { }

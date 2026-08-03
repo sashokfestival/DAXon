@@ -14,7 +14,7 @@ namespace OutSmart.DAXon.Collections
     // Set difference of two int predicates: matches value iff p1 matches AND p2 does NOT.
     // Was a hollow stub returning `a` (ignoring b), which broke regex character-class subtraction
     // for predicate-backed classes like `[\w-[b-y]]` (\w has no explicit IntSet -> the predicate path).
-    public class IntExceptPredicate : IIntPredicateProxy
+    internal class IntExceptPredicate : IIntPredicateProxy
     {
         private readonly IIntPredicateProxy p1;
         private readonly IIntPredicateProxy p2;

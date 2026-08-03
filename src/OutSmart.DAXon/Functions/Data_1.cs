@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implement XPath function fn:data() with a single argument
     /// </summary>
-    public class Data_1 : SystemFunction
+    internal class Data_1 : SystemFunction
     {
 
         public static Func<Data_1> New() => () => new Data_1();

@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the document-uri() function
     /// </summary>
-    public class DocumentUri_1 : ScalarSystemFunction
+    internal class DocumentUri_1 : ScalarSystemFunction
     {
 
         public static Func<DocumentUri_1> New() => () => new DocumentUri_1();

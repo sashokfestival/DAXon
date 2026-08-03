@@ -26,7 +26,7 @@ using OutSmart.DAXon.Types;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Values.Arrays
 {
-    public class SquareArrayConstructor : Expression, IPingable
+    internal class SquareArrayConstructor : Expression, IPingable
     {
         private OperandArray operanda;
         private double numberOfCalls = 0;

@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the round-to-half-even() function
     /// </summary>
-    public sealed class RoundHalfToEven : SystemFunction
+    internal sealed class RoundHalfToEven : SystemFunction
     {
 
         public static Func<RoundHalfToEven> New() => () => new RoundHalfToEven();
@@ -67,7 +67,7 @@ namespace OutSmart.DAXon.Functions
             return new RoundHalfToEvenElaborator();
         }
 
-        public class RoundHalfToEvenElaborator : ItemElaborator
+        internal class RoundHalfToEvenElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

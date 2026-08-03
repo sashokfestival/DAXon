@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public abstract class StaticContextAccessor : SystemFunction
+    internal abstract class StaticContextAccessor : SystemFunction
     {
         public abstract AtomicValue Evaluate(RetainedStaticContext rsc);
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Implement the XPath function default-collation()
         /// </summary>
-        public class DefaultCollation : StaticContextAccessor
+        internal class DefaultCollation : StaticContextAccessor
         {
             public override AtomicValue Evaluate(RetainedStaticContext rsc)
             {

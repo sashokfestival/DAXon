@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Functions
 {
-    public class UnparsedTextAvailable : UnparsedTextFunction, ICallable
+    internal class UnparsedTextAvailable : UnparsedTextFunction, ICallable
     {
 
         public static Func<UnparsedTextAvailable> New() => () => new UnparsedTextAvailable();

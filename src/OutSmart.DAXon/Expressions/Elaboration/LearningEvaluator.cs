@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
-    public class LearningEvaluator : ISequenceEvaluator
+    internal class LearningEvaluator : ISequenceEvaluator
     {
         private const int EVAL_LIMIT = 20;
         private readonly Expression expression;

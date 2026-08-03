@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Trees.Wrappers
 {
-    public interface IVirtualNode : NodeInfo
+    internal interface IVirtualNode : NodeInfo
     {
         object UnderlyingNode { get; }
         object RealNode { get; }

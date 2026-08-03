@@ -40,7 +40,7 @@ namespace OutSmart.DAXon.Regex
     /// <summary>
     /// A class that holds compiled regular expressions.
     /// </summary>
-    public class REProgram
+    internal class REProgram
     {
         public const int OPT_HASBACKREFS = 1;
         public const int OPT_HASBOL = 2;

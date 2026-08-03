@@ -27,7 +27,7 @@ using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Expressions.Instructions
 {
-    public class Block : Instruction
+    internal class Block : Instruction
     {
         private readonly Operand[] operanda;
         private bool allNodesUntyped;
@@ -757,13 +757,13 @@ namespace OutSmart.DAXon.Expressions.Instructions
         }
 
         // no-op
-        public interface IChainAction
+        internal interface IChainAction
         {
             ZenoSequence Perform(ZenoSequence @in, IXPathContext context);
         }
 
         // no-op
-        public class BlockElaborator : PullElaborator
+        internal class BlockElaborator : PullElaborator
         {
             public override ISequenceEvaluator Lazily(bool repeatable, bool lazyEvaluationRequired)
             {

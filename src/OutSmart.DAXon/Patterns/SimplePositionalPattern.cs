@@ -16,7 +16,7 @@ namespace OutSmart.DAXon.Patterns
     // Faithful port of net.sf.saxon.pattern.SimplePositionalPattern (Saxon 12.9). Was a hollow stub whose
     // implicit conversion to Pattern threw, so match="x[3]" (literal integer predicate) crashed at compile.
     // A pattern of the form A[N] where A is an axis step with a node test and N is a numeric literal.
-    public sealed class SimplePositionalPattern : Pattern
+    internal sealed class SimplePositionalPattern : Pattern
     {
         private readonly NodeTest nodeTest;
         private readonly int position;

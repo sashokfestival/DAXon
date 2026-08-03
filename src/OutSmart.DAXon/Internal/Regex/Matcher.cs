@@ -9,7 +9,7 @@ namespace OutSmart.DAXon.Internal.Regex
     using SysMatch = global::System.Text.RegularExpressions.Match;
     using SysGroup = global::System.Text.RegularExpressions.Group;
 
-    public sealed class Matcher
+    internal sealed class Matcher
     {
         private readonly Pattern _pattern;
         private readonly string _input;

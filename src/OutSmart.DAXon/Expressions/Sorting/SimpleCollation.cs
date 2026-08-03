@@ -21,7 +21,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
     /// <summary>
     /// A simple collation that just wraps a supplied Comparator
     /// </summary>
-    public class SimpleCollation : IStringCollator
+    internal class SimpleCollation : IStringCollator
     {
         private static readonly IPlatform platform = Core.Version.platform;
         private IComparer<string> comparator;

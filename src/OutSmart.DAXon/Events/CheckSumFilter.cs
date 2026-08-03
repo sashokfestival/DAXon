@@ -24,7 +24,7 @@ using System.IO;
 
 namespace OutSmart.DAXon.Events
 {
-    public class CheckSumFilter : ProxyReceiver
+    internal class CheckSumFilter : ProxyReceiver
     {
         public const string SIGMA = "Σ";
         public const string SIGMA2 = "Σ2";

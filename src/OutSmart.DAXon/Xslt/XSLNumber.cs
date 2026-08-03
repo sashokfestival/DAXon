@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Xslt
     /// <summary>
     /// An xsl:number element in the stylesheet. <br>
     /// </summary>
-    public class XSLNumber : StyleElement
+    internal class XSLNumber : StyleElement
     {
         private int level;
         private Patterns.Pattern count = null;

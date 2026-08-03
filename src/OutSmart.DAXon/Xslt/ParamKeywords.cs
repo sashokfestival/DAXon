@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Xslt
 {
-    public static class ParamKeywords
+    internal static class ParamKeywords
     {
         public static readonly HashSet<string> ALL = new HashSet<string>();
     }

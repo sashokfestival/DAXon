@@ -37,7 +37,6 @@ namespace OutSmart.DAXon.Trees.Utilities
         {
             return items.Count;
         }
-        public int size() => items.Count;
 
         public virtual bool IsEmpty()
         {

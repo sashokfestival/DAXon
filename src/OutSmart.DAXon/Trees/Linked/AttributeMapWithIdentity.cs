@@ -18,7 +18,7 @@ using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Trees.Linked
 {
-    public class AttributeMapWithIdentity : IAttributeMap
+    internal class AttributeMapWithIdentity : IAttributeMap
     {
         private readonly IList<AttributeInfo> attributes;
         public AttributeMapWithIdentity(IList<AttributeInfo> attributes)

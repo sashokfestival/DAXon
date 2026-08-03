@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implements the fn:contains() function, with the collation already known
     /// </summary>
-    public class Contains : CollatingFunctionFixed
+    internal class Contains : CollatingFunctionFixed
     {
 
         public static Func<Contains> New() => () => new Contains();
@@ -63,7 +63,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Expression elaborator for a call to contains(), starts-with(), or ends-with()
         /// </summary>
-        public class ContainsFnElaborator : BooleanElaborator
+        internal class ContainsFnElaborator : BooleanElaborator
         {
             public override IBooleanEvaluator ElaborateForBoolean()
             {

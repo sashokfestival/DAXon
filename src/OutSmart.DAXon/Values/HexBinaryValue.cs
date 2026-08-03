@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.Values
     /// <summary>
     /// A value of type xs:hexBinary
     /// </summary>
-    public class HexBinaryValue : AtomicValue, IAtomicMatchKey, IXPathComparable, IContextFreeAtomicValue
+    internal class HexBinaryValue : AtomicValue, IAtomicMatchKey, IXPathComparable, IContextFreeAtomicValue
     {
         private readonly byte[] binaryValue;
 

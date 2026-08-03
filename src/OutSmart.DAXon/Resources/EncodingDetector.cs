@@ -12,7 +12,7 @@ using OutSmart.DAXon.Model;
 namespace OutSmart.DAXon.Resources
 {
     // EncodingDetector stub - real class excluded.
-    public static class EncodingDetector
+    internal static class EncodingDetector
     {
         public static string InferStreamEncoding(object stream, string defaultEnc, object opts) => defaultEnc;
     }

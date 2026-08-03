@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the function fn:encode-for-uri()
     /// </summary>
-    public class EncodeForUri : ScalarSystemFunction
+    internal class EncodeForUri : ScalarSystemFunction
     {
 
         private static readonly string hex = "0123456789ABCDEF";

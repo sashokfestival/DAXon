@@ -19,7 +19,7 @@ namespace OutSmart.DAXon.Types
     /// ToUntypedAtomicConverter -> makeUntypedAtomic). Real subclasses (StringConverter.StringToString etc.)
     /// still dispatch via the dynamic call and take the early return -> their behaviour is unchanged.
     /// </summary>
-    public static class PhaseBConverters
+    internal static class PhaseBConverters
     {
         public static IConversionResult Convert(Converter conv, AtomicValue item)
         {

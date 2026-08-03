@@ -22,7 +22,7 @@ using OutSmart.DAXon.Core;
 using System.IO;
 namespace OutSmart.DAXon.Lib
 {
-    public class StandardResultDocumentResolver : IResultDocumentResolver
+    internal class StandardResultDocumentResolver : IResultDocumentResolver
     {
         private static readonly StandardResultDocumentResolver theInstance = new StandardResultDocumentResolver();
         public static StandardResultDocumentResolver GetInstance()

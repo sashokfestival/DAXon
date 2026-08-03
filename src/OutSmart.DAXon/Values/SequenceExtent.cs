@@ -23,7 +23,7 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Values
 {
-    public abstract class SequenceExtent : IGroundedValue
+    internal abstract class SequenceExtent : IGroundedValue
     {
         public abstract UnicodeString UnicodeStringValue { get; }
         public static Of<IItem> From(ISequenceIterator iter)
@@ -92,7 +92,7 @@ namespace OutSmart.DAXon.Values
         }
         // A SequenceExtent is an in-memory grounded value - already repeatable (upstream default).
         public virtual ISequence MakeRepeatable() => this;
-        public class Of<T> : SequenceExtent, IEnumerable<T> where T : IItem
+        internal class Of<T> : SequenceExtent, IEnumerable<T> where T : IItem
         {
             private IList<T> items;
 

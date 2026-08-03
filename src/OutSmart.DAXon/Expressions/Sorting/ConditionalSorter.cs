@@ -25,7 +25,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Sorting
 {
-    public class ConditionalSorter : Expression
+    internal class ConditionalSorter : Expression
     {
 
         private static readonly OperandRole DOC_SORTER_ROLE = new OperandRole(OperandRole.CONSTRAINED_CLASS, OperandUsage.TRANSMISSION, SequenceType.ANY_SEQUENCE, (expr) => expr is DocumentSorter);
@@ -172,7 +172,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
         // IRewriteAction interface->delegate.
         private delegate Expression IRewriteAction(Expression e);
 
-        public class ConditionalSorterElaborator : PullElaborator
+        internal class ConditionalSorterElaborator : PullElaborator
         {
             public override IPullEvaluator ElaborateForPull()
             {

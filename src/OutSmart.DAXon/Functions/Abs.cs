@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class implements the fn:abs() function
     /// </summary>
-    public sealed class Abs : ScalarSystemFunction
+    internal sealed class Abs : ScalarSystemFunction
     {
 
         public static Func<Abs> New() => () => new Abs();
@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Functions
             return new AbsElaborator();
         }
 
-        public class AbsElaborator : ItemElaborator
+        internal class AbsElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

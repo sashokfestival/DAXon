@@ -35,11 +35,11 @@ namespace OutSmart.DAXon.Patterns
     /// <summary>
     /// Class for handling patterns with simple non-positional boolean predicates
     /// </summary>
-    public class BasePatternWithPredicate : Pattern, IPatternWithPredicate
+    internal class BasePatternWithPredicate : Pattern, IPatternWithPredicate
     {
         Operand basePatternOp;
         Operand predicateOp;
-        IBooleanEvaluator predicateEvaluator;
+        volatile IBooleanEvaluator predicateEvaluator;   // volatile: published once, read per node match (round 11)
 
         public Expression Predicate => predicateOp.GetChildExpression();
 

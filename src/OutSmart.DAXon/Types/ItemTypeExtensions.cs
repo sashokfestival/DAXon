@@ -18,7 +18,7 @@ namespace OutSmart.DAXon.Types
     // Extension methods for ItemType -- provide stubs that callers can invoke
     // without each implementer having to declare them. Lives in OutSmart.DAXon.Internal (which
     // is implicitly imported by every Saxon file).
-    public static class ItemTypeExtensions
+    internal static class ItemTypeExtensions
     {
         // GetUType moved to Saxon side (excluded stubs.cs) where UType is accessible.
         // Removed `public static object GetUType(this ItemType t) => null;` -- object return broke 42 sites.

@@ -15,7 +15,7 @@ namespace OutSmart.DAXon.Patterns
     // Faithful port of net.sf.saxon.pattern.IntersectPattern (Saxon 12.9). Was a hollow stub whose implicit
     // conversion to Pattern returned NULL (not even a throw) — same silent-null family as ExceptPattern.
     // A pattern formed as the intersection of two other patterns.
-    public class IntersectPattern : VennPattern
+    internal class IntersectPattern : VennPattern
     {
 
         /// <summary>

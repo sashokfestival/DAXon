@@ -17,7 +17,7 @@ namespace OutSmart.DAXon.Types
     /// <summary>
     /// Interface representing a simple type of variety List
     /// </summary>
-    public interface IListType : ISimpleType, ICastingTarget
+    internal interface IListType : ISimpleType, ICastingTarget
     {
         ISimpleType GetItemType();
     }

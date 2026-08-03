@@ -28,7 +28,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
     /// <summary>
     /// An IterateInstr is the compiled form of an xsl:iterate instruction
     /// </summary>
-    public sealed class IterateInstr : Instruction, IContextSwitchingExpression
+    internal sealed class IterateInstr : Instruction, IContextSwitchingExpression
     {
         private readonly Operand selectOp;
         private readonly Operand actionOp;
@@ -235,7 +235,7 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new IterateElaborator();
         }
 
-        public class IterateElaborator : PushElaborator
+        internal class IterateElaborator : PushElaborator
         {
             public override IPushEvaluator ElaborateForPush()
             {

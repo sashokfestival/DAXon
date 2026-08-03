@@ -11,7 +11,7 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Events
 {
-    public class AttributeCollectionImpl
+    internal class AttributeCollectionImpl
     {
         public AttributeCollectionImpl() { }
         public AttributeCollectionImpl(object a, object b) { }

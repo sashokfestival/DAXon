@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// Implementation of the fn:empty function
     /// </summary>
-    public class Empty : Aggregate
+    internal class Empty : Aggregate
     {
 
         // Rewrite

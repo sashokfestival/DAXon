@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class ItemMappingIterator : ISequenceIterator, ILookaheadIterator, ILastPositionFinder
+    internal class ItemMappingIterator : ISequenceIterator, ILookaheadIterator, ILastPositionFinder
     {
         private readonly ISequenceIterator @base;
         private readonly IItemMappingFunction action;

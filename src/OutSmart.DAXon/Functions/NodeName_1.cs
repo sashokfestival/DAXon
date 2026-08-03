@@ -22,7 +22,7 @@ namespace OutSmart.DAXon.Functions
     /// <summary>
     /// This class supports the node-name() function with a single argument
     /// </summary>
-    public class NodeName_1 : ScalarSystemFunction
+    internal class NodeName_1 : ScalarSystemFunction
     {
 
         public static Func<NodeName_1> New() => () => new NodeName_1();
@@ -55,7 +55,7 @@ namespace OutSmart.DAXon.Functions
         /// <summary>
         /// Elaborator for the fn:node-name() function
         /// </summary>
-        public class NodeNameFnElaborator : ItemElaborator
+        internal class NodeNameFnElaborator : ItemElaborator
         {
             public override IItemEvaluator ElaborateForItem()
             {

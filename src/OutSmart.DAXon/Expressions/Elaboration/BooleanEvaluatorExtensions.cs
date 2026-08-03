@@ -17,7 +17,7 @@ using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions.Elaboration
 {
 
-    public static class BooleanEvaluatorExtensions
+    internal static class BooleanEvaluatorExtensions
     {
         public static bool Eval(this IBooleanEvaluator e, IXPathContext context) => e == null ? default : e(context);
     }

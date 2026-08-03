@@ -20,7 +20,7 @@ namespace OutSmart.DAXon.Functions
  * in turn, maintaining working data as the items are processed, and finally computing
  * the final result of the expression from the value of the working data.
  */
-    public interface IFold
+    internal interface IFold
     {
         void ProcessItem(IItem item);
         bool IsFinished();

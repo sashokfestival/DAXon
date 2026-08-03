@@ -18,7 +18,7 @@ using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal;
 namespace OutSmart.DAXon.Model
 {
-    public class GenericTreeInfo : ITreeInfo
+    internal class GenericTreeInfo : ITreeInfo
     {
         protected internal readonly object syncLock = new object();
         private Configuration config;

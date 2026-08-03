@@ -18,7 +18,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Expressions
 {
-    public class SwitchCaseComparer : GenericAtomicComparer
+    internal class SwitchCaseComparer : GenericAtomicComparer
     {
         public SwitchCaseComparer(IStringCollator collator, IXPathContext context) : base(collator, context)
         {

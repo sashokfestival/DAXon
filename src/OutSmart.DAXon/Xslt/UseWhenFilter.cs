@@ -33,7 +33,7 @@ using OutSmart.DAXon.Internal.Streams;
 using System.IO;
 namespace OutSmart.DAXon.Xslt
 {
-    public class UseWhenFilter : ProxyReceiver
+    internal class UseWhenFilter : ProxyReceiver
     {
         private int depthOfHole = 0;
         private bool emptyStylesheetElement = false;

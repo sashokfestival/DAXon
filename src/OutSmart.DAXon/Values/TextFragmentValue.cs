@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Values
     // threw NotImplementedException, so EVERY text-only temporary tree (<xsl:variable>text</xsl:variable> and the
     // document{} equivalent) crashed — the single most common XSLT pattern in the xslt30-test corpus.
     // A temporary tree whose root document node owns a single text node.
-    public sealed class TextFragmentValue : NodeInfo
+    internal sealed class TextFragmentValue : NodeInfo
     {
         private readonly UnicodeString text;
         private readonly string baseURI;
