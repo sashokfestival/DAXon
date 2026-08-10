@@ -27,8 +27,6 @@ namespace OutSmart.DAXon.Functions
 
         //
         public override string StreamerName => "Remove";
-
-        public static Func<Remove> New() => () => new Remove();
         public override Expression MakeFunctionCall(Expression[] arguments)
         {
             if (Literal.IsAtomic(arguments[1]))

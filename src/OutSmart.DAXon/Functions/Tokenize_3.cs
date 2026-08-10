@@ -21,8 +21,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class Tokenize_3 : RegexFunction
     {
-
-        public static Func<Tokenize_3> New() => () => new Tokenize_3();
         protected override bool AllowRegexMatchingEmptyString()
         {
             return false;

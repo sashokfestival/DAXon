@@ -21,8 +21,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class RegexFunctionSansFlags : SystemFunction
     {
-
-        public static Func<RegexFunctionSansFlags> New() => () => new RegexFunctionSansFlags();
         private SystemFunction AddFlagsArgument()
         {
             RetainedStaticContext rsc = GetRetainedStaticContext();

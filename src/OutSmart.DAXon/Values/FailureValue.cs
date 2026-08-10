@@ -20,10 +20,6 @@ namespace OutSmart.DAXon.Values
     internal class FailureValue : IGroundedValue
     {
         private readonly XPathException error;
-
-        public FailureValue() : this(new XPathException("Evaluation failed")) { }
-        public FailureValue(string err) : this(new XPathException(err ?? "Evaluation failed")) { }
-        public FailureValue(Exception err) : this(err as XPathException ?? new XPathException(err?.Message ?? "Evaluation failed", err)) { }
         public FailureValue(XPathException err) { error = err ?? new XPathException("Evaluation failed"); }
 
         // Every access re-raises the stored error, as upstream: this value IS the failure.
@@ -32,7 +28,6 @@ namespace OutSmart.DAXon.Values
         public UnicodeString UnicodeStringValue => throw Raise();
         public IItem Head() => throw Raise();
         public ISequenceIterator Iterate() => throw Raise();
-        public bool IsEmpty() => throw Raise();
         public IItem ItemAt(int n) => throw Raise();
         public int GetLength() => throw Raise();
         public string GetStringValue() => throw Raise();

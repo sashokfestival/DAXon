@@ -36,14 +36,6 @@ namespace OutSmart.DAXon.Xslt
                 this.match = value;
             }
         }
-
-        public virtual Expression Select
-        {
-            get => select; set
-            {
-                this.select = value;
-            }
-        }
         public override void PrepareAttributes()
         {
             string matchAtt = null;
@@ -142,11 +134,6 @@ namespace OutSmart.DAXon.Xslt
         public virtual bool IsPostDescent()
         {
             return postDescent;
-        }
-
-        public virtual void SetPostDescent(bool postDescent)
-        {
-            this.postDescent = postDescent;
         }
 
         public virtual bool IsCapture()

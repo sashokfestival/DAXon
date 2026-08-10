@@ -1208,7 +1208,8 @@ namespace OutSmart.DAXon.Core
             {
                 ITreeInfo docInfo = start.GetTreeInfo();
                 ISpaceStrippingRule spaceStrippingRule = SpaceStrippingRule;
-                if (docInfo.SpaceStrippingRule != spaceStrippingRule)
+                if (docInfo.SpaceStrippingRule != spaceStrippingRule
+                    && !(docInfo is Trees.Tiny.TinyTree noWs && !noWs.ContainsWhitespaceText()))
                 {
 
                     // if not already space-stripped

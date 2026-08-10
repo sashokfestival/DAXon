@@ -16,12 +16,6 @@ namespace OutSmart.DAXon.Lib
 {
     internal interface DOMLocator
     {
-        int GetLineNumber();
-        int GetColumnNumber();
-        int ByteOffset { get; }
-        int Utf16Offset { get; }
-        object RelatedNode { get; }
-        string GetUri();
         IDOMNode OriginatingNode { get; }
     }
 }

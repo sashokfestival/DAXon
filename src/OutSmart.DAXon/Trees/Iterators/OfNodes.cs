@@ -14,7 +14,6 @@ namespace OutSmart.DAXon.Trees.Iterators
     {
         private readonly N[] _items;
         private int _pos;
-        public OfNodes() { _items = new N[0]; }
         public OfNodes(N[] items) { _items = items ?? new N[0]; }
         public NodeInfo Next() => _pos < _items.Length ? (NodeInfo)(object)_items[_pos++] : null;
         IItem ISequenceIterator.Next() => Next();

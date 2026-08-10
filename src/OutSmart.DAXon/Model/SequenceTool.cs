@@ -116,11 +116,6 @@ namespace OutSmart.DAXon.Model
             }
         }
 
-        public static bool IsUnrepeatable(ISequence seq)
-        {
-            return seq is LazySequence || (seq is Closure && !(seq is MemoClosure || seq is SingletonClosure));
-        }
-
         public static int GetLength(ISequence sequence)
         {
             if (sequence is IGroundedValue)
@@ -129,28 +124,6 @@ namespace OutSmart.DAXon.Model
             }
 
             return Count.CountFn(sequence.Iterate());
-        }
-
-        public static bool HasLength(ISequenceIterator iter, int length)
-        {
-            if (SequenceTool.SupportsGetLength(iter))
-            {
-                return ((ILastPositionFinder)iter).GetLength() == length;
-            }
-            else
-            {
-                int n = 0;
-                while (iter.Next() != null)
-                {
-                    if (n++ == length)
-                    {
-                        iter.Dispose();
-                        return false;
-                    }
-                }
-
-                return length == 0;
-            }
         }
 
         public static bool SameLength(ISequenceIterator a, ISequenceIterator b)
@@ -180,23 +153,6 @@ namespace OutSmart.DAXon.Model
                         return itA == null && itB == null;
                     }
                 }
-            }
-        }
-
-        public static IItem ItemAt(ISequence sequence, int index)
-        {
-            if (sequence is IItem && index == 0)
-            {
-                return (IItem)sequence;
-            }
-
-            try
-            {
-                return sequence.Materialize().ItemAt(index);
-            }
-            catch (XPathException e)
-            {
-                throw new UncheckedXPathException(e);
             }
         }
 
@@ -448,13 +404,6 @@ namespace OutSmart.DAXon.Model
         public static ISequence[] MakeSequenceArray(int length)
         {
             return new ISequence[length];
-        }
-
-        public static ISequence[] FromItems(params IItem[] items)
-        {
-            ISequence[] seq = new ISequence[items.Length];
-            Array.Copy(items, 0, seq, 0, items.Length);
-            return seq;
         }
 
         public static IAttributeMap AttributeMapFromList(IList<AttributeInfo> list)

@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class QNameFn : SystemFunction
     {
-
-        public static Func<QNameFn> New() => () => new QNameFn();
         public static QNameValue ExpandedQName(StringValue @namespace, StringValue lexical)
         {
             string uri;

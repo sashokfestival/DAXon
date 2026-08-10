@@ -33,21 +33,9 @@ namespace OutSmart.DAXon.Model
             this.fingerprint = fingerprint;
         }
 
-        public FingerprintedQName(string prefix, NamespaceUri uri, string localName, NamePool pool)
-        {
-            qName = new StructuredQName(prefix, uri, localName);
-            this.fingerprint = pool.AllocateFingerprint(uri, localName);
-        }
-
         public FingerprintedQName(StructuredQName qName)
         {
             this.qName = qName;
-        }
-
-        public FingerprintedQName(StructuredQName qName, int fingerprint)
-        {
-            this.qName = qName;
-            this.fingerprint = fingerprint;
         }
 
         public FingerprintedQName(StructuredQName qName, NamePool pool)

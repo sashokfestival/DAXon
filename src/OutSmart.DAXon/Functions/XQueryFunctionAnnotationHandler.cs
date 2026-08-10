@@ -24,7 +24,7 @@ namespace OutSmart.DAXon.Functions
         // Must match the real impl: Configuration.Init registers this handler keyed by its assertion
         // namespace, and a null key throws ArgumentNullException from the backing Dictionary. The XQuery
         // 3.0 annotations namespace (per XQueryFunctionAnnotationHandler.cs:102).
-        public NamespaceUri AssertionNamespace => NamespaceUri.Of("http://www.w3.org/2012/xquery");
+        public NamespaceUri AssertionNamespace => NamespaceUri.Of(NamespaceConstant.XQUERY);
         public XQueryFunctionAnnotationHandler() { }
         // Was a hollow no-op, so `%public`/`%private` on an inline function were silently accepted (should
         // be XQST0125). %public/%private are only meaningful on a module-level function ("DF") or variable

@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Functions
     internal class Innermost : SystemFunction
     {
         bool presorted = false;
-
-        public static Func<Innermost> New() => () => new Innermost();
         public override int GetSpecialProperties(Expression[] arguments)
         {
             return StaticProperty.ORDERED_NODESET | StaticProperty.PEER_NODESET;

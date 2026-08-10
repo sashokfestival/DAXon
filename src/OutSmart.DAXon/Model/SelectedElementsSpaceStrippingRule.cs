@@ -29,35 +29,6 @@ namespace OutSmart.DAXon.Model
         private readonly Dictionary<INodeName, Rule> namedElementRules = new Dictionary<INodeName, Rule>(32);
         private int sequence = 0;
         private readonly bool rejectDuplicates; // in XSLT 3.0, duplicate conflicting rules are a static error
-
-        // keep searching other rules of the same precedence and priority
-        public virtual IEnumerator<Rule> RankedRules
-        {
-            get
-            {
-                SortedDictionary<int, Rule> treeMap = new SortedDictionary<int, Rule>();
-                Rule rule = anyElementRule;
-                while (rule != null)
-                {
-                    treeMap[-rule.Rank] = rule;
-                    rule = rule.Next;
-                }
-
-                rule = unnamedElementRuleChain;
-                while (rule != null)
-                {
-                    treeMap[-rule.Rank] = rule;
-                    rule = rule.Next;
-                }
-
-                foreach (Rule r in namedElementRules.Values)
-                {
-                    treeMap[-r.Rank] = r;
-                }
-
-                return treeMap.Values.GetEnumerator();
-            }
-        }
         public SelectedElementsSpaceStrippingRule(bool rejectDuplicates)
         {
             this.rejectDuplicates = rejectDuplicates;

@@ -87,13 +87,8 @@ namespace OutSmart.DAXon.Internal.Regex
         }
 
         public Matcher Matcher(string input) => new Matcher(this, input);
-
-        public string Pattern_() => _patternString;
         public int Flags() => _flags;
         public override string ToString() => _patternString;
-
-        public string[] Split(string input) => Regex.Split(input);
-        public string[] Split(string input, int limit) => limit <= 0 ? Regex.Split(input) : Regex.Split(input, limit);
 
         private struct PatternKey : global::System.IEquatable<PatternKey>
         {

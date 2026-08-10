@@ -23,9 +23,7 @@ namespace OutSmart.DAXon.Functions
     internal class ConstantFunction : SystemFunction
     {
         private readonly IGroundedValue _value;
-        public ConstantFunction() { }
         public ConstantFunction(object value) { _value = value as IGroundedValue; }
-        public static Func<ConstantFunction> New() => () => new ConstantFunction();
         public override ISequence Call(IXPathContext context, ISequence[] arguments) => _value;
         internal class True : ConstantFunction { public True() : base(BooleanValue.TRUE) { } }
         internal class False : ConstantFunction { public False() : base(BooleanValue.FALSE) { } }

@@ -18,13 +18,6 @@ namespace OutSmart.DAXon.Model
 {
     internal class OneOrMore<T> : ZeroOrMore<T>
     {
-        public OneOrMore(T[] content) : base(content.ToList())
-        {
-            if (content.Length == 0)
-            {
-                throw new ArgumentException();
-            }
-        }
 
         public OneOrMore(IList<T> content) : base(content)
         {

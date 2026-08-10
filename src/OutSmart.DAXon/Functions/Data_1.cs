@@ -21,8 +21,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Data_1 : SystemFunction
     {
-
-        public static Func<Data_1> New() => () => new Data_1();
         public override Expression MakeFunctionCall(params Expression[] arguments)
         {
             return Atomizer.MakeAtomizer(arguments[0], null);

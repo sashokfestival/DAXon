@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal sealed class RoundHalfToEven : SystemFunction
     {
-
-        public static Func<RoundHalfToEven> New() => () => new RoundHalfToEven();
         public override int GetCardinality(Expression[] arguments)
         {
             return arguments[0].GetCardinality();

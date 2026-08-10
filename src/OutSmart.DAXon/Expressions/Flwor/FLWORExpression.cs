@@ -333,26 +333,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return this;
         }
 
-        private IBinding[] ExtendBindingList(IBinding[] bindings, LocalVariableBinding[] moreBindings)
-        {
-            if (bindings == null)
-            {
-                bindings = new IBinding[0];
-            }
-
-            if (moreBindings == null || moreBindings.Length == 0)
-            {
-                return bindings;
-            }
-            else
-            {
-                IBinding[] b2 = new IBinding[bindings.Length + moreBindings.Length];
-                Array.Copy(bindings, 0, b2, 0, bindings.Length);
-                Array.Copy(moreBindings, 0, b2, bindings.Length, moreBindings.Length);
-                return b2;
-            }
-        }
-
         public override int GetEvaluationMethod()
         {
             return Expression.PROCESS_METHOD;

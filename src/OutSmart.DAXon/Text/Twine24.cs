@@ -30,8 +30,6 @@ namespace OutSmart.DAXon.Text
         protected byte[] bytes;
         protected int cachedHash = 0;
 
-        public virtual byte[] ByteArray => bytes;
-
         public override int Width => 24;
         public Twine24(byte[] bytes)
         {
@@ -48,10 +46,6 @@ namespace OutSmart.DAXon.Text
                 bytes[j + 1] = (byte)((c >> 8) & 0xff);
                 bytes[j + 2] = (byte)(c & 0xff);
             }
-        }
-
-        public Twine24(int[] codePoints) : this(codePoints, codePoints.Length)
-        {
         }
 
         public override long Length()
@@ -273,11 +267,6 @@ namespace OutSmart.DAXon.Text
             }
 
             return -1;
-        }
-
-        public virtual string Details()
-        {
-            return "Twine24 bytes.length = " + bytes.Length;
         }
 
         private sealed class AnonymousIntIterator : AbstractIntIterator

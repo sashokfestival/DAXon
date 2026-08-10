@@ -45,67 +45,9 @@ namespace OutSmart.DAXon.Lib
             }
         }
 
-        public virtual int MaximumNumberOfWarnings
-        {
-            get => this.maximumNumberOfWarnings; set
-            {
-                this.maximumNumberOfWarnings = value;
-            }
-        }
-
-        public virtual int MaximumNumberOfErrors
-        {
-            get => this.maximumNumberOfErrors; set
-            {
-                this.maximumNumberOfErrors = value;
-            }
-        }
-
-        public virtual int MaxOrdinaryCharacter
-        {
-            get => maxOrdinaryCharacter; set
-            {
-                maxOrdinaryCharacter = value;
-            }
-        }
-
-        public virtual int StackTraceDetail
-        {
-            get => stackTraceDetail; set
-            {
-                stackTraceDetail = value;
-            }
-        }
-
-        public virtual int NumberOfWarnings => warningCount;
-
         public virtual int NumberOfErrors => errorCount;
-
-        public virtual IXmlProcessingError LatestError => latestError;
         public StandardErrorReporter()
         {
-        }
-
-        public virtual void SetOutputErrorCodes(bool include)
-        {
-            this.outputErrorCodes = include;
-        }
-
-        public virtual void SuppressWarning(string code)
-        {
-            if (suppressedWarnings == null)
-            {
-                suppressedWarnings = new HashSet<StructuredQName>();
-            }
-
-            if (code.StartsWith("Q{", StringComparison.Ordinal))
-            {
-                suppressedWarnings.Add(StructuredQName.FromEQName(code));
-            }
-            else
-            {
-                suppressedWarnings.Add(new StructuredQName("err", NamespaceConstant.ERR, code));
-            }
         }
 
         public virtual bool IsSuppressedWarning(StructuredQName errorCode)
@@ -219,11 +161,6 @@ namespace OutSmart.DAXon.Lib
             // Outside the lock: logger is host code and may block.
             if (announceCap) { logger.Info("No more warnings will be displayed"); }
             else if (display) { logger.Warning(message); }
-        }
-
-        public virtual bool IsReportingWarnings()
-        {
-            return warningCount < MaximumNumberOfWarnings;
         }
 
         protected virtual void Error(IXmlProcessingError err)

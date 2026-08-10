@@ -37,8 +37,6 @@ namespace OutSmart.DAXon.Json
             OPTION_DETAILS = parseJsonOptions;
         }
 
-        public static Func<ParseJsonFn> New() => () => new ParseJsonFn();
-
         protected override IItem Eval(string input, MapItem options, IXPathContext context)
         {
             Dictionary<string, IGroundedValue> checkedOptions = null;

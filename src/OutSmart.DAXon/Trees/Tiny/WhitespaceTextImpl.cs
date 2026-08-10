@@ -55,11 +55,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return StringValue.MakeUntypedAtomic(UnicodeStringValue);
         }
 
-        public static long GetLongValue(TinyTree tree, int nodeNr)
-        {
-            return ((long)tree.alpha[nodeNr] << 32) | ((long)tree.beta[nodeNr] & 0xffffffff);
-        }
-
         public override int GetNodeKind()
         {
             return Types.Type.TEXT;

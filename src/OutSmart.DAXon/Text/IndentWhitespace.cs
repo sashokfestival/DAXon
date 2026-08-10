@@ -20,10 +20,6 @@ namespace OutSmart.DAXon.Text
     {
         private readonly int newlines;
         private readonly int spaces;
-
-        public virtual int Newlines => newlines;
-
-        public virtual int Spaces => spaces;
         private IndentWhitespace(int newlines, int spaces)
         {
             this.newlines = newlines;

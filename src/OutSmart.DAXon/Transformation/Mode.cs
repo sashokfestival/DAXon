@@ -379,6 +379,15 @@ namespace OutSmart.DAXon.Transformation
                     // No need to open a new stack frame
                     GetBuiltInRuleSet().Process(item, parameters, tunnelParameters, output, context, locationId);
                 }
+                else if (traceListener == null && !modeTracing
+                    && rule.GetAction() is TemplateRule emptyTemplate && Expressions.Literal.IsEmptySequence(emptyTemplate.GetBody()))
+                {
+                    // An empty template body (match="text()" suppression and friends) executes to
+                    // nothing — skip the frame/current-rule ceremony entirely. The reuse frame
+                    // stays the PREVIOUS template's, which is exactly what the next node matching
+                    // that template expects; an empty body has no tail call.
+                    tc = null;
+                }
                 else
                 {
                     tc = HandleRuleNotNull(rule, traceListener, context, item, ref previousTemplate, parameters, tunnelParameters, output);

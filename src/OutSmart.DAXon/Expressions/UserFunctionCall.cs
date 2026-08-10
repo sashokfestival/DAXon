@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using OutSmart.DAXon.Expressions.Elaboration;
 using OutSmart.DAXon.Expressions.Parsing;
@@ -488,34 +489,6 @@ namespace OutSmart.DAXon.Expressions
         //
         //
         //    }
-        private void RequestTailCall(IXPathContext context, ISequence[] actualArgs)
-        {
-            if (bindingSlot >= 0)
-            {
-                TailCallLoop.TailCallComponent info = new TailCallLoop.TailCallComponent();
-                Component target = GetTargetComponent(context);
-                info.component = target;
-                info.function = (UserFunction)target.GetActor();
-                if (target.IsHiddenAbstractComponent())
-                {
-                    throw new XPathException("Cannot call an abstract function (" + name.DisplayName + ") with no implementation", "XTDE3052");
-                }
-
-                ((XPathContextMajor)context).RequestTailCall(info, actualArgs);
-            }
-            else
-            {
-                TailCallLoop.TailCallFunction info = new TailCallLoop.TailCallFunction();
-                info.function = function;
-                ((XPathContextMajor)context).RequestTailCall(info, actualArgs);
-            }
-        }
-
-        //
-        //
-        //
-        //
-        //    }
         public override void Process(Outputter output, IXPathContext context)
         {
             ITailCall tc = MakeElaborator().ElaborateForPush().ProcessLeavingTail(output, context);
@@ -590,6 +563,44 @@ namespace OutSmart.DAXon.Expressions
             }
 
             return actualArgs;
+        }
+
+        /// <summary>
+        /// Argument evaluators with the per-call fallbacks of EvaluateArguments(c, streamed:false)
+        /// resolved once, for the elaborated direct-call path that binds arguments straight into
+        /// the callee's frame.
+        /// </summary>
+        internal ISequenceEvaluator[] ResolvedArgumentEvaluators()
+        {
+            ISequenceEvaluator[] evaluators = argumentEvaluators;
+            if (evaluators == null)
+            {
+                lock (syncLock)
+                {
+                    if (argumentEvaluators == null)
+                    {
+                        AllocateArgumentEvaluators();
+                    }
+                }
+
+                evaluators = argumentEvaluators;
+            }
+
+            ISequenceEvaluator[] resolved = null;
+            for (int i = 0; i < evaluators.Length; i++)
+            {
+                if (evaluators[i] == null || evaluators[i] is StreamingArgumentEvaluator)
+                {
+                    if (resolved == null)
+                    {
+                        resolved = (ISequenceEvaluator[])evaluators.Clone();
+                    }
+
+                    resolved[i] = Arguments[0].MakeElaborator().Eagerly();
+                }
+            }
+
+            return resolved ?? evaluators;
         }
 
         //
@@ -726,9 +737,126 @@ namespace OutSmart.DAXon.Expressions
                 return e.Describe("Too many nested function calls. May be due to infinite recursion", DAXonErrorCode.SXLM0001, expr.GetLocation());
             }
 
+            // Slim direct call: when Call is not overridden (MemoFunction), the per-call ceremony
+            // collapses - arguments bound once into a right-sized frame array (the generic path
+            // allocates args[] and then SetStackFrame reallocates+copies to slots[]), evaluator
+            // fallbacks pre-resolved. For XQuery (bindingSlot < 0) the target is fixed by
+            // construction; for XSLT components the elaboration-time FixedTarget is only a HINT -
+            // package overrides and hidden-abstract components can rebind at runtime (use-package
+            // tests), so the call site re-checks the actual actor per call and falls back.
+            //
+            // Right-sized replacement for EvaluateArguments: one array sized for the whole stack
+            // frame (the classic path allocates args[] and then SetStackFrame reallocates+copies
+            // it to slots[]), evaluator fallbacks pre-resolved. This frame pops before the callee
+            // body runs, exactly like EvaluateArguments in the classic path.
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private static ISequence[] BindArguments(ISequenceEvaluator[] argEvals, int frameSize, IXPathContext context)
+            {
+                ISequence[] vars = new ISequence[frameSize];
+                for (int i = 0; i < argEvals.Length; i++)
+                {
+                    vars[i] = argEvals[i].Evaluate(context);
+                }
+
+                return vars;
+            }
+
+            // The classic component-call ceremony, for calls whose runtime actor does not match
+            // the elaboration-time hint (package override rebinding).
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private static ISequence GenericComponentCall(UserFunctionCall expr, Component target, IXPathContext context)
+            {
+                ISequence[] actualArgs = expr.EvaluateArguments(context, false);
+                UserFunction targetFunction = (UserFunction)target.GetActor();
+                XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr, target);
+                return targetFunction.Call(c2, actualArgs);
+            }
+
+            private static bool TryMakeSlim(UserFunctionCall expr, out UserFunction target, out ISequenceEvaluator[] argEvals, out SlotManager frameMap)
+            {
+                target = null;
+                argEvals = null;
+                frameMap = null;
+                UserFunction fn;
+                if (expr.bindingSlot < 0)
+                {
+                    fn = expr.GetFunction();
+                }
+                else
+                {
+                    Component fixedTarget = expr.FixedTarget;
+                    fn = fixedTarget == null ? null : fixedTarget.GetActor() as UserFunction;
+                }
+
+                if (fn == null || fn.GetType() != typeof(UserFunction))
+                {
+                    return false;
+                }
+
+                SlotManager map = fn.GetStackFrameMap();
+                if (map == null || expr.GetArity() > map.NumberOfVariables)
+                {
+                    return false;
+                }
+
+                target = fn;
+                argEvals = expr.ResolvedArgumentEvaluators();
+                frameMap = map;
+                return true;
+            }
+
             public override IPullEvaluator ElaborateForPull()
             {
                 UserFunctionCall expr = (UserFunctionCall)GetExpression();
+                if (TryMakeSlim(expr, out UserFunction slimTarget, out ISequenceEvaluator[] slimArgEvals, out SlotManager slimFrameMap))
+                {
+                    int slimFrameSize = slimFrameMap.NumberOfVariables;
+                    if (expr.bindingSlot < 0)
+                    {
+                        return (context) =>
+                        {
+                            try
+                            {
+                                ISequence[] vars = BindArguments(slimArgEvals, slimFrameSize, context);
+                                XPathContextMajor c2 = slimTarget.MakeNewContext(context, expr);
+                                return slimTarget.CallRightSized(c2, vars).Iterate();
+                            }
+                            catch (RecursionDepthError e) when (!e.Described)
+                            {
+                                // Filtered: one such catch per recursion level; only the innermost describes.
+                                throw ReportStackOverflow(e, expr);
+                            }
+                        };
+                    }
+
+                    return (context) =>
+                    {
+                        Component target = expr.GetTargetComponent(context);
+                        try
+                        {
+                            ISequence result;
+                            if (ReferenceEquals(target.GetActor(), slimTarget) && !target.IsHiddenAbstractComponent())
+                            {
+                                ISequence[] vars = BindArguments(slimArgEvals, slimFrameSize, context);
+                                XPathContextMajor c2 = slimTarget.MakeNewContext(context, expr, target);
+                                result = slimTarget.CallRightSized(c2, vars);
+                            }
+                            else
+                            {
+                                TestNotAbstract(expr, target);
+                                result = GenericComponentCall(expr, target, context);
+                            }
+
+                            return result.Iterate();
+                        }
+                        catch (RecursionDepthError e) when (!e.Described)
+                        {
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
+                        }
+                    };
+                }
+
                 if (expr.bindingSlot >= 0)
                 {
 
@@ -741,8 +869,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             ISequence[] actualArgs = expr.EvaluateArguments(context, false);
                             UserFunction targetFunction = (UserFunction)target.GetActor();
-                            XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr);
-                            c2.SetCurrentComponent(target);
+                            XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr, target);
                             return targetFunction.Call(c2, actualArgs).Iterate();
                         }
                         catch (RecursionDepthError e) when (!e.Described)
@@ -777,6 +904,55 @@ namespace OutSmart.DAXon.Expressions
             public override IItemEvaluator ElaborateForItem()
             {
                 UserFunctionCall expr = (UserFunctionCall)GetExpression();
+                if (TryMakeSlim(expr, out UserFunction slimTarget, out ISequenceEvaluator[] slimArgEvals, out SlotManager slimFrameMap))
+                {
+                    int slimFrameSize = slimFrameMap.NumberOfVariables;
+                    if (expr.bindingSlot < 0)
+                    {
+                        return (context) =>
+                        {
+                            try
+                            {
+                                ISequence[] vars = BindArguments(slimArgEvals, slimFrameSize, context);
+                                XPathContextMajor c2 = slimTarget.MakeNewContext(context, expr);
+                                return slimTarget.CallRightSized(c2, vars).Head();
+                            }
+                            catch (RecursionDepthError e) when (!e.Described)
+                            {
+                                // Filtered: one such catch per recursion level; only the innermost describes.
+                                throw ReportStackOverflow(e, expr);
+                            }
+                        };
+                    }
+
+                    return (context) =>
+                    {
+                        Component target = expr.GetTargetComponent(context);
+                        try
+                        {
+                            ISequence result;
+                            if (ReferenceEquals(target.GetActor(), slimTarget) && !target.IsHiddenAbstractComponent())
+                            {
+                                ISequence[] vars = BindArguments(slimArgEvals, slimFrameSize, context);
+                                XPathContextMajor c2 = slimTarget.MakeNewContext(context, expr, target);
+                                result = slimTarget.CallRightSized(c2, vars);
+                            }
+                            else
+                            {
+                                TestNotAbstract(expr, target);
+                                result = GenericComponentCall(expr, target, context);
+                            }
+
+                            return result.Head();
+                        }
+                        catch (RecursionDepthError e) when (!e.Described)
+                        {
+                            // Filtered: one such catch per recursion level; only the innermost describes.
+                            throw ReportStackOverflow(e, expr);
+                        }
+                    };
+                }
+
                 if (expr.bindingSlot >= 0)
                 {
 
@@ -789,8 +965,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             ISequence[] actualArgs = expr.EvaluateArguments(context, false);
                             UserFunction targetFunction = (UserFunction)target.GetActor();
-                            XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr);
-                            c2.SetCurrentComponent(target);
+                            XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr, target);
                             return targetFunction.Call(c2, actualArgs).Head();
                         }
                         catch (RecursionDepthError e) when (!e.Described)
@@ -844,8 +1019,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             ISequence[] actualArgs = expr.EvaluateArguments(context, false);
                             UserFunction targetFunction = (UserFunction)target.GetActor();
-                            XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr);
-                            c2.SetCurrentComponent(target);
+                            XPathContextMajor c2 = targetFunction.MakeNewContext(context, expr, target);
                             targetFunction.Process(c2, actualArgs, output);
                         }
                         catch (RecursionDepthError e) when (!e.Described)

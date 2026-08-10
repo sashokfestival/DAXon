@@ -16,6 +16,5 @@ namespace OutSmart.DAXon.Resources
     {
         public static readonly IResourceFactory FACTORY = new GenericResourceFactory();
         public string Content => string.Empty;
-        public UnparsedTextResource() { }
     }
 }

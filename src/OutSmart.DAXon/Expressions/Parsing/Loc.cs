@@ -60,10 +60,5 @@ namespace OutSmart.DAXon.Expressions.Parsing
         {
             return this;
         }
-
-        public static bool IsUnknown(ILocation location)
-        {
-            return location == null || (location.GetSystemId() == null || (location.GetSystemId().Length == 0)) && location.GetLineNumber() == -1;
-        }
     }
 }

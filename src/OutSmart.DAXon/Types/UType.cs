@@ -83,7 +83,20 @@ namespace OutSmart.DAXon.Types
                 new NullReferenceException().ToString();
             }
 
-            return new UType(bits | other.bits);
+            // Steady-state unions (per-entry map type bookkeeping) are almost always subsets:
+            // return an existing instance instead of allocating an equal one.
+            int merged = bits | other.bits;
+            if (merged == bits)
+            {
+                return this;
+            }
+
+            if (merged == other.bits)
+            {
+                return other;
+            }
+
+            return new UType(merged);
         }
 
         public virtual UType Intersection(UType other)

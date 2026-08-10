@@ -13,8 +13,6 @@ namespace OutSmart.DAXon.Values.Arrays
 {
     internal class Parcel
     {
-        public Parcel() { }
         public Parcel(object value) { }
-        public static Parcel Of(object value) => new Parcel(value);
     }
 }

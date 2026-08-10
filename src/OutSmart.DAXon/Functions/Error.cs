@@ -32,11 +32,6 @@ namespace OutSmart.DAXon.Functions
             return base.GetSpecialProperties(arguments) & ~StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        public virtual bool IsVacuousExpression()
-        {
-            return true;
-        }
-
         public virtual IItem ErrorFn(IXPathContext context, QNameValue errorCode, StringValue desc, ISequenceIterator errObject)
         {
             QNameValue qname = null;

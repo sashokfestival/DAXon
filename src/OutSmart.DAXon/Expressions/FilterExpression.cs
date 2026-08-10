@@ -828,42 +828,6 @@ namespace OutSmart.DAXon.Expressions
             return this;
         }
 
-        private FilterExpression PromoteIndependentPredicates(IBinding[] bindings, Optimizer opt, TypeHierarchy th)
-        {
-            if (!ExpressionTool.DependsOnVariable(Base, bindings))
-            {
-                return this;
-            }
-
-            if (IsPositional(th))
-            {
-                return this;
-            }
-
-            if (Base is FilterExpression)
-            {
-                FilterExpression fe = (FilterExpression)Base;
-                if (fe.IsPositional(th))
-                {
-                    return this;
-                }
-
-                if (!ExpressionTool.DependsOnVariable(fe.Filter, bindings))
-                {
-                    return this;
-                }
-
-                if (!ExpressionTool.DependsOnVariable(Filter, bindings))
-                {
-                    FilterExpression result = new FilterExpression(new FilterExpression(fe.Base, Filter).PromoteIndependentPredicates(bindings, opt, th), fe.Filter);
-                    opt.Trace("Reordered filter predicates:", result);
-                    return result;
-                }
-            }
-
-            return this;
-        }
-
         public static bool IsPositionalFilter(Expression exp, TypeHierarchy th)
         {
             ItemType type = exp.GetItemType();
@@ -1151,10 +1115,11 @@ namespace OutSmart.DAXon.Expressions
             {
                 FilterExpression expr = (FilterExpression)GetExpression();
                 IPullEvaluator baseEval = expr.Base.MakeElaborator().ElaborateForPull();
+                IPullEvaluator generic;
                 if (expr.IsSimpleBooleanFilter())
                 {
                     IBooleanEvaluator conditionEval = expr.Filter.MakeElaborator().ElaborateForBoolean();
-                    return (context) =>
+                    generic = (context) =>
                     {
                         ISequenceIterator @base = baseEval.Iterate(context);
                         IXPathContext c2 = context.NewMinorContext();
@@ -1165,7 +1130,7 @@ namespace OutSmart.DAXon.Expressions
                 else
                 {
                     IPullEvaluator conditionEval = expr.Filter.MakeElaborator().ElaborateForPull();
-                    return (context) =>
+                    generic = (context) =>
                     {
                         ISequenceIterator @base = baseEval.Iterate(context);
                         IXPathContext c2 = context.NewMinorContext();
@@ -1173,6 +1138,24 @@ namespace OutSmart.DAXon.Expressions
                         return new PositionalFilteredIterator(c2, conditionEval);
                     };
                 }
+
+                // Both compiled forms of the leaf-element filter `//*[not(*)]` (see FusedLeafFilter):
+                // on an untyped Tiny context the leaf verdict reads straight off the node arrays.
+                if (Elaboration.FusedLeafFilter.MatchLeafElements(expr))
+                {
+                    return (context) => context.GetContextItem() is Trees.Tiny.TinyParentNodeImpl tiny && tiny.tree.TypeArray == null
+                        ? (ISequenceIterator)new Elaboration.FusedLeafFilter.LeafElementIterator(tiny)
+                        : generic(context);
+                }
+
+                if (Elaboration.FusedLeafFilter.MatchLeafTexts(expr))
+                {
+                    return (context) => context.GetContextItem() is Trees.Tiny.TinyParentNodeImpl tiny && tiny.tree.TypeArray == null
+                        ? (ISequenceIterator)new Elaboration.FusedLeafFilter.LeafTextIterator(tiny, false)
+                        : generic(context);
+                }
+
+                return generic;
             }
 
             internal class PositionalFilteredIterator : ISequenceIterator

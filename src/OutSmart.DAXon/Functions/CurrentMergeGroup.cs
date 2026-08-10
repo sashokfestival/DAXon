@@ -46,11 +46,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public virtual bool IsInLoop()
-        {
-            return inLoop;
-        }
-
         public override int GetSpecialProperties(Expression[] arguments)
         {
             return 0;

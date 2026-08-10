@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class Number_1 : ScalarSystemFunction
     {
-
-        public static Func<Number_1> New() => () => new Number_1();
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
             return ToNumber((AtomicValue)arg);

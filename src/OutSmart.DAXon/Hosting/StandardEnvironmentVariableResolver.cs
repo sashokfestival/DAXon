@@ -24,34 +24,42 @@ namespace OutSmart.DAXon.Lib
     // design; harmless now that neither references the deleted compat type.)
     // TIER-2 2026-06-17: faithful .NET equivalent of upstream StandardEnvironmentVariableResolver (Java System.getenv()).
     // Backs fn:environment-variable / fn:available-environment-variables when Feature.ALLOW_EXTERNAL_FUNCTIONS is on.
-    // global::System.Environment.GetEnvironmentVariable(name) == System.getenv(name);
-    // GetEnvironmentVariables() key set == System.getenv().keySet(). Was a hollow NIE stub.
+    // Snapshot frozen at first use per resolver (= per Configuration): upstream parity — Java's
+    // System.getenv() snapshots once per JVM — and O(1) lookups instead of a native block copy per call.
     internal class StandardEnvironmentVariableResolver : IEnvironmentVariableResolver
     {
+        private Dictionary<string, string> snapshot;
+
         public StandardEnvironmentVariableResolver() { }
+
+        private Dictionary<string, string> Snapshot()
+        {
+            Dictionary<string, string> s = System.Threading.Volatile.Read(ref snapshot);
+            if (s == null)
+            {
+                s = new Dictionary<string, string>(StringComparer.Ordinal);
+                foreach (DictionaryEntry e in Environment.GetEnvironmentVariables())
+                {
+                    s[(string)e.Key] = (string)e.Value;
+                }
+                s = System.Threading.Interlocked.CompareExchange(ref snapshot, s, null) ?? s;
+            }
+            return s;
+        }
+
         public HashSet<string> GetAvailableEnvironmentVariables()
         {
-            var set = new HashSet<string>();
-            foreach (DictionaryEntry e in Environment.GetEnvironmentVariables())
-            {
-                set.Add((string)e.Key);
-            }
-            return set;
+            return new HashSet<string>(Snapshot().Keys);
         }
-        // Ordinal lookup, not Environment.GetEnvironmentVariable: on Windows that API is
-        // case-INSENSITIVE, so environment-variable('PATH') would return a value while
-        // available-environment-variables() reports only 'Path' — the two functions must agree
-        // (F&O: a name is "available" iff environment-variable returns non-empty; function-1501).
+
+        // Ordinal lookup over the same snapshot the availability list is built from, not
+        // Environment.GetEnvironmentVariable: on Windows that API is case-INSENSITIVE, so
+        // environment-variable('PATH') would return a value while available-environment-variables()
+        // reports only 'Path' — the two functions must agree (F&O function-1501).
         public string GetEnvironmentVariable(string name)
         {
-            foreach (DictionaryEntry e in Environment.GetEnvironmentVariables())
-            {
-                if (string.Equals((string)e.Key, name, StringComparison.Ordinal))
-                {
-                    return (string)e.Value;
-                }
-            }
-            return null;
+            string value;
+            return Snapshot().TryGetValue(name, out value) ? value : null;
         }
     }
 }

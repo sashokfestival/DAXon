@@ -37,21 +37,6 @@ namespace OutSmart.DAXon.Functions
             return GetRetainedStaticContext();
         }
 
-        public static Expression InternalKeyCall(KeyManager keyManager, KeyDefinitionSet keySet, string name, Expression value, Expression doc, RetainedStaticContext rsc)
-        {
-            KeyFn fn = (KeyFn)SystemFunction.MakeFunction("key", rsc, 3);
-            fn.staticKeySet = keySet;
-            try
-            {
-                fn.FixArguments(new StringLiteral(name), value, doc);
-            }
-            catch (XPathException e)
-            {
-            }
-
-            return fn.MakeFunctionCall(new StringLiteral(name), value, doc);
-        }
-
         public override int GetSpecialProperties(Expression[] arguments)
         {
             int prop = StaticProperty.ORDERED_NODESET | StaticProperty.SINGLE_DOCUMENT_NODESET | StaticProperty.NO_NODES_NEWLY_CREATED;

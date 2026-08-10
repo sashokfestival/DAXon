@@ -52,11 +52,6 @@ namespace OutSmart.DAXon.Xslt
             return new RetainedStaticContext(this);
         }
 
-        public virtual Compilation GetCompilation()
-        {
-            return compilation;
-        }
-
         public override void IssueWarning(string s, string errorCode, ILocation locator)
         {
             compilation.GetCompilerInfo().ErrorReporter.Report(new XmlProcessingIncident(s, errorCode, locator).AsWarning());
@@ -121,21 +116,6 @@ namespace OutSmart.DAXon.Xslt
         public override DecimalFormatManager GetDecimalFormatManager()
         {
             return null;
-        }
-
-        public virtual int GetColumnNumber()
-        {
-            return 0;
-        }
-
-        public virtual string GetPublicId()
-        {
-            return null;
-        }
-
-        public virtual int GetLineNumber()
-        {
-            return -1;
         }
 
         public override Types.ItemType ResolveTypeAlias(StructuredQName typeName)

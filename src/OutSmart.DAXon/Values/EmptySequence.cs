@@ -20,10 +20,8 @@ namespace OutSmart.DAXon.Values
     internal sealed class EmptySequence : IGroundedValue
     {
         private static readonly EmptySequence _instance = new EmptySequence();
-        public static readonly EmptySequence INSTANCE = _instance;
         public UnicodeString UnicodeStringValue => EmptyUnicodeString.GetInstance();
         public static EmptySequence GetInstance() => _instance;
-        public bool IsEmpty() => true;
         public int GetLength() => 0;
         // IGroundedValue surface
         public IItem Head() => null;

@@ -14,7 +14,6 @@ namespace OutSmart.DAXon.Types
     internal static class AlphaCode
     {
         public static string FromItemType(ItemType t) => "";
-        public static ItemType ToItemType(string s) => throw new NotImplementedException("STUB: AlphaCode.ToItemType not ported (excluded stub)");
         // AlphaCode.FromSequenceType used by export visitors.
         public static string FromSequenceType(object t) => "";
     }

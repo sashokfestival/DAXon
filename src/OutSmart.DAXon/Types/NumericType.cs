@@ -36,8 +36,6 @@ namespace OutSmart.DAXon.Types
 
         public override SequenceType ResultTypeOfCast => SequenceType.ATOMIC_SEQUENCE;
 
-        public override double DefaultPriority => 0.125;
-
         public override int PrimitiveType => BuiltInAtomicType.ANY_ATOMIC.Fingerprint;
 
         public ISchemaType BuiltInBaseType => AnySimpleType.INSTANCE;
@@ -91,11 +89,6 @@ namespace OutSmart.DAXon.Types
             return Genre.ATOMIC;
         }
 
-        public override bool ContainsListType()
-        {
-            return false;
-        }
-
         public static bool IsNumericType(ItemType type)
         {
             return type.IsPlainType() && UType.NUMERIC.Subsumes(type.GetUType());
@@ -124,11 +117,6 @@ namespace OutSmart.DAXon.Types
         public override IPlainType GetAtomizedItemType()
         {
             return this;
-        }
-
-        public override bool IsAtomizable(TypeHierarchy th)
-        {
-            return true;
         }
 
         public override bool IsAtomicType()
@@ -257,12 +245,6 @@ namespace OutSmart.DAXon.Types
         public override bool IsIdRefType()
         {
             return false;
-        }
-
-        //    }
-        public override string ToExportString()
-        {
-            return ToString();
         }
 
         //    }

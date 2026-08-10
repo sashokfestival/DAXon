@@ -19,8 +19,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class UnparsedTextAvailable : UnparsedTextFunction, ICallable
     {
-
-        public static Func<UnparsedTextAvailable> New() => () => new UnparsedTextAvailable();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue hrefVal = (StringValue)arguments[0].Head();

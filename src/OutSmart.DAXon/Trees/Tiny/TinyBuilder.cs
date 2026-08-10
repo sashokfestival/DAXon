@@ -41,26 +41,7 @@ namespace OutSmart.DAXon.Trees.Tiny
         private int[] prevAtDepth = new int[100];
         private int[] siblingsAtDepth = new int[100];
         private bool isIDElement = false;
-        public virtual TinyTree Tree => tree;
-
-        public virtual int CurrentDepth => currentDepth;
-
-        /// <summary>
-        /// Notify the end of an element node
-        /// </summary>
-        public virtual TinyNodeImpl LastCompletedElement
-        {
-            get
-            {
-                if (tree == null)
-                {
-                    return null;
-                }
-
-
-                return (TinyNodeImpl)tree.GetNode(currentDepth >= 0 ? prevAtDepth[currentDepth] : 0); // Note: reading an incomplete tree needs care if it constructs a prior index, etc.
-            }
-        }
+        private string lastElementSystemId;   // last systemId INSTANCE seen by StartElementLocalSystemId
         public TinyBuilder(PipelineConfiguration pipe) : base(pipe)
         {
             Configuration config = pipe.GetConfiguration();
@@ -175,6 +156,7 @@ namespace OutSmart.DAXon.Trees.Tiny
             currentDepth = 0;
             nodeNr = 0;
             ended = false;
+            lastElementSystemId = null;
             statistics = config.GetTreeStatistics().TEMPORARY_TREE_STATISTICS;
         }
 
@@ -321,6 +303,16 @@ namespace OutSmart.DAXon.Trees.Tiny
         private void StartElementLocalSystemId(TinyTree tt, ILocation location)
         {
             string localSystemId = location.GetSystemId();
+            // Steady state (one document, no entity boundary): every element carries the same systemId
+            // INSTANCE. SetSystemId would dedupe it against its last entry and the uniform-base-URI
+            // verdict is already decided for this string, so the per-element ceremony can be skipped.
+            // Depth 1 keeps the full path: that branch writes the builder's own systemId.
+            if (ReferenceEquals(localSystemId, lastElementSystemId) && currentDepth != 1)
+            {
+                return;
+            }
+
+            lastElementSystemId = localSystemId;
             if (IsUseEventLocation() && localSystemId != null)
             {
                 tt.SetSystemId(nodeNr, localSystemId);
@@ -438,6 +430,115 @@ namespace OutSmart.DAXon.Trees.Tiny
         }
 
         /// <summary>
+        /// Fused entry from XmlReaderToReceiver when this builder is the pump's direct receiver:
+        /// buffered character data goes straight into the tree's text buffer, skipping the
+        /// intermediate UnicodeString that Characters() requires. Must mirror Characters() +
+        /// MakeTextNode() exactly — whitespace runs still take the compressed-whitespace lane,
+        /// and merge/eligibility/line-number behavior is byte-identical. The pump falls back to
+        /// the generic path for DISABLE_ESCAPING, so properties here are always WHOLE_TEXT_NODE.
+        /// </summary>
+        internal void CharactersDirect(char[] chars, int len, bool compress, ILocation locationId)
+        {
+            if (len == 0)
+            {
+                return;
+            }
+
+            int k = 0;
+            if (compress)
+            {
+                while (k < len && Values.Whitespace.IsWhite(chars[k]))
+                {
+                    k++;
+                }
+
+                if (k == len)
+                {
+                    UnicodeString ws = CompressedWhitespace.CompressWS(chars, 0, len);
+                    if (ws is CompressedWhitespace cw)
+                    {
+                        TinyTree tt0 = tree;
+                        long lvalue = cw.CompressedValue;
+                        nodeNr = tt0.AddNode(Types.Type.WHITESPACE_TEXT, currentDepth, (int)(lvalue >> 32), (int)lvalue, -1);
+                        int prev0 = prevAtDepth[currentDepth];
+                        if (prev0 > 0)
+                        {
+                            tt0.next[prev0] = nodeNr;
+                        }
+
+                        tt0.next[nodeNr] = prevAtDepth[currentDepth - 1]; // *O* owner pointer in last sibling
+                        prevAtDepth[currentDepth] = nodeNr;
+                        siblingsAtDepth[currentDepth]++;
+                        if (lineNumbering)
+                        {
+                            tt0.SetLineNumber(nodeNr, locationId.GetLineNumber(), locationId.GetColumnNumber());
+                        }
+
+                        return;
+                    }
+
+                    // Incompressible whitespace run: CompressWS already materialized a Twine — generic lane.
+                    Characters(ws, locationId, ReceiverOption.WHOLE_TEXT_NODE);
+                    return;
+                }
+            }
+
+            TinyTree tt = tree;
+            LargeTextBuffer buffer = tt.textBuffer;
+            int bufferStart = buffer.Length();
+            int cpLen;
+            if (buffer.TryAppendLatin1(chars, len))
+            {
+                cpLen = len;   // all codepoints < 256, so no surrogates
+            }
+            else
+            {
+                // Same scan Compress performs; the whitespace prefix skipped above is all < 256 and
+                // surrogate-free, so resuming from k cannot change either verdict.
+                int max = 255;
+                int surrogates = 0;
+                for (int i = k; i < len; i++)
+                {
+                    int c = chars[i];
+                    max |= c;
+                    if (Serialization.CharCodes.UTF16CharacterSet.IsSurrogate(c))
+                    {
+                        surrogates++;
+                    }
+                }
+
+                cpLen = len - surrogates / 2;
+                buffer.AppendCharSpan(chars, len, max, surrogates);
+            }
+            int n = tt.numberOfNodes - 1;
+            if (tt.nodeKind[n] == Types.Type.TEXT && tt.depth[n] == currentDepth)
+            {
+                // merge this text node with the previous text node
+                tt.beta[n] += cpLen;
+            }
+            else
+            {
+                nodeNr = tt.AddNode(Types.Type.TEXT, currentDepth, bufferStart, cpLen, -1);
+                int prev = prevAtDepth[currentDepth];
+                if (prev > 0)
+                {
+                    tt.next[prev] = nodeNr;
+                }
+
+                tt.next[nodeNr] = prevAtDepth[currentDepth - 1];
+                prevAtDepth[currentDepth] = nodeNr;
+                siblingsAtDepth[currentDepth]++;
+            }
+
+            if (lineNumbering)
+            {
+                tt.SetLineNumber(nodeNr, locationId.GetLineNumber(), locationId.GetColumnNumber());
+            }
+
+            textualElementEligibilityState = textualElementEligibilityState == Eligibility.PRIMED ? Eligibility.ELIGIBLE : Eligibility.INELIGIBLE;
+        }
+
+        /// <summary>
         /// Notify a text node
         /// </summary>
         protected virtual int MakeTextNode(UnicodeString chars)
@@ -498,14 +599,19 @@ namespace OutSmart.DAXon.Trees.Tiny
             tt.next[nodeNr] = prevAtDepth[currentDepth - 1]; // *O* owner pointer in last sibling
             prevAtDepth[currentDepth] = nodeNr;
             siblingsAtDepth[currentDepth]++;
+            // Any writer to the tree's systemIdMap must refresh the StartElement memo — a PI from an
+            // external entity (different BaseURI) would otherwise leave the memo claiming the map's
+            // last entry is still the main document's URI.
             string localLocation = locationId.GetSystemId();
             if (IsUseEventLocation() && localLocation != null)
             {
                 tt.SetSystemId(nodeNr, localLocation);
+                lastElementSystemId = localLocation;
             }
             else if (currentDepth == 1)
             {
                 tt.SetSystemId(nodeNr, systemId);
+                lastElementSystemId = systemId;
             }
 
             if (localLocation != null && !localLocation.Equals(baseURI))

@@ -130,7 +130,6 @@ namespace OutSmart.DAXon.Model
         public const int SAXON_DO = SAXON + 6;
         public const int SAXON_DOCTYPE = SAXON + 7;
         public const int SAXON_ENTITY_REF = SAXON + 8;
-        public const int SAXON_TABULATE_MAPS = SAXON + 9;
         public const int SAXON_WHILE = SAXON + 15;
         // Schema extension elements
         public const int SAXON_PARAM = SAXON + 20;
@@ -258,7 +257,6 @@ namespace OutSmart.DAXon.Model
         public const int XSI_SCHEMA_LOCATION_TYPE = XSI + 5;
         private static readonly string SAXON_B = '{' + NamespaceConstant.SAXON + '}';
         public static readonly string SAXON_ASYCHRONOUS = SAXON_B + "asynchronous";
-        public static readonly string SAXON_EXPLAIN = SAXON_B + "explain";
         public static readonly INodeName XML_ID_NAME = new FingerprintedQName("xml", NamespaceUri.XML, "id", XML_ID);
         private static readonly string[] localNames = new string[1023];
         private static readonly Dictionary<string, int> lookup = new Dictionary<string, int>(1023);
@@ -272,11 +270,6 @@ namespace OutSmart.DAXon.Model
             new StructuredQName("err", NamespaceUri.ERR, "column-number"),
             new StructuredQName("err", NamespaceUri.ERR, "additional")
         };
-
-        /// <summary>
-        /// A commonly-used name held in static:
-        /// </summary>
-        public static readonly StructuredQName SQ_XS_INVALID_NAME = new StructuredQName("xs", NamespaceUri.SCHEMA, "invalid-name"); //getStructuredQName(XS_INVALID_NAME);
 
         static StandardNames()
         {
@@ -505,11 +498,6 @@ namespace OutSmart.DAXon.Model
             BindXSIName(XSI_NO_NAMESPACE_SCHEMA_LOCATION, "noNamespaceSchemaLocation");
             BindXSIName(XSI_SCHEMA_LOCATION_TYPE, "anonymous_schemaLocationType");
         }
-        // key is an expanded QName in Clark notation
-        // value is a fingerprint, as a OutSmart.DAXon.Internal.Integer
-        private StandardNames()
-        {
-        }
 
         private static void BindXSLTName(int constant, string localName)
         {
@@ -570,19 +558,6 @@ namespace OutSmart.DAXon.Model
                     return NamespaceUri.SCHEMA_INSTANCE;
                 default:
                     throw new ArgumentException("Unknown system fingerprint " + fingerprint);
-            }
-        }
-
-        public static string GetClarkName(int fingerprint)
-        {
-            NamespaceUri uri = GetURI(fingerprint);
-            if (uri == NamespaceUri.NULL)
-            {
-                return GetLocalName(fingerprint);
-            }
-            else
-            {
-                return '{' + uri.ToString() + '}' + GetLocalName(fingerprint);
             }
         }
 

@@ -34,8 +34,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public virtual INodeName FixedElementName => elementName;
 
-        public virtual NamespaceMap ActiveNamespaces => namespaceBindings;
-
         public override string ExpressionName => "element";
         public FixedElement(INodeName elementName, NamespaceMap namespaceBindings, bool inheritNamespacesToChildren, bool inheritNamespacesFromParent, ISchemaType schemaType, int validation)
         {
@@ -360,19 +358,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public override ElementCreationDetails MakeElementCreationDetails()
-        {
-            return new AnonymousElementCreationDetails(this);
-        }
-
-        public override void OutputNamespaceNodes(Outputter @out, INodeName nodeName, ElementCreationDetails details)
-        {
-            foreach (NamespaceBinding ns in namespaceBindings)
-            {
-                @out.Namespace(ns.GetPrefix(), ns.GetNamespaceUri(), ReceiverOption.NONE);
-            }
-        }
-
         public override void Export(ExpressionPresenter @out)
         {
             @out.StartElement("elem", this);
@@ -437,29 +422,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new FixedElementElaborator();
         }
 
-        private sealed class AnonymousElementCreationDetails : ElementCreationDetails
-        {
-
-            private readonly FixedElement parent;
-            public AnonymousElementCreationDetails(FixedElement parent)
-            {
-                this.parent = parent;
-            }
-            public override INodeName GetNodeName(IXPathContext context)
-            {
-                return parent.FixedElementName;
-            }
-
-            public override string GetSystemId(IXPathContext context)
-            {
-                return parent.StaticBaseURIString;
-            }
-
-            public override void ProcessContent(Outputter output, IXPathContext context)
-            {
-                parent.GetContentExpression().Process(output, context);
-            }
-        }
 
         /// <summary>
         /// Elaborator for a FixedElement (literal result element) expression.

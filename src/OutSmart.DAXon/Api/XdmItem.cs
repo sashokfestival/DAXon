@@ -5,7 +5,6 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Values;
 using OutSmart.DAXon.Internal.Collections;
@@ -87,11 +86,6 @@ namespace OutSmart.DAXon.Api
         public virtual Dictionary<XdmAtomicValue, XdmValue> AsMap()
         {
             return null; // Overridden in XdmMap. The method is retained on this interface for compatibility reasons.
-        }
-
-        public XdmStream<XdmItem> Stream()
-        {
-            return new XdmStream<XdmItem>(this);
         }
 
         public virtual bool Matches(ItemType type)

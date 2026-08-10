@@ -18,12 +18,6 @@ namespace OutSmart.DAXon.Values
 {
     internal sealed class Cardinality
     {
-        /// <summary>
-        /// Private constructor: no instances allowed
-        /// </summary>
-        private Cardinality()
-        {
-        }
 
         public static bool AllowsMany(int cardinality)
         {
@@ -44,30 +38,6 @@ namespace OutSmart.DAXon.Values
             {
                 return AllowsMany(cardinality);
             }
-        }
-
-        public static bool ExpectsMany(Expression expression)
-        {
-            if (expression is VariableReference)
-            {
-                IBinding b = ((VariableReference)expression).GetBinding();
-                if (b is LetExpression)
-                {
-                    return ExpectsMany(((LetExpression)b).Sequence);
-                }
-            }
-
-            if (expression is Atomizer)
-            {
-                return ExpectsMany(((Atomizer)expression).BaseExpression);
-            }
-
-            if (expression is FilterExpression)
-            {
-                return ExpectsMany(((FilterExpression)expression).GetSelectExpression());
-            }
-
-            return AllowsMany(expression.GetCardinality());
         }
 
         public static bool AllowsZero(int cardinality)
@@ -209,51 +179,6 @@ namespace OutSmart.DAXon.Values
                     return "0";
                 default:
                     return "*";
-            }
-        }
-
-        public static int FromOccurrenceIndicator(string indicator)
-        {
-            switch (indicator)
-            {
-                case "?":
-                    return StaticProperty.ALLOWS_ZERO_OR_ONE;
-                case "*":
-                    return StaticProperty.ALLOWS_ZERO_OR_MORE;
-                case "+":
-                    return StaticProperty.ALLOWS_ONE_OR_MORE;
-                case "1":
-                    return StaticProperty.ALLOWS_ONE;
-                case "":
-                    return StaticProperty.ALLOWS_ONE;
-                case "°":
-                case "0":
-                default:
-                    return StaticProperty.ALLOWS_ZERO;
-            }
-        }
-
-        public static string GenerateJavaScriptChecker(int card)
-        {
-            if (Cardinality.AllowsZero(card) && Cardinality.AllowsMany(card))
-            {
-                return "function c() {return true;};";
-            }
-            else if (card == StaticProperty.EXACTLY_ONE)
-            {
-                return "function c(n) {return n==1;};";
-            }
-            else if (card == StaticProperty.EMPTY)
-            {
-                return "function c(n) {return n==0;};";
-            }
-            else if (!Cardinality.AllowsZero(card))
-            {
-                return "function c(n) {return n>=1;};";
-            }
-            else
-            {
-                return "function c(n) {return n<=1;};";
             }
         }
     }

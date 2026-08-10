@@ -41,8 +41,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public virtual AttributeSet TargetAttributeSet => target;
-
         public Component FixedTarget
         {
             get

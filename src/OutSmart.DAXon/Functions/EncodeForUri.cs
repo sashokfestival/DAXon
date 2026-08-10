@@ -49,8 +49,6 @@ namespace OutSmart.DAXon.Functions
             3,
             4
         };
-
-        public static Func<EncodeForUri> New() => () => new EncodeForUri();
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
             UnicodeString s = arg.UnicodeStringValue;

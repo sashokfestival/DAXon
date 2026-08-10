@@ -106,8 +106,6 @@ namespace OutSmart.DAXon.Functions
             codePoint <= 0xFFFF
                 ? CharUnicodeInfo.GetUnicodeCategory((char)codePoint)
                 : CharUnicodeInfo.GetUnicodeCategory(char.ConvertFromUtf32(codePoint), 0);
-
-        public static Func<FormatDate> New() => () => new FormatDate();
         private string AdjustCalendar(string calendarVal, string result, IXPathContext context)
         {
             StructuredQName cal;

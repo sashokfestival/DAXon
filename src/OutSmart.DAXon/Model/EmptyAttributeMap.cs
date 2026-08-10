@@ -16,10 +16,8 @@ namespace OutSmart.DAXon.Model
     internal sealed class EmptyAttributeMap : IAttributeMap
     {
         private static readonly EmptyAttributeMap _instance = new EmptyAttributeMap();
-        public static readonly EmptyAttributeMap INSTANCE = _instance;
         public static EmptyAttributeMap GetInstance() => _instance;
         public int Size() => 0;
-        public bool IsEmpty() => true;
         public AttributeInfo Get(INodeName name) => null;
         public AttributeInfo Get(NamespaceUri uri, string local) => null;
         public AttributeInfo GetByFingerprint(int fingerprint, NamePool namePool) => null; // no attributes: absent, like the sibling maps' miss result
@@ -34,8 +32,6 @@ namespace OutSmart.DAXon.Model
         public IAttributeMap Apply(Func<AttributeInfo, AttributeInfo> mapper) => this;
         public List<AttributeInfo> AsList() => new List<AttributeInfo>();
         public AttributeInfo ItemAt(int index) => throw new IndexOutOfRangeException(index + " of 0");
-        // Iterable<AttributeInfo>
-        public IEnumerator<AttributeInfo> IIterator() => EmptyEnumerator.SHARED;
         // IEnumerable<AttributeInfo>
         public IEnumerator<AttributeInfo> GetEnumerator() => EmptyEnumerator.SHARED;
         IEnumerator IEnumerable.GetEnumerator() => EmptyEnumerator.SHARED;

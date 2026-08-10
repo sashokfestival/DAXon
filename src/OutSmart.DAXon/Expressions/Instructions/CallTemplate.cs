@@ -37,8 +37,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         private int bindingSlot = -1;
         private readonly bool isWithinDeclaredStreamableConstruct;
 
-        public virtual StructuredQName CalledTemplateName => calledTemplateName;
-
         public Component FixedTarget
         {
             get
@@ -53,14 +51,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
                 {
                     return null;
                 }
-            }
-        }
-
-        public virtual NamedTemplate TargetTemplate
-        {
-            get => template; set
-            {
-                this.template = value;
             }
         }
 

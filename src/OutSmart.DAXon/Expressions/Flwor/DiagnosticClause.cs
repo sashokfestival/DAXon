@@ -30,7 +30,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
     internal class DiagnosticClause : Clause
     {
         private Operand sequenceOp;
-        private volatile IPullEvaluator evaluator;   // volatile: published once, read hot (round 11)
         public override ClauseName ClauseKey => DIAG;
 
         //    }
@@ -39,16 +38,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
         public override LocalVariableBinding[] RangeVariables => new LocalVariableBinding[]
             {
             };
-
-        public virtual IPullEvaluator GetEvaluator()
-        {
-            if (evaluator == null)
-            {
-                evaluator = Sequence.MakeElaborator().ElaborateForPull();
-            }
-
-            return evaluator;
-        }
 
         public override Clause Copy(FLWORExpression flwor, RebindingMap rebindings)
         {

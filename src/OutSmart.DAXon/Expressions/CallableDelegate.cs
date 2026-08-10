@@ -18,10 +18,6 @@ namespace OutSmart.DAXon.Expressions
     {
         private readonly Func<IXPathContext, ISequence[], ISequence> _impl;
         public CallableDelegate(Func<IXPathContext, ISequence[], ISequence> impl) { _impl = impl; }
-        public CallableDelegate(Func<object, object[], object> impl)
-        {
-            _impl = (ctx, args) => (ISequence)impl(ctx, args);
-        }
         public ISequence Call(IXPathContext context, ISequence[] arguments)
             => _impl != null ? _impl(context, arguments) : null;
     }

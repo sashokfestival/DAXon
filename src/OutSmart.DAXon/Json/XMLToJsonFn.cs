@@ -32,8 +32,6 @@ namespace OutSmart.DAXon.Json
         private static readonly IFunctionItemType formatterFunctionType = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_STRING }, SequenceType.SINGLE_STRING);
 
         public override string StreamerName => "XmlToJsonFn";
-
-        public static Func<XMLToJsonFn> New() => () => new XMLToJsonFn();
         public static OptionsParameter MakeOptionsParameter()
         {
             OptionsParameter xmlToJsonOptions = new OptionsParameter();

@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class DocumentUri_1 : ScalarSystemFunction
     {
-
-        public static Func<DocumentUri_1> New() => () => new DocumentUri_1();
         public override AtomicValue Evaluate(IItem item, IXPathContext context)
         {
             return GetDocumentURI((NodeInfo)item, context);

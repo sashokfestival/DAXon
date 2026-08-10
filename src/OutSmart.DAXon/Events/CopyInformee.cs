@@ -18,6 +18,5 @@ namespace OutSmart.DAXon.Events
 {
     internal interface ICopyInformee
     {
-        object NotifyElementNode(NodeInfo element);
     }
 }

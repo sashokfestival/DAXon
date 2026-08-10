@@ -37,15 +37,6 @@ namespace OutSmart.DAXon.Types
             t is BuiltInAtomicType b ? (ItemType)b.GetPrimitiveItemType()
             : t is LocalUnionType u ? (ItemType)u.GetPrimitiveItemType()
             : t;
-        // runtime 2026-06-05: hollow GetAtomizedItemType(this ItemType t) => t REMOVED. It returned the type
-        // itself for every receiver, so for a bare-ItemType-typed NodeTest (e.g. DIMENSIONVALUE in FinDim's
-        // `!=`) Atomizer.GetAtomizedItemType got back the NameTest instead of its content's atomic type ->
-        // TypeChecker.StaticTypeCheck rule-3 promotion threw "NameTest cannot be converted to BuiltInAtomicType".
-        // OutSmart.DAXon.Internal cannot reference Saxon's NodeTest at compile time, so the real dispatch lives Saxon-side in
-        // excluded stubs.cs (alongside the GetUType/GetGenre dispatch shims).
-        public static bool Matches(this ItemType t, object item, object th) => true;
-        // 1-arg Matches overload (Java's `boolean matches(Item)`).
-        public static bool Matches(this ItemType t, object item) => true;
         // Java's String.matches(regex) moved to Extensions/JavaApiExtensions.cs
         // because resolution from ItemTypeExtensions class was unreliable across callsites.
         // GetBasicAlphaCode promoted to a real ItemType interface member (above) so interface-typed calls in
@@ -53,20 +44,6 @@ namespace OutSmart.DAXon.Types
         // (the "" stub made "".StartsWith("")==true -> every atomic pair returned SUBSUMED_BY -> spurious XPTY0004).
         public static string GetFullAlphaCode(this ItemType t) => "";
         public static double GetNormalizedDefaultPriority(this ItemType t) => 0.0;
-        // GetGenre(this ItemType) moved to a Genre-typed shim on the Saxon side (generated/OutSmart.DAXon/
-        // excluded stubs.cs, DAXonItemTypeUTypeExt.GetGenre). OutSmart.DAXon.Internal cannot name OutSmart.DAXon.Model.Genre,
-        // so the prior `=> null` here made `(Genre)itemType.GetGenre()` callers (e.g. AxisExpression.TypeCheck
-        // :134, every xsl:for-each / path-step) unbox null -> NullReferenceException.
-        // DELIBERATELY permissive, NOT ported from upstream isAtomizable (attempted 2026-07-10,
-        // reverted): the faithful dispatch (MapType false; SpecificFunctionType only when arity-1
-        // with integer-compatible arg) made TypeChecker raise STATIC FOTY0013 for expressions the
-        // rest of this port reports at RUN time (spec-bank map-014/027/028 expect runtime
-        // FOJS0003/XQDY0137/FOJS0005 from map:merge, raised only when the call executes). And it
-        // buys no QT3 tests: hof-908/909 (typed `local:f#1 eq 3` -> FOTY0013) fail identically in
-        // upstream Java — their arity-1 integer-arg type IS statically atomizable, the atomized
-        // type is xs:error, and TypeChecker rule-3 raises XPTY0004 (same code path,
-        // TypeChecker.java:192-204) — Java-parity WONTFIX.
-        public static bool IsAtomizable(this ItemType t) => true;
         // 1-arg form taking TypeHierarchy (TypeChecker uses this).
         public static bool IsAtomizable(this ItemType t, object th) => true;
         public static string ExplainMismatch(this ItemType t, object item, object th) => "";

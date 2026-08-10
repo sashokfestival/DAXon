@@ -38,16 +38,6 @@ namespace OutSmart.DAXon.Collections
             _hashCode = -1;
         }
 
-        public IntRangeSet(IntRangeSet input)
-        {
-            startPoints = new int[input.used];
-            endPoints = new int[input.used];
-            used = input.used;
-            Array.Copy(input.startPoints, 0, startPoints, 0, used);
-            Array.Copy(input.endPoints, 0, endPoints, 0, used);
-            _hashCode = input._hashCode;
-        }
-
         public IntRangeSet(int[] startPoints, int[] endPoints)
         {
             if (startPoints.Length != endPoints.Length)

@@ -16,7 +16,6 @@ namespace OutSmart.DAXon.Types
     internal class StringToGYear : StringConverter
     {
         private readonly StringConverter inner;
-        public StringToGYear() { }
         public StringToGYear(object x) : base(x as ConversionRules) { inner = new StringConverter.StringToGYear(x as ConversionRules); }
         // Delegates to the proven nested converter (BuiltInAtomicType binds that one; this top-level
         // copy is what ConversionRules binds - it used to throw NIE if that registry path went live).

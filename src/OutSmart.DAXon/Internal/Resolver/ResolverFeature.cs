@@ -13,9 +13,6 @@ namespace OutSmart.DAXon.Internal.Resolver
     internal class ResolverFeature
     {
         public static readonly ResolverFeature<object> CATALOG_FILES = new ResolverFeature<object>("catalog-files");
-        public static readonly ResolverFeature<object> ACCESS_EXTERNAL_DOCUMENT = new ResolverFeature<object>("access-external-document");
-        public static readonly ResolverFeature<object> ACCESS_EXTERNAL_ENTITY = new ResolverFeature<object>("access-external-entity");
-        public static readonly ResolverFeature<object> THROW_URI_EXCEPTIONS = new ResolverFeature<object>("throw-uri-exceptions");
         public string Name { get; }
         public ResolverFeature(string name) { Name = name; }
     }

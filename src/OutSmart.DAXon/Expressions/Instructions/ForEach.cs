@@ -72,8 +72,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override int InstructionNameCode => StandardNames.XSL_FOR_EACH;
 
-        public virtual Expression NumberOfThreadsExpression => Threads;
-
         public override int ImplementationMethod => ITERATE_METHOD | PROCESS_METHOD | Expression.WATCH_METHOD | Expression.ITEM_FEED_METHOD;
 
         public override string ExpressionName => "forEach";
@@ -105,16 +103,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return _isInstruction;
         }
 
-        public virtual void SetContainsTailCall(bool tc)
-        {
-            containsTailCall = tc;
-        }
-
-        public virtual bool IsContainsTailCall()
-        {
-            return containsTailCall;
-        }
-
         public virtual Expression GetAction()
         {
             return actionOp.GetChildExpression();
@@ -133,16 +121,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         public Expression GetSelectExpression()
         {
             return Select;
-        }
-
-        public virtual void SetSelectExpression(Expression select)
-        {
-            this.Select = select;
-        }
-
-        public virtual void SetActionExpression(Expression action)
-        {
-            this.SetAction(action);
         }
 
         public Expression GetActionExpression()

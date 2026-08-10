@@ -31,8 +31,6 @@ namespace OutSmart.DAXon.Patterns
 
         public override int Fingerprint => wrappedPattern.Fingerprint;
 
-        public virtual Pattern WrappedPattern => wrappedPattern;
-
         public PatternThatSetsCurrent(Pattern wrappedPattern)
             : this(wrappedPattern, new LocalVariableBinding(Current.FN_CURRENT, SequenceType.SINGLE_ITEM))
         {

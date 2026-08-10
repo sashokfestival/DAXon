@@ -26,10 +26,41 @@ namespace OutSmart.DAXon.Serialization
         // result) would materialize as a single multi-hundred-MB string via ToString().
         private const int WRITE_CHUNK = 1 << 15;
         private char[] writeBuf;
-        public UnicodeWriterToWriter() { }
         public UnicodeWriterToWriter(TextWriter writer) { _w = writer; }
         public void Write(UnicodeString chars)
         {
+            // Latin1 byte reps: widen straight into the reused buffer - the ToString() below
+            // allocated a string (plus its 8->16 copy) per text-node write.
+            byte[] b8 = null;
+            int off8 = 0;
+            if (chars is Slice8 sl8)
+            {
+                b8 = sl8.ByteArray;
+                off8 = sl8.Start;
+            }
+            else if (chars is Twine8 tw8)
+            {
+                b8 = tw8.ByteArray;
+            }
+
+            if (b8 != null)
+            {
+                int len8 = chars.Length32();
+                char[] buf8 = writeBuf ?? (writeBuf = new char[WRITE_CHUNK]);
+                for (int i = 0; i < len8; i += WRITE_CHUNK)
+                {
+                    int n = Math.Min(WRITE_CHUNK, len8 - i);
+                    for (int k = 0; k < n; k++)
+                    {
+                        buf8[k] = (char)(b8[off8 + i + k] & 0xff);
+                    }
+
+                    _w.Write(buf8, 0, n);
+                }
+
+                return;
+            }
+
             long len = chars.Length();
             if (len <= WRITE_CHUNK)
             {

@@ -29,11 +29,6 @@ namespace OutSmart.DAXon.Expressions
         {
         }
 
-        public void SetGenerateIdEmulation(bool flag)
-        {
-            generateIdEmulation = flag;
-        }
-
         public bool IsGenerateIdEmulation()
         {
             return generateIdEmulation;

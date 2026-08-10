@@ -527,16 +527,45 @@ namespace OutSmart.DAXon.Transformation
         private volatile Internal.Caching.ClockCache<int, Rule> elementRuleMemo;
         private volatile int elementMemoState;   // 0 = not yet decided, 1 = enabled, 2 = disabled
 
+        // Direct-mapped front cache over elementRuleMemo: the ClockCache hit (concurrent-dictionary
+        // probe + ref-bit write) was the hottest frame of pure apply-templates dispatch. The memo
+        // value for a (mode, fingerprint) is deterministic forever, so a slot overwritten by a
+        // colliding name is never wrong, only re-fetched - and 64 fixed references cannot grow.
+        private const int MemoFrontSize = 64;
+        private volatile MemoSlot[] memoFront;
+
+        // Text nodes have no name, so when the text and generic chains are unconditional every
+        // text node in the mode resolves to the same rule forever — one field replaces the
+        // per-node chain searches (half the nodes of a typical dispatch workload are texts).
+        // Value written before state (build-then-publish); racing writers store the same rule.
+        private volatile Rule textRuleMemoValue;
+        private volatile int textMemoState;   // 0 = undecided, 1 = memo valid, 2 = disabled
+
+        private sealed class MemoSlot
+        {
+            internal readonly int Fp;
+            internal readonly Rule Rule;   // null = no rule matches; may also be NotMemoizable
+
+            internal MemoSlot(int fp, Rule rule)
+            {
+                Fp = fp;
+                Rule = rule;
+            }
+        }
+
         // The memo can help only if the chains searched for EVERY element (the unnamed-element and generic
         // chains) are themselves unconditional; otherwise a predicate there could change any name's result.
+        // The lock lives in a NoInlining helper: net472 refuses to inline methods with EH/locks, and this
+        // check runs once per element — the decided-state read must stay inlinable.
         private bool ElementMemoEnabled()
         {
             int s = elementMemoState;
-            if (s != 0)
-            {
-                return s == 1;
-            }
+            return s != 0 ? s == 1 : ElementMemoEnabledSlow();
+        }
 
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+        private bool ElementMemoEnabledSlow()
+        {
             lock (syncLock)
             {
                 if (elementMemoState == 0)
@@ -544,6 +573,7 @@ namespace OutSmart.DAXon.Transformation
                     if (ChainAllUnconditional(unnamedElementRuleChain) && ChainAllUnconditional(genericRuleChain))
                     {
                         elementRuleMemo = new Internal.Caching.ClockCache<int, Rule>(ElementRuleMemoCapacity);
+                        memoFront = new MemoSlot[MemoFrontSize];
                         elementMemoState = 1;
                     }
                     else
@@ -601,7 +631,25 @@ namespace OutSmart.DAXon.Transformation
             if (nodeKind == Types.Type.ELEMENT && node.HasFingerprint() && ElementMemoEnabled())
             {
                 memoFp = node.Fingerprint;
-                if (elementRuleMemo.TryGet(memoFp, out Rule cached))
+                MemoSlot[] front = memoFront;
+                MemoSlot slot = front[memoFp & (MemoFrontSize - 1)];
+                Rule cached;
+                bool hit;
+                if (slot != null && slot.Fp == memoFp)
+                {
+                    cached = slot.Rule;
+                    hit = true;
+                }
+                else
+                {
+                    hit = elementRuleMemo.TryGet(memoFp, out cached);
+                    if (hit)
+                    {
+                        front[memoFp & (MemoFrontSize - 1)] = new MemoSlot(memoFp, cached);
+                    }
+                }
+
+                if (hit)
                 {
                     if (!ReferenceEquals(cached, NotMemoizable))
                     {
@@ -660,6 +708,11 @@ namespace OutSmart.DAXon.Transformation
                     }
 
                 case Types.Type.TEXT:
+                    if (textMemoState == 1)
+                    {
+                        return textRuleMemoValue;
+                    }
+
                     unnamedNodeChain = textRuleChain;
                     break;
                 case Types.Type.COMMENT:
@@ -694,7 +747,22 @@ namespace OutSmart.DAXon.Transformation
                 // first resolution for this element name (or first since eviction): cache it if
                 // content-independent, else record that it must always be searched. Set rather than
                 // TryAdd: racing writers store the same deterministic value, so last-wins is fine.
-                elementRuleMemo.Set(memoFp, IsFpContentIndependent(memoFp) ? bestRule : NotMemoizable);
+                Rule memoValue = IsFpContentIndependent(memoFp) ? bestRule : NotMemoizable;
+                elementRuleMemo.Set(memoFp, memoValue);
+                memoFront[memoFp & (MemoFrontSize - 1)] = new MemoSlot(memoFp, memoValue);
+            }
+
+            if (nodeKind == Types.Type.TEXT && textMemoState == 0)
+            {
+                if (ChainAllUnconditional(textRuleChain) && ChainAllUnconditional(genericRuleChain))
+                {
+                    textRuleMemoValue = bestRule;
+                    textMemoState = 1;
+                }
+                else
+                {
+                    textMemoState = 2;
+                }
             }
 
             return bestRule;

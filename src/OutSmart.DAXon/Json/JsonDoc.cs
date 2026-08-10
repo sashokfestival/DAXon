@@ -29,8 +29,6 @@ namespace OutSmart.DAXon.Json
     /// </summary>
     internal class JsonDoc : SystemFunction
     {
-
-        public static Func<JsonDoc> New() => () => new JsonDoc();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             IItem arg0 = arguments[0].Head();

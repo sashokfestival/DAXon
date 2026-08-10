@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class HasChildren_1 : SystemFunction
     {
-
-        public static Func<HasChildren_1> New() => () => new HasChildren_1();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             NodeInfo arg = (NodeInfo)arguments[0].Head();

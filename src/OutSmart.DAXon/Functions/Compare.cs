@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Compare : CollatingFunctionFixed
     {
-
-        public static Func<Compare> New() => () => new Compare();
         private static Int64Value CompareFn(StringValue s1, StringValue s2, IAtomicComparer comparer)
         {
             if (s1 == null || s2 == null)

@@ -186,29 +186,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        public static string NodeKindName(int kind)
-        {
-            switch (kind)
-            {
-                case Types.Type.DOCUMENT:
-                    return "document";
-                case Types.Type.ELEMENT:
-                    return "element";
-                case Types.Type.ATTRIBUTE:
-                    return "attribute";
-                case Types.Type.COMMENT:
-                    return "comment";
-                case Types.Type.TEXT:
-                    return "text";
-                case Types.Type.PROCESSING_INSTRUCTION:
-                    return "processing-instruction";
-                case Types.Type.NAMESPACE:
-                    return "namespace";
-                default:
-                    return "** error **";
-            }
-        }
-
         /// <summary>
         /// Returns a hash code value for the object.
         /// </summary>

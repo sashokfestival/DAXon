@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class NormalizeUnicode : SystemFunction
     {
-
-        public static Func<NormalizeUnicode> New() => () => new NormalizeUnicode();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue sv = (StringValue)arguments[0].Head();

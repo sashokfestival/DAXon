@@ -524,11 +524,18 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public XPathContextMajor MakeNewContext(IXPathContext oldContext, IContextOriginator originator)
         {
+            return MakeNewContext(oldContext, originator, DeclaringComponent);
+        }
+
+        // Variant for callers that already resolved the target component, so the default
+        // DeclaringComponent store is not written just to be overwritten (per-call hot path).
+        public XPathContextMajor MakeNewContext(IXPathContext oldContext, IContextOriginator originator, Component current)
+        {
             XPathContextMajor c2 = oldContext.NewCleanContext();
 
             c2.TemporaryOutputState = StandardNames.XSL_FUNCTION;
             c2.CurrentOutputUri = null;
-            c2.SetCurrentComponent(DeclaringComponent); // default value for the caller to override if necessary
+            c2.SetCurrentComponent(current);
             c2.Origin = originator;
             return c2;
         }
@@ -537,6 +544,17 @@ namespace OutSmart.DAXon.Expressions.Instructions
         {
             XPathContextMajor c2 = (XPathContextMajor)context;
             c2.SetStackFrame(GetStackFrameMap(), actualArgs);
+            return EvaluateBodyDirect(c2);
+        }
+
+        // Call for a caller that guarantees vars.Length == stack-frame size (no realloc+copy in
+        // SetStackFrame) and has already checked this is not a Call override (MemoFunction).
+        // Deliberately mirrors Call's frame shape: recursion descends through here, and the
+        // per-level stack cost must not exceed the classic path's (probe contract: depth-2000
+        // user-function recursion, including on a 1MB thread).
+        internal ISequence CallRightSized(XPathContextMajor c2, ISequence[] vars)
+        {
+            c2.SetStackFrame(GetStackFrameMap(), vars);
             return EvaluateBodyDirect(c2);
         }
 

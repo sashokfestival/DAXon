@@ -75,33 +75,6 @@ namespace OutSmart.DAXon.Xslt
             }
         }
 
-        public static Expression PrepareTestAttribute(StyleElement se)
-        {
-            AttributeInfo testAtt = null;
-            foreach (AttributeInfo att in se.Attributes())
-            {
-                INodeName attName = att.GetNodeName();
-                string f = attName.DisplayName;
-                if (f.Equals("test"))
-                {
-                    testAtt = att;
-                }
-                else
-                {
-                    se.CheckUnknownAttribute(attName);
-                }
-            }
-
-            if (testAtt == null)
-            {
-                return null;
-            }
-            else
-            {
-                return se.MakeExpression(testAtt.Value, testAtt);
-            }
-        }
-
         public override void Validate(ComponentDeclaration decl)
         {
             test = TypeCheck("test", test);

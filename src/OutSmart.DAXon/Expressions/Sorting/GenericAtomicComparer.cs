@@ -143,6 +143,17 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public static IAtomicComparisonFunction MakeAtomicComparisonFunction(BuiltInAtomicType type0, BuiltInAtomicType type1, IStringCollator collator, int @operator, bool allowRecursion, int version)
         {
+            // NaN-free numeric pair: integer/decimal values cannot be NaN, so the double lane
+            // ApplyPromotion would route them to only adds two virtual IsNaN probes per call on
+            // top of the same cross-numeric CompareTo. Take the exact lane directly.
+            int rawFp0 = type0.Fingerprint;
+            int rawFp1 = type1.Fingerprint;
+            if ((rawFp0 == StandardNames.XS_INTEGER || rawFp0 == StandardNames.XS_DECIMAL)
+                && (rawFp1 == StandardNames.XS_INTEGER || rawFp1 == StandardNames.XS_DECIMAL))
+            {
+                return GetContextFreeComparisonFunction(@operator);
+            }
+
             int fp0 = ApplyPromotion(type0, version);
             int fp1 = ApplyPromotion(type1, version);
             if (fp0 == fp1)
@@ -166,8 +177,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
                     case StandardNames.XS_FLOAT:
                         return GetFloatingPointComparisonFunction(@operator);
                     case StandardNames.XS_BOOLEAN:
-                    case StandardNames.XS_INTEGER:
-                    case StandardNames.XS_DECIMAL:
                     case StandardNames.XS_DAY_TIME_DURATION:
                     case StandardNames.XS_YEAR_MONTH_DURATION:
                     case StandardNames.XS_BASE64_BINARY:
@@ -189,23 +198,25 @@ namespace OutSmart.DAXon.Expressions.Sorting
                         }
 
                     case StandardNames.XS_STRING:
-                        if (collator is CodepointCollator && @operator == Token.FEQ)
+                        if (collator is CodepointCollator)
                         {
-                            return (a, b, context) => a.Equals(b);
+                            switch (@operator)
+                            {
+                                case Token.FEQ:
+                                    return (a, b, context) => a.Equals(b);
+                                case Token.FNE:
+                                    return (a, b, context) => !a.Equals(b);
+                                default:
+                                    // Codepoint ordering IS UnicodeString.CompareTo — skip the collator dispatch.
+                                    return (a, b, context) => CompareToConstant.InterpretComparisonResult(@operator, a.UnicodeStringValue.CompareTo(b.UnicodeStringValue));
+                            }
                         }
 
-                        if (collator is CodepointCollator && @operator == Token.FNE)
+                        return (a, b, context) =>
                         {
-                            return (a, b, context) => !a.Equals(b);
-                        }
-                        else
-                        {
-                            return (a, b, context) =>
-                            {
-                                int comp = collator.CompareStrings(a.UnicodeStringValue, b.UnicodeStringValue);
-                                return CompareToConstant.InterpretComparisonResult(@operator, comp);
-                            };
-                        }
+                            int comp = collator.CompareStrings(a.UnicodeStringValue, b.UnicodeStringValue);
+                            return CompareToConstant.InterpretComparisonResult(@operator, comp);
+                        };
                 }
             }
 

@@ -341,6 +341,21 @@ namespace OutSmart.DAXon.Expressions
                         pos++;
                         try
                         {
+                            // xsl:number value="position()" and friends: a plain integer needs no
+                            // rounding, no MAX_LONG probe, no converter — the long IS the number.
+                            // Negatives fall to the same catch → XTDE0980 as the generic path.
+                            if (val is Int64Value plain)
+                            {
+                                long iv = plain.LongValue();
+                                if (iv < 0)
+                                {
+                                    throw new XPathException("The numbers to be formatted must not be negative");
+                                }
+
+                                vec.Add(iv + (startValue - 1));
+                                continue;
+                            }
+
                             NumericValue num;
                             if (val is NumericValue)
                             {

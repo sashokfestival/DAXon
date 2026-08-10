@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class DateTimeConstructor : SystemFunction
     {
-
-        public static Func<DateTimeConstructor> New() => () => new DateTimeConstructor();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             DateValue arg0 = (DateValue)arguments[0].Head();

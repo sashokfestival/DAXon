@@ -9,7 +9,6 @@ using OutSmart.DAXon.Functions;
 
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Patterns;
-using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Trees.Wrappers;
@@ -65,24 +64,6 @@ namespace OutSmart.DAXon.Api
             {
                 NodeInfo p = UnderlyingNode.Root;
                 return p == null ? null : (XdmNode)XdmValue.Wrap(p);
-            }
-        }
-
-        public virtual XdmNode OutermostElement
-        {
-            get
-            {
-                if (GetNodeKind() == XdmNodeKind.DOCUMENT)
-                {
-                    // Select is a NotImplemented stub (XdmStream/Step excluded); it throws before FirstItem is reached.
-                    Select(Steps.Child("*"));
-                    return null;
-                }
-                else
-                {
-                    Select(Steps.AncestorOrSelf("*"));
-                    return null;
-                }
             }
         }
 
@@ -199,31 +180,6 @@ namespace OutSmart.DAXon.Api
             return UnderlyingNode.GetColumnNumber();
         }
 
-        public virtual IEnumerable<XdmNode> Children()
-        {
-            // Select is a NotImplemented stub (XdmStream/Step excluded); it throws before AsListOfNodes is reached.
-            Select(Steps.Child());
-            return null;
-        }
-
-        public virtual IEnumerable<XdmNode> Children(string localName)
-        {
-            Select(Steps.Child(localName));
-            return null;
-        }
-
-        public virtual IEnumerable<XdmNode> Children(string uri, string localName)
-        {
-            Select(Steps.Child(uri, localName));
-            return null;
-        }
-
-        public virtual IEnumerable<XdmNode> Children(Func<XdmNode, bool> filter)
-        {
-            Select(Steps.Child((filter).ToString()));
-            return null;
-        }
-
         public virtual XdmSequenceIterator<XdmNode> IAxisIterator(Axis axis)
         {
             IAxisIterator @base = UnderlyingNode.IterateAxis(axis.GetAxisNumber());
@@ -296,11 +252,6 @@ namespace OutSmart.DAXon.Api
         public override bool Equals(object other)
         {
             return other is XdmNode && UnderlyingNode.Equals(((XdmNode)other).UnderlyingNode);
-        }
-
-        public XdmStream<XdmNode> Stream()
-        {
-            return new XdmStream<XdmNode>(this);
         }
     }
 }

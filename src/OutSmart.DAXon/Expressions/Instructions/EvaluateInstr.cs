@@ -175,11 +175,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             optionsOp = new Operand(this, options, OperandRole.ABSORB);
         }
 
-        public void SetActualParameters(WithParam[] @params)
-        {
-            ActualParams = @params;
-        }
-
         public void SetDefaultXPathNamespace(NamespaceUri defaultXPathNamespace)
         {
             this.defaultXPathNamespace = defaultXPathNamespace;
@@ -188,16 +183,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         public override bool IsInstruction()
         {
             return true;
-        }
-
-        public void ImportSchemaNamespace(NamespaceUri ns)
-        {
-            if (importedSchemaNamespaces == null)
-            {
-                importedSchemaNamespaces = new HashSet<NamespaceUri>();
-            }
-
-            importedSchemaNamespaces.Add(ns);
         }
 
         public override Expression TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)

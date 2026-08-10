@@ -97,18 +97,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        private void Write(TextWriter writer, long start, long len)
-        {
-            if (writer is UTF8Writer)
-            {
-                ((UTF8Writer)writer).WriteLatin1(bytes, this.start + RequireInt(start), RequireInt(len));
-            }
-            else
-            {
-                writer.Write(Substring(RequireInt(start), RequireInt(start + len)).ToString());
-            }
-        }
-
         public override long IndexWhere(Func<int, bool> predicate, long from)
         {
             for (int i = requireNonNegativeInt(from) + start; i < end; i++)
@@ -156,6 +144,25 @@ namespace OutSmart.DAXon.Text
             {
                 target[j++] = bytes[i++] & 0xff;
             }
+        }
+
+        // Content equality against a raw Latin-1 byte span (fused group-by key probe).
+        internal bool ContentEqualsSpan(byte[] b, int off, int len)
+        {
+            if (end - start != len)
+            {
+                return false;
+            }
+
+            for (int i = 0; i < len; i++)
+            {
+                if (bytes[start + i] != b[off + i])
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public override int GetHashCode()

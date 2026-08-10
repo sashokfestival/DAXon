@@ -77,7 +77,7 @@ namespace OutSmart.DAXon.Serialization
                 }
                 else
                 {
-                    StructuredQName name = new StructuredQName("saxon", "http://saxon.sf.net/", "combined-character-map");
+                    StructuredQName name = new StructuredQName("saxon", NamespaceConstant.SAXON, "combined-character-map");
                     characterMapExpander.SetCharacterMap(new CharacterMap(characterMaps, name));
                 }
             }

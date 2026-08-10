@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class ParseXmlFragment : SystemFunction, ICallable
     {
-
-        public static Func<ParseXmlFragment> New() => () => new ParseXmlFragment();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue input = (StringValue)arguments[0].Head();
@@ -148,7 +146,6 @@ namespace OutSmart.DAXon.Functions
         {
 
             private int level = 0;
-            private readonly bool suppressStartContent = false;
             public OuterElementStripper(IReceiver next) : base(next)
             {
             }

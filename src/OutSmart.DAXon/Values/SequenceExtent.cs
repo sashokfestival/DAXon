@@ -66,8 +66,6 @@ namespace OutSmart.DAXon.Values
                 return new Of<T>(input);
             }
         }
-
-        public abstract ISequenceIterator ReverseIterate();
         public abstract ISequenceIterator Iterate();
         public abstract IItem ItemAt(int arg0);
         public abstract IItem Head();
@@ -130,19 +128,9 @@ namespace OutSmart.DAXon.Values
             {
             }
 
-            public Of(Of<T> ext, int start, int length)
-            {
-                items = ext.items.GetRange(start, (start + length) - (start));
-            }
-
             public override ISequenceIterator Iterate()
             {
                 return new ListIterator.Of<T>(items);
-            }
-
-            public override ISequenceIterator ReverseIterate()
-            {
-                return Reverse.ReverseIterator(items);
             }
 
             public override bool EffectiveBooleanValue()
@@ -269,12 +257,6 @@ namespace OutSmart.DAXon.Values
                 {
                     return this;
                 }
-            }
-
-            //@Override
-            public virtual IEnumerator<T> IIterator()
-            {
-                return items.GetEnumerator();
             }
             public IEnumerator<T> GetEnumerator() => items.GetEnumerator();
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();

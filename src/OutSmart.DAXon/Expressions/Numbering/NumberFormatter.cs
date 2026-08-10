@@ -127,6 +127,7 @@ namespace OutSmart.DAXon.Expressions.Numbering
 
 
             // output the list of numbers
+            RegularGroupFormatter rgf = new RegularGroupFormatter(groupSize, groupSeparator, EmptyUnicodeString.GetInstance());
             while (num < numbers.Count)
             {
                 if (num > 0)
@@ -149,14 +150,12 @@ namespace OutSmart.DAXon.Expressions.Numbering
                 if (o is long)
                 {
                     long nr = (long)o;
-                    RegularGroupFormatter rgf = new RegularGroupFormatter(groupSize, groupSeparator, EmptyUnicodeString.GetInstance());
                     s = numberer.Format(nr, formatTokens[tok], rgf, letterValue, "", ordinal);
                 }
                 else if (o is BigInteger)
                 {
 
                     // Saxon bug 2071; test case number-0111
-                    RegularGroupFormatter rgf = new RegularGroupFormatter(groupSize, groupSeparator, EmptyUnicodeString.GetInstance());
                     s = rgf.Format(o.ToString());
                     s = TranslateDigits(s, formatTokens[tok]);
                 }

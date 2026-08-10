@@ -32,16 +32,6 @@ namespace OutSmart.DAXon.Expressions
         public const int MOD = 4;
         public const int IDIV = 5;
 
-        private static readonly int[] tokens = new int[]
-        {
-            Token.PLUS,
-            Token.MINUS,
-            Token.MULT,
-            Token.DIV,
-            Token.MOD,
-            Token.IDIV
-        };
-
         public static readonly Calculator[] ANY_ANY = new Calculator[]
         {
             new AnyPlusAny(),
@@ -184,88 +174,82 @@ namespace OutSmart.DAXon.Expressions
         /// Table mapping argument types to the Calculator class used to implement them
         /// </summary>
         private static readonly IntHashMap<Calculator[]> table = new IntHashMap<Calculator[]>(100);
-        private static readonly IntHashMap<string> nameTable = new IntHashMap<string>(100);
 
         static Calculator()
         {
-            Def(StandardNames.XS_DOUBLE, StandardNames.XS_DOUBLE, DOUBLE_DOUBLE, "DOUBLE_DOUBLE");
-            Def(StandardNames.XS_DOUBLE, StandardNames.XS_FLOAT, DOUBLE_FLOAT, "DOUBLE_FLOAT");
-            Def(StandardNames.XS_DOUBLE, StandardNames.XS_DECIMAL, DOUBLE_DECIMAL, "DOUBLE_DECIMAL");
-            Def(StandardNames.XS_DOUBLE, StandardNames.XS_INTEGER, DOUBLE_INTEGER, "DOUBLE_INTEGER");
-            Def(StandardNames.XS_FLOAT, StandardNames.XS_DOUBLE, FLOAT_DOUBLE, "FLOAT_DOUBLE");
-            Def(StandardNames.XS_FLOAT, StandardNames.XS_FLOAT, FLOAT_FLOAT, "FLOAT_FLOAT");
-            Def(StandardNames.XS_FLOAT, StandardNames.XS_DECIMAL, FLOAT_DECIMAL, "FLOAT_DECIMAL");
-            Def(StandardNames.XS_FLOAT, StandardNames.XS_INTEGER, FLOAT_INTEGER, "FLOAT_INTEGER");
-            Def(StandardNames.XS_DECIMAL, StandardNames.XS_DOUBLE, DECIMAL_DOUBLE, "DECIMAL_DOUBLE");
-            Def(StandardNames.XS_DECIMAL, StandardNames.XS_FLOAT, DECIMAL_FLOAT, "DECIMAL_FLOAT");
-            Def(StandardNames.XS_DECIMAL, StandardNames.XS_DECIMAL, DECIMAL_DECIMAL, "DECIMAL_DECIMAL");
-            Def(StandardNames.XS_DECIMAL, StandardNames.XS_INTEGER, DECIMAL_INTEGER, "DECIMAL_INTEGER");
-            Def(StandardNames.XS_INTEGER, StandardNames.XS_DOUBLE, INTEGER_DOUBLE, "INTEGER_DOUBLE");
-            Def(StandardNames.XS_INTEGER, StandardNames.XS_FLOAT, INTEGER_FLOAT, "INTEGER_FLOAT");
-            Def(StandardNames.XS_INTEGER, StandardNames.XS_DECIMAL, INTEGER_DECIMAL, "INTEGER_DECIMAL");
-            Def(StandardNames.XS_INTEGER, StandardNames.XS_INTEGER, INTEGER_INTEGER, "INTEGER_INTEGER");
-            Def(StandardNames.XS_DATE_TIME, StandardNames.XS_DATE_TIME, DATETIME_DATETIME, "DATETIME_DATETIME");
-            Def(StandardNames.XS_DATE_TIME, StandardNames.XS_DURATION, DATETIME_DURATION, "DATETIME_DURATION");
-            Def(StandardNames.XS_DURATION, StandardNames.XS_DATE_TIME, DURATION_DATETIME, "DURATION_DATETIME");
-            Def(StandardNames.XS_DURATION, StandardNames.XS_DURATION, DURATION_DURATION, "DURATION_DURATION");
-            Def(StandardNames.XS_DURATION, StandardNames.XS_DOUBLE, DURATION_NUMERIC, "DURATION_NUMERIC");
-            Def(StandardNames.XS_DURATION, StandardNames.XS_FLOAT, DURATION_NUMERIC, "DURATION_NUMERIC");
-            Def(StandardNames.XS_DURATION, StandardNames.XS_DECIMAL, DURATION_NUMERIC, "DURATION_NUMERIC");
-            Def(StandardNames.XS_DURATION, StandardNames.XS_INTEGER, DURATION_NUMERIC, "DURATION_NUMERIC");
-            Def(StandardNames.XS_DOUBLE, StandardNames.XS_DURATION, NUMERIC_DURATION, "NUMERIC_DURATION");
-            Def(StandardNames.XS_FLOAT, StandardNames.XS_DURATION, NUMERIC_DURATION, "NUMERIC_DURATION");
-            Def(StandardNames.XS_DECIMAL, StandardNames.XS_DURATION, NUMERIC_DURATION, "NUMERIC_DURATION");
-            Def(StandardNames.XS_INTEGER, StandardNames.XS_DURATION, NUMERIC_DURATION, "NUMERIC_DURATION");
-        }
-        public static int GetTokenFromOperator(int @operator)
-        {
-            return tokens[@operator];
+            Def(StandardNames.XS_DOUBLE, StandardNames.XS_DOUBLE, DOUBLE_DOUBLE);
+            Def(StandardNames.XS_DOUBLE, StandardNames.XS_FLOAT, DOUBLE_FLOAT);
+            Def(StandardNames.XS_DOUBLE, StandardNames.XS_DECIMAL, DOUBLE_DECIMAL);
+            Def(StandardNames.XS_DOUBLE, StandardNames.XS_INTEGER, DOUBLE_INTEGER);
+            Def(StandardNames.XS_FLOAT, StandardNames.XS_DOUBLE, FLOAT_DOUBLE);
+            Def(StandardNames.XS_FLOAT, StandardNames.XS_FLOAT, FLOAT_FLOAT);
+            Def(StandardNames.XS_FLOAT, StandardNames.XS_DECIMAL, FLOAT_DECIMAL);
+            Def(StandardNames.XS_FLOAT, StandardNames.XS_INTEGER, FLOAT_INTEGER);
+            Def(StandardNames.XS_DECIMAL, StandardNames.XS_DOUBLE, DECIMAL_DOUBLE);
+            Def(StandardNames.XS_DECIMAL, StandardNames.XS_FLOAT, DECIMAL_FLOAT);
+            Def(StandardNames.XS_DECIMAL, StandardNames.XS_DECIMAL, DECIMAL_DECIMAL);
+            Def(StandardNames.XS_DECIMAL, StandardNames.XS_INTEGER, DECIMAL_INTEGER);
+            Def(StandardNames.XS_INTEGER, StandardNames.XS_DOUBLE, INTEGER_DOUBLE);
+            Def(StandardNames.XS_INTEGER, StandardNames.XS_FLOAT, INTEGER_FLOAT);
+            Def(StandardNames.XS_INTEGER, StandardNames.XS_DECIMAL, INTEGER_DECIMAL);
+            Def(StandardNames.XS_INTEGER, StandardNames.XS_INTEGER, INTEGER_INTEGER);
+            Def(StandardNames.XS_DATE_TIME, StandardNames.XS_DATE_TIME, DATETIME_DATETIME);
+            Def(StandardNames.XS_DATE_TIME, StandardNames.XS_DURATION, DATETIME_DURATION);
+            Def(StandardNames.XS_DURATION, StandardNames.XS_DATE_TIME, DURATION_DATETIME);
+            Def(StandardNames.XS_DURATION, StandardNames.XS_DURATION, DURATION_DURATION);
+            Def(StandardNames.XS_DURATION, StandardNames.XS_DOUBLE, DURATION_NUMERIC);
+            Def(StandardNames.XS_DURATION, StandardNames.XS_FLOAT, DURATION_NUMERIC);
+            Def(StandardNames.XS_DURATION, StandardNames.XS_DECIMAL, DURATION_NUMERIC);
+            Def(StandardNames.XS_DURATION, StandardNames.XS_INTEGER, DURATION_NUMERIC);
+            Def(StandardNames.XS_DOUBLE, StandardNames.XS_DURATION, NUMERIC_DURATION);
+            Def(StandardNames.XS_FLOAT, StandardNames.XS_DURATION, NUMERIC_DURATION);
+            Def(StandardNames.XS_DECIMAL, StandardNames.XS_DURATION, NUMERIC_DURATION);
+            Def(StandardNames.XS_INTEGER, StandardNames.XS_DURATION, NUMERIC_DURATION);
         }
         public virtual string Code()
         {
             string name = GetType().Name;
             return name.Replace("Any", "a").Replace("Double", "d").Replace("Float", "f").Replace("Decimal", "c").Replace("Integer", "i").Replace("Numeric", "n").Replace("DateTime", "t").Replace("Duration", "u").Replace("Plus", "+").Replace("Minus", "-").Replace("Times", "*").Replace("Div", "/").Replace("Idiv", "~").Replace("Mod", "%");
         }
-        private static void Def(int typeA, int typeB, Calculator[] calculatorSet, string setName)
+        private static void Def(int typeA, int typeB, Calculator[] calculatorSet)
         {
             int key = (typeA & 0xffff) << 16 | (typeB & 0xffff);
             table.Put(key, calculatorSet);
-            nameTable.Put(key, setName);
 
             // As well as the entries added directly, we also add derived entries for other types
             // considered primitive
             if (typeA == StandardNames.XS_DURATION)
             {
-                Def(StandardNames.XS_DAY_TIME_DURATION, typeB, calculatorSet, setName);
-                Def(StandardNames.XS_YEAR_MONTH_DURATION, typeB, calculatorSet, setName);
+                Def(StandardNames.XS_DAY_TIME_DURATION, typeB, calculatorSet);
+                Def(StandardNames.XS_YEAR_MONTH_DURATION, typeB, calculatorSet);
             }
 
             if (typeB == StandardNames.XS_DURATION)
             {
-                Def(typeA, StandardNames.XS_DAY_TIME_DURATION, calculatorSet, setName);
-                Def(typeA, StandardNames.XS_YEAR_MONTH_DURATION, calculatorSet, setName);
+                Def(typeA, StandardNames.XS_DAY_TIME_DURATION, calculatorSet);
+                Def(typeA, StandardNames.XS_YEAR_MONTH_DURATION, calculatorSet);
             }
 
             if (typeA == StandardNames.XS_DATE_TIME)
             {
-                Def(StandardNames.XS_DATE, typeB, calculatorSet, setName);
-                Def(StandardNames.XS_TIME, typeB, calculatorSet, setName);
+                Def(StandardNames.XS_DATE, typeB, calculatorSet);
+                Def(StandardNames.XS_TIME, typeB, calculatorSet);
             }
 
             if (typeB == StandardNames.XS_DATE_TIME)
             {
-                Def(typeA, StandardNames.XS_DATE, calculatorSet, setName);
-                Def(typeA, StandardNames.XS_TIME, calculatorSet, setName);
+                Def(typeA, StandardNames.XS_DATE, calculatorSet);
+                Def(typeA, StandardNames.XS_TIME, calculatorSet);
             }
 
             if (typeA == StandardNames.XS_DOUBLE)
             {
-                Def(StandardNames.XS_UNTYPED_ATOMIC, typeB, calculatorSet, setName);
+                Def(StandardNames.XS_UNTYPED_ATOMIC, typeB, calculatorSet);
             }
 
             if (typeB == StandardNames.XS_DOUBLE)
             {
-                Def(typeA, StandardNames.XS_UNTYPED_ATOMIC, calculatorSet, setName);
+                Def(typeA, StandardNames.XS_UNTYPED_ATOMIC, calculatorSet);
             }
         }
 
@@ -288,66 +272,6 @@ namespace OutSmart.DAXon.Expressions
             {
                 return set[@operator];
             }
-        }
-
-        public static Calculator ReconstructCalculator(string code)
-        {
-            int typeA = TypeFromCode(code[0]);
-            int typeB = TypeFromCode(code[2]);
-            int @operator = OperatorFromCode(code[1]);
-            return GetCalculator(typeA, typeB, @operator, false);
-        }
-
-        private static int TypeFromCode(char code)
-        {
-            switch (code)
-            {
-                case 'a':
-                    return StandardNames.XS_ANY_ATOMIC_TYPE;
-                case 'd':
-                    return StandardNames.XS_DOUBLE;
-                case 'i':
-                    return StandardNames.XS_INTEGER;
-                case 'f':
-                    return StandardNames.XS_FLOAT;
-                case 'c':
-                    return StandardNames.XS_DECIMAL;
-                case 'n':
-                    return StandardNames.XS_NUMERIC;
-                case 't':
-                    return StandardNames.XS_DATE_TIME;
-                case 'u':
-                    return StandardNames.XS_DURATION;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
-
-        public static int OperatorFromCode(char code)
-        {
-            switch (code)
-            {
-                case '+':
-                    return PLUS;
-                case '-':
-                    return MINUS;
-                case '*':
-                    return TIMES;
-                case '/':
-                    return DIV;
-                case '~':
-                    return IDIV;
-                case '%':
-                    return MOD;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }
-
-        public static string GetCalculatorSetName(int typeA, int typeB)
-        {
-            int key = (typeA & 0xffff) << 16 | (typeB & 0xffff);
-            return nameTable[key];
         }
 
         public abstract AtomicValue Compute(AtomicValue a, AtomicValue b, IXPathContext c);

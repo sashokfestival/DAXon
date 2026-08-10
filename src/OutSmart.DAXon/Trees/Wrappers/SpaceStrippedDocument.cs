@@ -4,8 +4,10 @@
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+using OutSmart.DAXon.Events;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Patterns;
+using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Types;
@@ -116,5 +118,57 @@ namespace OutSmart.DAXon.Trees.Wrappers
         public virtual bool ContainsPreserveSpace() => preservesSpace;
 
         public virtual bool ContainsAssertions() => _containsAssertions;
+
+        // Memo of the strip/preserve rule verdict by parent-element fingerprint: the rule lookup
+        // allocates a NameOfNode per whitespace text and the verdict is name-deterministic. Same
+        // direct-mapped immutable-slot pattern as SimpleMode's dispatch memo - safe under any
+        // sharing, bounded by construction.
+        private const int VerdictSlots = 64;
+        private VerdictSlot[] verdicts;
+
+        private sealed class VerdictSlot
+        {
+            internal readonly int Fp;
+            internal readonly bool Preserved;
+
+            internal VerdictSlot(int fp, bool preserved)
+            {
+                Fp = fp;
+                Preserved = preserved;
+            }
+        }
+
+        internal bool PreservedByRule(NodeInfo actualParent)
+        {
+            int fp = actualParent.HasFingerprint() ? actualParent.Fingerprint : -1;
+            VerdictSlot[] slots = null;
+            if (fp >= 0)
+            {
+                slots = verdicts ?? (verdicts = new VerdictSlot[VerdictSlots]);
+                VerdictSlot slot = slots[fp & (VerdictSlots - 1)];
+                if (slot != null && slot.Fp == fp)
+                {
+                    return slot.Preserved;
+                }
+            }
+
+            bool preserved;
+            try
+            {
+                preserved = strippingRule.IsSpacePreserving(NameOfNode.MakeName(actualParent), null) == Stripper.ALWAYS_PRESERVE;
+            }
+            catch (XPathException)
+            {
+                // Ambiguity between strip-space and preserve-space. Take the recovery action.
+                preserved = true;
+            }
+
+            if (slots != null)
+            {
+                slots[fp & (VerdictSlots - 1)] = new VerdictSlot(fp, preserved);
+            }
+
+            return preserved;
+        }
     }
 }

@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class StaticBaseUri : SystemFunction
     {
-
-        public static Func<StaticBaseUri> New() => () => new StaticBaseUri();
         public override ISequence Call(IXPathContext context, ISequence[] args)
         {
             return new AnyURIValue(GetRetainedStaticContext().StaticBaseUriString);

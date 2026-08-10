@@ -48,8 +48,6 @@ namespace OutSmart.DAXon.Trees.Tiny
 
         public override int Fingerprint => tree.attCode[nodeNr] & 0xfffff;
 
-        public int NameCode => tree.attCode[nodeNr];
-
         public override string DisplayName
         {
             get
@@ -190,11 +188,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         public override bool IsNilled()
         {
             return false;
-        }
-
-        public bool IsDefaultedAttribute()
-        {
-            return tree.IsDefaultedAttribute(nodeNr);
         }
 
         public override int GetHashCode()

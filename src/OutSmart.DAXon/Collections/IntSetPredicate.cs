@@ -21,10 +21,6 @@ namespace OutSmart.DAXon.Collections
         /// Convenience predicate that always matches
         /// </summary>
         public static readonly IIntPredicateProxy ALWAYS_TRUE = IntPredicateLambda.Of((i) => true);
-        /// <summary>
-        /// Convenience predicate that never matches
-        /// </summary>
-        public static readonly IIntPredicateProxy ALWAYS_FALSE = IntPredicateLambda.Of((i) => false);
         private readonly IntSet set;
         public IntSetPredicate(IntSet set)
         {

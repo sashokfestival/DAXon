@@ -113,11 +113,6 @@ namespace OutSmart.DAXon.Trees.Utilities
             this.typeAnnotation = typeAnnotation;
         }
 
-        public void SetIsId(bool id)
-        {
-            SetOption(ReceiverOption.IS_ID, id);
-        }
-
         private void SetOption(int option, bool on)
         {
             if (on)
@@ -133,11 +128,6 @@ namespace OutSmart.DAXon.Trees.Utilities
         private bool IsOption(int option)
         {
             return ReceiverOption.Contains(options, option);
-        }
-
-        public void SetIsIdref(bool idref)
-        {
-            SetOption(ReceiverOption.IS_IDREF, idref);
         }
 
         public void SetDisableOutputEscaping(bool doe)

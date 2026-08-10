@@ -34,7 +34,7 @@ namespace OutSmart.DAXon.Types
 
         public override IConversionResult ConvertString(UnicodeString input)
         {
-            IConversionResult iv = IntegerValue.StringToInteger(input.ToString());
+            IConversionResult iv = IntegerValue.StringToInteger(input);
             if (iv is Int64Value)
             {
                 bool ok = IntegerValue.CheckRange(((Int64Value)iv).LongValue(), targetType);

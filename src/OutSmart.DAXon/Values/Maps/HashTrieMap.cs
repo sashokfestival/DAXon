@@ -5,7 +5,6 @@
 // This Source Code Form is "Incompatible With Secondary Licenses", as defined by the Mozilla Public License, v. 2.0.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Expressions.Sorting;
-using OutSmart.DAXon.Collections.Trie;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Core;
@@ -27,7 +26,7 @@ namespace OutSmart.DAXon.Values.Maps
     /// </summary>
     internal class HashTrieMap : MapItem
     {
-        private IImmutableMap<IAtomicMatchKey, KeyValuePair> imap;
+        private object root;   // MapTrie node, null = empty
         // type.
         private UType keyUType = UType.VOID;
         // type.
@@ -46,21 +45,15 @@ namespace OutSmart.DAXon.Values.Maps
         // type.
         public HashTrieMap()
         {
-            this.imap = ImmutableHashTrieMap<IAtomicMatchKey, KeyValuePair>.Empty();
+            this.root = null;
             this.entries = 0;
         }
 
         // type.
-        public HashTrieMap(IImmutableMap<IAtomicMatchKey, KeyValuePair> imap)
+        private HashTrieMap(object root)
         {
-            this.imap = imap;
+            this.root = root;
             entries = -1;
-        }
-
-        // type.
-        public static HashTrieMap Singleton(AtomicValue key, IGroundedValue value)
-        {
-            return (HashTrieMap)new HashTrieMap().AddEntry(key, value);
         }
 
         // type.
@@ -130,7 +123,7 @@ namespace OutSmart.DAXon.Values.Maps
         // type.
         public override bool IsEmpty()
         {
-            return entries == 0 || !imap.Any();
+            return entries == 0 || root == null;
         }
 
         // type.
@@ -250,10 +243,10 @@ namespace OutSmart.DAXon.Values.Maps
         public override MapItem AddEntry(AtomicValue key, IGroundedValue value)
         {
             IAtomicMatchKey amk = MakeKey(key);
-            bool isNew = imap[amk] == null;
+            bool isNew = MapTrie.Get(root, amk) == null;
             bool empty = IsEmpty();
-            IImmutableMap<IAtomicMatchKey, KeyValuePair> imap2 = imap.Put(amk, new KeyValuePair(key, value));
-            HashTrieMap t2 = new HashTrieMap(imap2);
+            object root2 = MapTrie.Put(root, amk, new KeyValuePair(key, value, amk));
+            HashTrieMap t2 = new HashTrieMap(root2);
             t2.valueCardinality = this.valueCardinality;
             t2.keyUType = keyUType;
             t2.valueUType = valueUType;
@@ -272,38 +265,72 @@ namespace OutSmart.DAXon.Values.Maps
         /// Accumulator for map:merge over a stream of small maps. Performs the same put sequence
         /// as a chain of AddEntry calls starting from an empty map — identical resulting trie
         /// structure and type-information — but the trie is privately owned until ToMap(), so
-        /// array nodes update child slots in place (<see cref="ImmutableHashTrieMap{K,V}.PutOwned"/>)
+        /// interior nodes update child slots in place (<see cref="MapTrie.PutOwned"/>)
         /// instead of path-copying per entry. No put may follow ToMap().
         /// </summary>
         internal sealed class MergeBuilder
         {
             private readonly HashTrieMap m = new HashTrieMap();
-            private ImmutableHashTrieMap<IAtomicMatchKey, KeyValuePair> trie =
-                ImmutableHashTrieMap<IAtomicMatchKey, KeyValuePair>.Empty();
+            private object trie;   // MapTrie node, null = empty
             private int count;
+            private IAtomicType lastKeyType;   // shape memo: last pair fed to UpdateTypeInformation
+            private IAtomicType lastValueType; // (single-atomic values only)
 
             internal ISequence GetExisting(AtomicValue key, out IAtomicMatchKey amk)
             {
                 amk = key.AsMapKey();
-                KeyValuePair kvp = trie.Get(amk);
+                KeyValuePair kvp = MapTrie.Get(trie, amk);
                 return kvp == null ? null : kvp.value;
             }
 
             internal void Put(IAtomicMatchKey amk, AtomicValue key, IGroundedValue value, bool isNew)
             {
                 bool wasEmpty = count == 0;
-                trie = trie.PutOwned(amk, new KeyValuePair(key, value));
+                trie = MapTrie.PutOwned(trie, amk, new KeyValuePair(key, value, amk));
                 if (isNew)
                 {
                     count++;
                 }
 
+                UpdateTypeInfoMemo(key, value, wasEmpty);
+            }
+
+            /// <summary>
+            /// use-first put: ONE trie descent decides existence and inserts; a duplicate key
+            /// leaves the map and its type-information untouched, exactly like the probe-then-skip
+            /// two-step it replaces.
+            /// </summary>
+            internal void PutFirst(AtomicValue key, IGroundedValue value)
+            {
+                bool wasEmpty = count == 0;
+                KeyValuePair kvp = new KeyValuePair(key, value);
+                trie = MapTrie.PutIfAbsentOwned(trie, kvp.MatchKey, kvp, out bool inserted);
+                if (inserted)
+                {
+                    count++;
+                    UpdateTypeInfoMemo(key, value, wasEmpty);
+                }
+            }
+
+            // The dominant merge stream is shape-homogeneous (same key type, same single-atomic
+            // value type pair after pair); for a repeated shape every union/conform check in
+            // UpdateTypeInformation is idempotent, so it can be skipped wholesale.
+            private void UpdateTypeInfoMemo(AtomicValue key, IGroundedValue value, bool wasEmpty)
+            {
+                if (!wasEmpty && ReferenceEquals(key.GetItemType(), lastKeyType)
+                    && value is AtomicValue av && ReferenceEquals(av.GetItemType(), lastValueType))
+                {
+                    return;
+                }
+
                 m.UpdateTypeInformation(key, value, wasEmpty);
+                lastKeyType = key.GetItemType();
+                lastValueType = value is AtomicValue av2 ? av2.GetItemType() : null;
             }
 
             internal HashTrieMap ToMap()
             {
-                m.imap = trie;
+                m.root = trie;
                 m.entries = count;
                 return m;
             }
@@ -315,8 +342,8 @@ namespace OutSmart.DAXon.Values.Maps
 
             bool empty = IsEmpty();
             IAtomicMatchKey amk = MakeKey(key);
-            bool exists = imap[amk] != null;
-            imap = imap.Put(amk, new KeyValuePair(key, value));
+            bool exists = MapTrie.Get(root, amk) != null;
+            root = MapTrie.Put(root, amk, new KeyValuePair(key, value, amk));
             UpdateTypeInformation(key, value, empty);
             entries = -1;
             return exists;
@@ -340,15 +367,15 @@ namespace OutSmart.DAXon.Values.Maps
             // assigned that bucket. So now we do an explicit check.
             // This is probably slower, but remove() is an uncommon
             // operation. And it gives the correct result!
-            if (imap[MakeKey(key)] == null)
+            IAtomicMatchKey amk = MakeKey(key);
+            if (MapTrie.Get(root, amk) == null)
             {
 
                 // The key is not present; the map is unchanged
                 return this;
             }
 
-            IImmutableMap<IAtomicMatchKey, KeyValuePair> m2 = imap.Remove(MakeKey(key));
-            HashTrieMap result = new HashTrieMap(m2);
+            HashTrieMap result = new HashTrieMap(MapTrie.Remove(root, amk));
             result.keyUType = keyUType;
             result.valueUType = valueUType;
             result.valueCardinality = valueCardinality;
@@ -359,14 +386,8 @@ namespace OutSmart.DAXon.Values.Maps
         // type.
         public override IGroundedValue Get(AtomicValue key)
         {
-            KeyValuePair o = imap[MakeKey(key)];
+            KeyValuePair o = MapTrie.Get(root, MakeKey(key));
             return o == null ? null : o.value;
-        }
-
-        // type.
-        public virtual KeyValuePair GetKeyValuePair(AtomicValue key)
-        {
-            return imap[MakeKey(key)];
         }
 
         // type.
@@ -381,19 +402,6 @@ namespace OutSmart.DAXon.Values.Maps
 
             // For C# - don't use a lambda expression here
             return new AnonymousIterable(this);
-        }
-
-        // type.
-        public virtual void DiagnosticDump()
-        {
-            Console.Error.WriteLine("IMap details:");
-            foreach (TrieKVP<IAtomicMatchKey, KeyValuePair> entry in imap)
-            {
-                IAtomicMatchKey k1 = entry.key;
-                AtomicValue k2 = entry.value.key;
-                ISequence v = entry.value.value;
-                Console.Error.WriteLine(k1.GetType() + " " + k1 + " #:" + k1.GetHashCode() + " = (" + k2.GetType() + " " + k2 + " : " + v + ")");
-            }
         }
 
         // type.
@@ -416,66 +424,17 @@ namespace OutSmart.DAXon.Values.Maps
         private sealed class AnonymousAtomicIterator : IAtomicIterator
         {
 
-            private readonly HashTrieMap parent;
-            private readonly IEnumerator<TrieKVP<IAtomicMatchKey, KeyValuePair>> baseIter;
+            private readonly IEnumerator<KeyValuePair> baseIter;
             public AnonymousAtomicIterator(HashTrieMap parent)
             {
-                this.parent = parent;
-                this.baseIter = parent.imap.IIterator();
+                this.baseIter = MapTrie.Enumerate(parent.root);
             }
             public AtomicValue Next()
             {
-                return baseIter.MoveNext() ? baseIter.Current.value.key : null;
+                return baseIter.MoveNext() ? baseIter.Current.key : null;
             }
             IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
             public void Dispose() { }
-        }
-
-        private sealed class AnonymousIEnumerator : IEnumerator<KeyValuePair>, IIterator<KeyValuePair>
-        {
-            private KeyValuePair __cur_kvp;
-
-            private readonly HashTrieMap parent;
-            private readonly IEnumerator<TrieKVP<IAtomicMatchKey, KeyValuePair>> baseIter;
-            private KeyValuePair lookahead;
-            private bool lookaheadFilled;
-            public KeyValuePair Current => __cur_kvp;
-            object System.Collections.IEnumerator.Current => __cur_kvp;
-            public AnonymousIEnumerator(HashTrieMap parent)
-            {
-                this.parent = parent;
-                this.baseIter = parent.imap.IIterator();
-            }
-            public bool MoveNext() { if (HasNext()) { __cur_kvp = Next(); return true; } return false; }
-            public void Reset() { }
-            public void Dispose() { }
-            public bool HasNext()
-            {
-                if (!lookaheadFilled && baseIter.MoveNext())
-                {
-                    lookahead = baseIter.Current.value;
-                    lookaheadFilled = true;
-                }
-
-                return lookaheadFilled;
-            }
-
-            public KeyValuePair Next()
-            {
-                if (!lookaheadFilled)
-                {
-                    baseIter.MoveNext();
-                    lookahead = baseIter.Current.value;
-                }
-
-                lookaheadFilled = false;
-                return lookahead;
-            }
-
-            public void Remove()
-            {
-                throw new NotSupportedException(); // immutable trie map: Iterator.remove() unsupported
-            }
         }
 
         private sealed class AnonymousIterable : IEnumerable<KeyValuePair>
@@ -486,12 +445,8 @@ namespace OutSmart.DAXon.Values.Maps
             {
                 this.parent = parent;
             }
-            public IEnumerator<KeyValuePair> GetEnumerator() => new AnonymousIEnumerator(parent);
+            public IEnumerator<KeyValuePair> GetEnumerator() => MapTrie.Enumerate(parent.root);
             System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
-            public IIterator<KeyValuePair> IIterator()
-            {
-                return new AnonymousIEnumerator(parent);
-            }
         }
     }
 }

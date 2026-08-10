@@ -24,7 +24,6 @@ namespace OutSmart.DAXon.Functions
     internal class StreamAvailable : SystemFunction
     {
         public StreamAvailable() { }
-        public static Func<StreamAvailable> New() => () => new StreamAvailable();
 
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {

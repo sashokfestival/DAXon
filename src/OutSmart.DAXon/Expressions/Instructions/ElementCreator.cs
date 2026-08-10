@@ -48,26 +48,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return StaticProperty.EXACTLY_ONE;
         }
 
-        public virtual void SetBequeathNamespacesToChildren(bool inherit)
-        {
-            bequeathNamespacesToChildren = inherit;
-        }
-
-        public virtual bool IsBequeathNamespacesToChildren()
-        {
-            return bequeathNamespacesToChildren;
-        }
-
-        public virtual void SetInheritNamespacesFromParent(bool inherit)
-        {
-            inheritNamespacesFromParent = inherit;
-        }
-
-        public virtual bool IsInheritNamespacesFromParent()
-        {
-            return inheritNamespacesFromParent;
-        }
-
         protected override int ComputeSpecialProperties()
         {
             int p = base.ComputeSpecialProperties() | StaticProperty.SINGLE_DOCUMENT_NODESET;
@@ -187,8 +167,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public abstract void OutputNamespaceNodes(Outputter receiver, INodeName nodeName, ElementCreationDetails details);
-
         protected virtual void ExportValidationAndType(ExpressionPresenter @out)
         {
             if (GetValidationAction() != Validation.SKIP && GetValidationAction() != Validation.BY_TYPE)
@@ -225,27 +203,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
 
             return flags;
-        }
-
-        public virtual void SetInheritanceFlags(string flags)
-        {
-            inheritNamespacesFromParent = !flags.Contains("P");
-            bequeathNamespacesToChildren = !flags.Contains("C");
-            if (flags.Contains("V"))
-            {
-                preservingTypes = true;
-            }
-        }
-
-        public virtual ElementCreationDetails MakeElementCreationDetails()
-        {
-            throw new NotSupportedException();
-        }
-        internal abstract class ElementCreationDetails
-        {
-            public virtual INodeName GetNodeName(IXPathContext context) => null;
-            public virtual string GetSystemId(IXPathContext context) => null;
-            public virtual void ProcessContent(Outputter @out, IXPathContext context) { }
         }
     }
 }

@@ -283,26 +283,28 @@ namespace OutSmart.DAXon.Values
             // that is fixed (bare `floor#1 instance of function(xs:numeric) as xs:numeric` is correct), and the
             // permissive `true` here skipped both the array member signature check (ArrayTest-064/084) and the
             // HOF coercion fast-path mismatch (a false just routes to ApplyFunctionCoercion, like Java).
-            System.Func<OutSmart.DAXon.Model.IItem, bool?> matchItem;
-            if (_primaryType is OutSmart.DAXon.Types.IPlainType
-                || _primaryType is OutSmart.DAXon.Patterns.NodeTest
-                || _primaryType is OutSmart.DAXon.Types.IFunctionItemType)
-            {
-                matchItem = it => _primaryType.Matches(it, typeHierarchy);
-            }
-            else
+            if (!(_primaryType is OutSmart.DAXon.Types.IPlainType
+                  || _primaryType is OutSmart.DAXon.Patterns.NodeTest
+                  || _primaryType is OutSmart.DAXon.Types.IFunctionItemType))
             {
                 // any/unknown kinds (e.g. AnyItemType): permissive fast-path — every item matches item()
                 // anyway; the downstream ItemTypeCheckingFunction still enforces exotic cases.
                 return true;
             }
 
+            // Singleton fast path: one item satisfies every cardinality clause below, and the HOF
+            // coercion checks (FusedArity2Caller, ApplyFunctionConversionRules) pass one item per
+            // call — skip the AsIterable wrapper and its enumerator.
+            if (groundedValue is OutSmart.DAXon.Model.IItem single)
+            {
+                return _primaryType.Matches(single, typeHierarchy);
+            }
+
             int count = 0;
             foreach (OutSmart.DAXon.Model.IItem item in groundedValue.AsIterable())
             {
                 count++;
-                bool? m = matchItem(item);
-                if (m == false)
+                if (!_primaryType.Matches(item, typeHierarchy))
                 {
                     return false;
                 }

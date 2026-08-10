@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "NotFn";
-
-        public static Func<NotFn> New() => () => new NotFn();
         public override void SupplyTypeInformation(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType, Expression[] arguments)
         {
             XPathException err = TypeChecker.EbvError(arguments[0], visitor.GetConfiguration().GetTypeHierarchy());

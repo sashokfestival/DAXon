@@ -25,7 +25,6 @@ namespace OutSmart.DAXon.Xslt
     internal class XSLIterate : StyleElement
     {
         Expression select = null;
-        bool compilable;
         public override bool IsInstruction()
         {
             return true;
@@ -69,16 +68,6 @@ namespace OutSmart.DAXon.Xslt
                 select = Literal.MakeEmptySequence();
                 ReportAbsence("select");
             }
-        }
-
-        public virtual void SetCompilable(bool compilable)
-        {
-            this.compilable = compilable;
-        }
-
-        public virtual bool IsCompilable()
-        {
-            return compilable;
         }
 
         public override void Validate(ComponentDeclaration decl)

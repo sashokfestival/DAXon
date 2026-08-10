@@ -41,7 +41,6 @@ namespace OutSmart.DAXon.Serialization
         private int maxLineLength = 80;
         private readonly JSONEmitter emitter;
         private Properties outputProperties;
-        private ICharacterSet characterSet;
         private bool isIndenting;
         private IComparer<AtomicValue> propertySorter;
         private bool unfailing = false;

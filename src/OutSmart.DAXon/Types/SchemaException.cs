@@ -18,19 +18,8 @@ namespace OutSmart.DAXon.Types
 {
     internal class SchemaException : XPathException
     {
-        public SchemaException(string message, ILocation locator) : base(message, null, locator)
-        {
-        }
 
         public SchemaException(string message) : base(message)
-        {
-        }
-
-        public SchemaException(Exception exception) : base(exception)
-        {
-        }
-
-        public SchemaException(string message, Exception exception) : base(message, exception)
         {
         }
     }

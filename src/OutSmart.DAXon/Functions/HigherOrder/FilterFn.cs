@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     {
 
         public override string StreamerName => "FilterFn";
-
-        public static Func<FilterFn> New() => () => new FilterFn();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             return SequenceTool.ToLazySequence(EvalFilter((IFunctionItem)arguments[1].Head(), arguments[0].Iterate(), context));

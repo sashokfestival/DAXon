@@ -414,17 +414,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 }
             }
         }
-
-        private void ShowArcs(Logger @out, PathMapNode node, int indent)
-        {
-            string pad = "                                           ".Substring(0, indent);
-            IList<PathMapArc> arcs = node.arcs;
-            foreach (PathMapArc arc in arcs)
-            {
-                @out.Info(pad + AxisInfo.axisName[arc.GetAxis()] + "::" + arc.GetNodeTest().ToString() + (arc.GetTarget().IsAtomized() ? " @" : "") + (arc.GetTarget().IsReturnable() ? " #" : "") + (arc.GetTarget().HasUnknownDependencies() ? " ...??" : ""));
-                ShowArcs(@out, arc.GetTarget(), indent + 2);
-            }
-        }
         public class PathMapNode
         {
             internal IList<PathMapArc> arcs;   // Arcs is the public spelling

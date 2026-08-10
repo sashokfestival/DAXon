@@ -53,35 +53,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             map = new Dictionary<K, LFUCacheEntryWithCounter<V>>(cacheSize);
         }
 
-
-        public virtual V Get(K key)
-        {
-            LFUCacheEntryWithCounter<V> entry = map.GetOrDefault(key);
-            if (entry == null)
-            {
-                return default(V);
-            }
-            else
-            {
-                entry.counter++;
-                return entry.value;
-            }
-        }
-
-        public virtual bool ContainsKey(K key)
-        {
-            LFUCacheEntryWithCounter<V> entry = map.GetOrDefault(key);
-            if (entry == null)
-            {
-                return false;
-            }
-            else
-            {
-                entry.counter++;
-                return true;
-            }
-        }
-
         public virtual void Put(K key, V value)
         {
             map[key] = new LFUCacheEntryWithCounter<V>(value);
@@ -125,22 +96,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             // Replace the map. Note this update isn't thread-safe; it doesn't matter if we lose it, or if some
             // other thread is doing the same thing concurrently.
             map = m2;
-        }
-
-        /// <summary>
-        /// Clear the cache
-        /// </summary>
-        public virtual void Clear()
-        {
-            map.Clear();
-        }
-
-        /// <summary>
-        /// Clear the cache
-        /// </summary>
-        public virtual int Size()
-        {
-            return map.Count;
         }
     }
 }

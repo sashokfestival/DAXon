@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class NamespaceUriFn_1 : ScalarSystemFunction
     {
-
-        public static Func<NamespaceUriFn_1> New() => () => new NamespaceUriFn_1();
         public override AtomicValue Evaluate(IItem item, IXPathContext context)
         {
             NamespaceUri uri = ((NodeInfo)item).GetNamespaceUri();

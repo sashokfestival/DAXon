@@ -48,34 +48,6 @@ namespace OutSmart.DAXon.Trees.Utilities
             -1,
             1
         };
-        // Class is never instantiated
-        private Navigator()
-        {
-        }
-
-        public static string GetAttributeValue(NodeInfo element, NamespaceUri uri, string localName)
-        {
-            return element.GetAttributeValue(uri, localName);
-        }
-
-        public static string GetInheritedAttributeValue(NodeInfo element, NamespaceUri uri, string localName)
-        {
-            NodeInfo node = element;
-            while (node != null)
-            {
-                string value = node.GetAttributeValue(uri, localName);
-                if (value == null)
-                {
-                    node = node.GetParent();
-                }
-                else
-                {
-                    return value;
-                }
-            }
-
-            return null;
-        }
 
         public static StructuredQName GetNodeName(NodeInfo node)
         {
@@ -258,22 +230,6 @@ namespace OutSmart.DAXon.Trees.Utilities
             }
 
             return sb.ToString();
-        }
-
-        public static AbsolutePath GetAbsolutePath(NodeInfo node)
-        {
-            bool streamed = node.GetConfiguration().IsStreamedNode(node);
-            LinkedList<AbsolutePath.PathElement> path = new LinkedList<AbsolutePath.PathElement>();
-            string sysId = node.GetSystemId();
-            while (node != null && node.GetNodeKind() != Types.Type.DOCUMENT)
-            {
-                path.AddFirst(new AbsolutePath.PathElement(node.GetNodeKind(), NameOfNode.MakeName(node), streamed ? -1 : GetNumberSimple(node, null)));
-                node = node.GetParent();
-            }
-
-            AbsolutePath a = new AbsolutePath(path);
-            a.SystemId = sysId;
-            return a;
         }
 
         public static bool HaveSameName(NodeInfo n1, NodeInfo n2)
@@ -1007,85 +963,6 @@ namespace OutSmart.DAXon.Trees.Utilities
                 return AxisInfo.FOLLOWING;
             }
         }
-        public static void AppendSequentialKey(ISiblingCountingNode node, StringBuilder sb, bool addDocNr)
-        {
-            if (addDocNr)
-            {
-                sb.Append('w');
-                sb.Append(node.GetTreeInfo().GetDocumentNumber());
-            }
-
-            if (node.GetNodeKind() != Types.Type.DOCUMENT)
-            {
-                NodeInfo parent = node.GetParent();
-                if (parent != null)
-                {
-                    AppendSequentialKey((ISiblingCountingNode)parent, sb, false);
-                }
-
-                if (node.GetNodeKind() == Types.Type.ATTRIBUTE)
-                {
-                    sb.Append('A');
-                }
-            }
-
-            sb.Append(AlphaKey(node.GetSiblingPosition()));
-        }
-
-        public static string AlphaKey(int value)
-        {
-            if (value < 1)
-            {
-                return "a";
-            }
-
-            if (value < 10)
-            {
-                return "b" + value;
-            }
-
-            if (value < 100)
-            {
-                return "c" + value;
-            }
-
-            if (value < 1000)
-            {
-                return "d" + value;
-            }
-
-            if (value < 10000)
-            {
-                return "e" + value;
-            }
-
-            if (value < 100000)
-            {
-                return "f" + value;
-            }
-
-            if (value < 1000000)
-            {
-                return "g" + value;
-            }
-
-            if (value < 10000000)
-            {
-                return "h" + value;
-            }
-
-            if (value < 100000000)
-            {
-                return "i" + value;
-            }
-
-            if (value < 1000000000)
-            {
-                return "j" + value;
-            }
-
-            return "k" + value;
-        }
 
         public static bool IsAncestorOrSelf(NodeInfo a, NodeInfo d)
         {
@@ -1252,34 +1129,6 @@ namespace OutSmart.DAXon.Trees.Utilities
             public virtual void Dispose() { }
         }
 
-        internal class EmptyTextFilter : IAxisIterator
-        {
-            private readonly IAxisIterator @base;
-            public EmptyTextFilter(IAxisIterator @base)
-            {
-                this.@base = @base;
-            }
-
-            public virtual NodeInfo Next()
-            {
-                while (true)
-                {
-                    NodeInfo next = @base.Next();
-                    if (next == null)
-                    {
-                        return null;
-                    }
-
-                    if (!(next.GetNodeKind() == Types.Type.TEXT && next.UnicodeStringValue.IsEmpty()))
-                    {
-                        return next;
-                    }
-                }
-            }
-            IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
-            public virtual void Dispose() { }
-        }
-
         /// <summary>
         /// General-purpose implementation of the ancestor and ancestor-or-self axes
         /// </summary>
@@ -1395,10 +1244,6 @@ namespace OutSmart.DAXon.Trees.Utilities
                 }
 
                 return null;
-            }
-
-            public void Advance()
-            {
             }
             IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
             public void Dispose() { }

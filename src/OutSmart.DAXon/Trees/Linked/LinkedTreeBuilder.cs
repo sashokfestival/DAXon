@@ -53,12 +53,6 @@ namespace OutSmart.DAXon.Trees.Linked
 
         public virtual ParentNodeImpl CurrentParentNode => currentNode;
 
-        public virtual NodeImpl CurrentLeafNode => (NodeImpl)currentNode.LastChild;
-        public LinkedTreeBuilder(PipelineConfiguration pipe) : base(pipe)
-        {
-            nodeFactory = DefaultNodeFactory.THE_INSTANCE;
-        }
-
         public LinkedTreeBuilder(PipelineConfiguration pipe, Durability durability) : base(pipe)
         {
             this.durability = durability;

@@ -94,16 +94,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             numberingInstruction = true;
         }
 
-        public bool IsNumberingInstruction()
-        {
-            return numberingInstruction;
-        }
-
-        public bool IsNoNodeIfEmpty()
-        {
-            return noNodeIfEmpty;
-        }
-
         public override string ToShortString()
         {
             if (Select is StringLiteral)

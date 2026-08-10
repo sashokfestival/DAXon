@@ -31,7 +31,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         private readonly bool allowReducedArity;
 
         public virtual IFunctionItem TargetFunction => targetFunction;
-        public virtual SpecificFunctionType RequiredType => requiredType;
 
         public override IFunctionItemType FunctionItemType => requiredType;
 
@@ -49,25 +48,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             this.targetFunction = targetFunction;
             this.requiredType = requiredType;
             this.allowReducedArity = allowReducedArity;
-        }
-
-        public CoercedFunction(SpecificFunctionType requiredType)
-        {
-            this.requiredType = requiredType;
-            this.allowReducedArity = false;
-        }
-
-        public virtual void SetTargetFunction(IFunctionItem targetFunction)
-        {
-            if (targetFunction.GetArity() != requiredType.GetArity())
-            {
-                if (targetFunction.GetArity() > requiredType.GetArity() || !allowReducedArity)
-                {
-                    throw new XPathException(WrongArityMessage(targetFunction, requiredType.GetArity()), "XPTY0004");
-                }
-            }
-
-            this.targetFunction = targetFunction;
         }
 
         public override void TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType)

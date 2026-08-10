@@ -29,8 +29,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
                 Int64Value.MakeIntegerValue(65535)
             };
 
-        public static Func<FunctionArity> New() => () => new FunctionArity();
-
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             IFunctionItem f = (IFunctionItem)arguments[0].Head();

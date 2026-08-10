@@ -20,10 +20,6 @@ namespace OutSmart.DAXon.Collections
         private readonly int startPoint;
         private readonly int endPoint;
         private int cachedHashCode = -1;
-
-        public virtual int StartPoint => startPoint;
-
-        public virtual int EndPoint => endPoint;
         public IntBlockSet(int startPoint, int endPoint)
         {
             this.startPoint = startPoint;

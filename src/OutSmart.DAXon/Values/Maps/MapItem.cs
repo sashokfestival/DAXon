@@ -147,6 +147,22 @@ namespace OutSmart.DAXon.Values.Maps
 
             try
             {
+                // Map values are overwhelmingly single items; skip the iterator ceremony for them.
+                if (value is IItem one)
+                {
+                    if (one is AtomicValue oneAtomic)
+                    {
+                        return itemType is IAtomicType oneTarget && Types.Type.IsSubType(oneAtomic.GetItemType(), oneTarget);
+                    }
+
+                    if (one is NodeInfo oneNode)
+                    {
+                        return itemType is NodeTest oneTest && oneTest.Test(oneNode);
+                    }
+
+                    return false;
+                }
+
                 ISequenceIterator iter = value.Iterate();
                 for (IItem item; (item = iter.Next()) != null;)
                 {

@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Types
         private readonly AnnotationList assertions;
         private readonly Configuration config;
 
-        public virtual AnnotationList Assertions => assertions;
-
         public AnyFunctionTypeWithAssertions(AnnotationList assertions, Configuration config)
         {
             this.assertions = assertions;

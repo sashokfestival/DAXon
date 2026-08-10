@@ -19,7 +19,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    sealed class DescendantIteratorSansText : IAxisIterator
+    sealed class DescendantIteratorSansText : IAxisIterator, IFastCountable
     {
         private readonly TinyTree tree;
         private int nextNodeNr;
@@ -56,6 +56,24 @@ namespace OutSmart.DAXon.Trees.Tiny
             while (!matcher.Test(n));
             nextNodeNr = n;
             return tree.GetNode(n);
+        }
+        // Same walk as Next() minus GetNode: fn:count only needs how many entries pass the matcher.
+        public bool TryFastCount(out int count)
+        {
+            short[] d = tree.depth;
+            int nn = tree.numberOfNodes;
+            int c = 0;
+            for (int n = nextNodeNr + 1; n < nn && d[n] > startDepth; n++)
+            {
+                if (matcher.Test(n))
+                {
+                    c++;
+                }
+            }
+
+            nextNodeNr = -1;
+            count = c;
+            return true;
         }
         IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
         public void Dispose() { }

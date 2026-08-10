@@ -19,7 +19,6 @@ namespace OutSmart.DAXon.Values
     internal class PromoterToString : Converter
     {
         public PromoterToString() { }
-        public PromoterToString(object rules) { }
         // net472 port: the real OutSmart.DAXon.Types.Converter (poc/output/full/Converter.cs) is EXCLUDED from the
         // build (re-including cascades errors), so the active base is the OutSmart.DAXon.Internal Converter stub
         // whose `Convert(object) => null` made fn:string-argument atomization yield an empty sequence

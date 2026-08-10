@@ -69,15 +69,6 @@ namespace OutSmart.DAXon.Expressions
         }
 
         /// <summary>
-        /// Ask if the expression is allowed to return an empty sequence
-        /// </summary>
-        /// <returns>true if the expected cardinality is zero-or-one, false if it is exactly-one</returns>
-        public bool IsAllowEmpty()
-        {
-            return allowEmpty;
-        }
-
-        /// <summary>
         /// Simplify an expression
         /// </summary>
         public override Expression Simplify()

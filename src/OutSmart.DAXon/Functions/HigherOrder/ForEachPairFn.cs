@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// </summary>
     internal class ForEachPairFn : SystemFunction
     {
-
-        public static Func<ForEachPairFn> New() => () => new ForEachPairFn();
         public override ItemType GetResultItemType(Expression[] args)
         {
 

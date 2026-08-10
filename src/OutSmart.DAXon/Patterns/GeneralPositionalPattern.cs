@@ -30,8 +30,6 @@ namespace OutSmart.DAXon.Patterns
         private Expression positionExpr;
         private bool usesPosition = true;
 
-        public virtual Expression PositionExpr => positionExpr;
-
         public override int Dependencies => positionExpr.Dependencies & (StaticProperty.DEPENDS_ON_LOCAL_VARIABLES | StaticProperty.DEPENDS_ON_USER_FUNCTIONS);
 
         public override int Fingerprint => nodeTest.Fingerprint;
@@ -45,12 +43,6 @@ namespace OutSmart.DAXon.Patterns
         public override IEnumerable<Operand> Operands()
         {
             return new Operand(this, positionExpr, OperandRole.FOCUS_CONTROLLED_ACTION);
-        }
-        public virtual NodeTest GetNodeTest() => nodeTest;
-
-        public virtual void SetUsesPosition(bool usesPosition)
-        {
-            this.usesPosition = usesPosition;
         }
 
         public override Expression Simplify()

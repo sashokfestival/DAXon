@@ -93,11 +93,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        private void Write(TextWriter writer, long start, long len)
-        {
-            writer.Write(chars, this.start + RequireInt(start), RequireInt(len));
-        }
-
         public override long IndexWhere(Func<int, bool> predicate, long from)
         {
             for (int i = requireNonNegativeInt(from) + start; i < end; i++)

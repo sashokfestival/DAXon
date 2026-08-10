@@ -17,7 +17,6 @@ namespace OutSmart.DAXon.Text
         private readonly string _s;
         public virtual char[] CharArray => _s.ToCharArray(); // batch6: real UTF8Writer fast path
         public override int Width => 16;
-        public Twine16() { _s = ""; }
         public Twine16(string s) { _s = s ?? ""; }
         public Twine16(char[] chars) { _s = new string(chars); }
         public Twine16(char[] chars, int offset, int length) { _s = new string(chars, offset, length); }

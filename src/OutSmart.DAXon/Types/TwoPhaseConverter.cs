@@ -17,10 +17,7 @@ namespace OutSmart.DAXon.Types
     {
         private readonly Converter phaseOne;
         private readonly Converter phaseTwo;
-
-        public TwoPhaseConverter() { }
         public TwoPhaseConverter(Converter a, Converter b) { phaseOne = a; phaseTwo = b; }
-        public TwoPhaseConverter(object a, object b) { phaseOne = a as Converter; phaseTwo = b as Converter; }
 
         public override IConversionResult Convert(object value)
         {

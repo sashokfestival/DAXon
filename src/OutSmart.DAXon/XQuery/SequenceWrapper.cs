@@ -48,7 +48,6 @@ namespace OutSmart.DAXon.XQuery
         private FingerprintedQName resultArrayMember;
         private FingerprintedQName resultExternalValue;
         private FingerprintedQName xsiType;
-        private NamespaceMap namespaces;
 
         public virtual ComplexContentOutputter Destination => @out;
         public SequenceWrapper(IReceiver destination) : base(destination.GetPipelineConfiguration())

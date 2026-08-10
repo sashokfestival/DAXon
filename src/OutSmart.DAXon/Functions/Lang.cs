@@ -19,8 +19,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class Lang : SystemFunction
     {
-
-        public static Func<Lang> New() => () => new Lang();
         public static bool IsLang(string arglang, NodeInfo target)
         {
             string doclang = null;

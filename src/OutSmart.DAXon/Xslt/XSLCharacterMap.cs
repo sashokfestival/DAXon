@@ -47,11 +47,6 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        public virtual bool IsRedundant()
-        {
-            return redundant;
-        }
-
         public override void PrepareAttributes()
         {
             string name = null;

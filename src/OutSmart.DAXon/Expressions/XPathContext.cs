@@ -62,7 +62,6 @@ namespace OutSmart.DAXon.Expressions
         IRegexIterator GetCurrentRegexIterator();
         DateTimeValue GetCurrentDateTime();
         int GetImplicitTimezone();
-        IEnumerator<ContextStackFrame> IterateStackFrames();
         XPathException GetCurrentException();
         XPathContextMajor.ThreadManager GetThreadManager();
         void WaitForChildThreads();

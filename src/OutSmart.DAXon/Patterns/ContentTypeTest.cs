@@ -44,11 +44,6 @@ namespace OutSmart.DAXon.Patterns
             return kind == Types.Type.ELEMENT ? UType.ELEMENT : UType.ATTRIBUTE;
         }
 
-        public virtual void SetNillable(bool nillable)
-        {
-            this.nillable = nillable;
-        }
-
         public override bool IsNillable()
         {
             return nillable;
@@ -57,11 +52,6 @@ namespace OutSmart.DAXon.Patterns
         public virtual ISchemaType GetSchemaType()
         {
             return schemaType;
-        }
-
-        public virtual int GetNodeKind()
-        {
-            return kind;
         }
 
         public override bool Matches(int nodeKind, INodeName name, ISchemaType annotation)
@@ -153,11 +143,6 @@ namespace OutSmart.DAXon.Patterns
         public override string ToString()
         {
             return (kind == Types.Type.ELEMENT ? "element(*, " : "attribute(*, ") + schemaType.EQName + ')';
-        }
-
-        public string ToExportString()
-        {
-            return (kind == Types.Type.ELEMENT ? "element(*, " : "attribute(*, ") + TypeHierarchy.GetNearestNamedType(schemaType).EQName + ')';
         }
 
         /// <summary>

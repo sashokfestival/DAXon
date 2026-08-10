@@ -35,7 +35,6 @@ namespace OutSmart.DAXon.Internal
         private ILocation location;
 
         public RecursionDepthError() : base("") { }
-        public RecursionDepthError(string m) : base(m) { }
 
         public override string Message => description ?? base.Message;
 

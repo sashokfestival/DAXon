@@ -39,8 +39,6 @@ namespace OutSmart.DAXon.Functions
                 return new SpecificFunctionType(argTypes, SequenceType.SINGLE_STRING);
             }
         }
-
-        public static Func<Concat31> New() => () => new Concat31();
         protected override ISequence ResultIfEmpty(int arg)
         {
             return null;

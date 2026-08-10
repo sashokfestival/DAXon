@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Text;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Expressions;
+using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Values;
 
 namespace OutSmart.DAXon.Functions
@@ -91,7 +92,74 @@ namespace OutSmart.DAXon.Functions
 
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
+            // ASCII 8-bit content maps byte-for-byte, skipping the String materialization +
+            // per-char MapCase + UnicodeString rewrap. Latin1 0x80-0xFF stays on the generic
+            // route (µ/ß/ÿ case outside Latin1 or expand).
+            AtomicValue fast = TryAsciiCase(arg.UnicodeStringValue, _upper);
+            if (fast != null)
+            {
+                return fast;
+            }
+
             return new StringValue(MapCase(arg.GetStringValue(), _upper));
+        }
+
+        private static AtomicValue TryAsciiCase(UnicodeString us, bool upper)
+        {
+            byte[] b;
+            int off, len;
+            if (us is Slice8 s8)
+            {
+                b = s8.ByteArray;
+                off = s8.Start;
+                len = s8.End - s8.Start;
+            }
+            else if (us is Twine8 t8)
+            {
+                b = t8.ByteArray;
+                off = 0;
+                len = b.Length;
+            }
+            else
+            {
+                return null;
+            }
+
+            int firstChange = -1;
+            for (int k = 0; k < len; k++)
+            {
+                byte c = b[off + k];
+                if (c >= 0x80)
+                {
+                    return null;
+                }
+
+                if (upper ? c >= (byte)'a' && c <= (byte)'z' : c >= (byte)'A' && c <= (byte)'Z')
+                {
+                    if (firstChange < 0)
+                    {
+                        firstChange = k;
+                    }
+                }
+            }
+
+            if (firstChange < 0)
+            {
+                return new StringValue(us);
+            }
+
+            byte[] mapped = new byte[len];
+            Array.Copy(b, off, mapped, 0, len);
+            for (int k = firstChange; k < len; k++)
+            {
+                byte c = mapped[k];
+                if (upper ? c >= (byte)'a' && c <= (byte)'z' : c >= (byte)'A' && c <= (byte)'Z')
+                {
+                    mapped[k] = (byte)(c ^ 0x20);
+                }
+            }
+
+            return new StringValue(new Twine8(mapped));
         }
 
         private static string MapCase(string s, bool upper)

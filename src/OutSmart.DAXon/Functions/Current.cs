@@ -22,17 +22,6 @@ namespace OutSmart.DAXon.Functions
     internal class Current : SystemFunction
     {
         public static readonly StructuredQName FN_CURRENT = NamespaceUri.FN.QName("current");
-        public virtual IFunctionItem BindContext(IXPathContext context)
-        {
-
-            //        Int64Value value;
-            //        try {
-            //            value = evaluateItem(context);
-            //        } catch (final XPathException e) {
-            //            // This happens when we do a dynamic lookup of position() or last() when there is no context item
-            //                throw e;
-            return null;
-        }
 
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {

@@ -30,11 +30,6 @@ namespace OutSmart.DAXon.Trees.Iterators
             this.@base = @base;
         }
 
-        public virtual void SetRoleDiagnostic(RoleDiagnostic role)
-        {
-            this.roleDiagnostic = role;
-        }
-
         public virtual AtomicValue Next()
         {
             while (true)

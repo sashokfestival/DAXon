@@ -137,21 +137,6 @@ namespace OutSmart.DAXon.Regex
             return xsd11;
         }
 
-        public virtual void SetDebug(bool debug)
-        {
-            this.debug = debug;
-        }
-
-        public virtual bool IsDebug()
-        {
-            return debug;
-        }
-
-        public virtual void SetAllowUnknownBlockNames(bool allow)
-        {
-            this.allowUnknownBlockNames = allow;
-        }
-
         public virtual bool IsAllowUnknownBlockNames()
         {
             return allowUnknownBlockNames;

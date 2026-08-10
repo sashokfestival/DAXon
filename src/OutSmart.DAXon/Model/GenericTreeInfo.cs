@@ -166,11 +166,6 @@ namespace OutSmart.DAXon.Model
             }
         }
 
-        public virtual bool IsStreamed()
-        {
-            return false;
-        }
-
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===
         public virtual bool IsTyped() => false; /* Phase B: Saxon-HE non-schema-aware -> source tree never type-annotated; real GenericTreeInfo.typed defaults false, no SetTyped caller */
     }

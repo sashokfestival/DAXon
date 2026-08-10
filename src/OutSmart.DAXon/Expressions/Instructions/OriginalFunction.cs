@@ -33,8 +33,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         public override IFunctionItemType FunctionItemType => userFunction.FunctionItemType;
 
         public override string Description => userFunction.Description;
-
-        public virtual string ContainingPackageName => component.ContainingPackage.PackageName;
         public OriginalFunction(Component component)
         {
             this.component = component;

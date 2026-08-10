@@ -23,10 +23,26 @@ namespace OutSmart.DAXon.Values.Maps
     {
         public AtomicValue key;
         public IGroundedValue value;
+        // Match-key cache for MapTrie, where this pair doubles as the trie leaf. Lazy racy-init is
+        // benign: AsMapKey is deterministic and equal-by-value, so competing writes are equivalent.
+        internal Expressions.Sorting.IAtomicMatchKey amk;
+
         public KeyValuePair(AtomicValue key, IGroundedValue value)
         {
             this.key = key;
             this.value = value;
+        }
+
+        internal KeyValuePair(AtomicValue key, IGroundedValue value, Expressions.Sorting.IAtomicMatchKey amk)
+        {
+            this.key = key;
+            this.value = value;
+            this.amk = amk;
+        }
+
+        internal Expressions.Sorting.IAtomicMatchKey MatchKey
+        {
+            get { return amk ?? (amk = key.AsMapKey()); }
         }
     }
 }

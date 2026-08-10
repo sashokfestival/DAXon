@@ -21,10 +21,6 @@ namespace OutSmart.DAXon.Functions
     internal abstract class DynamicContextAccessor : SystemFunction
     {
         private AtomicValue boundValue;
-        public virtual void BindContext(IXPathContext context)
-        {
-            boundValue = Evaluate(context);
-        }
 
         public abstract AtomicValue Evaluate(IXPathContext context);
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
@@ -99,8 +95,6 @@ namespace OutSmart.DAXon.Functions
 
         internal class DefaultLanguage : DynamicContextAccessor
         {
-
-            public static Func<DefaultLanguage> New() => () => new DefaultLanguage();
             public override AtomicValue Evaluate(IXPathContext context)
             {
                 string lang = context.GetConfiguration().GetDefaultLanguage();

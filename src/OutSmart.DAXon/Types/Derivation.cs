@@ -18,6 +18,5 @@ namespace OutSmart.DAXon.Types
         public const int DERIVATION_EXTENSION = 2;
         public const int DERIVATION_LIST = 4;
         public const int DERIVATION_UNION = 8;
-        public const int DERIVATION_SUBSTITUTION = 16;
     }
 }

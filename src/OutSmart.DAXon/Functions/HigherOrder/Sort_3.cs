@@ -15,12 +15,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
+using OutSmart.DAXon.Values;
 namespace OutSmart.DAXon.Functions.HigherOrder
 {
     internal class Sort_3 : Sort_2
     {
-
-        public static Func<Sort_3> New() => () => new Sort_3();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             ISequence input = arguments[0];
@@ -31,6 +30,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             // Key results are atomized (grounded) before the next item, so the coerced lambda
             // chain can run through a reused clean context + argument array.
             FusedArity1Caller fused = FusedArity1Caller.TryMake(key, context);
+            NumericChildSortKey numericKey = NumericChildSortKey.TryMake(key);
             ISequenceIterator iterator = input.Iterate();
             IItem item;
             while ((item = iterator.Next()) != null)
@@ -38,6 +38,14 @@ namespace OutSmart.DAXon.Functions.HigherOrder
                 ItemToBeSorted member = new ItemToBeSorted();
                 member.value = item;
                 member.originalPosition = i++;
+                DoubleValue direct = numericKey?.TryExtract(item);
+                if (direct != null)
+                {
+                    member.sortKey = direct;
+                    inputList.Add(member);
+                    continue;
+                }
+
                 // The sort key is the atomized result of the key function (fn:sort compares atomic values);
                 // a key that yields nodes (e.g. function($e){$e/name/last, $e/name/first}) must be atomized
                 // first, else CompareSortKeys' (AtomicValue) cast fails -> spurious XPTY0004. (Sort_1 atomizes

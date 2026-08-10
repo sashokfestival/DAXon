@@ -49,8 +49,6 @@ namespace OutSmart.DAXon.Trees.Wrappers
             return _current;
         }
 
-        public virtual NodeInfo Current() => _current;
-
         IItem ISequenceIterator.Next() => Next();
 
         public void Dispose()

@@ -78,18 +78,6 @@ namespace OutSmart.DAXon.Regex
             }
         }
 
-        public static ARegularExpression Compile(UnicodeString pattern, string flags)
-        {
-            try
-            {
-                return new ARegularExpression(pattern, flags, "XP31", null, null);
-            }
-            catch (XPathException e)
-            {
-                throw new ArgumentException(e.Message, e);
-            }
-        }
-
         public virtual bool Matches(UnicodeString input)
         {
             if (input.IsEmpty() && regex.IsNullable())

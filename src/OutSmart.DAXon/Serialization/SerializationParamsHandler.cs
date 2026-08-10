@@ -41,11 +41,6 @@ namespace OutSmart.DAXon.Serialization
             this.properties = props;
         }
 
-        public virtual void SetLocator(ILocation locator)
-        {
-            this.locator = locator;
-        }
-
         public virtual void SetSerializationParams(NodeInfo node)
         {
             if (properties == null)

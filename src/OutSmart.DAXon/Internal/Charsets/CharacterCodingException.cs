@@ -18,6 +18,5 @@ namespace OutSmart.DAXon.Internal.Charsets
     internal class CharacterCodingException : global::System.IO.IOException
     {
         public CharacterCodingException() : base("character coding error") { }
-        public CharacterCodingException(string m) : base(m) { }
     }
 }

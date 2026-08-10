@@ -27,7 +27,6 @@ namespace OutSmart.DAXon.Types
 {
     internal class SpecificFunctionType : AnyFunctionType
     {
-        public static readonly IFunctionItemType COMPONENT_FUNCTION_TYPE = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_STRING }, SequenceType.ANY_SEQUENCE);
         private readonly SequenceType[] argTypes;
         private readonly SequenceType resultType;
         private readonly AnnotationList annotations;
@@ -334,118 +333,6 @@ namespace OutSmart.DAXon.Types
 
             Affinity affinity = th.Relationship(((IFunctionItem)item).FunctionItemType, this);
             return affinity == Affinity.SAME_TYPE || affinity == Affinity.SUBSUMED_BY;
-        }
-
-        public string ExplainMismatch(IItem item, TypeHierarchy th)
-        {
-            if (!(item is IFunctionItem))
-            {
-                return null;
-            }
-
-            if (item is MapItem)
-            {
-                if (GetArity() == 1)
-                {
-                    if (argTypes[0].GetCardinality() == StaticProperty.EXACTLY_ONE && argTypes[0].PrimaryType.IsPlainType())
-                    {
-                        foreach (KeyValuePair pair in ((MapItem)item).KeyValuePairs())
-                        {
-                            if (!resultType.Matches(pair.value, th))
-                            {
-                                string s = "The supplied map contains an entry with key (" + pair.key + ") whose corresponding value (" + Err.DepictSequence(pair.value) + ") is not an instance of the return type in the function signature (" + resultType + ")";
-                                string more = resultType.ExplainMismatch(pair.value, th);
-                                if (more != null)
-                                {
-                                    s = s + ". " + more;
-                                }
-
-                                return (s);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        string s = "The function argument is of type " + argTypes[0] + "; a map can only be supplied for a function type whose argument type is atomic";
-                        return (s);
-                    }
-                }
-                else
-                {
-                    string s = "The function arity is " + GetArity() + "; a map can only be supplied for a function type with arity 1";
-                    return (s);
-                }
-            }
-
-            if (item is ArrayItem)
-            {
-
-                if (GetArity() == 1)
-                {
-                    if (argTypes[0].GetCardinality() == StaticProperty.EXACTLY_ONE && argTypes[0].PrimaryType.IsPlainType())
-                    {
-                        Affinity rel = th.Relationship(argTypes[0].PrimaryType, BuiltInAtomicType.INTEGER);
-                        if (!(rel == Affinity.SAME_TYPE || rel == Affinity.SUBSUMED_BY))
-                        {
-                            string s = "The function expects an argument of type " + argTypes[0] + "; an array can only be supplied for a function that expects an integer";
-                            return (s);
-                        }
-                        else
-                        {
-                            foreach (IGroundedValue member in ((ArrayItem)item).Members())
-                            {
-                                if (!resultType.Matches(member, th))
-                                {
-                                    string s = "The supplied array contains an entry (" + Err.DepictSequence(member) + ") is not an instance of the return type in the function signature (" + resultType + ")";
-                                    string more = resultType.ExplainMismatch(member, th);
-                                    if (more != null)
-                                    {
-                                        s = s + ". " + more;
-                                    }
-
-                                    return (s);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        string s = "The function argument is of type " + argTypes[0] + "; an array can only be supplied for a function type whose argument type is xs:integer";
-                        return (s);
-                    }
-                }
-                else
-                {
-                    string s = "The function arity is " + GetArity() + "; an array can only be supplied for a function type with arity 1";
-                    return (s);
-                }
-            }
-
-            IFunctionItemType other = ((IFunctionItem)item).FunctionItemType;
-            if (GetArity() != ((IFunctionItem)item).GetArity())
-            {
-                string s = "The required function arity is " + GetArity() + "; the supplied function has arity " + ((IFunctionItem)item).GetArity();
-                return (s);
-            }
-
-            Affinity affinity = th.SequenceTypeRelationship(resultType, other.ResultType);
-            if (affinity != Affinity.SAME_TYPE && affinity != Affinity.SUBSUMES)
-            {
-                string s = "The return type of the required function is " + resultType + " but the return type of the supplied function is " + other.ResultType;
-                return (s);
-            }
-
-            for (int j = 0; j < GetArity(); j++)
-            {
-                affinity = th.SequenceTypeRelationship(argTypes[j], other.ArgumentTypes[j]);
-                if (affinity != Affinity.SAME_TYPE && affinity != Affinity.SUBSUMED_BY)
-                {
-                    string s = "The type of the " + RoleDiagnostic.Ordinal(j + 1) + " argument of the required function is " + argTypes[j] + " but the declared type of the corresponding argument of the supplied function is " + other.ArgumentTypes[j];
-                    return (s);
-                }
-            }
-
-            return null;
         }
 
         public override Expression MakeFunctionSequenceCoercer(Expression exp, Func<RoleDiagnostic> role, bool allow40)

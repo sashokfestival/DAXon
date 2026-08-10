@@ -6,7 +6,6 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 using OutSmart.DAXon.Expressions;
 using OutSmart.DAXon.Model;
-using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.XPath;
 using OutSmart.DAXon.Internal.Streams;
 using System;
@@ -66,11 +65,6 @@ namespace OutSmart.DAXon.Api
             return new XPathSelector(exp, declaredVariables);
         }
 
-        public virtual Step AsStep()
-        {
-            return new AnonymousStep(this);
-        }
-
         public virtual IEnumerator<QName> IterateExternalVariables()
         {
             IList<QName> list = new List<QName>();
@@ -105,30 +99,6 @@ namespace OutSmart.DAXon.Api
             else
             {
                 return OccurrenceIndicatorHelper.GetOccurrenceIndicator(var.GetRequiredType().GetCardinality());
-            }
-        }
-
-        private sealed class AnonymousStep : Step
-        {
-
-            private readonly XPathExecutable parent;
-            public AnonymousStep(XPathExecutable parent)
-            {
-                this.parent = parent;
-            }
-            public XdmStream<XdmItem> Apply(XdmItem item)
-            {
-                try
-                {
-                    XPathSelector selector = parent.Load();
-                    selector.SetContextItem(item);
-                    XdmSequenceIterator<XdmItem> result = selector.IIterator();
-                    return result.Stream();
-                }
-                catch (DAXonApiException e)
-                {
-                    throw new DAXonApiUncheckedException(e);
-                }
             }
         }
     }

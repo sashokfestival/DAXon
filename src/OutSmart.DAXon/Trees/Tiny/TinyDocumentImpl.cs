@@ -42,14 +42,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         }
 
         /// <summary>
-        /// Get the tree containing this node
-        /// </summary>
-        public NodeInfo GetRootNode()
-        {
-            return this;
-        }
-
-        /// <summary>
         /// Get the configuration previously set using setConfiguration
         /// </summary>
         public override Configuration GetConfiguration()
@@ -94,11 +86,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         public override int GetLineNumber()
         {
             return 0;
-        }
-
-        public bool IsTyped()
-        {
-            return tree.TypeArray != null;
         }
 
         public override int GetNodeKind()

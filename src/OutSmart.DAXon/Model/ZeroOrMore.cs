@@ -59,19 +59,6 @@ namespace OutSmart.DAXon.Model
             return value.Count;
         }
 
-        public virtual int GetCardinality()
-        {
-            switch (value.Count)
-            {
-                case 0:
-                    return StaticProperty.EMPTY;
-                case 1:
-                    return StaticProperty.EXACTLY_ONE;
-                default:
-                    return StaticProperty.ALLOWS_ONE_OR_MORE;
-            }
-        }
-
         public virtual T ItemAt(int n)
         {
             if (n < 0 || n >= GetLength())
@@ -87,11 +74,6 @@ namespace OutSmart.DAXon.Model
         public virtual ListIterator.Of<T> Iterate()
         {
             return new ListIterator.Of<T>(value);
-        }
-
-        public virtual ISequenceIterator ReverseIterate()
-        {
-            return Reverse.ReverseIterator(value);
         }
 
         public virtual bool EffectiveBooleanValue()
@@ -164,12 +146,6 @@ namespace OutSmart.DAXon.Model
             {
                 return this;
             }
-        }
-
-        //@Override
-        public virtual IEnumerator<T> IIterator()
-        {
-            return value.GetEnumerator();
         }
         ISequenceIterator IGroundedValue.Iterate() => Iterate();
         IItem IGroundedValue.ItemAt(int arg0) => (IItem)(object)ItemAt(arg0);

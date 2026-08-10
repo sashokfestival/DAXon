@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class BaseUri_1 : SystemFunction, ICallable
     {
-
-        public static Func<BaseUri_1> New() => () => new BaseUri_1();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             NodeInfo node = (NodeInfo)arguments[0].Head();

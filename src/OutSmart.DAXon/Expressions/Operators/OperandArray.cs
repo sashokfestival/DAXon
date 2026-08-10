@@ -63,11 +63,6 @@ namespace OutSmart.DAXon.Expressions.Operators
             }
         }
 
-        private OperandArray(Operand[] operands)
-        {
-            this.operandArray = operands;
-        }
-
         public virtual IEnumerator<Operand> IIterator()
         {
             return operandArray.ToList().GetEnumerator();

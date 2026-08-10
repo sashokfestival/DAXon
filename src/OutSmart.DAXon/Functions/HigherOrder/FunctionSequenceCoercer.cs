@@ -37,12 +37,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
 
         public override int ImplementationMethod => ITERATE_METHOD;
 
-        /// <summary>
-        /// Determine the static cardinality of the expression
-        /// </summary>
-        /// <returns>the role locator</returns>
-        public RoleDiagnostic RoleSupplier => roleSupplier();
-
         public override string ExpressionName => "fnCoercer";
         public FunctionSequenceCoercer(Expression sequence, SpecificFunctionType requiredItemType, Func<RoleDiagnostic> role, bool allow40) : base(sequence)
         {

@@ -32,7 +32,6 @@ namespace OutSmart.DAXon.Core
 {
     internal class DotNetPlatform : IPlatform
     {
-        public virtual string PlatformVersion => ".NET " + Environment.Version;
         public virtual string PlatformSuffix => "N";
         public virtual string DefaultCountry
         {
@@ -52,9 +51,7 @@ namespace OutSmart.DAXon.Core
             // dereference fn:collection / fn:uri-collection URIs.
             config.CollectionFinder = new OutSmart.DAXon.Resources.StandardCollectionFinder();
         }
-        public virtual bool IsJava() => false;
         public virtual bool IsDotNet() => true;
-        public virtual bool IsWindows() => true;
         public virtual string GetDefaultLanguage() => CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
         // Backed by embedded resources (upstream data/*.xml via the csproj): casevariants/categories/
         // unicodeBlocks — regex case-blind matching, \p{} categories and \p{Is...} blocks need them.
@@ -75,12 +72,7 @@ namespace OutSmart.DAXon.Core
             messages?.Add("Resource not found in embedded manifest: " + filename);
             return null;
         }
-        public virtual void ShowEmbeddedResources() { }
-        public virtual void RegisterAllBuiltInObjectModels(Configuration config) { }
-        public virtual string GetInstallationDirectory(string edition, Configuration config) => null;
         public virtual IModuleURIResolver MakeStandardModuleURIResolver(Configuration config) => new OutSmart.DAXon.Lib.StandardModuleURIResolver(config);
-        public virtual bool HasICUCollator() => false;
-        public virtual bool HasICUNumberer() => false;
         // A collation can supply xsl:key/collation keys iff equal-under-collation implies equal keys. The
         // CompareInfo locale collations qualify, and so do the algorithmic collators whose GetCollationKey is a
         // real value (codepoint = the string itself; html5-ascii-case-blind = case-normalized form). Only the

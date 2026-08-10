@@ -21,8 +21,6 @@ namespace OutSmart.DAXon.Patterns
         private readonly Func<NodeInfo, bool> predicate;
 
         public override double DefaultPriority => 0;
-
-        public UType UType => UType.ANY;
         private NodeSelector(Func<NodeInfo, bool> predicate)
         {
             this.predicate = predicate;

@@ -64,10 +64,6 @@ namespace OutSmart.DAXon.Values
         {
         }
 
-        public GYearMonthValue(int year, byte month, int tz, IAtomicType type) : this(new MutableGDateValue(year, month, 1, false, tz, type))
-        {
-        }
-
         public static IConversionResult MakeGYearMonthValue(UnicodeString value, ConversionRules rules)
         {
             UnicodeString trimmed = Whitespace.Trim(value);

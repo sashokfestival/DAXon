@@ -27,8 +27,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "Reverse";
-
-        public static Func<Reverse> New() => () => new Reverse();
         public override int GetSpecialProperties(Expression[] arguments)
         {
             int baseProps = arguments[0].GetSpecialProperties();

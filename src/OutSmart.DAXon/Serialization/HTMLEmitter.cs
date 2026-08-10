@@ -28,17 +28,11 @@ namespace OutSmart.DAXon.Serialization
     /// </summary>
     internal abstract class HTMLEmitter : XMLEmitter
     {
-        private const int REP_NATIVE = 0;
-        private const int REP_ENTITY = 1;
-        private const int REP_DECIMAL = 2;
-        private const int REP_HEX = 3;
 
         static HTMLTagHashSet emptyTags = new HTMLTagHashSet(31);
 
         private static readonly HTMLTagHashSet booleanAttributes = new HTMLTagHashSet(43);
         private static readonly HTMLTagHashSet booleanCombinations = new HTMLTagHashSet(57);
-        private readonly int nonASCIIRepresentation = REP_NATIVE;
-        private readonly int excludedRepresentation = REP_ENTITY;
         private int inScript;
         protected int version = 5;
         private string parentElement;
@@ -102,27 +96,6 @@ namespace OutSmart.DAXon.Serialization
             SetBooleanAttribute("video", "controls"); // HTML5
             SetBooleanAttribute("video", "loop"); // HTML5
             SetBooleanAttribute("video", "muted"); // HTML5
-        }
-
-        public HTMLEmitter()
-        {
-        }
-        private static int RepresentationCode(string rep)
-        {
-            rep = rep.ToLowerInvariant();
-            switch (rep)
-            {
-                case "native":
-                    return REP_NATIVE;
-                case "entity":
-                    return REP_ENTITY;
-                case "decimal":
-                    return REP_DECIMAL;
-                case "hex":
-                    return REP_HEX;
-                default:
-                    return REP_ENTITY;
-            }
         }
         protected static void SetEmptyTag(string tag)
         {
@@ -202,12 +175,6 @@ namespace OutSmart.DAXon.Serialization
             inScript++;
             nodeNameStack.Push(elemName);
         }
-
-        public virtual void StartContentOLD()
-        {
-            CloseStartTag(); // prevent <xxx/> syntax
-        }
-
         protected override void WriteAttribute(INodeName elCode, string attname, string value, int properties)
         {
             try

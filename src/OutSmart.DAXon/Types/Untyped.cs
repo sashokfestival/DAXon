@@ -43,16 +43,10 @@ namespace OutSmart.DAXon.Types
         // --- IComplexType members (faithful to net.sf.saxon.type.Untyped) ---
         public ComplexVariety Variety => ComplexVariety.MIXED;
         public ISimpleType SimpleContentType => null;
-        public string PreferredJsonLayout => "mixed";
         public static Untyped GetInstance() => _instance;
         public override bool IsComplexType() => true;
-        public bool IsAbstract() => false;
-        public bool IsComplexContent() => true;
         public bool IsSimpleContent() => false;
-        public bool IsAllContent() => false;
-        public bool IsRestricted() => true;
         public bool IsEmptyContent() => false;
-        public bool IsEmptiable() => true;
         public bool IsMixedContent() => true;
         public ISchemaType GetElementParticleType(int elementName, bool considerExtensions) => this;
         public int GetElementParticleCardinality(int elementName, bool considerExtensions) => StaticProperty.ALLOWS_ZERO_OR_MORE;

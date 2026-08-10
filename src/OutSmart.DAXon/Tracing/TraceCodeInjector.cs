@@ -22,27 +22,6 @@ namespace OutSmart.DAXon.Tracing
     internal class TraceCodeInjector : ICodeInjector
     {
         protected int traceLevel = TraceLevel.NORMAL;
-        public virtual void SetTraceLevel(int traceLevel)
-        {
-            this.traceLevel = traceLevel;
-        }
-
-        public static int LevelValue(string level)
-        {
-            switch (level)
-            {
-                case "none":
-                    return TraceLevel.NONE;
-                case "low":
-                    return TraceLevel.LOW;
-                case "normal":
-                    return TraceLevel.NORMAL;
-                case "high":
-                    return TraceLevel.HIGH;
-                default:
-                    throw new ArgumentException("Trace level " + level);
-            }
-        }
 
         public virtual Expression Inject(Expression exp)
         {

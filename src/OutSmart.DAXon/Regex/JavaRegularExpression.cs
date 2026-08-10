@@ -37,11 +37,6 @@ namespace OutSmart.DAXon.Regex
         private readonly int flagBits;
 
         /// <summary>
-        /// Get the flag bits as passed to the compat OutSmart.DAXon.Internal.Regex.Pattern engine
-        /// </summary>
-        public virtual int FlagBits => flagBits;
-
-        /// <summary>
         /// Get the flags used at the time the regular expression was compiled (the original flag string).
         /// </summary>
         public virtual string Flags => originalFlags;
@@ -72,14 +67,6 @@ namespace OutSmart.DAXon.Regex
                 // System.Text.RegularExpressions.Regex ctor (Java: PatternSyntaxException).
                 throw new XPathException("Incorrect syntax for native regular expression: " + e.Message, "FORX0002");
             }
-        }
-
-        /// <summary>
-        /// Get the Java regular expression (after translation from an XPath regex, but before compilation)
-        /// </summary>
-        public virtual string GetJavaRegularExpression()
-        {
-            return javaRegex;
         }
 
         /// <summary>

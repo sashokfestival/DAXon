@@ -66,11 +66,6 @@ namespace OutSmart.DAXon.Expressions.Compatibility
             return this;
         }
 
-        public virtual void SetAtomicComparer(IAtomicComparer comparer)
-        {
-            this.comparer = comparer;
-        }
-
         public override Expression Optimize(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Configuration config = visitor.GetConfiguration();

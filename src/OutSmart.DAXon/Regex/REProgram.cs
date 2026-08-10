@@ -107,6 +107,23 @@ namespace OutSmart.DAXon.Regex
                 Pred1 = pred1;
                 Pred2 = pred2;
             }
+
+            // Unanchored two-segment shape C1 C2{m,n}: C1 consumes exactly one codepoint, so no
+            // backtracking exists — an attempt at i either extends into a C2 run of >= min or the
+            // scan advances to i+1; no disjointness condition needed. With Seq2Captures the two
+            // segments are capture groups 1 and 2 ("([A-Z])([0-9]+)"), else bare ("[A-Z][0-9]+").
+            internal readonly bool Seq2;
+            internal readonly bool Seq2Captures;
+
+            internal FastShape(IIntPredicateProxy pred1, IIntPredicateProxy pred2, int min2, int max2, bool captures)
+            {
+                Seq2 = true;
+                Seq2Captures = captures;
+                Pred1 = pred1;
+                Pred2 = pred2;
+                Min2 = min2;
+                Max2 = max2;
+            }
         }
 
         private static readonly FastShape NotFast = new FastShape(false, null, 0, 0);
@@ -146,6 +163,14 @@ namespace OutSmart.DAXon.Regex
                     // min >= 1 excludes '*'/{0,n} whose empty match has separate progress semantics.
                     result = new FastShape(true, rcc.Predicate, rep.min, rep.max);
                 }
+                else if (root is OpSequence seq2 && seq2.Operations.Count == 3
+                    && seq2.Operations[0] is OpCharClass s1
+                    && seq2.Operations[1] is OpRepeat s2 && s2.greedy && s2.min >= 1 && s2.op is OpCharClass s2c
+                    && seq2.Operations[2] is OpEndProgram)
+                {
+                    // C1 C2{m,n} (e.g. replace($s, '[A-Z][0-9]+', ...)).
+                    result = new FastShape(s1.Predicate, s2c.Predicate, s2.min, s2.max, false);
+                }
             }
             else if (maxParens <= 1
                 && (optimizationFlags & OPT_HASBACKREFS) == 0
@@ -173,13 +198,21 @@ namespace OutSmart.DAXon.Regex
                 && cseq.Operations[0] is OpCapture cp1 && cp1.groupNr == 1
                 && cseq.Operations[1] is OpCapture cp2 && cp2.groupNr == 2
                 && cseq.Operations[2] is OpEndProgram
-                && cp1.childOp is OpRepeat cr1 && cr1.greedy && cr1.min == 1 && cr1.max == int.MaxValue && cr1.op is OpCharClass ccl1
-                && cp2.childOp is OpRepeat cr2 && cr2.greedy && cr2.min == 1 && cr2.max == int.MaxValue && cr2.op is OpCharClass ccl2
-                && ccl1.Predicate is CharClass.ICharacterClass ch1 && ccl2.Predicate is CharClass.ICharacterClass ch2
-                && ch1.IsDisjoint(ch2))
+                && cp2.childOp is OpRepeat cr2 && cr2.greedy && cr2.min >= 1 && cr2.op is OpCharClass ccl2)
             {
-                // (C1+)(C2+) with disjoint classes, e.g. analyze-string "([A-Z]+)([0-9]+)".
-                result = new FastShape(ccl1.Predicate, ccl2.Predicate);
+                if (cp1.childOp is OpRepeat cr1 && cr1.greedy && cr1.min == 1 && cr1.max == int.MaxValue && cr1.op is OpCharClass ccl1
+                    && cr2.min == 1 && cr2.max == int.MaxValue
+                    && ccl1.Predicate is CharClass.ICharacterClass ch1 && ccl2.Predicate is CharClass.ICharacterClass ch2
+                    && ch1.IsDisjoint(ch2))
+                {
+                    // (C1+)(C2+) with disjoint classes, e.g. analyze-string "([A-Z]+)([0-9]+)".
+                    result = new FastShape(ccl1.Predicate, ccl2.Predicate);
+                }
+                else if (cp1.childOp is OpCharClass single)
+                {
+                    // (C1)(C2{m,n}), e.g. replace($s, '([A-Z])([0-9]+)', '$2-$1').
+                    result = new FastShape(single.Predicate, ccl2.Predicate, cr2.min, cr2.max, true);
+                }
             }
 
             fastShape = result;   // volatile write publishes the fully-constructed shape
@@ -296,11 +329,6 @@ namespace OutSmart.DAXon.Regex
         {
             int m = operation.MatchesEmptyString();
             return (m & Operation.MATCHES_ZLS_ANYWHERE) != 0;
-        }
-
-        public virtual UnicodeString GetPrefix()
-        {
-            return prefix;
         }
     }
 }

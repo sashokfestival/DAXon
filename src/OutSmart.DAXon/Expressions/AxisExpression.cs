@@ -91,25 +91,6 @@ namespace OutSmart.DAXon.Expressions
      * Get a string representation of a name to use in diagnostics
      */
         public override string StreamerName => "AxisExpression";
-
-        /*
-     * Get a string representation of a name to use in diagnostics
-     */
-        public HashSet<Expression> Preconditions
-        {
-            get
-            {
-                HashSet<Expression> pre = new HashSet<Expression>(1);
-                /*Expression args[] = new Expression[1];
-            args[0] = this.copy();
-            pre.add(SystemFunctionCall.makeSystemFunction(
-                    "exists", args));*/
-                Expression a = this.Copy(new RebindingMap());
-                a.SetRetainedStaticContext(GetRetainedStaticContext());
-                pre.Add(a);
-                return pre;
-            }
-        }
         public AxisExpression(int axis, NodeTest nodeTest)
         {
             this.axis = axis;
@@ -1074,14 +1055,6 @@ namespace OutSmart.DAXon.Expressions
         public bool IsContextPossiblyUndefined()
         {
             return staticInfo.IsPossiblyAbsent();
-        }
-
-        /*
-     * Get a string representation of a name to use in diagnostics
-     */
-        public ContextItemStaticInfo GetContextItemStaticInfo()
-        {
-            return staticInfo;
         }
 
         /*

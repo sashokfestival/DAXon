@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Text
         private readonly int[] _cps; // non-null only when _s contains a surrogate pair
         public override int Width => _cps != null ? 24 : 16;
 
-        public StringView() { _s = ""; }
-
         public StringView(string s)
         {
             _s = s ?? "";
@@ -52,7 +50,6 @@ namespace OutSmart.DAXon.Text
         }
 
         public static StringView Of(string s) => new StringView(s);
-        public static UnicodeString TidyZeroLength(UnicodeString us) => us == null ? (UnicodeString)new StringView("") : us;
         // Tidy(UnicodeString) - normalizes / interns the string.
         public static UnicodeString Tidy(UnicodeString us) => us ?? (UnicodeString)new StringView("");
         public static UnicodeString Tidy(string s) => new StringView(s);

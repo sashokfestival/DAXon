@@ -13,7 +13,5 @@ namespace OutSmart.DAXon.Internal.Charsets
 {
     internal class MalformedInputException : CharacterCodingException
     {
-        public MalformedInputException() { }
-        public MalformedInputException(string m) : base(m) { }
     }
 }

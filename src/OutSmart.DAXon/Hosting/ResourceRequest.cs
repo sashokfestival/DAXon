@@ -17,6 +17,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 using OutSmart.DAXon.Core;
+using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Lib
 {
     public class ResourceRequest
@@ -27,7 +28,7 @@ namespace OutSmart.DAXon.Lib
         public const string XML_NATURE = "https://www.iana.org/assignments/media-types/application/xml";
         public const string DTD_NATURE = "https://www.iana.org/assignments/media-types/application/xml-dtd";
         public const string EXTERNAL_ENTITY_NATURE = "https://www.iana.org/assignments/media-types/application/xml-external-parsed-entity";
-        public const string SCHEMA_NATURE = "http://www.w3.org/2001/XMLSchema";
+        public const string SCHEMA_NATURE = NamespaceConstant.SCHEMA;
         public const string VALIDATION_PURPOSE = "http://www.rddl.org/purposes#validation";
         public static readonly string XSLT_NATURE = NamespaceConstant.XSLT;
         public static readonly string XSD_NATURE = NamespaceConstant.SCHEMA;

@@ -47,11 +47,7 @@ namespace OutSmart.DAXon.Expressions
             return err is XPathException.StackOverflow || err.HasErrorCode(DAXonErrorCode.SXTO0001);
         }
 
-        public virtual Operand TryOperand => tryOp;
-
         public virtual Expression TryExpr => tryOp.GetChildExpression();
-
-        public virtual IList<CatchClause> CatchClauses => catchClauses;
 
         public override int ImplementationMethod => ITERATE_METHOD;
 
@@ -77,11 +73,6 @@ namespace OutSmart.DAXon.Expressions
         public virtual void SetRollbackOutput(bool rollback)
         {
             this.rollbackOutput = rollback;
-        }
-
-        public virtual bool IsRollbackOutput()
-        {
-            return this.rollbackOutput;
         }
 
         public override bool IsInstruction()
@@ -219,7 +210,6 @@ namespace OutSmart.DAXon.Expressions
 
         internal class CatchClause
         {
-            public int slotNumber = -1;
             public Operand catchOp;
             public IQNameTest nameTest;
         }

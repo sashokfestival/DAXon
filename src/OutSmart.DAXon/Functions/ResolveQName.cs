@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class ResolveQName : SystemFunction
     {
-
-        public static Func<ResolveQName> New() => () => new ResolveQName();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             AtomicValue lex = (AtomicValue)arguments[0].Head();

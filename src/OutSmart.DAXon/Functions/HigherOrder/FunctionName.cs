@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// </summary>
     internal class FunctionName : SystemFunction
     {
-
-        public static Func<FunctionName> New() => () => new FunctionName();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             IFunctionItem f = (IFunctionItem)arguments[0].Head();

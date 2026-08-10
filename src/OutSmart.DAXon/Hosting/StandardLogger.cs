@@ -34,14 +34,6 @@ namespace OutSmart.DAXon.Lib
                 this.writer = value;
             }
         }
-
-        public virtual int Threshold
-        {
-            get => threshold; set
-            {
-                this.threshold = value;
-            }
-        }
         public StandardLogger()
         {
         }
@@ -51,12 +43,6 @@ namespace OutSmart.DAXon.Lib
         public StandardLogger(TextWriter writer)
         {
             PrintWriter = (TextWriter)writer;
-        }
-
-        public StandardLogger(string fileName)
-        {
-            PrintWriter = new StreamWriter(fileName) { AutoFlush = true };
-            mustClose = true;
         }
 
         public virtual void SetPrintStream(TextWriter stream)

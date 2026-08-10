@@ -47,6 +47,5 @@ namespace OutSmart.DAXon.Events
         {
             return systemId;
         }
-        object ICopyInformee.NotifyElementNode(NodeInfo arg0) => NotifyElementNode(arg0);
     }
 }

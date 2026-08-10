@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class NodeName_1 : ScalarSystemFunction
     {
-
-        public static Func<NodeName_1> New() => () => new NodeName_1();
         public override AtomicValue Evaluate(IItem item, IXPathContext context)
         {
             if (!(item is NodeInfo))

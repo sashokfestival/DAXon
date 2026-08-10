@@ -29,11 +29,44 @@ namespace OutSmart.DAXon.Trees.Tiny
 {
     internal sealed class TinyTree : GenericTreeInfo, INodeVectorTree
     {
-        public const int TYPECODE_IDREF = 1 << 29;
         private static readonly string[] EMPTY_STRING_ARRAY = new string[0];
         public LargeTextBuffer textBuffer;
         public UnicodeString commentBuffer = null; // created when needed
         public int numberOfNodes = 0; // excluding attributes and namespaces
+
+        // Whether any text (or textual-element inline text) is whitespace-only. When none is, a
+        // space-stripping view of this tree is an identity view (rules only ever preserve more),
+        // so the wrap - and its per-node wrapper tax - can be skipped. Lazy with early exit:
+        // documents that do contain whitespace find the first one immediately. Benign idempotent
+        // race on the cached verdict.
+        private volatile int whitespaceTextState;   // 0 unknown, 1 present, 2 absent
+
+        internal bool ContainsWhitespaceText()
+        {
+            int s = whitespaceTextState;
+            if (s != 0)
+            {
+                return s == 1;
+            }
+
+            bool found = false;
+            for (int i = 0; i < numberOfNodes; i++)
+            {
+                int kind = nodeKind[i];
+                // WHITESPACE_TEXT is all-white by construction (its alpha/beta hold the packed
+                // compressed run, not buffer offsets - never read them as text coordinates).
+                if (kind == Types.Type.WHITESPACE_TEXT
+                    || ((kind == Types.Type.TEXT || kind == Types.Type.TEXTUAL_ELEMENT)
+                        && TinyTextImpl.IsWhitespaceOnly(this, i)))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            whitespaceTextState = found ? 1 : 2;
+            return found;
+        }
         public byte[] nodeKind;
         public short[] depth;
         public int[] next;
@@ -43,7 +76,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         internal int[] prior = null;
         ISchemaType[] typeArray = null;
         IAtomicSequence[] typedValueArray = null;
-        IntSet idRefElements = null;
         IntSet idRefAttributes = null;
         IntSet nilledElements = null;
         IntSet defaultedAttributes = null;
@@ -93,53 +125,11 @@ namespace OutSmart.DAXon.Trees.Tiny
 
         public int NumberOfNodes => numberOfNodes;
 
-        public int NumberOfAttributes => numberOfAttributes;
-
-        public int NumberOfNamespaces => numberOfNamespaces;
-
         public byte[] NodeKindArray => nodeKind;
-
-        public short[] NodeDepthArray => depth;
 
         public int[] NameCodeArray => nameCode;
 
         public ISchemaType[] TypeArray => typeArray;
-
-        public int[] NextPointerArray => next;
-
-        public int[] AlphaArray => alpha;
-
-        public int[] BetaArray => beta;
-
-        public LargeTextBuffer CharacterBuffer => textBuffer;
-
-        public UnicodeString CommentBuffer => commentBuffer;
-
-        public int[] AttributeNameCodeArray => attCode;
-
-        public ISimpleType[] AttributeTypeArray => attType;
-
-        public int[] AttributeParentArray => attParent;
-
-        public String[] AttributeValueArray => attValue;
-
-        public NamespaceBinding[] NamespaceBindings
-        {
-            get
-            {
-                throw new NotSupportedException();
-            }
-        }
-
-        public NamespaceMap[] NamespaceMaps => namespaceMaps;
-
-        public int[] NamespaceParentArray
-        {
-            get
-            {
-                throw new NotSupportedException();
-            }
-        }
 
         //                case global::OutSmart.DAXon.Types.Type.TEXTUAL_ELEMENT: {
         //                    nameCode[to] = (source.nameCode[from] & NamePool.FP_MASK) |
@@ -294,11 +284,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        public PrefixPool GetPrefixPool()
-        {
-            return prefixPool;
-        }
-
         public int AddDocumentNode(TinyDocumentImpl doc)
         {
             SetRootNode(doc);
@@ -362,11 +347,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             textBuffer.AppendUnicodeString(chars); //        chars.supplyContent(textBuffer, 0, chars.length());
             //        ensureTextCapacity(1);
             //        textChunks[textChunksUsed++] = chars;
-        }
-
-        public int AddTextNodeCopy(int depth, int existingNodeNr)
-        {
-            return AddNode(Types.Type.TEXT, depth, alpha[existingNodeNr], beta[existingNodeNr], -1);
         }
 
         public void Condense(Statistics statistics)
@@ -444,16 +424,6 @@ namespace OutSmart.DAXon.Trees.Tiny
 
                 typeArray[nodeNr] = type;
             }
-        }
-
-        public int GetTypeAnnotation(int nodeNr)
-        {
-            if (typeArray == null)
-            {
-                return StandardNames.XS_UNTYPED;
-            }
-
-            return typeArray[nodeNr].Fingerprint;
         }
 
         public ISchemaType GetSchemaType(int nodeNr)
@@ -615,11 +585,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         {
             int kind = nodeKind[nodeNr];
             return kind == Types.Type.WHITESPACE_TEXT ? Types.Type.TEXT : kind;
-        }
-
-        public int GetNameCode(int nodeNr)
-        {
-            return nameCode[nodeNr];
         }
 
         public int GetFingerprint(int nodeNr)
@@ -817,11 +782,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             defaultedAttributes.Add(attNr);
         }
 
-        public bool IsDefaultedAttribute(int attNr)
-        {
-            return defaultedAttributes != null && defaultedAttributes.Contains(attNr);
-        }
-
         public void IndexIDElement(NodeInfo root, int nodeNr)
         {
             string id = Whitespace.Trim(TinyParentNodeImpl.GetStringValue(this, nodeNr).Tidy()).ToString();
@@ -971,23 +931,6 @@ namespace OutSmart.DAXon.Trees.Tiny
 
                 default:
                     throw new InvalidOperationException("Unknown node kind");
-            }
-        }
-
-        TinyAttributeImpl GetAttributeNode(int nr)
-        {
-            return new TinyAttributeImpl(this, nr);
-        }
-
-        int GetAttributeAnnotation(int nr)
-        {
-            if (attType == null)
-            {
-                return StandardNames.XS_UNTYPED_ATOMIC;
-            }
-            else
-            {
-                return attType[nr].Fingerprint;
             }
         }
 
@@ -1253,64 +1196,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return topWithinEntity != null && topWithinEntity.Contains(nodeNr);
         }
 
-        public void DiagnosticDump()
-        {
-            NamePool pool = GetNamePool();
-            Console.Error.WriteLine("    node    kind   depth    next   alpha    beta    name    type");
-            for (int i = 0; i < numberOfNodes; i++)
-            {
-                string eqName = "";
-                if (nameCode[i] != -1)
-                {
-                    try
-                    {
-                        eqName = pool.GetEQName(nameCode[i]);
-                    }
-                    catch (Exception err)
-                    {
-                        eqName = "#" + nameCode[1];
-                    }
-                }
-
-                Console.Error.WriteLine(N8(i) + N8(nodeKind[i]) + N8(depth[i]) + N8(next[i]) + N8(alpha[i]) + N8(beta[i]) + N8(nameCode[i]) + N8(GetTypeAnnotation(i)) + " " + eqName);
-            }
-
-            Console.Error.WriteLine("    attr  parent    name    value");
-            for (int i = 0; i < numberOfAttributes; i++)
-            {
-                Console.Error.WriteLine(N8(i) + N8(attParent[i]) + N8(attCode[i]) + "    " + attValue[i]);
-            }
-
-            Console.Error.WriteLine("      ns  parent  prefix     uri");
-            for (int i = 0; i < numberOfNamespaces; i++)
-            {
-                Console.Error.WriteLine(N8(i) + "  " + namespaceMaps[i]);
-            }
-        }
-
-        public static void DiagnosticDump(NodeInfo node)
-        {
-            lock (typeof(TinyTree))
-            {
-                if (node is TinyNodeImpl)
-                {
-                    TinyTree tree = ((TinyNodeImpl)node).tree;
-                    Console.Error.WriteLine("Tree containing node " + ((TinyNodeImpl)node).nodeNr);
-                    tree.DiagnosticDump();
-                }
-                else
-                {
-                    Console.Error.WriteLine("Node is not in a TinyTree");
-                }
-            }
-        }
-
-        private static string N8(int val)
-        {
-            string s = "        " + val;
-            return s.Substring(s.Length - 8);
-        }
-
         public void ShowSize(Logger logger)
         {
             logger.Info("Tree size: " + numberOfNodes + " nodes, " + textBuffer.Length() + " characters, " + numberOfAttributes + " attributes");
@@ -1319,11 +1204,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         public override bool IsTyped()
         {
             return typeArray != null;
-        }
-
-        public bool IsUsesNamespaces()
-        {
-            return usesNamespaces;
         }
         NodeInfo INodeVectorTree.GetNode(int arg0) => GetNode(arg0); // was => default (null), breaking NodeTest.GetMatcher fallback
     }

@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "InsertBefore";
-
-        public static Func<InsertBefore> New() => () => new InsertBefore();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             NumericValue n = (NumericValue)arguments[1].Head();

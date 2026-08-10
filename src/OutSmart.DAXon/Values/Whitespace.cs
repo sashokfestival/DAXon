@@ -37,7 +37,6 @@ namespace OutSmart.DAXon.Values
         public const int ALL = 2;
         public const int UNSPECIFIED = 3;
         public const int XSLT = 4;
-        private static ARegularExpression _anyWhitespaceLazy;
         private static readonly OutSmart.DAXon.Internal.Regex.Pattern J_oneWhitespace = OutSmart.DAXon.Internal.Regex.Pattern.Compile("[ \\n\\r\\t]");
         private static readonly OutSmart.DAXon.Internal.Regex.Pattern J_anyWhitespace = OutSmart.DAXon.Internal.Regex.Pattern.Compile("[ \\n\\r\\t]+");
 
@@ -77,10 +76,6 @@ namespace OutSmart.DAXon.Values
             false,
             true
         };
-        private static ARegularExpression anyWhitespace => _anyWhitespaceLazy ??= ARegularExpression.Compile(StringTool.FromLatin1("[ \\n\\r\\t]+"), "");
-        private Whitespace()
-        {
-        }
         public static UnicodeString ApplyWhitespaceNormalization(int action, UnicodeString value)
         {
             switch (action)
@@ -464,29 +459,6 @@ namespace OutSmart.DAXon.Values
             return @in.Substring(firstNonWhite, lastNonWhite + 1 - firstNonWhite) /*Java substring(begin,END) -> C# (start,LENGTH)*/;
         }
 
-        public static UnicodeString Collapse(UnicodeString @in)
-        {
-            UnicodeBuilder builder = new UnicodeBuilder(@in.Length32());
-            Tokenize(@in.CodePoints(), (s, e, cat) =>
-            {
-                TokenCategory category = cat; // redeclared to assist C# conversion
-                switch (category)
-                {
-                    case TokenCategory.CONTENT:
-                        builder.Accept(@in.Substring(s, e));
-                        break;
-                    case TokenCategory.SEPARATOR_WHITESPACE:
-                        builder.Append(' ');
-                        break;
-                    default:
-
-                        // no action
-                        break;
-                }
-            });
-            return builder.ToUnicodeString();
-        }
-
         public static string Collapse(string @in)
         {
             StringBuilder builder = new StringBuilder(@in.Length);
@@ -508,33 +480,6 @@ namespace OutSmart.DAXon.Values
                 }
             });
             return builder.ToString();
-        }
-
-        public static UnicodeString Normalize(UnicodeString @in)
-        {
-            UnicodeBuilder builder = new UnicodeBuilder(@in.Length32());
-            Tokenize(@in.CodePoints(), (s, e, cat) =>
-            {
-                TokenCategory category = cat; // redeclared to assist C# conversion
-                switch (category)
-                {
-                    case TokenCategory.CONTENT:
-                        builder.Accept(@in.Substring(s, e));
-                        break;
-                    case TokenCategory.SEPARATOR_WHITESPACE:
-                        for (int i = s; i < e; i++)
-                        {
-                            builder.Append(' ');
-                        }
-
-                        break;
-                    default:
-
-                        // no action
-                        break;
-                }
-            });
-            return builder.ToUnicodeString();
         }
 
         public static string Normalize(string @in)
@@ -579,11 +524,6 @@ namespace OutSmart.DAXon.Values
         {
             private readonly UnicodeString input;
             private long position;
-            public Tokenizer(string input)
-            {
-                this.input = StringView.Tidy(input);
-                this.position = 0;
-            }
 
             public Tokenizer(UnicodeString input)
             {

@@ -42,10 +42,6 @@ namespace OutSmart.DAXon.Values
         /// </summary>
         public static readonly Int64Value MAX_LONG = new Int64Value(long.MaxValue);
         /// <summary>
-        /// IntegerValue representing the minimum value for a long
-        /// </summary>
-        public static readonly Int64Value MIN_LONG = new Int64Value(long.MinValue);
-        /// <summary>
         /// Array of small integer values (immutable, so sharing is safe; sized to catch the
         /// common products of string-length, position, count-of-small-sets and similar)
         /// </summary>
@@ -119,15 +115,6 @@ namespace OutSmart.DAXon.Values
             this.value = value;
         }
 
-        public Int64Value(long val, BuiltInAtomicType typeLabel, bool check) : base(typeLabel)
-        {
-            value = val;
-            if (check && !CheckRange(value, typeLabel))
-            {
-                throw new XPathException("Integer value " + val + " is out of range for the requested type " + typeLabel.Description).WithErrorCode("XPTY0004").AsTypeError();
-            }
-        }
-
         public static Int64Value MakeIntegerValue(long value)
         {
             if (value >= 0 && value < SMALL_INTEGERS.Length)
@@ -143,18 +130,6 @@ namespace OutSmart.DAXon.Values
         public static Int64Value MakeDerived(long val, IAtomicType type)
         {
             return new Int64Value(val, type);
-        }
-
-        public static Int64Value Signum(long val)
-        {
-            if (val == 0)
-            {
-                return ZERO;
-            }
-            else
-            {
-                return val < 0 ? MINUS_ONE : PLUS_ONE;
-            }
         }
 
         public override int AsSubscript()
@@ -664,10 +639,15 @@ namespace OutSmart.DAXon.Values
         /// <summary>
         /// Integer divide by another integer
         /// </summary>
+        // True when the value does not fit in 32 bits — the BigInteger-promotion trigger for
+        // Times/Div/Mod/Idiv. The sign-extension of an in-range NEGATIVE value is all ones, so
+        // the -1 case must pass too (upstream isLong verbatim); without it every negative
+        // operand was silently routed through BigInteger arithmetic (value-identical, but the
+        // whole negative half of integer multiply/divide paid the big-number path).
         private bool IsLong()
         {
             long top = value >> 31;
-            return top != 0;
+            return top != 0 && top != -1;
         }
 
         /// <summary>

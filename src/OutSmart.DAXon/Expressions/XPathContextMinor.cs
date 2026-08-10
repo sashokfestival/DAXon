@@ -350,11 +350,6 @@ namespace OutSmart.DAXon.Expressions
             return controller.GetImplicitTimezone();
         }
 
-        public virtual IEnumerator<ContextStackFrame> IterateStackFrames()
-        {
-            return (IEnumerator<ContextStackFrame>)(new ContextStackIterator(this));
-        }
-
         public virtual Component GetTargetComponent(int bindingSlot)
         {
             return MajorContext.GetTargetComponent(bindingSlot);

@@ -490,12 +490,6 @@ namespace OutSmart.DAXon.Collections.Zeno
         }
 
         // copy.
-        public virtual bool IsSingleton()
-        {
-            return masterList.Count == 1 && masterList[0].Count == 1;
-        }
-
-        // copy.
         public virtual IEnumerator<T> IIterator()
         {
             return new ZenoChainIterator<T>(masterList);
@@ -516,20 +510,6 @@ namespace OutSmart.DAXon.Collections.Zeno
                 sb[sb.Length - 1] = ')';
             }
 
-            return sb.ToString();
-        }
-
-        // copy.
-        public virtual string ShowMetrics()
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append('(');
-            foreach (IList<T> segment in masterList)
-            {
-                sb.Append(segment.Count).Append(',');
-            }
-
-            sb[sb.Length - 1] = ')';
             return sb.ToString();
         }
         public IEnumerator<T> GetEnumerator() => new ZenoChainIterator<T>(masterList);

@@ -16,7 +16,6 @@ namespace OutSmart.DAXon.Types
     internal class StringToAnyURI : StringConverter
     {
         private readonly StringConverter inner;
-        public StringToAnyURI() { }
         public StringToAnyURI(object x) : base(x as ConversionRules) { inner = new StringConverter.StringToAnyURI(x as ConversionRules); }
         // Delegates to the proven nested converter (BuiltInAtomicType binds that one; this top-level
         // copy is what ConversionRules binds - it used to throw NIE if that registry path went live).

@@ -78,9 +78,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         }
 
         public override string StreamerName => "ApplyTemplates";
-        protected ApplyTemplates()
-        {
-        }
 
         public ApplyTemplates(Expression select, bool useCurrentMode, bool useTailRecursion, bool implicitSelect, bool inStreamableConstruct, Mode mode, RuleManager ruleManager)
         {
@@ -98,11 +95,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             this._useTailRecursion = useTailRecursion;
             this.mode = mode;
             AdoptChildExpression(select);
-        }
-
-        public virtual void SetMode(SimpleMode target)
-        {
-            this.mode = target;
         }
 
         public WithParam[] GetActualParams()
@@ -195,11 +187,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return this;
         }
 
-        public virtual RuleManager GetRuleManager()
-        {
-            return ruleManager;
-        }
-
         public override Expression Copy(RebindingMap rebindings)
         {
             ApplyTemplates a2 = new ApplyTemplates(Select.Copy(rebindings), useCurrentMode, _useTailRecursion, implicitSelect, inStreamableConstruct, mode, ruleManager);
@@ -255,29 +242,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return targetMode;
         }
 
-        public virtual Expression GetSelectExpression()
-        {
-            return Select;
-        }
-
-        public virtual bool IsImplicitSelect()
-        {
-            return implicitSelect;
-        }
-
         public virtual bool UseTailRecursion()
         {
             return _useTailRecursion;
-        }
-
-        public virtual bool UsesCurrentMode()
-        {
-            return useCurrentMode;
-        }
-
-        public virtual Mode GetMode()
-        {
-            return mode;
         }
 
         public SymbolicName GetSymbolicName()

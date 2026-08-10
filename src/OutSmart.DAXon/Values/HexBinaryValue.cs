@@ -47,8 +47,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        public virtual int LengthInOctets => binaryValue.Length;
-
         public IXPathComparable XPathComparable => this;
         public HexBinaryValue(UnicodeString @in) : base(BuiltInAtomicType.HEX_BINARY)
         {

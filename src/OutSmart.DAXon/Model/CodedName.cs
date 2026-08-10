@@ -20,6 +20,9 @@ namespace OutSmart.DAXon.Model
         private readonly int fingerprint;
         private readonly string prefix;
         private readonly NamePool pool;
+        // One name is asked several times per output event (HasURI twice, GetLocalPart for the
+        // tag); resolve the pool lookup once. Benign race: idempotent write of an immutable QName.
+        private StructuredQName resolved;
 
         public virtual string DisplayName => (prefix.Length == 0) ? GetLocalPart() : prefix + ":" + GetLocalPart();
 
@@ -32,6 +35,11 @@ namespace OutSmart.DAXon.Model
             this.pool = pool;
         }
 
+        private StructuredQName Resolve()
+        {
+            return resolved ?? (resolved = pool.GetUnprefixedQName(fingerprint));
+        }
+
         public virtual string GetPrefix()
         {
             return prefix;
@@ -39,17 +47,17 @@ namespace OutSmart.DAXon.Model
 
         public virtual NamespaceUri GetNamespaceUri()
         {
-            return pool.GetURI(fingerprint);
+            return Resolve().GetNamespaceUri();
         }
 
         public virtual string GetLocalPart()
         {
-            return pool.GetLocalName(fingerprint);
+            return Resolve().GetLocalPart();
         }
 
         public virtual StructuredQName GetStructuredQName()
         {
-            StructuredQName qn = pool.GetUnprefixedQName(fingerprint);
+            StructuredQName qn = Resolve();
             if ((prefix.Length == 0))
             {
                 return qn;
@@ -62,7 +70,7 @@ namespace OutSmart.DAXon.Model
 
         public virtual bool HasURI(NamespaceUri ns)
         {
-            return pool.GetStructuredQName(fingerprint).HasURI(ns);
+            return Resolve().HasURI(ns);
         }
 
         public virtual NamespaceBinding GetNamespaceBinding()

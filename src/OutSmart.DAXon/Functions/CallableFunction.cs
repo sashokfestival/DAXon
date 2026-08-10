@@ -73,11 +73,6 @@ namespace OutSmart.DAXon.Functions
             this.type = type;
         }
 
-        public virtual void SetType(IFunctionItemType type)
-        {
-            this.type = type;
-        }
-
         public override StructuredQName GetFunctionName()
         {
             return name.ComponentName;
@@ -86,11 +81,6 @@ namespace OutSmart.DAXon.Functions
         public override int GetArity()
         {
             return name.GetArity();
-        }
-
-        public virtual void SetAnnotations(AnnotationList annotations)
-        {
-            this.annotations = annotations;
         }
 
         public override AnnotationList GetAnnotations()

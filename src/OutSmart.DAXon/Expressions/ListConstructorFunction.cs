@@ -33,8 +33,6 @@ namespace OutSmart.DAXon.Expressions
 
         public virtual IListType TargetType => targetType;
 
-        public virtual ISimpleType MemberType => memberType;
-
         public override IFunctionItemType FunctionItemType
         {
             get

@@ -114,11 +114,6 @@ namespace OutSmart.DAXon.Expressions
             return null;
         }
 
-        public virtual FocusTrackingIterator GetCurrentIterator()
-        {
-            return null;
-        }
-
         public virtual Component.M GetCurrentMode()
         {
             NotAllowed();
@@ -233,12 +228,6 @@ namespace OutSmart.DAXon.Expressions
         public virtual int GetImplicitTimezone()
         {
             return CalendarValue.MISSING_TIMEZONE;
-        }
-
-        // no-op
-        public virtual IEnumerator<ContextStackFrame> IterateStackFrames()
-        {
-            return System.Linq.Enumerable.Empty<ContextStackFrame>().GetEnumerator();
         }
 
         // no-op

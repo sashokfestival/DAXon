@@ -72,11 +72,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return memberType.PrimaryType.GetAtomizedItemType() as IPlainType ?? BuiltInAtomicType.ANY_ATOMIC;
         }
 
-        public virtual int GetArity()
-        {
-            return 1;
-        }
-
         public override bool Matches(IItem item, TypeHierarchy th)
         {
             if (!(item is ArrayItem))
@@ -117,11 +112,6 @@ namespace OutSmart.DAXon.Values.Arrays
             {
                 return "array(" + show(memberType) + ")";
             }
-        }
-
-        public string ToExportString()
-        {
-            return MakeString(st => st.ToExportString());
         }
 
         /// <summary>
@@ -190,30 +180,6 @@ namespace OutSmart.DAXon.Values.Arrays
         public override Expression MakeFunctionSequenceCoercer(Expression exp, Func<RoleDiagnostic> role, bool allow40)
         {
             return new SpecificFunctionType(ArgumentTypes, ResultType).MakeFunctionSequenceCoercer(exp, role, false);
-        }
-
-        public string ExplainMismatch(IItem item, TypeHierarchy th)
-        {
-            if (item is ArrayItem)
-            {
-                for (int i = 0; i < ((ArrayItem)item).ArrayLength(); i++)
-                {
-                    IGroundedValue member = ((ArrayItem)item)[i];
-                    if (!memberType.Matches(member, th))
-                    {
-                        string s = "The " + RoleDiagnostic.Ordinal(i + 1) + " member of the supplied array {" + Err.DepictSequence(member) + "} does not match the required member type " + memberType;
-                        string more = memberType.ExplainMismatch(member, th);
-                        if (more != null)
-                        {
-                            s = s + ". " + more;
-                        }
-
-                        return (s);
-                    }
-                }
-            }
-
-            return null;
         }
     }
 }

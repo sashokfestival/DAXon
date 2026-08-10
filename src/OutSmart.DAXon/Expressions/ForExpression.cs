@@ -449,6 +449,9 @@ namespace OutSmart.DAXon.Expressions
                 else
                 {
                     IItemEvaluator actionEval = expr.GetAction().MakeElaborator().ElaborateForItem();
+                    // Parity with Iterate(): an EXACTLY_ONE body makes the mapping one-to-one, so
+                    // LastPositionFinder consumers (fn:count) read the base length without mapping.
+                    bool oneToOne = actionCardinality == StaticProperty.EXACTLY_ONE;
                     return (context) =>
                     {
                         ISequenceIterator @base = selectEval.Iterate(context);
@@ -456,7 +459,7 @@ namespace OutSmart.DAXon.Expressions
                         {
                             context.SetLocalVariable(slot, item);
                             return actionEval.Eval(context);
-                        }), context.GetController());
+                        }), oneToOne, context.GetController());
                     };
                 }
             }

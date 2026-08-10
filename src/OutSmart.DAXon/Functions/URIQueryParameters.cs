@@ -281,11 +281,6 @@ namespace OutSmart.DAXon.Functions
             {
                 return Directory.Exists(Path.Combine(dir, name)) || pattern.Matches(StringView.Of(name).Tidy());
             }
-
-            public virtual bool Matches(string name)
-            {
-                return pattern.Matches(StringView.Of(name).Tidy());
-            }
         }
     }
 }

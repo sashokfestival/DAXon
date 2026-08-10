@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class ResolveURI : SystemFunction
     {
-
-        public static Func<ResolveURI> New() => () => new ResolveURI();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             AtomicValue arg0 = (AtomicValue)arguments[0].Head();

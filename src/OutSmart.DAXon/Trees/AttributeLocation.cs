@@ -30,14 +30,6 @@ namespace OutSmart.DAXon.Trees
         private readonly StructuredQName attributeName;
         private NodeInfo elementNode;
 
-        public virtual NodeInfo ElementNode
-        {
-            get => elementNode; set
-            {
-                elementNode = value;
-            }
-        }
-
         public virtual StructuredQName ElementName => elementName;
 
         public virtual StructuredQName AttributeName => attributeName;

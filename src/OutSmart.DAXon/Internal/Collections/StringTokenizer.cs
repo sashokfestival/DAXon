@@ -52,8 +52,6 @@ namespace OutSmart.DAXon.Internal.Collections
             return p < _str.Length;
         }
 
-        public bool HasMoreElements() => HasMoreTokens();
-
         public string NextToken()
         {
             if (!_returnDelims)
@@ -77,8 +75,6 @@ namespace OutSmart.DAXon.Internal.Collections
                 _pos++;
             return _str.Substring(start, _pos - start);
         }
-
-        public object NextElement() => NextToken();
 
         public int CountTokens()
         {

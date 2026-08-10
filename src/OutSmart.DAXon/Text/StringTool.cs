@@ -100,17 +100,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        public static UnicodeString FromLatin1(string str)
-        {
-            byte[] bytes = new byte[str.Length];
-            for (int i = 0; i < str.Length; i++)
-            {
-                bytes[i] = (byte)(str[i] & 0xff);
-            }
-
-            return new Twine8(bytes);
-        }
-
         public static IIntIterator CodePoints(string value)
         {
             return new AnonymousIntIterator(null, value);
@@ -186,14 +175,6 @@ namespace OutSmart.DAXon.Text
             }
 
             builder.Insert(0, array);
-        }
-
-        public static void AppendRepeated(StringBuilder builder, char ch, int count)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                builder.Append(ch);
-            }
         }
 
         public static int LastCodePoint(UnicodeString str)
@@ -337,7 +318,6 @@ namespace OutSmart.DAXon.Text
             private readonly StringTool parent;
             private readonly string value;
             int i = 0;
-            bool expectingLowSurrogate;
             public AnonymousIntIterator(StringTool parent, string value)
             {
                 this.parent = parent;

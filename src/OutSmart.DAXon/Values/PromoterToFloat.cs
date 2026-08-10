@@ -21,7 +21,6 @@ namespace OutSmart.DAXon.Values
     // upstream Converter.PromoterToFloat (Converter.java:771): double -> float is NOT promotable.
     internal class PromoterToFloat : Converter
     {
-        public PromoterToFloat() { }
         public PromoterToFloat(object rules) { }
         public override IConversionResult Convert(object value)
         {

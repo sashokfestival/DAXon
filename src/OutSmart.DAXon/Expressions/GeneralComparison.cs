@@ -847,6 +847,72 @@ namespace OutSmart.DAXon.Expressions
                 }
             }
 
+            // `exists x in range: x op value`, decided from the range bounds (bounds access does not
+            // consume the iterator). Extracted from the EvaluateManyToOne fast path so the
+            // many-to-many route can reuse it; untyped conversion mirrors the original code.
+            private static bool RangeOpValue(RangeIterator ri, int singletonOperator, AtomicValue value)
+            {
+                if (value.IsUntypedAtomic())
+                {
+                    value = StringConverter.StringToInteger.INSTANCE.ConvertString(value.UnicodeStringValue).AsAtomic();
+                }
+
+                switch (singletonOperator)
+                {
+                    case Token.FEQ:
+                        return ri.ContainsEq((NumericValue)value);
+                    case Token.FNE:
+                        return ri.First.CompareTo(ri.GetLast()) != 0 || ri.First.CompareTo(((NumericValue)value)) != 0;
+                    case Token.FLE:
+                        return ri.GetMin().CompareTo(((NumericValue)value)) <= 0;
+                    case Token.FLT:
+                        return ri.GetMin().CompareTo(((NumericValue)value)) < 0;
+                    case Token.FGE:
+                        return ri.GetMax().CompareTo(((NumericValue)value)) >= 0;
+                    case Token.FGT:
+                        return ri.GetMax().CompareTo(((NumericValue)value)) > 0;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+
+            // `exists x in r0, y in r1: x op y` from the two ranges' bounds. FEQ is interval
+            // overlap (integer ranges hold every integer between their bounds).
+            private static bool RangeOpRange(RangeIterator r0, int singletonOperator, RangeIterator r1)
+            {
+                switch (singletonOperator)
+                {
+                    case Token.FEQ:
+                        return r0.GetMin().CompareTo(r1.GetMax()) <= 0 && r0.GetMax().CompareTo(r1.GetMin()) >= 0;
+                    case Token.FNE:
+                        return r0.First.CompareTo(r0.GetLast()) != 0 || r1.First.CompareTo(r1.GetLast()) != 0
+                            || r0.First.CompareTo(r1.First) != 0;
+                    case Token.FLE:
+                        return r0.GetMin().CompareTo(r1.GetMax()) <= 0;
+                    case Token.FLT:
+                        return r0.GetMin().CompareTo(r1.GetMax()) < 0;
+                    case Token.FGE:
+                        return r0.GetMax().CompareTo(r1.GetMin()) >= 0;
+                    case Token.FGT:
+                        return r0.GetMax().CompareTo(r1.GetMin()) > 0;
+                    default:
+                        throw new InvalidOperationException();
+                }
+            }
+
+            // x op y  ⟺  y invert(op) x
+            private static int InvertOperator(int singletonOperator)
+            {
+                switch (singletonOperator)
+                {
+                    case Token.FLT: return Token.FGT;
+                    case Token.FLE: return Token.FGE;
+                    case Token.FGT: return Token.FLT;
+                    case Token.FGE: return Token.FLE;
+                    default: return singletonOperator;
+                }
+            }
+
             public virtual bool EvaluateManyToOne(ISequenceIterator iter0, AtomicValue value1, int singletonOperator, IAtomicComparer comparer, bool runTimeCheckNeeded, RetainedStaticContext staticContext, ILocation loc, IXPathContext context)
             {
                 try
@@ -859,29 +925,7 @@ namespace OutSmart.DAXon.Expressions
 
                     if (iter0 is RangeIterator)
                     {
-                        if (value1.IsUntypedAtomic())
-                        {
-                            value1 = StringConverter.StringToInteger.INSTANCE.ConvertString(value1.UnicodeStringValue).AsAtomic();
-                        }
-
-                        RangeIterator ri = (RangeIterator)iter0;
-                        switch (singletonOperator)
-                        {
-                            case Token.FEQ:
-                                return ri.ContainsEq((NumericValue)value1);
-                            case Token.FNE:
-                                return ri.First.CompareTo(ri.GetLast()) != 0 || ri.First.CompareTo(((NumericValue)value1)) != 0;
-                            case Token.FLE:
-                                return ri.GetMin().CompareTo(((NumericValue)value1)) <= 0;
-                            case Token.FLT:
-                                return ri.GetMin().CompareTo(((NumericValue)value1)) < 0;
-                            case Token.FGE:
-                                return ri.GetMax().CompareTo(((NumericValue)value1)) >= 0;
-                            case Token.FGT:
-                                return ri.GetMax().CompareTo(((NumericValue)value1)) > 0;
-                            default:
-                                throw new InvalidOperationException();
-                        }
+                        return RangeOpValue((RangeIterator)iter0, singletonOperator, value1);
                     }
 
                     AtomicValue item0;
@@ -907,6 +951,59 @@ namespace OutSmart.DAXon.Expressions
             {
                 try
                 {
+                    // Range operands fold to a bounds decision instead of an element scan — the
+                    // shortcut EvaluateManyToOne has always taken; a one-to-many comparison lands
+                    // here because the elaborator has no dedicated ONE_TO_MANY route.
+                    if (iter0 is RangeIterator && iter1 is RangeIterator)
+                    {
+                        bool res = RangeOpRange((RangeIterator)iter0, singletonOperator, (RangeIterator)iter1);
+                        iter0.Dispose();
+                        iter1.Dispose();
+                        return res;
+                    }
+
+                    if (iter0 is RangeIterator || iter1 is RangeIterator)
+                    {
+                        bool rangeOnLeft = iter0 is RangeIterator;
+                        RangeIterator range = (RangeIterator)(rangeOnLeft ? iter0 : iter1);
+                        ISequenceIterator items = rangeOnLeft ? iter1 : iter0;
+                        // exists x in range: x op y decides item-on-right; item-on-left inverts.
+                        int rangeOp = rangeOnLeft ? singletonOperator : InvertOperator(singletonOperator);
+                        IAtomicComparer itemComparer = comparer.ProvideContext(context);
+                        AtomicValue item;
+                        while ((item = (AtomicValue)items.Next()) != null)
+                        {
+                            bool hit;
+                            if (item.IsNaN() && singletonOperator != Token.FNE)
+                            {
+                                continue;
+                            }
+
+                            if (item is NumericValue || item.IsUntypedAtomic())
+                            {
+                                hit = RangeOpValue(range, rangeOp, item);
+                            }
+                            else
+                            {
+                                // Non-numeric operand: comparing it to any of the range's integers
+                                // behaves identically (XPTY0004 or false) — probe one element.
+                                hit = rangeOnLeft
+                                    ? Compare(range.First, singletonOperator, item, itemComparer, runTimeCheckNeeded, context, staticContext)
+                                    : Compare(item, singletonOperator, range.First, itemComparer, runTimeCheckNeeded, context, staticContext);
+                            }
+
+                            if (hit)
+                            {
+                                iter0.Dispose();
+                                iter1.Dispose();
+                                return true;
+                            }
+                        }
+
+                        range.Dispose();
+                        return false;
+                    }
+
                     bool exhausted0 = false;
                     bool exhausted1 = false;
                     IList<AtomicValue> value0 = new List<AtomicValue>();

@@ -192,6 +192,9 @@ namespace OutSmart.DAXon.Trees.Tiny
         {
             private readonly TinyTextualElement element;
 
+            // In-place whiteness for whitespace stripping (no virtual-value materialization).
+            internal bool IsWhitespaceOnly => TinyTextImpl.IsWhitespaceOnly(element.tree, element.nodeNr);
+
             public virtual UnicodeString UnicodeStringValue => element.UnicodeStringValue;
 
             public virtual int Fingerprint => -1;
@@ -539,11 +542,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             public virtual IGroundedValue Materialize()
             {
                 return this;
-            }
-
-            public virtual IEnumerable<IItem> AsIterable()
-            {
-                return new IItem[] { this }; // singleton grounded value (upstream GroundedValue default for an Item)
             }
 
             public virtual bool ContainsNode(NodeInfo sought) => OutSmart.DAXon.Expressions.SingletonIntersectExpression.ContainsNode(((OutSmart.DAXon.Model.ISequence)this).Iterate(), sought); // upstream GroundedValue default

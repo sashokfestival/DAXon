@@ -30,7 +30,6 @@ namespace OutSmart.DAXon.Values
         public static readonly BigInteger MAX_LONG = new BigInteger(long.MaxValue);
         public static readonly BigInteger MIN_LONG = new BigInteger(long.MinValue);
         public static readonly BigInteger MAX_UNSIGNED_LONG = BigIntegers.FromString("18446744073709551615");
-        public static readonly BigIntegerValue ZERO = new BigIntegerValue(BigInteger.Zero);
         private readonly BigInteger value;
 
         public override UnicodeString PrimitiveStringValue => BMPString.Of(value.ToString());
@@ -95,11 +94,6 @@ namespace OutSmart.DAXon.Values
         public override BigInteger AsBigInteger()
         {
             return value;
-        }
-
-        public bool IsWithinLongRange()
-        {
-            return value.CompareTo(MIN_LONG) >= 0 && value.CompareTo(MAX_LONG) <= 0;
         }
 
         public BigDecimal AsDecimal()

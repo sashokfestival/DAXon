@@ -56,29 +56,9 @@ namespace OutSmart.DAXon.Types
 
         public virtual IList<IPlainType> PlainMemberTypes => new List<IPlainType>(memberTypes);
 
-        public virtual double DefaultPriority
-        {
-            get
-            {
-                double result = 1;
-                foreach (IAtomicType t in memberTypes)
-                {
-                    result *= t.DefaultPriority;
-                }
-
-                return result;
-            }
-        }
-
         public LocalUnionType(IList<IAtomicType> memberTypes)
         {
             this.memberTypes = memberTypes;
-        }
-
-        public LocalUnionType(params IAtomicType[] memberTypes)
-        {
-            this.memberTypes = new List<IAtomicType>();
-            this.memberTypes.AddRange(memberTypes.ToList());
         }
         public virtual Genre GetGenre()
         {
@@ -130,11 +110,6 @@ namespace OutSmart.DAXon.Types
         }
 
         public virtual bool IsAtomicType()
-        {
-            return false;
-        }
-
-        public virtual bool ContainsListType()
         {
             return false;
         }
@@ -260,11 +235,6 @@ namespace OutSmart.DAXon.Types
             return this;
         }
 
-        public virtual bool IsAtomizable(TypeHierarchy th)
-        {
-            return true;
-        }
-
         public override string ToString()
         {
             StringBuilder fsb = new StringBuilder(256);
@@ -273,21 +243,6 @@ namespace OutSmart.DAXon.Types
             {
                 string member = at.DisplayName;
                 fsb.Append(member);
-                fsb.Append(", ");
-            }
-
-            fsb.Length = fsb.Length - 2;
-            fsb.Append(')');
-            return fsb.ToString();
-        }
-
-        public virtual string ToExportString()
-        {
-            StringBuilder fsb = new StringBuilder(256);
-            fsb.Append("union(");
-            foreach (IAtomicType at in memberTypes)
-            {
-                fsb.Append(at.ToExportString());
                 fsb.Append(", ");
             }
 

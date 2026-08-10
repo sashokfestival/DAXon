@@ -164,18 +164,6 @@ namespace OutSmart.DAXon.Transformation
             return null;
         }
 
-        private KeyIndex BuildIndex(KeyDefinitionSet keySet, ITreeInfo doc, IXPathContext context)
-        {
-            lock (syncLock)
-            {
-
-                KeyIndex index = new KeyIndex(keySet.IsRangeKey());
-                index.BuildIndex(keySet, doc, context);
-
-                return index;
-            }
-        }
-
         private void BuildIndex(KeyIndex index, KeyDefinitionSet keySet, ITreeInfo doc, IXPathContext context)
         {
             index.BuildIndex(keySet, doc, context);

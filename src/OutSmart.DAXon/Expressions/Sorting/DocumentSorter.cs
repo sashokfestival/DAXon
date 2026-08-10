@@ -239,7 +239,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public override ISequenceIterator Iterate(IXPathContext context)
         {
-            return new DocumentOrderIterator(BaseExpression.Iterate(context), comparer);
+            return DocumentOrderIterator.Of(BaseExpression.Iterate(context), comparer);
         }
 
         public override bool EffectiveBooleanValue(IXPathContext context)
@@ -270,7 +270,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
                 DocumentSorter expr = (DocumentSorter)GetExpression();
                 IPullEvaluator baseEval = expr.BaseExpression.MakeElaborator().ElaborateForPull();
                 IComparer<NodeInfo> comparer = expr.GetComparer();
-                return (context) => (ISequenceIterator)new DocumentOrderIterator(baseEval.Iterate(context), comparer);
+                return (context) => DocumentOrderIterator.Of(baseEval.Iterate(context), comparer);
             }
 
             public override IBooleanEvaluator ElaborateForBoolean()

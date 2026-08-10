@@ -247,7 +247,7 @@ namespace OutSmart.DAXon.Xslt
                 catch (XPathException e) when (!e.HasBeenReported() || e.HasErrorCode("XTSE0180"))
                 {
                     e.MaybeSetErrorCode("XTSE0165");
-                    if (e.HasErrorCode("SXXP0003"))
+                    if (e.HasErrorCode(DAXonErrorCode.SXXP0003))
                     {
                         e.SetErrorCode("XTSE0165");
                     }

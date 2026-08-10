@@ -111,10 +111,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         {
             return tree;
         }
-        public virtual NodeInfo Head()
-        {
-            return this;
-        }
 
         public virtual ISchemaType GetSchemaType()
         {

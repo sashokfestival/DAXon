@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Xslt
     {
         Expression key = null;
         Expression select = null;
-
-        protected virtual ItemType ReturnedItemType => MapType.ANY_MAP_TYPE;
         public override bool IsInstruction()
         {
             return true;

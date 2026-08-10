@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Serialization.CharCodes
         // The `10` variants stay on XmlConvert (genuine XML 1.0 4th-ed semantics). IsValid* left permissive.
         public static bool IsValid11(int c = 0) => (c >= 0x1 && c <= 0xD7FF) || (c >= 0xE000 && c <= 0xFFFD) || (c >= 0x10000 && c <= 0x10FFFF);
         public static bool IsValid10(int c = 0) => c == 0x9 || c == 0xA || c == 0xD || (c >= 0x20 && c <= 0xD7FF) || (c >= 0xE000 && c <= 0xFFFD) || (c >= 0x10000 && c <= 0x10FFFF);
-        public static bool IsNCNameChar11(int c) => IsNCName11(c);
-        public static bool IsNCNameStartChar11(int c) => IsNCNameStart11(c);
         public static bool IsNCNameStart11(int c) =>
             (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_'
             || (c >= 0xC0 && c <= 0xD6) || (c >= 0xD8 && c <= 0xF6) || (c >= 0xF8 && c <= 0x2FF)
@@ -38,10 +36,5 @@ namespace OutSmart.DAXon.Serialization.CharCodes
             IsNCNameStart11(c)
             || c == '-' || c == '.' || (c >= '0' && c <= '9') || c == 0xB7
             || (c >= 0x0300 && c <= 0x036F) || (c >= 0x203F && c <= 0x2040);
-        public static bool IsNCName10(int c) => c >= 0 && c <= 0xFFFF && XmlConvert.IsNCNameChar((char)c);
-        public static bool IsNCNameStart10(int c) => c >= 0 && c <= 0xFFFF && XmlConvert.IsStartNCNameChar((char)c);
-        public static bool IsValid(int c) => true;
-        public static bool IsNCName(int c) => IsNCName11(c);
-        public static bool IsNCNameStart(int c) => IsNCNameStart11(c);
     }
 }

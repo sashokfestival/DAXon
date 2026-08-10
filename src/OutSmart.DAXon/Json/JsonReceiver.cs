@@ -102,11 +102,6 @@ namespace OutSmart.DAXon.Json
             this.indenting = indenting;
         }
 
-        public virtual bool IsIndenting()
-        {
-            return indenting;
-        }
-
         public virtual void Open()
         {
             output.Open();

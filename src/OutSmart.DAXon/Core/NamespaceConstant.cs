@@ -18,10 +18,6 @@ namespace OutSmart.DAXon.Lib
     internal class NamespaceConstant
     {
         /// <summary>
-        /// A URI representing the null namespace (actually, an empty string)
-        /// </summary>
-        public const string NULL = "";
-        /// <summary>
         /// Fixed namespace name for XML: "http://www.w3.org/XML/1998/namespace".
         /// </summary>
         public const string XML = "http://www.w3.org/XML/1998/namespace";
@@ -203,92 +199,6 @@ namespace OutSmart.DAXon.Lib
         /// URI for interactive XSLT extensions in Saxon-CE and SaxonJS
         /// </summary>
         public const string IXSL = "http://saxonica.com/ns/interactiveXSLT";
-        /// <summary>
-        /// Private constructor: class is never instantiated
-        /// </summary>
-        private NamespaceConstant()
-        {
-        }
-
-        public static string GetConventionalPrefix(string uri)
-        {
-            switch (uri)
-            {
-                case XSLT:
-                    return "xsl";
-                case FN:
-                    return "fn";
-                case XML:
-                    return "xml";
-                case SCHEMA:
-                    return "xs";
-                case SCHEMA_INSTANCE:
-                    return "xsi";
-                case IXSL:
-                    return "ixsl";
-                case GLOBAL_JS:
-                    return "js";
-                case SAXON:
-                    return "saxon";
-                case SAXON_GENERATED_VARIABLE:
-                    return "vv";
-                case MATH:
-                    return "math";
-                case MAP_FUNCTIONS:
-                    return "map";
-                case ARRAY_FUNCTIONS:
-                    return "array";
-                case ERR:
-                    return "err";
-                default:
-                    return null;
-            }
-        }
-
-        public static string GetUriForConventionalPrefix(string prefix)
-        {
-            switch (prefix)
-            {
-                case "xsl":
-                    return XSLT;
-                case "fn":
-                    return FN;
-                case "xml":
-                    return XML;
-                case "xs":
-                    return SCHEMA;
-                case "xsi":
-                    return SCHEMA_INSTANCE;
-                case "err":
-                    return ERR;
-                case "ixsl":
-                    return IXSL;
-                case "js":
-                    return GLOBAL_JS;
-                case "saxon":
-                    return SAXON;
-                case "vv":
-                    return SAXON_GENERATED_VARIABLE;
-                case "math":
-                    return MATH;
-                case "map":
-                    return MAP_FUNCTIONS;
-                case "array":
-                    return ARRAY_FUNCTIONS;
-                default:
-                    return null;
-            }
-        }
-
-        public static bool IsReserved(string uri)
-        {
-            return uri != null && (uri.Equals(XSLT) || uri.Equals(FN) || uri.Equals(MATH) || uri.Equals(MAP_FUNCTIONS) || uri.Equals(ARRAY_FUNCTIONS) || uri.Equals(XML) || uri.Equals(SCHEMA) || uri.Equals(SCHEMA_INSTANCE) || uri.Equals(ERR) || uri.Equals(XMLNS));
-        }
-
-        public static bool IsReservedInQuery31(string uri)
-        {
-            return uri.Equals(FN) || uri.Equals(XML) || uri.Equals(SCHEMA) || uri.Equals(SCHEMA_INSTANCE) || uri.Equals(MATH) || uri.Equals(XQUERY) || uri.Equals(MAP_FUNCTIONS) || uri.Equals(ARRAY_FUNCTIONS);
-        }
 
         public static string FindSimilarNamespace(string candidate)
         {

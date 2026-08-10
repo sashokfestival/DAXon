@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Xslt
     internal class XSLOriginalLibrary : IFunctionLibrary
     {
         private static readonly XSLOriginalLibrary THE_INSTANCE = new XSLOriginalLibrary();
-
-        public static StructuredQName XSL_ORIGINAL = new StructuredQName("xsl", NamespaceUri.XSLT, "original");
         private XSLOriginalLibrary()
         {
         }

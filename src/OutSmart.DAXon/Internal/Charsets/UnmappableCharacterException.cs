@@ -13,7 +13,5 @@ namespace OutSmart.DAXon.Internal.Charsets
 {
     internal class UnmappableCharacterException : CharacterCodingException
     {
-        public UnmappableCharacterException() { }
-        public UnmappableCharacterException(string m) : base(m) { }
     }
 }

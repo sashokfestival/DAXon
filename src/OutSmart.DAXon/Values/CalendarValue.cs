@@ -218,8 +218,26 @@ namespace OutSmart.DAXon.Values
 
         protected static void AppendString(UnicodeBuilder sb, int value, int size)
         {
-            string s = "000000000" + value;
-            sb.Append(s.Substring(s.Length - size));
+            // Digits written by division - the old '"000000000" + value' + Substring allocated three
+            // strings per field. Semantics unchanged: the last `size` decimal digits, zero-padded.
+            if (value < 0)
+            {
+                string s = "000000000" + value;
+                sb.Append(s.Substring(s.Length - size));
+                return;
+            }
+
+            int div = 1;
+            for (int i = 1; i < size; i++)
+            {
+                div *= 10;
+            }
+
+            while (div > 0)
+            {
+                sb.Append((char)(value / div % 10 + '0'));
+                div /= 10;
+            }
         }
 
         protected static void AppendTwoDigits(UnicodeBuilder sb, int value)

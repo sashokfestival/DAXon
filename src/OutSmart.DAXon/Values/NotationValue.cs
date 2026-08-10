@@ -41,14 +41,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        public NotationValue(string prefix, string uri, string localName, bool check) : this(prefix, NamespaceUri.Of(uri), localName, check)
-        {
-        }
-
-        public NotationValue(string prefix, NamespaceUri uri, string localName) : base(new StructuredQName(prefix, uri, localName), BuiltInAtomicType.NOTATION)
-        {
-        }
-
         public NotationValue(string prefix, NamespaceUri uri, string localName, IAtomicType typeLabel) : base(new StructuredQName(prefix, uri, localName), typeLabel)
         {
         }

@@ -68,7 +68,6 @@ namespace OutSmart.DAXon.Trees
         }
 
         public virtual ITreeInfo GetTreeInfo() => element.GetTreeInfo();
-        public virtual NodeInfo Head() => this;
         public virtual Genre GetGenre() => Genre.NODE;
         public virtual int GetNodeKind() => OutSmart.DAXon.Types.Type.NAMESPACE;
 
@@ -115,7 +114,6 @@ namespace OutSmart.DAXon.Trees
         public virtual string GetURI() => GetNamespaceUri().ToString();
         public virtual string GetPrefix() => "";
         public virtual Configuration GetConfiguration() => element.GetConfiguration();
-        public virtual NamePool GetNamePool() => GetConfiguration().GetNamePool();
         public virtual ISchemaType GetSchemaType() => BuiltInAtomicType.STRING;
         public virtual NodeInfo GetParent() => element;
 

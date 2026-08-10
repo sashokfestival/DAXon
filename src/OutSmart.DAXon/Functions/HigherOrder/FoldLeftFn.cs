@@ -24,12 +24,59 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// </summary>
     internal class FoldLeftFn : FoldingFunction
     {
-
-        public static Func<FoldLeftFn> New() => () => new FoldLeftFn();
         public override IFold GetFold(IXPathContext context, params ISequence[] arguments)
         {
             ISequence arg0 = arguments[0];
             return new FoldLeftFold(context, arg0.Materialize(), (IFunctionItem)arguments[1].Head());
+        }
+
+        public override ISequence Call(IXPathContext context, ISequence[] arguments)
+        {
+            // Range-aware long lane: the base values are the range's own longs, so the base
+            // iterator's per-item boxing and the IFold ceremony drop out entirely. Step is
+            // always 1 for `to`-ranges; anything else keeps the generic path.
+            ISequenceIterator it = arguments[0].Iterate();
+            if (it is Expressions.AscendingRangeIterator range && range.GetStep().LongValue() == 1)
+            {
+                IFunctionItem fn = (IFunctionItem)arguments[2].Head();
+                arguments[2] = (ISequence)fn;   // keep the fallback single-read
+                FusedArity2Caller fused = FusedArity2Caller.TryMake(fn, context);
+                FusedArity2Caller.LongBody lane = fused == null ? null : fused.TryLongLane();
+                if (lane != null)
+                {
+                    IGroundedValue zero = arguments[1].Materialize();
+                    arguments[1] = zero;
+                    if (zero is Values.Int64Value z && ReferenceEquals(z.GetItemType(), Types.BuiltInAtomicType.INTEGER))
+                    {
+                        long start = range.GetMin().LongValue();
+                        long limit = range.GetMax().LongValue();
+                        long n = limit - start + 1;   // <= 2^31 by range construction, so no overflow
+                        long acc = z.LongValue();
+                        long v = start;
+                        for (long i = 0; i < n; i++, v++)
+                        {
+                            Core.Controller.CheckActiveTimeout();
+                            if (!lane(acc, v, out long next))
+                            {
+                                // Guard tripped: this value and the rest replay on the boxed path.
+                                ISequence data = Values.Int64Value.MakeIntegerValue(acc);
+                                for (; i < n; i++, v++)
+                                {
+                                    data = fused.CallTwo(data, Values.Int64Value.MakeIntegerValue(v));
+                                }
+
+                                return data;
+                            }
+
+                            acc = next;
+                        }
+
+                        return Values.Int64Value.MakeIntegerValue(acc);
+                    }
+                }
+            }
+
+            return RunFold(GetFold(context, TailArguments(arguments)), it);
         }
 
         public override ItemType GetResultItemType(Expression[] args)
@@ -54,6 +101,9 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             private readonly IXPathContext context;
             private readonly IFunctionItem function;
             private readonly FusedArity2Caller fused;
+            private readonly FusedArity2Caller.LongBody lane;
+            private long acc;
+            private bool laneActive;
             private ISequence data;
             private int counter;
             public FoldLeftFold(IXPathContext context, IGroundedValue zero, IFunctionItem function)
@@ -63,10 +113,38 @@ namespace OutSmart.DAXon.Functions.HigherOrder
                 this.fused = FusedArity2Caller.TryMake(function, context);
                 this.data = zero;
                 this.counter = 0;
+                // Long lane: plain xs:integer only — a subtype-labelled zero/item must stay boxed
+                // (an identity body returns the labelled instance itself on the boxed path).
+                if (fused != null && zero is Values.Int64Value z
+                    && ReferenceEquals(z.GetItemType(), Types.BuiltInAtomicType.INTEGER))
+                {
+                    lane = fused.TryLongLane();
+                    if (lane != null)
+                    {
+                        acc = z.LongValue();
+                        laneActive = true;
+                    }
+                }
             }
 
             public virtual void ProcessItem(IItem item)
             {
+                if (laneActive)
+                {
+                    if (item is Values.Int64Value iv
+                        && ReferenceEquals(iv.GetItemType(), Types.BuiltInAtomicType.INTEGER)
+                        && lane(acc, iv.LongValue(), out long next))
+                    {
+                        acc = next;
+                        return;
+                    }
+
+                    // Guard tripped or non-plain-integer item: rejoin the boxed path from the
+                    // current accumulator; nothing was consumed, this item replays boxed.
+                    laneActive = false;
+                    data = Values.Int64Value.MakeIntegerValue(acc);
+                }
+
                 if (fused != null)
                 {
                     // Reused-frame invoker; results come back materialized, so no memo wrapping.
@@ -101,7 +179,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
 
             public virtual ISequence Result()
             {
-                return data;
+                return laneActive ? Values.Int64Value.MakeIntegerValue(acc) : data;
             }
         }
     }

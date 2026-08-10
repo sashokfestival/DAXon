@@ -29,8 +29,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "BooleanFn";
-
-        public static Func<BooleanFn> New() => () => new BooleanFn();
         public override void SupplyTypeInformation(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType, Expression[] arguments)
         {
             XPathException err = TypeChecker.EbvError(arguments[0], visitor.GetConfiguration().GetTypeHierarchy());

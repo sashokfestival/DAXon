@@ -134,27 +134,6 @@ namespace OutSmart.DAXon.Resources
 
         public string ContentType => "application/xml";
 
-        /// <summary>
-        /// Create an XML resource using a specific node
-        /// </summary>
-        public XmlResource(NodeInfo doc)
-        {
-            this.config = doc.GetConfiguration();
-            this.context = this.config.ConversionContext;
-            this.doc = doc;
-        }
-
-        public XmlResource(IXPathContext context, NodeInfo doc)
-        {
-            this.context = context;
-            this.config = context.GetConfiguration();
-            this.doc = doc;
-            if (config != doc.GetConfiguration())
-            {
-                throw new System.ArgumentException("Supplied node belongs to wrong configuration");
-            }
-        }
-
         public XmlResource(IXPathContext context, AbstractResourceCollection.InputDetails details)
         {
             this.config = context.GetConfiguration();

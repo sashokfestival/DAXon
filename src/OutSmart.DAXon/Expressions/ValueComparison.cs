@@ -511,9 +511,39 @@ namespace OutSmart.DAXon.Expressions
                     t1 = BuiltInAtomicType.ANY_ATOMIC;
                 }
 
-                GenericAtomicComparer.IAtomicComparisonFunction comparer = GenericAtomicComparer.MakeAtomicComparisonFunction((BuiltInAtomicType)t0, (BuiltInAtomicType)t1, defaultCollation, @operator, true, expr.GetRetainedStaticContext().GetPackageData().HostLanguageVersion);
                 bool nullable0 = Cardinality.AllowsZero(card0);
                 bool nullable1 = Cardinality.AllowsZero(card1);
+
+                // Plain xs:string vs xs:string under the codepoint collation: the verdict is one
+                // direct codepoint CompareTo — no comparison-function interface hop, no NaN or
+                // type gates (strings have neither). The per-character recursion idiom
+                // ($c ge '0' and $c le '9') pays this comparison per character.
+                if (ReferenceEquals(t0, BuiltInAtomicType.STRING) && ReferenceEquals(t1, BuiltInAtomicType.STRING)
+                    && defaultCollation is CodepointCollator && !nullable0 && !nullable1)
+                {
+                    int strOp = @operator;
+                    return (context) =>
+                    {
+                        int c = ((StringValue)p0.Eval(context)).Content.CompareTo(((StringValue)p1.Eval(context)).Content);
+                        return CompareToConstant.InterpretComparisonResult(strOp, c);
+                    };
+                }
+
+                // xs:integer vs xs:integer: a total order with no NaN and no promotion, so the
+                // polymorphic IntegerValue.CompareTo (Int64 or BigInteger either side) is the
+                // whole verdict (string-length($x) = 0 and friends sit on per-call paths).
+                if (ReferenceEquals(t0, BuiltInAtomicType.INTEGER) && ReferenceEquals(t1, BuiltInAtomicType.INTEGER)
+                    && !nullable0 && !nullable1)
+                {
+                    int intOp = @operator;
+                    return (context) =>
+                    {
+                        int c = ((IntegerValue)p0.Eval(context)).CompareTo((IntegerValue)p1.Eval(context));
+                        return CompareToConstant.InterpretComparisonResult(intOp, c);
+                    };
+                }
+
+                GenericAtomicComparer.IAtomicComparisonFunction comparer = GenericAtomicComparer.MakeAtomicComparisonFunction((BuiltInAtomicType)t0, (BuiltInAtomicType)t1, defaultCollation, @operator, true, expr.GetRetainedStaticContext().GetPackageData().HostLanguageVersion);
                 if (!nullable0 && !nullable1)
                 {
                     return (context) => comparer.Compare((AtomicValue)p0.Eval(context), (AtomicValue)p1.Eval(context), context);

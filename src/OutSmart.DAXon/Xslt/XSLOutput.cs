@@ -28,7 +28,6 @@ namespace OutSmart.DAXon.Xslt
     {
         private StructuredQName outputFormatName;
         private readonly string method = null;
-        private readonly string outputVersion = null;
         private string useCharacterMaps = null;
         private readonly Dictionary<string, string> serializationAttributes = new Dictionary<string, string>(10);
         private Dictionary<string, string> userAttributes = null;

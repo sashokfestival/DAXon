@@ -87,18 +87,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        private void Emit(UnicodeString s)
-        {
-            try
-            {
-                writer.Write(s);
-            }
-            catch (IOException e)
-            {
-                throw new XPathException(e?.Message);
-            }
-        }
-
         public override void Write(IItem item)
         {
             if (started)

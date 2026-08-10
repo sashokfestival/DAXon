@@ -32,8 +32,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public virtual IStringCollator Collator => collator;
 
-        public virtual IStringCollator StringCollator => collator;
-
         protected AtomicSortComparer(IStringCollator collator, int itemType, IXPathContext context)
         {
             this.collator = collator;
@@ -83,11 +81,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
         public virtual IAtomicComparer ProvideContext(IXPathContext context)
         {
             return new AtomicSortComparer(collator, itemType, context);
-        }
-
-        public virtual int GetItemType()
-        {
-            return itemType;
         }
 
         public virtual int CompareAtomicValues(AtomicValue a, AtomicValue b)
@@ -197,11 +190,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
                 // The logic here is to choose a value that compares equal to itself but not equal to any other
                 // value. We use StructuredQName because it has a simple equals() method.
                 return new QNameValue("saxon", NamespaceUri.Of("http://saxon.sf.net/collation-key"), "NaN");
-            }
-
-            public virtual int CompareTo(IAtomicMatchKey o)
-            {
-                return SequenceTool.INDETERMINATE_ORDERING;
             }
         }
     }

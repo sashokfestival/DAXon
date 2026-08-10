@@ -20,14 +20,5 @@ namespace OutSmart.DAXon.Transformation
         {
             this.notifiedByConsumer = notifiedByConsumer;
         }
-
-        // Legacy stub ctors kept for existing catch/throw sites
-        public QuitParsingException() : this(false) { }
-        public QuitParsingException(string m) : base(m, "SXQP0001") { notifiedByConsumer = false; }
-
-        public virtual bool IsNotifiedByConsumer()
-        {
-            return notifiedByConsumer;
-        }
     }
 }

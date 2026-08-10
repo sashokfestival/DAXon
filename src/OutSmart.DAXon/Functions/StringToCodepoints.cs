@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Functions
                 Int64Value.MakeIntegerValue(1114111)
             };
 
-        public static Func<StringToCodepoints> New() => () => new StringToCodepoints();
-
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue val = (StringValue)arguments[0].Head();

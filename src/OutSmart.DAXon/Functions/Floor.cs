@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal sealed class Floor : ScalarSystemFunction
     {
-
-        public static Func<Floor> New() => () => new Floor();
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
             return ((NumericValue)arg).Floor();

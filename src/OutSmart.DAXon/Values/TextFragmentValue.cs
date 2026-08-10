@@ -38,7 +38,6 @@ namespace OutSmart.DAXon.Values
         public string DisplayName => "";
         public NamespaceMap AllNamespaces => null;
         public NodeInfo Root => this;
-        public IEnumerator<string> UnparsedEntityNames => ((IEnumerable<string>)new string[0]).GetEnumerator();
 
         private TextFragmentTextNode TextNode
         {
@@ -84,11 +83,8 @@ namespace OutSmart.DAXon.Values
 
         public ITreeInfo GetTreeInfo() => treeInfo;
         public Configuration GetConfiguration() => treeInfo.GetConfiguration();
-        public NodeInfo GetRootNode() => this;
-        public bool IsTyped() => false;
         public int GetNodeKind() => OutSmart.DAXon.Types.Type.DOCUMENT;
         public string GetStringValue() => text.ToString();
-        public NodeInfo Head() => this;
         public Genre GetGenre() => Genre.NODE;
 
         public bool IsSameNodeInfo(NodeInfo other) => Equals(other);
@@ -240,9 +236,6 @@ namespace OutSmart.DAXon.Values
         public void Deliver(IReceiver receiver, ParseOptions options) => receiver.Append(this);
         public IActiveSource AsActiveSource() => new NodeSource(this);
 
-        public NodeInfo SelectID(string id, bool getParent) => null;
-        public string[] GetUnparsedEntity(string name) => null;
-
         public bool IsId() => false;
         public bool IsIdref() => false;
         public bool IsNilled() => false;
@@ -302,7 +295,6 @@ namespace OutSmart.DAXon.Values
 
             public int GetNodeKind() => OutSmart.DAXon.Types.Type.TEXT;
             public string GetStringValue() => fragment.text.ToString();
-            public NodeInfo Head() => this;
             public Genre GetGenre() => Genre.NODE;
             public bool IsSameNodeInfo(NodeInfo other) => Equals(other);
 

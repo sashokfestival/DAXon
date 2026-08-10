@@ -27,8 +27,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "CodepointsToString";
-
-        public static Func<CodepointsToString> New() => () => new CodepointsToString();
         public static StringValue UnicodeToString(ISequenceIterator chars, IIntPredicateProxy checker)
         {
             UnicodeBuilder sb = new UnicodeBuilder();

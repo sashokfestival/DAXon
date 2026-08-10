@@ -24,7 +24,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         private readonly int _element;
         private readonly NodeTest _test;
         private int _index;
-        public AttributeIterator() { }
         public AttributeIterator(object tree, int node, object test)
         {
             _tree = tree as TinyTree;

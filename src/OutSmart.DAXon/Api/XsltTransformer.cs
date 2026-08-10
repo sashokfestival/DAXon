@@ -125,22 +125,6 @@ namespace OutSmart.DAXon.Api
         }
 
         /*staticParameters*/
-        internal virtual void SetSource(IActiveSource source)
-        {
-            lock (syncLock)
-            {
-                if (source is NodeInfo)
-                {
-                    InitialContextNode = new XdmNode((NodeInfo)source);
-                }
-                else
-                {
-                    initialSource = source;
-                }
-            }
-        }
-
-        /*staticParameters*/
         public virtual void SetParameter(QName name, XdmValue value)
         {
             lock (syncLock)

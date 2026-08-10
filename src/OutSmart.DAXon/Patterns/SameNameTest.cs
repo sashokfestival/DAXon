@@ -56,11 +56,6 @@ namespace OutSmart.DAXon.Patterns
             this.origin = origin;
         }
 
-        public virtual int GetNodeKind()
-        {
-            return origin.GetNodeKind();
-        }
-
         public override UType GetUType()
         {
             return UType.FromTypeCode(origin.GetNodeKind());
@@ -123,16 +118,6 @@ namespace OutSmart.DAXon.Patterns
         public bool MatchesFingerprint(NamePool namePool, int fp)
         {
             return fp == Fingerprint;
-        }
-
-        public virtual NamespaceUri GetNamespaceURI()
-        {
-            return origin.GetNamespaceUri();
-        }
-
-        public virtual string GetLocalPart()
-        {
-            return origin.GetLocalPart();
         }
 
         public override string ToString()

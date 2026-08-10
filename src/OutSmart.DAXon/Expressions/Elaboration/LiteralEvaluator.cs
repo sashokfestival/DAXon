@@ -12,7 +12,6 @@ namespace OutSmart.DAXon.Expressions.Elaboration
     internal class LiteralEvaluator : ISequenceEvaluator
     {
         private readonly IGroundedValue value;
-        public LiteralEvaluator() { }
         public LiteralEvaluator(object value) { this.value = value as IGroundedValue; }
         public ISequence Evaluate(IXPathContext context) => value;
     }

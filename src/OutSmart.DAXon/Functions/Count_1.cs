@@ -23,7 +23,6 @@ namespace OutSmart.DAXon.Functions
     internal class Count_1 : SystemFunction
     {
         public Count_1() { }
-        public static Func<Count_1> New() => () => new Count_1();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             ISequence arg = arguments[0];
@@ -34,25 +33,69 @@ namespace OutSmart.DAXon.Functions
             }
             else
             {
-                var __it = arg.Iterate();
-                // Java's Count.count(iter): a LAST_POSITION_FINDER iterator yields its length without
-                // iterating. This makes count(reverse(X)), count(subsequence(...)) etc. O(1)/O(base-length)
-                // instead of walking every item. Byte-identical: GetLength() is the item count.
-                if (__it is ILastPositionFinder __lpf && __lpf.SupportsGetLength())
-                {
-                    size = __lpf.GetLength();
-                }
-                else
-                {
-                    size = 0;
-                    IItem __c;
-                    while ((__c = __it.Next()) != null)
-                    {
-                        size++;
-                    }
-                }
+                size = CountIterator(arg.Iterate());
             }
             return Int64Value.MakeIntegerValue(size);
+        }
+
+        // Java's Count.count(iter): a LAST_POSITION_FINDER iterator yields its length without
+        // iterating. This makes count(reverse(X)), count(subsequence(...)) etc. O(1)/O(base-length)
+        // instead of walking every item. Byte-identical: GetLength() is the item count.
+        internal static int CountIterator(ISequenceIterator it)
+        {
+            if (it is ILastPositionFinder lpf && lpf.SupportsGetLength())
+            {
+                return lpf.GetLength();
+            }
+
+            if (it is Trees.Iterators.IFastCountable fc && fc.TryFastCount(out int fcount))
+            {
+                // TinyTree axis iterators count array entries directly - no node objects for
+                // count(//*) / count(//text()).
+                return fcount;
+            }
+
+            int size = 0;
+            while (it.Next() != null)
+            {
+                size++;
+            }
+
+            return size;
+        }
+
+        public override Expressions.Elaboration.Elaborator GetElaborator()
+        {
+            return new CountFnElaborator();
+        }
+
+        internal class CountFnElaborator : Expressions.Elaboration.ItemElaborator
+        {
+            public override Expressions.Elaboration.IItemEvaluator ElaborateForItem()
+            {
+                SystemFunctionCall fnc = (SystemFunctionCall)GetExpression();
+                Expression arg = fnc.GetArg(0);
+                Expressions.Elaboration.IPullEvaluator puller = arg.MakeElaborator().ElaborateForPull();
+
+                // count(//@*) rooted at a document: the optimizer compiles it to
+                // descendant(-or-self)::element()/attribute::*, and every attribute in a TinyTree
+                // belongs to that document, so the answer is the tree's attribute total — no
+                // iteration, no wrappers. Any other context item runs the generic count.
+                if (arg is SlashExpression slash
+                    && slash.GetSelectExpression() is AxisExpression selAxis
+                    && (selAxis.Axis == AxisInfo.DESCENDANT || selAxis.Axis == AxisInfo.DESCENDANT_OR_SELF)
+                    && selAxis.GetNodeTest() is Patterns.NodeKindTest ekt && ekt.PrimitiveType == Types.Type.ELEMENT
+                    && slash.GetActionExpression() is AxisExpression actAxis
+                    && actAxis.Axis == AxisInfo.ATTRIBUTE
+                    && actAxis.GetNodeTest() is Patterns.NodeKindTest akt && akt.PrimitiveType == Types.Type.ATTRIBUTE)
+                {
+                    return (context) => context.GetContextItem() is Trees.Tiny.TinyDocumentImpl doc
+                        ? Int64Value.MakeIntegerValue(doc.tree.numberOfAttributes)
+                        : Int64Value.MakeIntegerValue(CountIterator(puller(context)));
+                }
+
+                return (context) => Int64Value.MakeIntegerValue(CountIterator(puller(context)));
+            }
         }
     }
 }

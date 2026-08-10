@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Path_1 : ScalarSystemFunction
     {
-
-        public static Func<Path_1> New() => () => new Path_1();
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
             return MakePath((NodeInfo)arg, context);

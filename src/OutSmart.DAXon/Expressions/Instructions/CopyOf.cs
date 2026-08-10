@@ -87,11 +87,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return validation;
         }
 
-        public virtual bool IsValidating()
-        {
-            return validating;
-        }
-
         public ISchemaType GetSchemaType()
         {
             return schemaType;
@@ -127,24 +122,9 @@ namespace OutSmart.DAXon.Expressions.Instructions
             copyForUpdate = forUpdate;
         }
 
-        public virtual bool IsCopyForUpdate()
-        {
-            return copyForUpdate;
-        }
-
-        public virtual bool IsCopyNamespaces()
-        {
-            return copyNamespaces;
-        }
-
         public virtual void SetCopyAccumulators(bool copy)
         {
             copyAccumulators = copy;
-        }
-
-        public virtual bool IsCopyAccumulators()
-        {
-            return copyAccumulators;
         }
 
         public override Expression Copy(RebindingMap rebindings)

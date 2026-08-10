@@ -330,7 +330,7 @@ namespace OutSmart.DAXon.Api
                     catch (DAXonApiUncheckedException e)
                     {
                         XPathException xe = XPathException.MakeXPathException(e);
-                        xe.MaybeSetErrorCode("SXRD0001");
+                        xe.MaybeSetErrorCode(DAXonErrorCode.SXRD0001);
                         throw xe;
                     }
 

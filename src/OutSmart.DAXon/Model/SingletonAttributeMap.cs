@@ -85,11 +85,6 @@ namespace OutSmart.DAXon.Model
             }
         }
 
-        public IEnumerator<AttributeInfo> IIterator()
-        {
-            yield return this;
-        }
-
         public IAttributeMap Apply(Func<AttributeInfo, AttributeInfo> mapper)
         {
             return SingletonAttributeMap.Of(mapper(this));

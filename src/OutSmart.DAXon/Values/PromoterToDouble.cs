@@ -21,7 +21,6 @@ namespace OutSmart.DAXon.Values
     // Converter.PromoterToDouble (Converter.java:734).
     internal class PromoterToDouble : Converter
     {
-        public PromoterToDouble() { }
         public PromoterToDouble(object rules) { }
         public override IConversionResult Convert(object value)
         {

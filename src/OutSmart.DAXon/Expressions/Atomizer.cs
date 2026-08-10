@@ -665,7 +665,7 @@ namespace OutSmart.DAXon.Expressions
                 }
 
                 IPullEvaluator baseEval = expr.BaseExpression.MakeElaborator().ElaborateForPull();
-                return (context) =>
+                IPullEvaluator generic = (context) =>
                 {
                     try
                     {
@@ -706,6 +706,20 @@ namespace OutSmart.DAXon.Expressions
                         }
                     }
                 };
+
+                // atomize(descendant::text()[parent leaf]) — the compiled body of
+                // distinct-values(//*[not(*)]/text()) and friends: untypedAtomic values are built
+                // straight from the text buffer, with no text-node wrappers at all.
+                if (oneToOne
+                    && expr.BaseExpression is FilterExpression fe
+                    && Elaboration.FusedLeafFilter.MatchLeafTexts(fe))
+                {
+                    return (context) => context.GetContextItem() is Trees.Tiny.TinyParentNodeImpl tiny && tiny.tree.TypeArray == null
+                        ? (ISequenceIterator)new Elaboration.FusedLeafFilter.LeafTextIterator(tiny, true)
+                        : generic(context);
+                }
+
+                return generic;
             }
 
             public override IItemEvaluator ElaborateForItem()

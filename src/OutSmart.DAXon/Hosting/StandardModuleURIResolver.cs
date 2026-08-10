@@ -22,9 +22,6 @@ namespace OutSmart.DAXon.Lib
     internal class StandardModuleURIResolver : IModuleURIResolver
     {
         Configuration config = null;
-        public StandardModuleURIResolver()
-        {
-        }
 
         public StandardModuleURIResolver(Configuration config)
         {

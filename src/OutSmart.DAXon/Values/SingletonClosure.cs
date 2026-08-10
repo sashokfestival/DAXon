@@ -91,21 +91,6 @@ namespace OutSmart.DAXon.Values
             }
         }
 
-        public virtual IItem ItemAt(int n)
-        {
-            if (n != 0)
-            {
-                return null;
-            }
-
-            return AsItem();
-        }
-
-        public virtual int GetLength()
-        {
-            return AsItem() == null ? 0 : 1;
-        }
-
         public override IGroundedValue Materialize()
         {
             try

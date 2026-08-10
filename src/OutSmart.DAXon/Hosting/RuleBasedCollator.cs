@@ -11,5 +11,5 @@ using OutSmart.DAXon.Model;
 
 namespace OutSmart.DAXon.Lib
 {
-    internal class RuleBasedCollator { public RuleBasedCollator() { } public RuleBasedCollator(string rules) { } }
+    internal class RuleBasedCollator { }
 }

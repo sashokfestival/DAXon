@@ -76,8 +76,6 @@ namespace OutSmart.DAXon.Functions
             codePoint <= 0xFFFF
                 ? CharUnicodeInfo.GetUnicodeCategory((char)codePoint)
                 : CharUnicodeInfo.GetUnicodeCategory(char.ConvertFromUtf32(codePoint), 0);
-
-        public static Func<FormatInteger> New() => () => new FormatInteger();
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
             bool opt = true;

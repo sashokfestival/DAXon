@@ -60,16 +60,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        public virtual HashSet<Expression> Preconditions
-        {
-            get
-            {
-                HashSet<Expression> pre = new HashSet<Expression>();
-
-                return pre;
-            }
-        }
-
         public override string ExpressionName => "gVarRef";
         public GlobalVariableReference(StructuredQName name) : base(name)
         {
@@ -95,11 +85,6 @@ namespace OutSmart.DAXon.Expressions
         public SymbolicName GetSymbolicName()
         {
             return new SymbolicName(StandardNames.XSL_VARIABLE, VariableName);
-        }
-
-        public virtual void SetTarget(Component target)
-        {
-            binding = (GlobalVariable)target.GetActor();
         }
 
         public virtual Component GetTarget()

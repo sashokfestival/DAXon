@@ -46,9 +46,6 @@ namespace OutSmart.DAXon.Trees.Wrappers
                 }
             }
         }
-        protected SpaceStrippedNode()
-        {
-        }
 
         protected SpaceStrippedNode(NodeInfo node, SpaceStrippedNode parent)
         {
@@ -70,13 +67,35 @@ namespace OutSmart.DAXon.Trees.Wrappers
             return wrapper;
         }
 
+        // Whiteness without materializing the text: tiny nodes (real and textual-element virtual)
+        // scan the shared text buffer in place; the generic path keeps the old string route.
+        private static bool IsAllWhiteText(NodeInfo node)
+        {
+            if (node is Tiny.WhitespaceTextImpl)
+            {
+                return true;   // compressed whitespace: all-white by construction
+            }
+
+            if (node is Tiny.TinyTextImpl tt)
+            {
+                return Tiny.TinyTextImpl.IsWhitespaceOnly(tt.tree, tt.nodeNr);
+            }
+
+            if (node is Tiny.TinyTextualElement.TinyTextualElementText tet)
+            {
+                return tet.IsWhitespaceOnly;
+            }
+
+            return Whitespace.IsAllWhite(node.UnicodeStringValue);
+        }
+
         /// <summary>
         /// Ask whether a node is preserved after whitespace stripping
         /// </summary>
         public static bool IsPreservedNode(NodeInfo node, SpaceStrippedDocument docWrapper, NodeInfo actualParent)
         {
             // Non-text nodes, non-whitespace nodes, and parentless nodes are preserved
-            if (node.GetNodeKind() != OutSmart.DAXon.Types.Type.TEXT || actualParent == null || !Whitespace.IsAllWhite(node.UnicodeStringValue))
+            if (node.GetNodeKind() != OutSmart.DAXon.Types.Type.TEXT || actualParent == null || !IsAllWhiteText(node))
             {
                 return true;
             }
@@ -130,16 +149,7 @@ namespace OutSmart.DAXon.Trees.Wrappers
             }
 
             // otherwise it depends on xsl:strip-space
-            try
-            {
-                int preserve = docWrapper.StrippingRule.IsSpacePreserving(NameOfNode.MakeName(actualParent), null);
-                return preserve == Stripper.ALWAYS_PRESERVE;
-            }
-            catch (XPathException)
-            {
-                // Ambiguity between strip-space and preserve-space. Take the recovery action.
-                return true;
-            }
+            return docWrapper.PreservedByRule(actualParent);
         }
 
         public override IAtomicSequence Atomize()
@@ -306,6 +316,13 @@ namespace OutSmart.DAXon.Trees.Wrappers
             private bool IsPreserved(NodeInfo nextRealNode)
             {
                 if (nextRealNode.GetNodeKind() != OutSmart.DAXon.Types.Type.TEXT)
+                {
+                    return true;
+                }
+
+                // Cheap in-place whiteness first: non-white text (the common case) is preserved
+                // without resolving the parent (a sibling-chain walk on tiny text nodes).
+                if (!IsAllWhiteText(nextRealNode))
                 {
                     return true;
                 }

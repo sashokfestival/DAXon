@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Functions
         bool presorted = false;
 
         public override string StreamerName => "Outermost";
-
-        public static Func<Outermost> New() => () => new Outermost();
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
             if ((arguments[0].GetSpecialProperties() & StaticProperty.PEER_NODESET) != 0)

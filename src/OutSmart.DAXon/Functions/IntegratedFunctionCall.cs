@@ -46,11 +46,6 @@ namespace OutSmart.DAXon.Functions
             this.function = function;
         }
 
-        public virtual void SetResultType(SequenceType resultType)
-        {
-            this.resultType = resultType;
-        }
-
         public override StructuredQName GetFunctionName()
         {
             return name;
@@ -59,11 +54,6 @@ namespace OutSmart.DAXon.Functions
         public override IFunctionItem GetTargetFunction(IXPathContext context)
         {
             return null;
-        }
-
-        public virtual ExtensionFunctionCall GetFunction()
-        {
-            return function;
         }
 
         protected override void CheckArguments(ExpressionVisitor visitor)

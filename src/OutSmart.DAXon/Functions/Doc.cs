@@ -27,16 +27,9 @@ namespace OutSmart.DAXon.Functions
     internal class Doc : SystemFunction, ICallable
     {
         private ParseOptions parseOptions;
-
-        public static Func<Doc> New() => () => new Doc();
         public virtual ParseOptions GetParseOptions()
         {
             return parseOptions;
-        }
-
-        public virtual void SetParseOptions(ParseOptions parseOptions)
-        {
-            this.parseOptions = parseOptions;
         }
 
         public override int GetCardinality(Expression[] arguments)

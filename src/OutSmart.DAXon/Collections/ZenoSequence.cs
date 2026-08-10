@@ -59,12 +59,6 @@ namespace OutSmart.DAXon.Collections.Zeno
             this.chain = chain;
         }
 
-        public static ZenoSequence FromList(IList<IItem> items)
-        {
-            ZenoChain<IItem> chain = new ZenoChain<IItem>().AddAll(items);
-            return new ZenoSequence(chain);
-        }
-
         public virtual ISequenceIterator Iterate()
         {
             return new ZenoSequenceIterator(this);
@@ -173,29 +167,6 @@ namespace OutSmart.DAXon.Collections.Zeno
 
                     break;
             }
-        }
-
-        public static ZenoSequence Join(IList<IGroundedValue> segments)
-        {
-
-            // Note: currently used only for testing
-            ZenoChain<IItem> list = new ZenoChain<IItem>();
-            foreach (IGroundedValue val in segments)
-            {
-                if (val is ZenoSequence)
-                {
-                    list = list.Concat(((ZenoSequence)val).chain);
-                }
-                else
-                {
-                    foreach (IItem item in val.AsIterable())
-                    {
-                        list = list.Add(item);
-                    }
-                }
-            }
-
-            return new ZenoSequence(list);
         }
 
         // === Auto-generated stubs (StubGenerator Phase 3.1f) ===

@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
     /// </summary>
     internal class FoldRightFn : SystemFunction
     {
-
-        public static Func<FoldRightFn> New() => () => new FoldRightFn();
         public override ItemType GetResultItemType(Expression[] args)
         {
 
@@ -50,9 +48,86 @@ namespace OutSmart.DAXon.Functions.HigherOrder
 
         private ISequence EvalFoldRight(IFunctionItem function, ISequence zero, ISequenceIterator @base, IXPathContext context)
         {
+            FusedArity2Caller fused = FusedArity2Caller.TryMake(function, context);
+
+            // Range-aware long lane (see FoldLeftFn.Call): iterate the range's longs directly,
+            // descending, skipping the reverse iterator's per-item boxing.
+            if (fused != null && @base is Expressions.AscendingRangeIterator range && range.GetStep().LongValue() == 1)
+            {
+                FusedArity2Caller.LongBody rangeLane = fused.TryLongLane();
+                if (rangeLane != null && zero is Values.Int64Value z0
+                    && ReferenceEquals(z0.GetItemType(), Types.BuiltInAtomicType.INTEGER))
+                {
+                    long start = range.GetMin().LongValue();
+                    long limit = range.GetMax().LongValue();
+                    long n = limit - start + 1;   // <= 2^31 by range construction
+                    long acc = z0.LongValue();
+                    long v = limit;
+                    for (long i = 0; i < n; i++, v--)
+                    {
+                        Core.Controller.CheckActiveTimeout();
+                        if (!rangeLane(v, acc, out long next))
+                        {
+                            ISequence zz = Values.Int64Value.MakeIntegerValue(acc);
+                            for (; i < n; i++, v--)
+                            {
+                                zz = fused.CallTwoSeq(Values.Int64Value.MakeIntegerValue(v), zz);
+                            }
+
+                            return zz;
+                        }
+
+                        acc = next;
+                    }
+
+                    return Values.Int64Value.MakeIntegerValue(acc);
+                }
+            }
+
             ISequenceIterator reverseBase = Reverse.GetReverseIterator(@base);
-            ISequence[] args = new ISequence[2];
             IItem item;
+            if (fused != null)
+            {
+                // Long lane (see FoldLeftFold): fold-right's per-item call is (item, accumulator).
+                FusedArity2Caller.LongBody lane = fused.TryLongLane();
+                if (lane != null && zero is Values.Int64Value z
+                    && ReferenceEquals(z.GetItemType(), Types.BuiltInAtomicType.INTEGER))
+                {
+                    long acc = z.LongValue();
+                    while ((item = reverseBase.Next()) != null)
+                    {
+                        if (item is Values.Int64Value iv
+                            && ReferenceEquals(iv.GetItemType(), Types.BuiltInAtomicType.INTEGER)
+                            && lane(iv.LongValue(), acc, out long next))
+                        {
+                            acc = next;
+                            continue;
+                        }
+
+                        // Guard tripped: this item and the rest continue on the boxed path.
+                        zero = Values.Int64Value.MakeIntegerValue(acc);
+                        zero = fused.CallTwoSeq(item, zero);
+                        while ((item = reverseBase.Next()) != null)
+                        {
+                            zero = fused.CallTwoSeq(item, zero);
+                        }
+
+                        return zero;
+                    }
+
+                    return Values.Int64Value.MakeIntegerValue(acc);
+                }
+
+                // Reused-frame invoker (same contract as fold-left); results come back materialized.
+                while ((item = reverseBase.Next()) != null)
+                {
+                    zero = fused.CallTwoSeq(item, zero);
+                }
+
+                return zero;
+            }
+
+            ISequence[] args = new ISequence[2];
             while ((item = reverseBase.Next()) != null)
             {
                 args[0] = item;

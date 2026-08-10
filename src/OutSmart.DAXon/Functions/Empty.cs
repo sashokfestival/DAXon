@@ -33,8 +33,6 @@ namespace OutSmart.DAXon.Functions
         //        return new SystemFunctionCall(this, arguments) {
         //
         public override string StreamerName => "Empty";
-
-        public static Func<Empty> New() => () => new Empty();
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
 

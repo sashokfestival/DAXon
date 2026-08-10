@@ -31,8 +31,6 @@ namespace OutSmart.DAXon.Xslt
     {
         private Expression select = null;
         private Expression onDuplicates = null;
-
-        protected virtual ItemType ReturnedItemType => MapType.ANY_MAP_TYPE;
         public override bool IsInstruction()
         {
             return true;

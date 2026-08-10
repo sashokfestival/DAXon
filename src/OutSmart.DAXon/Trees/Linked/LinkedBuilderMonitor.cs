@@ -13,7 +13,6 @@ namespace OutSmart.DAXon.Trees.Linked
     internal class LinkedBuilderMonitor : BuilderMonitor
     {
         public override NodeInfo MarkedNode => null;
-        public LinkedBuilderMonitor() : base(null) { }
         public LinkedBuilderMonitor(object a) : base(null) { }
         public override void MarkNextNode(int nodeKind) { }
     }

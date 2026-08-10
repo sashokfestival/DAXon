@@ -55,10 +55,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public virtual SortKeyDefinitionList SortKeyDefinitions => sortKeysOp == null ? null : (SortKeyDefinitionList)sortKeysOp.GetChildExpression();
 
-        public virtual IAtomicComparer[] SortKeyComparators => sortComparators;
-
-        public virtual IStringCollator Collation => collator;
-
         public override string StreamerName => "ForEachGroup";
 
         public virtual Expression CollationNameExpression
@@ -112,18 +108,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         public Expression GetActionExpression()
         {
             return actionOp.GetChildExpression();
-        }
-
-        public virtual URI GetBaseURI()
-        {
-            try
-            {
-                return GetRetainedStaticContext().GetStaticBaseUri();
-            }
-            catch (XPathException err)
-            {
-                return null;
-            }
         }
 
         public virtual bool IsComposite()
@@ -477,79 +461,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public virtual IGroupIterator GetGroupIterator(IPullEvaluator selectPull, IXPathContext context)
-        {
-
-            // get an iterator over the groups in "order of first appearance"
-            IGroupIterator groupIterator;
-            switch (algorithm)
-            {
-                case GROUP_BY:
-                    {
-                        IStringCollator coll = collator;
-                        if (coll == null)
-                        {
-
-                            // The collation is determined at run-time
-                            coll = GetCollator(context);
-                        }
-
-                        IXPathContext c2 = context.NewMinorContext();
-                        IFocusIterator population = c2.TrackFocus(selectPull.Iterate(context));
-                        groupIterator = new GroupByIterator(population, GroupingKey, c2, coll, composite);
-                        break;
-                    }
-
-                case GROUP_ADJACENT:
-                    {
-                        IStringCollator coll = collator;
-                        if (coll == null)
-                        {
-
-                            // The collation is determined at run-time
-                            coll = GetCollator(context);
-                        }
-
-                        groupIterator = new GroupAdjacentIterator(selectPull, GroupingKey, context, coll, composite);
-                        break;
-                    }
-
-                case GROUP_STARTING:
-                    groupIterator = new GroupStartingIterator(selectPull, (Patterns.Pattern)GroupingKey, context);
-                    break;
-                case GROUP_ENDING:
-                    groupIterator = new GroupEndingIterator(selectPull, (Patterns.Pattern)GroupingKey, context);
-                    break;
-                case GROUP_SPLIT_WHEN:
-                    IFunctionItem breakWhen = (IFunctionItem)GroupingKey.EvaluateItem(context);
-                    groupIterator = new GroupBreakingIterator(selectPull, breakWhen, context);
-                    break;
-                default:
-                    throw new InvalidOperationException("Unknown grouping algorithm");
-            }
-
-
-            // now iterate over the leading nodes of the groups
-            if (SortKeyDefinitions != null)
-            {
-                IAtomicComparer[] comps = sortComparators;
-                IXPathContext xpc = context.NewMinorContext();
-                if (comps == null)
-                {
-                    comps = new IAtomicComparer[SortKeyDefinitions.Count];
-                    for (int s = 0; s < SortKeyDefinitions.Count; s++)
-                    {
-                        comps[s] = SortKeyDefinitions.GetSortKeyDefinition(s).MakeComparator(xpc);
-                    }
-                }
-
-                MakeSortKeyEvaluators();
-                groupIterator = new SortedGroupIterator(xpc, groupIterator, this, comps);
-            }
-
-            return groupIterator;
-        }
-
         private void MakeSortKeyEvaluators()
         {
             lock (syncLock)
@@ -645,21 +556,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
         }
 
-        public virtual void SetSelect(Expression select)
-        {
-            selectOp.SetChildExpression(select);
-        }
-
-        public virtual void SetAction(Expression action)
-        {
-            actionOp.SetChildExpression(action);
-        }
-
-        public virtual void SetKey(Expression key)
-        {
-            keyOp.SetChildExpression(key);
-        }
-
         public override Elaborator GetElaborator()
         {
             return new ForEachGroupElaborator();
@@ -681,6 +577,32 @@ namespace OutSmart.DAXon.Expressions.Instructions
                     {
                         case GROUP_BY:
                             {
+                                // Static probe of the fused tiny group-by shape: select is
+                                // start/child::element-test and the key is a fused child atomizer.
+                                // The runtime gate (single untyped Tiny parent, codepoint collation)
+                                // picks the node-number builder; everything else stays generic.
+                                int rowFp = -2;
+                                int keyFp = -1;
+                                IPullEvaluator startPull = null;
+                                if (!expr.composite && FusedChildAtomizer.MatchAtomizer(expr.GroupingKey, out keyFp)
+                                    && select is SlashExpression slash
+                                    && slash.GetStep() is AxisExpression ax && ax.Axis == AxisInfo.CHILD)
+                                {
+                                    if (ax.GetNodeTest() is NameTest nt && nt.PrimitiveType == Types.Type.ELEMENT)
+                                    {
+                                        rowFp = nt.Fingerprint;
+                                    }
+                                    else if (ax.GetNodeTest() is NodeKindTest nkt && nkt.PrimitiveType == Types.Type.ELEMENT)
+                                    {
+                                        rowFp = -1;
+                                    }
+
+                                    if (rowFp != -2)
+                                    {
+                                        startPull = slash.Start.MakeElaborator().ElaborateForPull();
+                                    }
+                                }
+
                                 return (context) =>
                                 {
                                     IStringCollator coll = expr.collator;
@@ -689,6 +611,17 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
                                         // The collation is determined at run-time
                                         coll = expr.GetCollator(context);
+                                    }
+
+                                    if (startPull != null && coll is CodepointCollator)
+                                    {
+                                        ISequenceIterator start = startPull.Iterate(context);
+                                        IItem p1 = start.Next();
+                                        if (p1 != null && start.Next() == null
+                                            && p1 is Trees.Tiny.TinyParentNodeImpl tp && tp.tree.TypeArray == null)
+                                        {
+                                            return new GroupByIterator(tp, rowFp, keyFp, expr.GroupingKey, context.NewMinorContext(), coll);
+                                        }
                                     }
 
                                     IXPathContext c2 = context.NewMinorContext();

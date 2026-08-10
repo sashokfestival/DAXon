@@ -83,16 +83,6 @@ namespace OutSmart.DAXon.Events
             {
                 @out.StartElement(name, type, attributes, namespaces, location, properties);
             }
-
-            public virtual void Replay(IReceiver @out, int newProps)
-            {
-                @out.StartElement(name, type, attributes, namespaces, location, newProps);
-            }
-
-            public virtual int GetProperties()
-            {
-                return properties;
-            }
         }
 
         /// <summary>

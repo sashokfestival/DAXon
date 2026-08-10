@@ -101,15 +101,6 @@ namespace OutSmart.DAXon.Lib
                 this.nextResolver = rr;
             }
 
-            public virtual void SetAllowedProtocols(string protocols)
-            {
-                if (nextResolver is CatalogResourceResolver)
-                {
-                    CatalogResourceResolver catres = (CatalogResourceResolver)nextResolver;
-                    catres.SetAllowedProtocols(protocols);
-                }
-            }
-
             public virtual ResolvedResource Resolve(ResourceRequest request)
             {
                 if (protocolRestrictor.Test(URI.Create(request.uri)))

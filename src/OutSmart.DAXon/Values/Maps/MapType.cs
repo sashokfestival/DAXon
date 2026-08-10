@@ -27,8 +27,6 @@ namespace OutSmart.DAXon.Values.Maps
         public static readonly MapType ANY_MAP_TYPE = new MapType(BuiltInAtomicType.ANY_ATOMIC, SequenceType.ANY_SEQUENCE);
         public static readonly MapType EMPTY_MAP_TYPE = new MapType(BuiltInAtomicType.ANY_ATOMIC, SequenceType.ANY_SEQUENCE, true);
         public static readonly SequenceType OPTIONAL_MAP_ITEM = SequenceType.MakeSequenceType(ANY_MAP_TYPE, StaticProperty.ALLOWS_ZERO_OR_ONE);
-        public static readonly SequenceType SINGLE_MAP_ITEM = SequenceType.MakeSequenceType(ANY_MAP_TYPE, StaticProperty.ALLOWS_ONE);
-        public static readonly SequenceType SEQUENCE_OF_MAPS = SequenceType.MakeSequenceType(ANY_MAP_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         private readonly IPlainType keyType;
         private readonly SequenceType valueType;
         private readonly bool mustBeEmpty;
@@ -122,11 +120,6 @@ namespace OutSmart.DAXon.Values.Maps
             }
         }
 
-        public virtual int GetArity()
-        {
-            return 1;
-        }
-
         public override string ToString()
         {
             if (this == ANY_MAP_TYPE)
@@ -144,28 +137,6 @@ namespace OutSmart.DAXon.Values.Maps
                 sb.Append(keyType.ToString());
                 sb.Append(", ");
                 sb.Append(valueType.ToString());
-                sb.Append(')');
-                return sb.ToString();
-            }
-        }
-
-        public string ToExportString()
-        {
-            if (this == ANY_MAP_TYPE)
-            {
-                return "map(*)";
-            }
-            else if (this == EMPTY_MAP_TYPE)
-            {
-                return "map{}";
-            }
-            else
-            {
-                StringBuilder sb = new StringBuilder(100);
-                sb.Append("map(");
-                sb.Append(keyType.ToExportString());
-                sb.Append(", ");
-                sb.Append(valueType.ToExportString());
                 sb.Append(')');
                 return sb.ToString();
             }
@@ -264,35 +235,6 @@ namespace OutSmart.DAXon.Values.Maps
 
                 return new SpecificFunctionType(new SequenceType[] { SequenceType.ATOMIC_SEQUENCE }, st).Relationship(other, th);
             }
-        }
-
-        public string ExplainMismatch(IItem item, TypeHierarchy th)
-        {
-            if (item is MapItem)
-            {
-                foreach (KeyValuePair kvp in ((MapItem)item).KeyValuePairs())
-                {
-                    if (!keyType.Matches(kvp.key, th))
-                    {
-                        string s = "The map contains a key (" + kvp.key.Show() + ") of type " + kvp.key.GetItemType() + " that is not an instance of the required type " + keyType;
-                        return (s);
-                    }
-
-                    if (!valueType.Matches(kvp.value, th))
-                    {
-                        string s = "The map contains an entry with key (" + kvp.key.Show() + ") whose corresponding value (" + Err.DepictSequence(kvp.value) + ") is not an instance of the required type " + valueType;
-                        string more = valueType.ExplainMismatch(kvp.value, th);
-                        if (more != null)
-                        {
-                            s = s + ". " + more;
-                        }
-
-                        return (s);
-                    }
-                }
-            }
-
-            return null;
         }
 
         public override Expression MakeFunctionSequenceCoercer(Expression exp, Func<RoleDiagnostic> role, bool allow40)

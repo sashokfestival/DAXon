@@ -12,7 +12,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
     internal class RuleBasedSubstringMatcher : IStringCollator
     {
         public string CollationURI => null;
-        public RuleBasedSubstringMatcher() { }
         public RuleBasedSubstringMatcher(object a, object b) { }
         public int CompareStrings(UnicodeString o1, UnicodeString o2) => 0;
         public bool ComparesEqual(UnicodeString s1, UnicodeString s2) => false;

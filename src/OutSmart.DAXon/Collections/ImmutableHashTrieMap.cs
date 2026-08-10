@@ -7,14 +7,16 @@
 //
 // Faithful port of upstream net/sf/saxon/ma/trie/ImmutableHashTrieMap.java (a hash-array-mapped trie, HAMT).
 // Replaces the Phase 4.8c stub which backed the map with a copy-on-write Dictionary and copied the whole
-// dictionary on every Put/Remove -- O(n) per mutation, so building a large map (e.g. map:merge over a
-// 500 000-entry sequence) was O(n^2) and appeared to hang. This structural-sharing trie is O(log32 n) per
-// mutation and iterates in the same hash-bucket order as Java Saxon.
+// dictionary on every Put/Remove -- O(n) per mutation, so building a large map was O(n^2) and appeared to
+// hang. This structural-sharing trie is O(log32 n) per mutation and iterates in the same hash-bucket order
+// as Java Saxon. The XDM map itself now uses the specialized Values.Maps.MapTrie (same shape, the
+// KeyValuePair doubles as the leaf); this generic form backs the remaining keyed stores (ParseOptions).
 //
 // Original author: Michael Froh (published on Github). Released under MPL 2.0 by Saxonica Limited with
 // permission from the author.
 
 using System;
+using OutSmart.DAXon.Internal;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -63,20 +65,93 @@ namespace OutSmart.DAXon.Collections.Trie
             return DoRemove(0, key);
         }
 
-        public V Get(K key)
+        public IEnumerator<TrieKVP<K, V>> GetEnumerator()
         {
-            return DoGet(0, key);
+            return new FlatTrieEnumerator(this);
         }
 
-        public IEnumerator<TrieKVP<K, V>> IIterator()
-        {
-            return GetEnumerator();
-        }
-
-        public abstract IEnumerator<TrieKVP<K, V>> GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        // One explicit-stack walker for the whole trie, replacing the per-node-class nested yield
+        // enumerators — those stacked a compiler state machine per trie level, so every element of
+        // a large map paid a MoveNext chain the full depth of its path. Same emission order: the
+        // compact arrays are bucket-ascending and collision lists walk head-first.
+        private sealed class FlatTrieEnumerator : IEnumerator<TrieKVP<K, V>>
+        {
+            private readonly List<object> stack = new List<object>(8); // trie nodes + collision-list tails
+            private TrieKVP<K, V> current;
+
+            internal FlatTrieEnumerator(ImmutableHashTrieMap<K, V> root)
+            {
+                if (!root.IsEmptyNode)
+                {
+                    stack.Add(root);
+                }
+            }
+
+            public TrieKVP<K, V> Current => current;
+            object IEnumerator.Current => current;
+
+            public bool MoveNext()
+            {
+                List<object> s = stack;
+                while (s.Count > 0)
+                {
+                    object top = s[s.Count - 1];
+                    s.RemoveAt(s.Count - 1);
+                    if (top is EntryHashNode entry)
+                    {
+                        current = new TrieKVP<K, V>(entry.key, entry.value);
+                        return true;
+                    }
+
+                    if (top is BranchedArrayHashNode branch)
+                    {
+                        for (int i = branch.count - 1; i >= 0; i--)
+                        {
+                            s.Add(branch.subnodes[i]);
+                        }
+
+                        continue;
+                    }
+
+                    if (top is SingletonArrayHashNode single)
+                    {
+                        s.Add(single.subnode);
+                        continue;
+                    }
+
+                    if (top is ListHashNode list)
+                    {
+                        top = list.entries;
+                    }
+                    else if (top is EmptyHashNode)
+                    {
+                        continue;
+                    }
+
+                    var tail = (ImmutableList<TrieKVP<K, V>>)top;
+                    if (!tail.IsEmpty())
+                    {
+                        current = tail.Head();
+                        s.Add(tail.Tail());
+                        return true;
+                    }
+                }
+
+                current = null;
+                return false;
+            }
+
+            public void Reset()
+            {
+                throw new NotSupportedException();
+            }
+
+            public void Dispose() { }
         }
 
         // ---- internal recursion, one abstract method per operation ----
@@ -84,25 +159,6 @@ namespace OutSmart.DAXon.Collections.Trie
         internal abstract ImmutableHashTrieMap<K, V> DoRemove(int shift, K key);
         internal abstract V DoGet(int shift, K key);
         internal abstract bool IsArrayNode();
-
-        /// <summary>
-        /// Put for a PRIVATELY OWNED trie (map:merge's accumulator): the resulting logical tree is
-        /// identical to <see cref="Put"/>, but an array node that already contains the target
-        /// bucket updates its child slot in place instead of cloning itself — legal only while
-        /// every array node reachable from the root was created by the owner's own puts and the
-        /// root has not been published. Shape changes (a new bucket) and the leaf node types fall
-        /// through to the immutable DoPut, so entry/list semantics (including collision-list
-        /// ordering) are byte-for-byte those of the immutable path.
-        /// </summary>
-        internal ImmutableHashTrieMap<K, V> PutOwned(K key, V value)
-        {
-            return DoPutOwned(0, key, value);
-        }
-
-        internal virtual ImmutableHashTrieMap<K, V> DoPutOwned(int shift, K key, V value)
-        {
-            return DoPut(shift, key, value);
-        }
 
         /// <summary>
         /// Create a new node combining two existing nodes whose hash codes differ. Descends creating a chain
@@ -161,18 +217,13 @@ namespace OutSmart.DAXon.Collections.Trie
             {
                 return default(V);
             }
-
-            public override IEnumerator<TrieKVP<K, V>> GetEnumerator()
-            {
-                yield break;
-            }
         }
 
         /// <summary>Implementation for a single-entry map.</summary>
         private sealed class EntryHashNode : ImmutableHashTrieMap<K, V>
         {
-            private readonly K key;
-            private readonly V value;
+            internal readonly K key;
+            internal readonly V value;
 
             internal EntryHashNode(K key, V value)
             {
@@ -221,17 +272,12 @@ namespace OutSmart.DAXon.Collections.Trie
 
                 return default(V);
             }
-
-            public override IEnumerator<TrieKVP<K, V>> GetEnumerator()
-            {
-                yield return new TrieKVP<K, V>(key, value);
-            }
         }
 
         /// <summary>Implementation for a set of entries whose keys all share the same hash code.</summary>
         private sealed class ListHashNode : ImmutableHashTrieMap<K, V>
         {
-            private readonly ImmutableList<TrieKVP<K, V>> entries;
+            internal readonly ImmutableList<TrieKVP<K, V>> entries;
 
             internal ListHashNode(TrieKVP<K, V> entry1, TrieKVP<K, V> entry2)
             {
@@ -317,11 +363,6 @@ namespace OutSmart.DAXon.Collections.Trie
 
                 return default(V);
             }
-
-            public override IEnumerator<TrieKVP<K, V>> GetEnumerator()
-            {
-                return entries.GetEnumerator();
-            }
         }
 
         private abstract class ArrayHashNode : ImmutableHashTrieMap<K, V>
@@ -340,13 +381,15 @@ namespace OutSmart.DAXon.Collections.Trie
         // identical to the dense form.
         private sealed class BranchedArrayHashNode : ArrayHashNode
         {
-            private readonly int bitmap;                           // bit b set => bucket b occupied
-            private readonly ImmutableHashTrieMap<K, V>[] subnodes; // occupied sub-nodes, ascending bucket
+            private readonly int bitmap;                              // bit b set => bucket b occupied
+            internal readonly ImmutableHashTrieMap<K, V>[] subnodes;  // occupied sub-nodes, ascending bucket
+            internal readonly int count;                              // occupied buckets == Bits.BitCount(bitmap)
 
             // Combine two sub-nodes at distinct buckets (h1 != h2, guaranteed by NewArrayHashNode).
             internal BranchedArrayHashNode(int h1, ImmutableHashTrieMap<K, V> subNode1, int h2, ImmutableHashTrieMap<K, V> subNode2)
             {
                 bitmap = (1 << h1) | (1 << h2);
+                count = 2;
                 subnodes = new ImmutableHashTrieMap<K, V>[2];
                 if (h1 < h2)
                 {
@@ -364,31 +407,8 @@ namespace OutSmart.DAXon.Collections.Trie
             {
                 this.bitmap = bitmap;
                 this.subnodes = subnodes;
+                this.count = Bits.BitCount(bitmap);
             }
-
-            // Number of occupied buckets below `bit` == the entry's index in the compact array.
-            private static int BitCount(int v)
-            {
-                uint x = (uint)v;
-                x = x - ((x >> 1) & 0x55555555u);
-                x = (x & 0x33333333u) + ((x >> 2) & 0x33333333u);
-                x = (x + (x >> 4)) & 0x0f0f0f0fu;
-                return (int)((x * 0x01010101u) >> 24);
-            }
-
-            private static int TrailingZeros(int v)
-            {
-                int n = 0;
-                uint x = (uint)v;
-                while ((x & 1u) == 0u)
-                {
-                    x >>= 1;
-                    n++;
-                }
-
-                return n;
-            }
-
             internal override V DoGet(int shift, K key)
             {
                 int bit = 1 << GetBucket(shift, key);
@@ -397,38 +417,26 @@ namespace OutSmart.DAXon.Collections.Trie
                     return default(V);
                 }
 
-                return subnodes[BitCount(bitmap & (bit - 1))].DoGet(shift + BITS, key);
+                return subnodes[Bits.BitCount(bitmap & (bit - 1))].DoGet(shift + BITS, key);
             }
 
             internal override ImmutableHashTrieMap<K, V> DoPut(int shift, K key, V value)
             {
                 int bit = 1 << GetBucket(shift, key);
-                int idx = BitCount(bitmap & (bit - 1));
+                int idx = Bits.BitCount(bitmap & (bit - 1));
                 if ((bitmap & bit) != 0)
                 {
-                    ImmutableHashTrieMap<K, V>[] newNodes = (ImmutableHashTrieMap<K, V>[])subnodes.Clone();
+                    ImmutableHashTrieMap<K, V>[] newNodes = new ImmutableHashTrieMap<K, V>[count];
+                    Array.Copy(subnodes, 0, newNodes, 0, count);
                     newNodes[idx] = subnodes[idx].DoPut(shift + BITS, key, value);
                     return new BranchedArrayHashNode(bitmap, newNodes);
                 }
 
-                ImmutableHashTrieMap<K, V>[] grown = new ImmutableHashTrieMap<K, V>[subnodes.Length + 1];
+                ImmutableHashTrieMap<K, V>[] grown = new ImmutableHashTrieMap<K, V>[count + 1];
                 Array.Copy(subnodes, 0, grown, 0, idx);
                 grown[idx] = new EntryHashNode(key, value);
-                Array.Copy(subnodes, idx, grown, idx + 1, subnodes.Length - idx);
+                Array.Copy(subnodes, idx, grown, idx + 1, count - idx);
                 return new BranchedArrayHashNode(bitmap | bit, grown);
-            }
-
-            internal override ImmutableHashTrieMap<K, V> DoPutOwned(int shift, K key, V value)
-            {
-                int bit = 1 << GetBucket(shift, key);
-                if ((bitmap & bit) != 0)
-                {
-                    int idx = BitCount(bitmap & (bit - 1));
-                    subnodes[idx] = subnodes[idx].DoPutOwned(shift + BITS, key, value);
-                    return this;
-                }
-
-                return DoPut(shift, key, value);
             }
 
             internal override ImmutableHashTrieMap<K, V> DoRemove(int shift, K key)
@@ -439,50 +447,40 @@ namespace OutSmart.DAXon.Collections.Trie
                     return this;
                 }
 
-                int idx = BitCount(bitmap & (bit - 1));
+                int idx = Bits.BitCount(bitmap & (bit - 1));
                 ImmutableHashTrieMap<K, V> newSub = subnodes[idx].DoRemove(shift + BITS, key);
                 if (!newSub.IsEmptyNode)
                 {
-                    ImmutableHashTrieMap<K, V>[] newNodes = (ImmutableHashTrieMap<K, V>[])subnodes.Clone();
+                    ImmutableHashTrieMap<K, V>[] newNodes = new ImmutableHashTrieMap<K, V>[count];
+                    Array.Copy(subnodes, 0, newNodes, 0, count);
                     newNodes[idx] = newSub;
                     return new BranchedArrayHashNode(bitmap, newNodes);
                 }
 
                 // The bucket became empty. When exactly one bucket remains, collapse this node: a lone
                 // array sub-node is re-wrapped in a SingletonArrayHashNode, a lone entry/list floats up.
-                if (subnodes.Length == 2)
+                if (count == 2)
                 {
                     ImmutableHashTrieMap<K, V> orphan = subnodes[1 - idx];
                     if (orphan.IsArrayNode())
                     {
-                        return new SingletonArrayHashNode(TrailingZeros(bitmap & ~bit), orphan);
+                        return new SingletonArrayHashNode(Bits.TrailingZeros(bitmap & ~bit), orphan);
                     }
 
                     return orphan;
                 }
 
-                ImmutableHashTrieMap<K, V>[] shrunk = new ImmutableHashTrieMap<K, V>[subnodes.Length - 1];
+                ImmutableHashTrieMap<K, V>[] shrunk = new ImmutableHashTrieMap<K, V>[count - 1];
                 Array.Copy(subnodes, 0, shrunk, 0, idx);
-                Array.Copy(subnodes, idx + 1, shrunk, idx, subnodes.Length - idx - 1);
+                Array.Copy(subnodes, idx + 1, shrunk, idx, count - idx - 1);
                 return new BranchedArrayHashNode(bitmap & ~bit, shrunk);
-            }
-
-            public override IEnumerator<TrieKVP<K, V>> GetEnumerator()
-            {
-                for (int i = 0; i < subnodes.Length; i++)
-                {
-                    foreach (TrieKVP<K, V> kvp in subnodes[i])
-                    {
-                        yield return kvp;
-                    }
-                }
             }
         }
 
         private sealed class SingletonArrayHashNode : ArrayHashNode
         {
             private readonly int bucket;
-            private ImmutableHashTrieMap<K, V> subnode;   // non-readonly for DoPutOwned only
+            internal readonly ImmutableHashTrieMap<K, V> subnode;
 
             internal SingletonArrayHashNode(int bucket, ImmutableHashTrieMap<K, V> subnode)
             {
@@ -499,18 +497,6 @@ namespace OutSmart.DAXon.Collections.Trie
                 }
 
                 return new BranchedArrayHashNode(this.bucket, subnode, b, new EntryHashNode(key, value));
-            }
-
-            internal override ImmutableHashTrieMap<K, V> DoPutOwned(int shift, K key, V value)
-            {
-                int b = GetBucket(shift, key);
-                if (b == this.bucket)
-                {
-                    subnode = subnode.DoPutOwned(shift + BITS, key, value);
-                    return this;
-                }
-
-                return DoPut(shift, key, value);
             }
 
             internal override ImmutableHashTrieMap<K, V> DoRemove(int shift, K key)
@@ -539,11 +525,6 @@ namespace OutSmart.DAXon.Collections.Trie
                 }
 
                 return default(V);
-            }
-
-            public override IEnumerator<TrieKVP<K, V>> GetEnumerator()
-            {
-                return subnode.GetEnumerator();
             }
         }
     }

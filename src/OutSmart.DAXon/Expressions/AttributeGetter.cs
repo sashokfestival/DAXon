@@ -31,9 +31,7 @@ namespace OutSmart.DAXon.Expressions
         private readonly FingerprintedQName attributeName;
         public override int ImplementationMethod => EVALUATE_METHOD;
         public override int IntrinsicDependencies => StaticProperty.DEPENDS_ON_CONTEXT_ITEM;
-        public AttributeGetter() { }
         public AttributeGetter(object name) { attributeName = name as FingerprintedQName; }
-        public AttributeGetter(object fp, object check) { attributeName = fp as FingerprintedQName; }
         public override Expression Copy(RebindingMap r) => new AttributeGetter(attributeName);
         public override void Export(ExpressionPresenter @out) { }
         public override ItemType GetItemType() => BuiltInAtomicType.UNTYPED_ATOMIC;

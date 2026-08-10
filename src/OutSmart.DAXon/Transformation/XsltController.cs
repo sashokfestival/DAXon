@@ -515,7 +515,8 @@ namespace OutSmart.DAXon.Transformation
                     // the whole transform. The type-annotation test above keeps its identity check
                     // - typed trees need a schema-aware processor, so it has no reachable trigger.
                     ISpaceStrippingRule spaceStrippingRule = SpaceStrippingRule;
-                    if (IsStylesheetContainingStripSpace() && IsStripSourceTree() && !(node is SpaceStrippedNode) && node.GetTreeInfo().SpaceStrippingRule != spaceStrippingRule)
+                    if (IsStylesheetContainingStripSpace() && IsStripSourceTree() && !(node is SpaceStrippedNode) && node.GetTreeInfo().SpaceStrippingRule != spaceStrippingRule
+                        && !(node.GetTreeInfo() is Trees.Tiny.TinyTree noWs && !noWs.ContainsWhitespaceText()))
                     {
                         SpaceStrippedDocument strippedDoc = new SpaceStrippedDocument(node.GetTreeInfo(), spaceStrippingRule);
 

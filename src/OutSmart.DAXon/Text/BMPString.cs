@@ -44,7 +44,6 @@ namespace OutSmart.DAXon.Text
                 return v == 1;
             }
         }
-        public BMPString() { _s = ""; }
         public BMPString(string s) { _s = s ?? ""; }
         public static UnicodeString Of(string s) => new BMPString(s);
         public override long Length() => _s.Length;

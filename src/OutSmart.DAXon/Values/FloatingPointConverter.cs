@@ -33,7 +33,6 @@ namespace OutSmart.DAXon.Values
         private const int floatExpShift = 23;
         private const int floatExpBias = 127;
         private const int floatFractMask = 0x7fffff;
-        public static FloatingPointConverter THE_INSTANCE = new FloatingPointConverter();
 
         /// <summary>
         /// char array holding the characters for the string "-Infinity".
@@ -62,9 +61,6 @@ namespace OutSmart.DAXon.Values
         };
         private static readonly BigInteger TEN = new BigInteger(10);
         private static readonly BigInteger NINE = new BigInteger(9);
-        private FloatingPointConverter()
-        {
-        }
 
         /// <summary>Reinterpret a float's IEEE-754 bits as an int (net472 lacks BitConverter.SingleToInt32Bits).</summary>
         public static int SingleToInt32Bits(float f) => BitConverter.ToInt32(BitConverter.GetBytes(f), 0);
@@ -408,8 +404,159 @@ namespace OutSmart.DAXon.Values
             }
         }
 
+        // Long-arithmetic twin of the BigInteger Dragon4 body in FppfppExponential: identical
+        // recurrence, so the digits are char-identical (differential-tested in javacompat-tests).
+        // Digits accumulate MSB-first into a packed long; any *10 that could overflow bails and
+        // the caller reruns the BigInteger form. In practice this covers |value| from ~0.008 to
+        // ~1e17 — the entire format-number / string(double) hot zone.
+        private static bool TryShortestDigitsCore(int e, long f, int p, out long digits, out int n, out int H)
+        {
+            digits = 0;
+            n = 0;
+            H = 0;
+            int shiftR = Math.Max(e - p, 0);
+            int shiftS = Math.Max(0, -(e - p));
+            if (shiftR > 8 || shiftS > 60)
+            {
+                return false;
+            }
+
+            const long SAFE = long.MaxValue / 10;
+            long R = f << shiftR;
+            long S = 1L << shiftS;
+            long Mminus = 1L << shiftR;
+            long Mplus = Mminus;
+
+            if (f == 1L << (p - 1))
+            {
+                Mplus <<= 1;
+                R <<= 1;
+                S <<= 1;
+            }
+
+            int k = 0;
+            while (R < (S + 9) / 10)
+            {
+                if (R > SAFE / 4 || Mplus > SAFE / 4)
+                {
+                    return false;
+                }
+
+                k--;
+                R *= 10;
+                Mminus *= 10;
+                Mplus *= 10;
+            }
+
+            while (2 * R + Mplus >= 2 * S)
+            {
+                if (S > SAFE / 2)
+                {
+                    return false;
+                }
+
+                S *= 10;
+                k++;
+            }
+
+            if (S > SAFE)
+            {
+                return false;
+            }
+
+            H = k - 1;
+            bool low;
+            bool high;
+            int U;
+            while (true)
+            {
+                if (Mminus > SAFE || Mplus > SAFE || n == 18)
+                {
+                    return false;
+                }
+
+                long R10 = R * 10;
+                U = (int)(R10 / S);
+                R = R10 - U * S;
+                Mminus *= 10;
+                Mplus *= 10;
+                low = 2 * R < Mminus;
+                high = 2 * R > 2 * S - Mplus;
+                if (low || high)
+                    break;
+                digits = digits * 10 + U;
+                n++;
+            }
+
+            if (high && (!low || 2 * R > S))
+            {
+                U++;
+            }
+
+            digits = digits * 10 + U;
+            n++;
+            return true;
+        }
+
+        // Shortest-form digits of a positive normal double (Dragon4, long path only).
+        // The decimal value is digits * 10^(H - n + 1); false when the long twin bails.
+        internal static bool TryShortestDigits(double d, out long digits, out int n, out int H)
+        {
+            digits = 0;
+            n = 0;
+            H = 0;
+            long bits = BitConverter.DoubleToInt64Bits(d);
+            long rawExp = (bits & doubleExpMask) >> doubleExpShift;
+            if (d <= 0 || rawExp == 0 || rawExp == 0x7ff)
+            {
+                return false;
+            }
+
+            long fraction = (1L << 52) | (bits & doubleFractMask);
+            return TryShortestDigitsCore((int)rawExp - doubleExpBias, fraction, 52, out digits, out n, out H);
+        }
+
+        private static bool TryFppfppExponentialLong(UnicodeBuilder sb, int e, long f, int p)
+        {
+            if (!TryShortestDigitsCore(e, f, p, out long digits, out int n, out int H))
+            {
+                return false;
+            }
+
+            if (n == 1)
+            {
+                sb.Append(charForDigit[(int)digits]);
+                sb.Append(".0");
+            }
+            else
+            {
+                long div = 1;
+                for (int i = 1; i < n; i++)
+                {
+                    div *= 10;
+                }
+
+                sb.Append(charForDigit[(int)(digits / div)]);
+                sb.Append('.');
+                while (div > 1)
+                {
+                    digits %= div;
+                    div /= 10;
+                    sb.Append(charForDigit[(int)(digits / div)]);
+                }
+            }
+
+            sb.Append('E');
+            AppendInt(sb, H);
+            return true;
+        }
+
         private static void FppfppExponential(UnicodeBuilder sb, int e, long f, int p)
         {
+            if (TryFppfppExponentialLong(sb, e, f, p))
+            {
+                return;
+            }
 
             //long R = f << Math.max(e-p, 0);
             BigInteger R = new BigInteger(f) << Math.Max(e - p, 0);

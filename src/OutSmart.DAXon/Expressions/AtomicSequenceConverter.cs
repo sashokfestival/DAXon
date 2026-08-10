@@ -521,6 +521,18 @@ namespace OutSmart.DAXon.Expressions
                     && atomBase.IsUntyped()
                     && atomBase.BaseExpression.GetItemType() is Patterns.NodeTest)
                 {
+                    // Value-lane sort: when the nodes come from a sort whose only key is the atomized
+                    // context item, convert BEFORE sorting — each node's key equals its converted value
+                    // and equal keys keep input order in both forms, so the order is byte-identical
+                    // while the sorter's array holds strings instead of retained node wrappers and the
+                    // separate per-node key-atomization pass disappears.
+                    if (atomBase.BaseExpression is Sorting.SortExpression se && se.HasSingleSelfAtomizedKey())
+                    {
+                        IPullEvaluator selEval = se.BaseExpression.MakeElaborator().ElaborateForPull();
+                        return (context) => se.IterateSorted(
+                            new Elaboration.FusedChildAtomizer.NodeToStringIterator(selEval.Iterate(context)), context);
+                    }
+
                     IPullEvaluator nodesEval = atomBase.BaseExpression.MakeElaborator().ElaborateForPull();
                     return (context) => new Elaboration.FusedChildAtomizer.NodeToStringIterator(nodesEval.Iterate(context));
                 }

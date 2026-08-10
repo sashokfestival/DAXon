@@ -327,34 +327,6 @@ namespace OutSmart.DAXon.Text
             }
         }
 
-        private ZenoString Consolidate()
-        {
-
-            // internal, so works in-situ
-            int i = segments.Count - 2;
-            long prevLength = segments[i + 1].Length();
-            while (i >= 0)
-            {
-                long thisLength = segments[i].Length();
-                long nextLength = i == 0 ? 0 : segments[i - 1].Length();
-                if ((thisLength <= prevLength && thisLength <= nextLength) || thisLength + prevLength <= 32)
-                {
-                    segments[i] = ConcatSegments(segments[i], segments[i + 1]);
-                    segments.RemoveAt(i + 1);
-                    offsets.RemoveAt(i + 1);
-                    prevLength = segments[i].Length();
-                }
-                else
-                {
-                    prevLength = thisLength;
-                }
-
-                i--;
-            }
-
-            return this;
-        }
-
         public virtual void WriteSegments(IUnicodeWriter writer)
         {
             foreach (UnicodeString str in segments)
@@ -406,37 +378,6 @@ namespace OutSmart.DAXon.Text
             return this;
         }
 
-        private ZenoString Consolidate1()
-        {
-
-            // internal, so works in-situ
-            int halfway = segments.Count / 2;
-            for (int i = 0; i < (halfway - 1); i++)
-            {
-                if (segments[i].Length() + segments[i + 1].Length() < (32 << i))
-                {
-                    UnicodeString merged = segments[i].Concat(segments[i + 1]);
-                    segments.RemoveAt(i + 1);
-                    offsets.RemoveAt(i + 1);
-                    segments[i] = merged;
-                }
-            }
-
-            int distance = 0;
-            for (int i = segments.Count - 1; i > halfway; i--)
-            {
-                if (segments[i].Length() + segments[i - 1].Length() < (32 << (distance++)))
-                {
-                    UnicodeString merged = segments[i - 1].Concat(segments[i]);
-                    segments.RemoveAt(i);
-                    offsets.RemoveAt(i);
-                    segments[i - 1] = merged;
-                }
-            }
-
-            return this;
-        }
-
         public override UnicodeString Economize()
         {
             int segs = segments.Count;
@@ -469,44 +410,6 @@ namespace OutSmart.DAXon.Text
             }
 
             return sb.ToString();
-        }
-
-        public virtual IList<long> DebugSegmentLengths()
-        {
-            IList<long> result = new List<long>(segments.Count);
-            foreach (UnicodeString str in segments)
-            {
-                result.Add(str.Length());
-            }
-
-            return result;
-        }
-
-        // Diagnostic method
-        private void ShowSegmentLengths()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (UnicodeString str in segments)
-            {
-                sb.Append(str.Length() + ", ");
-            }
-
-            Console.Error.WriteLine(sb);
-        }
-
-        private void VerifySegmentLengths()
-        {
-            long total = 0;
-            for (int i = 0; i < segments.Count; i++)
-            {
-                if (offsets[i] != total)
-                {
-                    ShowSegmentLengths();
-                    throw new InvalidOperationException("Bad offset for segment " + i);
-                }
-
-                total += segments[i].Length();
-            }
         }
 
         private sealed class AnonymousIntIterator : AbstractIntIterator

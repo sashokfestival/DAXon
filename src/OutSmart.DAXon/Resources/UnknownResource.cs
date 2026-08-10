@@ -15,6 +15,5 @@ namespace OutSmart.DAXon.Resources
     internal class UnknownResource
     {
         public static readonly IResourceFactory FACTORY = new GenericResourceFactory();
-        public UnknownResource() { }
     }
 }

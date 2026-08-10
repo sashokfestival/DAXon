@@ -35,8 +35,6 @@ namespace OutSmart.DAXon.Functions
         /// Tracing IIterator class
         /// </summary>
         public override string StreamerName => "Trace";
-
-        public static Func<Trace> New() => () => new Trace();
         public override int GetSpecialProperties(Expression[] arguments)
         {
             return arguments[0].GetSpecialProperties();

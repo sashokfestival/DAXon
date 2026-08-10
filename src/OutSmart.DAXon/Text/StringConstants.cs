@@ -21,11 +21,8 @@ namespace OutSmart.DAXon.Text
     {
 
         public static readonly UnicodeString SINGLE_SPACE = new Twine8(Bytes(" "));
-        public static readonly UnicodeString NEWLINE = new Twine8(Bytes("\n"));
         public static readonly UnicodeString TRUE = new Twine8(Bytes("true"));
         public static readonly UnicodeString FALSE = new Twine8(Bytes("false"));
-        public static readonly UnicodeString ONE = new Twine8(Bytes("1"));
-        public static readonly UnicodeString ZERO = new Twine8(Bytes("0"));
         public static readonly UnicodeString ZERO_TO_NINE = new Twine8(Bytes("0123456789"));
         public static readonly UnicodeString MIN_LONG = new Twine8(Bytes("-9223372036854775808"));
         public static readonly UnicodeString POINT_ZERO = new Twine8(Bytes(".0"));

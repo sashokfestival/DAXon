@@ -20,9 +20,6 @@ namespace OutSmart.DAXon.Collections.Trie
     {
         IImmutableMap<K, V> Put(K key, V value);
         IImmutableMap<K, V> Remove(K key);
-        V Get(K key);
-        // PHASE7_IIMMUTABLEMAP_INDEXER
         V this[K key] { get; }
-        IEnumerator<TrieKVP<K, V>> IIterator();
     }
 }

@@ -23,11 +23,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             this.reason = reason;
         }
 
-        public string GetMessage()
-        {
-            return reason.Message;
-        }
-
         public virtual XPathException GetReason()
         {
             return reason;

@@ -52,19 +52,9 @@ namespace OutSmart.DAXon.Expressions
             this.allowEmpty = allowEmpty;
         }
 
-        protected virtual OperandRole GetOperandRole()
-        {
-            return OperandRole.SINGLE_ATOMIC;
-        }
-
         public virtual bool IsAllowEmpty()
         {
             return allowEmpty;
-        }
-
-        public virtual INamespaceResolver GetNamespaceResolver()
-        {
-            return resolver;
         }
 
         public override StructuredQName GetFunctionName()

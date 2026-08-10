@@ -9,7 +9,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
 {
     internal class DiagnosticClausePull
     {
-        public DiagnosticClausePull() { }
         public DiagnosticClausePull(object a, object b) { }
         public static implicit operator TuplePull(DiagnosticClausePull x) => null;
     }

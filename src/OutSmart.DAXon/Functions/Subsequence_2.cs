@@ -27,8 +27,6 @@ namespace OutSmart.DAXon.Functions
 
         // fall through  (for example, in 1.0 mode start can be a StringValue ...)
         public override string StreamerName => "Subsequence";
-
-        public static Func<Subsequence_2> New() => () => new Subsequence_2();
         public override int GetSpecialProperties(Expression[] arguments)
         {
             return arguments[0].GetSpecialProperties();

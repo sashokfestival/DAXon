@@ -44,6 +44,15 @@ namespace OutSmart.DAXon.Events
         private readonly PipelineConfiguration pipe;
         private readonly XmlReader reader;
 
+        // Exact-type check: the fused text lane replicates TinyBuilder's Characters/MakeTextNode
+        // behavior, which a subclass could override — anything else keeps the generic route.
+        private readonly Trees.Tiny.TinyBuilder directBuilder;
+
+        // Text values are chunked straight into the accumulation buffer, skipping the per-node
+        // reader.Value string. Chunked reads advance the reader's reported line position past the
+        // node, so a line-numbered parse keeps the Value route to preserve text-node locators.
+        private readonly bool chunkValues;
+
         private XmlPullLocation localLocator;
         private readonly Stack<string> entityBaseStack = new Stack<string>();   // reader.BaseURI per open element
         private ILocation lastTextNodeLocator;
@@ -64,6 +73,11 @@ namespace OutSmart.DAXon.Events
         // false once an end tag has been seen; controls whitespace-compression of the next text node.
         private bool afterStartTag = true;
 
+        // Set on the DocumentType event (always before the root element). Without a DTD no entity can
+        // exist, so BaseURI is constant and the per-element entity-boundary tracking (BaseURI read +
+        // stack + compare) is skipped entirely.
+        private bool hasDtd;
+
         // Element-nesting depth (0 in the prolog/epilog). XmlReader reports boundary whitespace that a
         // Java SAX parser never would, so it is suppressed at depth 0.
         private int elementDepth;
@@ -71,10 +85,21 @@ namespace OutSmart.DAXon.Events
         // Stack of in-scope namespace maps; the bottom entry is the empty document-level map.
         private readonly Stack<NamespaceMap> namespaceStack = new Stack<NamespaceMap>();
 
-        // Name cache mirroring ReceivingContentHandler.GetNodeName: uri -> (lexical-QName -> INodeName).
-        private readonly Dictionary<string, Dictionary<string, INodeName>> nameCache =
-            new Dictionary<string, Dictionary<string, INodeName>>(10);
-        private readonly Dictionary<string, INodeName> noNamespaceNameCache = new Dictionary<string, INodeName>(50);
+        // Name cache keyed on the reader's ATOMIZED name parts: XmlReader.NameTable returns one string
+        // instance per lexical name for the whole parse, so a hit is three pointer compares. A flat
+        // 2-way table instead of a Dictionary because net472 never devirtualizes IEqualityComparer —
+        // a dictionary lookup paid two interface calls plus two identity hashes per element (~9% of a
+        // full parse). A non-atomized string (or a slot conflict) can only cause a miss that creates a
+        // duplicate but equivalent INodeName — never a wrong hit.
+        private readonly NameEntry[] nameCache = new NameEntry[256];
+
+        private struct NameEntry
+        {
+            public string Local;
+            public string Prefix;
+            public string Uri;
+            public INodeName Name;
+        }
 
         public XmlReaderToReceiver(XmlReader reader, IReceiver receiver)
         {
@@ -84,6 +109,8 @@ namespace OutSmart.DAXon.Events
             Configuration config = pipe.GetConfiguration();
             this.lineNumbering = pipe.GetParseOptions().IsLineNumbering();
             this.allowDisableOutputEscaping = config.GetConfigurationProperty(Feature<bool>.USE_PI_DISABLE_OUTPUT_ESCAPING);
+            this.directBuilder = receiver.GetType() == typeof(Trees.Tiny.TinyBuilder) ? (Trees.Tiny.TinyBuilder)receiver : null;
+            this.chunkValues = reader.CanReadValueChunk && !lineNumbering;
         }
 
         /// <summary>
@@ -186,6 +213,21 @@ namespace OutSmart.DAXon.Events
 
         private static Stream MaybeDowngradeXml11(Stream input, XmlReaderSettings settings)
         {
+            // XmlReader refills its internal buffer in small chunks, so an unbuffered input
+            // (File.OpenRead's 4KB default, raw network streams) pays a syscall per refill —
+            // measured ~15ms on a 7.5MB file. 64KB stays under the LOH threshold; a seekable
+            // stream caps the buffer at its length so small documents don't pay for it.
+            if (!(input is MemoryStream))
+            {
+                int bufSize = 64 * 1024;
+                if (input.CanSeek)
+                {
+                    bufSize = (int)Math.Min(bufSize, Math.Max(4096, input.Length));
+                }
+
+                input = new BufferedStream(input, bufSize);
+            }
+
             byte[] head = new byte[XmlDeclPeekBytes];
             int n = 0, r;
             while (n < XmlDeclPeekBytes && (r = input.Read(head, n, XmlDeclPeekBytes - n)) > 0)
@@ -225,7 +267,6 @@ namespace OutSmart.DAXon.Events
             localLocator = new XmlPullLocation(reader);
             lastTextNodeLocator = localLocator;
             StartDocument();
-            bool hasDtd = false;
             // When the reader validates against a DTD, .NET reports whitespace in element-only content as
             // XmlNodeType.Whitespace and whitespace in mixed content as SignificantWhitespace — the signal
             // needed to drop ignorable whitespace (number-4501). Without validation every inter-element
@@ -289,7 +330,7 @@ namespace OutSmart.DAXon.Events
                         goto case XmlNodeType.Text;
                     case XmlNodeType.Text:
                     case XmlNodeType.CDATA:
-                        AppendChars(reader.Value);
+                        AppendReaderValue();
                         break;
                     case XmlNodeType.ProcessingInstruction:
                         ProcessingInstruction(reader.Name, reader.Value);
@@ -462,7 +503,10 @@ namespace OutSmart.DAXon.Events
 
             string uri = reader.NamespaceURI ?? string.Empty;
             string localName = reader.LocalName;
-            string qName = reader.Name;
+            string elemPrefix = reader.Prefix;
+            // The element's lexical QName is only needed for the DTD ATTLIST lookup: reader.Name
+            // re-concatenates prefixed names on every call, so keep it off the DTD-less hot path.
+            string qName = dtdAttTypes != null ? reader.Name : null;
 
             NamespaceMap nsMap = namespaceStack.Peek();
             IList<AttributeInfo> attributes = null;
@@ -471,14 +515,13 @@ namespace OutSmart.DAXon.Events
             {
                 do
                 {
-                    string aName = reader.Name;
                     string aPrefix = reader.Prefix;
                     string aLocal = reader.LocalName;
-                    if (aName == "xmlns" || aPrefix == "xmlns")
+                    if ((aPrefix.Length == 0 && aLocal == "xmlns") || aPrefix == "xmlns")
                     {
                         // Namespace declaration: fold into the namespace map, not the attribute list.
                         // The binding xmlns:xmlns is never legal and is ignored (matching ReceivingContentHandler).
-                        string prefix = aName == "xmlns" ? string.Empty : aLocal;
+                        string prefix = aPrefix.Length == 0 ? string.Empty : aLocal;
                         if (!prefix.Equals("xmlns"))
                         {
                             nsMap = nsMap.Bind(prefix, NamespaceUri.Of(reader.Value));
@@ -488,10 +531,10 @@ namespace OutSmart.DAXon.Events
                     {
                         if (attributes == null)
                         {
-                            attributes = new List<AttributeInfo>();
+                            attributes = new List<AttributeInfo>(reader.AttributeCount);
                         }
 
-                        INodeName attName = GetNodeName(reader.NamespaceURI ?? string.Empty, aLocal, aName);
+                        INodeName attName = GetNodeName(reader.NamespaceURI ?? string.Empty, aPrefix, aLocal);
 
                         // Non-validating parse: attributes are untyped, but recover DTD-declared ID/IDREF
                         // typing (from the ATTLIST harvest above) as IS_ID / IS_IDREF flags so fn:id and
@@ -499,7 +542,7 @@ namespace OutSmart.DAXon.Events
                         // does for the SAX path. NMTOKEN(S)/ENTITY(IES) have no fn:id/idref effect on an
                         // untyped tree, so they stay plain untyped.
                         int attProps = ReceiverOption.NAMESPACE_OK;
-                        if (dtdAttTypes != null && dtdAttTypes.TryGetValue(qName + "\t" + aName, out string dtdType))
+                        if (dtdAttTypes != null && dtdAttTypes.TryGetValue(qName + "\t" + reader.Name, out string dtdType))
                         {
                             if (dtdType == "ID")
                             {
@@ -518,7 +561,7 @@ namespace OutSmart.DAXon.Events
                 reader.MoveToElement();
             }
 
-            INodeName elementName = GetNodeName(uri, localName, qName);
+            INodeName elementName = GetNodeName(uri, elemPrefix, localName);
             IAttributeMap attributeMap = attributes == null
                 ? (IAttributeMap)EmptyAttributeMap.GetInstance()
                 : SequenceTool.AttributeMapFromList(attributes);
@@ -526,13 +569,23 @@ namespace OutSmart.DAXon.Events
             // SAX resets levelInEntity via startEntity/endEntity; XmlReader expands entities
             // transparently, so detect the boundary by a BaseURI change vs the enclosing element —
             // the builder marks LevelInEntity==0 elements topWithinEntity (xml:base inside an
-            // external entity resolves against the ENTITY's URI, base-uri-051/052).
-            string curBase = reader.BaseURI;
-            localLocator.topOfEntity = entityBaseStack.Count > 0
-                && !string.Equals(curBase, entityBaseStack.Peek(), StringComparison.Ordinal);
-            receiver.StartElement(elementName, Untyped.INSTANCE, attributeMap, nsMap, localLocator, options);
-            localLocator.topOfEntity = false;
-            entityBaseStack.Push(curBase);
+            // external entity resolves against the ENTITY's URI, base-uri-051/052). Without a DTD
+            // no entity can exist, so the tracking is skipped (levelInEntity still counts depth —
+            // the builder's LevelInEntity==0 test must stay false below the root).
+            if (hasDtd)
+            {
+                string curBase = reader.BaseURI;
+                localLocator.topOfEntity = entityBaseStack.Count > 0
+                    && !string.Equals(curBase, entityBaseStack.Peek(), StringComparison.Ordinal);
+                receiver.StartElement(elementName, Untyped.INSTANCE, attributeMap, nsMap, localLocator, options);
+                localLocator.topOfEntity = false;
+                entityBaseStack.Push(curBase);
+            }
+            else
+            {
+                receiver.StartElement(elementName, Untyped.INSTANCE, attributeMap, nsMap, localLocator, options);
+            }
+
             localLocator.levelInEntity++;
             namespaceStack.Push(nsMap);
             afterStartTag = true;
@@ -543,10 +596,36 @@ namespace OutSmart.DAXon.Events
             // Don't attempt whitespace compression if this end tag directly follows a start tag.
             Flush(!afterStartTag);
             localLocator.levelInEntity--;
-            entityBaseStack.Pop();
+            if (hasDtd)
+            {
+                entityBaseStack.Pop();
+            }
+
             receiver.EndElement();
             afterStartTag = false;
             namespaceStack.Pop();
+        }
+
+        private void AppendReaderValue()
+        {
+            if (!chunkValues)
+            {
+                AppendChars(reader.Value);
+                return;
+            }
+
+            int read;
+            do
+            {
+                if (buffer.Length - charsUsed < 256)
+                {
+                    Array.Resize(ref buffer, buffer.Length * 2);
+                }
+
+                read = reader.ReadValueChunk(buffer, charsUsed, buffer.Length - charsUsed);
+                charsUsed += read;
+            }
+            while (read > 0);
         }
 
         private void AppendChars(string s)
@@ -574,8 +653,16 @@ namespace OutSmart.DAXon.Events
         {
             if (charsUsed > 0)
             {
-                UnicodeString content = StringTool.Compress(buffer, 0, charsUsed, compress);
-                receiver.Characters(content, lastTextNodeLocator, escapingDisabled ? ReceiverOption.DISABLE_ESCAPING : ReceiverOption.WHOLE_TEXT_NODE);
+                if (directBuilder != null && !escapingDisabled)
+                {
+                    directBuilder.CharactersDirect(buffer, charsUsed, compress, lastTextNodeLocator);
+                }
+                else
+                {
+                    UnicodeString content = StringTool.Compress(buffer, 0, charsUsed, compress);
+                    receiver.Characters(content, lastTextNodeLocator, escapingDisabled ? ReceiverOption.DISABLE_ESCAPING : ReceiverOption.WHOLE_TEXT_NODE);
+                }
+
                 charsUsed = 0;
                 escapingDisabled = false;
             }
@@ -610,38 +697,35 @@ namespace OutSmart.DAXon.Events
             receiver.Comment(StringView.Of(text), localLocator, ReceiverOption.NONE);
         }
 
-        private INodeName GetNodeName(string uri, string localname, string rawname)
+        private INodeName GetNodeName(string uri, string prefix, string localname)
         {
-            Dictionary<string, INodeName> map2;
-            if (uri.Length == 0)
+            NameEntry[] cache = nameCache;
+            int h = global::System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(localname) & 255;
+            if (ReferenceEquals(cache[h].Local, localname)
+                && ReferenceEquals(cache[h].Uri, uri)
+                && ReferenceEquals(cache[h].Prefix, prefix))
             {
-                map2 = noNamespaceNameCache;
-            }
-            else if (!nameCache.TryGetValue(uri, out map2))
-            {
-                map2 = new Dictionary<string, INodeName>(50);
-                nameCache[uri] = map2;
+                return cache[h].Name;
             }
 
-            if (map2.TryGetValue(rawname, out INodeName cached))
+            int h2 = h ^ 1;
+            if (ReferenceEquals(cache[h2].Local, localname)
+                && ReferenceEquals(cache[h2].Uri, uri)
+                && ReferenceEquals(cache[h2].Prefix, prefix))
             {
-                return cached;
+                return cache[h2].Name;
             }
 
             // The INodeName is shared by all nodes with the same lexical QName; the namecode/fingerprint,
-            // if needed, is allocated later by the tree builder. We key on the raw QName to retain the prefix.
-            INodeName created;
-            if (uri.Length == 0)
-            {
-                created = new NoNamespaceName(localname);
-            }
-            else
-            {
-                string prefix = NameChecker.GetPrefix(rawname);
-                created = new FingerprintedQName(prefix, NamespaceUri.Of(uri), localname);
-            }
-
-            map2[rawname] = created;
+            // if needed, is allocated later by the tree builder. The prefix is part of the key to retain it.
+            INodeName created = uri.Length == 0
+                ? (INodeName)new NoNamespaceName(localname)
+                : new FingerprintedQName(prefix, NamespaceUri.Of(uri), localname);
+            int victim = cache[h].Local == null || cache[h2].Local != null ? h : h2;
+            cache[victim].Local = localname;
+            cache[victim].Prefix = prefix;
+            cache[victim].Uri = uri;
+            cache[victim].Name = created;
             return created;
         }
 

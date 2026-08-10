@@ -16,7 +16,6 @@ namespace OutSmart.DAXon.Model
 {
     internal class SmallAttributeMap : IAttributeMap
     {
-        public const int LIMIT = 8;
         private readonly List<AttributeInfo> attributes;
         public SmallAttributeMap(IList<AttributeInfo> attributes)
         {
@@ -69,11 +68,6 @@ namespace OutSmart.DAXon.Model
             }
 
             return null;
-        }
-
-        public virtual IEnumerator<AttributeInfo> IIterator()
-        {
-            return attributes.GetEnumerator();
         }
 
         public virtual List<AttributeInfo> AsList()

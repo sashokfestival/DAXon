@@ -782,30 +782,6 @@ namespace OutSmart.DAXon.Regex
             return true;
         }
 
-        public static ICharacterClass MakeUnion(ICharacterClass p1, ICharacterClass p2)
-        {
-            if (p1 == EmptyCharacterClass.GetInstance())
-            {
-                return p2;
-            }
-
-            if (p2 == EmptyCharacterClass.GetInstance())
-            {
-                return p1;
-            }
-
-            IntSet is1 = p1.GetIntSet();
-            IntSet is2 = p2.GetIntSet();
-            if (is1 == null || is2 == null)
-            {
-                return new UnionCharacterClass(new ICharacterClass[] { p1, p2 });
-            }
-            else
-            {
-                return new IntSetCharacterClass(is1.Union(is2));
-            }
-        }
-
         /// <summary>
         /// n-ary union. Members with a known extent merge into one set; the rest are tested by
         /// a loop in UnionCharacterClass. Accumulation loops (a class body of escapes, the

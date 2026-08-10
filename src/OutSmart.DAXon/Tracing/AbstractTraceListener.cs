@@ -37,10 +37,6 @@ namespace OutSmart.DAXon.Tracing
         /// Called at start of a transformation
         /// </summary>
         protected virtual string OpeningAttributes => "";
-        public virtual void SetLevelOfDetail(int level)
-        {
-            this.detail = level;
-        }
 
         /// <summary>
         /// Called at start of a transformation
@@ -246,11 +242,6 @@ namespace OutSmart.DAXon.Tracing
         public void SetOutputDestination(Logger stream)
         {
             @out = stream;
-        }
-
-        public virtual Logger GetOutputDestination()
-        {
-            return @out;
         }
 
         public object Checkpoint()

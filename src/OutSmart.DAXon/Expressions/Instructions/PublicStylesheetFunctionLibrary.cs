@@ -26,11 +26,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             this.@base = @base;
         }
 
-        public void SetConfiguration(Configuration config)
-        {
-            // no configuration state of its own; the base library is configured by its owner
-        }
-
         public Expression Bind(SymbolicName.F functionName, Expression[] staticArgs,
                                Dictionary<StructuredQName, int> keywords, IStaticContext env, IList<string> reasons)
         {

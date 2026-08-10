@@ -25,9 +25,6 @@ namespace OutSmart.DAXon.Values
     /// </summary>
     internal sealed class FloatValue : NumericValue
     {
-        public static readonly FloatValue ZERO = new FloatValue((float)0);
-        public static readonly FloatValue NEGATIVE_ZERO = new FloatValue(-0.0f);
-        public static readonly FloatValue ONE = new FloatValue((float)1);
         public static readonly FloatValue NaN = new FloatValue(float.NaN);
         private readonly float value;
 
@@ -53,11 +50,6 @@ namespace OutSmart.DAXon.Values
         public FloatValue(float value, IAtomicType typeLabel) : base(typeLabel)
         {
             this.value = value;
-        }
-
-        public static FloatValue MakeFloatValue(float value)
-        {
-            return new FloatValue(value);
         }
 
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)

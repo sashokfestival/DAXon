@@ -19,7 +19,6 @@ namespace OutSmart.DAXon.Internal.Regex
         internal Matcher(Pattern pattern, string input) { _pattern = pattern; _input = input; _searchStart = 0; }
 
         public bool Matches() { _current = _pattern.Regex.Match(_input); return _current.Success && _current.Length == _input.Length; }
-        public bool LookingAt() { _current = _pattern.Regex.Match(_input); return _current.Success && _current.Index == 0; }
 
         public bool Find()
         {
@@ -32,32 +31,10 @@ namespace OutSmart.DAXon.Internal.Regex
             return false;
         }
 
-        public bool Find(int start)
-        {
-            _current = _pattern.Regex.Match(_input, start);
-            if (_current.Success)
-            {
-                _searchStart = _current.Index + Math.Max(1, _current.Length);
-                return true;
-            }
-            return false;
-        }
-
-        public string Group() => _current?.Value;
         public string Group(int group) => _current?.Groups[group]?.Value;
-        public string Group(string name) => _current?.Groups[name]?.Value;
 
         public int Start() => _current?.Index ?? -1;
-        public int Start(int group) => _current?.Groups[group]?.Index ?? -1;
         public int End() => _current == null ? -1 : _current.Index + _current.Length;
-        public int End(int group) => _current?.Groups[group] is SysGroup g ? g.Index + g.Length : -1;
-
-        public int GroupCount() => _pattern.Regex.GetGroupNumbers().Length - 1;
-
         public string ReplaceAll(string replacement) => _pattern.Regex.Replace(_input, replacement);
-        public string ReplaceFirst(string replacement) => _pattern.Regex.Replace(_input, replacement, 1);
-
-        public void Reset() { _current = null; _searchStart = 0; }
-        public Matcher Reset(string input) => new Matcher(_pattern, input);
     }
 }

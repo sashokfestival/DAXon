@@ -3,13 +3,16 @@
 // This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
 // If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// Stubs for Saxon types whose source files are EXCLUDED from build (too many compile errors).
-// These types exist only to satisfy CS0246 references in other Saxon files. Calling them throws.
-// Add more here as we exclude more files.
 
-using System;
-
-namespace OutSmart.DAXon.Tracing
+namespace OutSmart.DAXon.Trees.Iterators
 {
-    internal interface TraceListener { void Open(); void Close(); }
+    /// <summary>
+    /// Iterators that can report how many items remain without materializing them (fn:count over a
+    /// TinyTree axis walk counts array entries instead of building a node object per entry). The call
+    /// consumes the iterator: after a successful TryFastCount, Next() returns end-of-sequence.
+    /// </summary>
+    internal interface IFastCountable
+    {
+        bool TryFastCount(out int count);
+    }
 }

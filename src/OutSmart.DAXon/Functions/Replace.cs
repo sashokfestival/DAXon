@@ -31,13 +31,6 @@ namespace OutSmart.DAXon.Functions
             rep.version = 20;
             return rep;
         }
-
-        public static Replace Make40()
-        {
-            Replace rep = new Replace();
-            rep.version = 40;
-            return rep;
-        }
         protected override bool AllowRegexMatchingEmptyString()
         {
             return false;

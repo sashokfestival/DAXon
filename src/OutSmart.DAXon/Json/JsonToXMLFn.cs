@@ -39,8 +39,6 @@ namespace OutSmart.DAXon.Json
             OPTION_DETAILS = jsonToXmlOptions;
         }
 
-        public static Func<JsonToXMLFn> New() => () => new JsonToXMLFn();
-
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             IItem arg0 = arguments[0].Head();

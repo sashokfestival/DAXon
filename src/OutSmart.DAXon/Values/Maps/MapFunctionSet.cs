@@ -74,6 +74,19 @@ namespace OutSmart.DAXon.Values.Maps
             ItemType actionType = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_ATOMIC, SequenceType.ANY_SEQUENCE }, SequenceType.ANY_SEQUENCE);
             Register("for-each", 2, (e) => e.Populate(() => new MapForEach(), AnyItemType.GetInstance(), STAR, 0).Arg(0, MapType.ANY_MAP_TYPE, ONE | INS, null).Arg(1, actionType, ONE | INS, null));
             Register("get", 2, (e) => e.Populate(() => new MapGet(), AnyItemType.GetInstance(), STAR, 0).Arg(0, MapType.ANY_MAP_TYPE, ONE | INS, null).Arg(1, BuiltInAtomicType.ANY_ATOMIC, ONE | ABS, null));
+            if (version >= 40)
+            {
+                // Produced pairs are exactly {key, value}; accepted ones may carry extra fields.
+                ItemType filterPredicateType = new SpecificFunctionType(new SequenceType[] { SequenceType.SINGLE_ATOMIC, SequenceType.ANY_SEQUENCE }, SequenceType.SINGLE_BOOLEAN);
+                Register("entries", 1, (e) => e.Populate(() => new MapEntries(), MapType.ANY_MAP_TYPE, STAR, 0).Arg(0, MapType.ANY_MAP_TYPE, ONE | INS, null));
+                Register("filter", 2, (e) => e.Populate(() => new MapFilter(), MapType.ANY_MAP_TYPE, ONE, 0).Arg(0, MapType.ANY_MAP_TYPE, ONE | INS, null).Arg(1, filterPredicateType, ONE | INS, null));
+                Register("pair", 2, (e) => e.Populate(() => new MapPair(), KVP_TYPE_INEXTENSIBLE, ONE, 0).Arg(0, BuiltInAtomicType.ANY_ATOMIC, ONE | ABS, null).Arg(1, AnyItemType.GetInstance(), STAR | NAV, null));
+                Register("pairs", 1, (e) => e.Populate(() => new MapPairs(), KVP_TYPE_INEXTENSIBLE, STAR, 0).Arg(0, MapType.ANY_MAP_TYPE, ONE | INS, null));
+                Register("of-pairs", 1, 2, (e) => e.Populate(() => new MapOfPairs(), MapType.ANY_MAP_TYPE, ONE, 0).Arg(0, KVP_TYPE_EXTENSIBLE, STAR | INS, null).Arg(1, ON_DUPLICATES_CALLBACK_TYPE, OPT | INS, null));
+
+                // map:build stays unregistered: its defaulted $key/$value resolve fn:identity through
+                // MakeFunction40, and every 4.0 fn: set throws "requires Saxon-PE or higher" here.
+            }
         }
 
         public override NamespaceUri GetNamespace()
@@ -139,7 +152,7 @@ namespace OutSmart.DAXon.Values.Maps
                         string key = ((StringLiteral)arguments[1]).Stringify();
                         if (((IRecordType)it).GetFieldType(key) == null)
                         {
-                            XPathException xe = new XPathException("Field " + key + " is not defined for tuple type " + it, "SXTT0001");
+                            XPathException xe = new XPathException("Field " + key + " is not defined for tuple type " + it, DAXonErrorCode.SXTT0001);
                             xe.SetIsTypeError(true);
                             throw xe;
                         }
@@ -446,18 +459,21 @@ namespace OutSmart.DAXon.Values.Maps
             {
                 MapItem map = (MapItem)arguments[0].Head();
                 IFunctionItem fn = (IFunctionItem)arguments[1].Head();
-                ZenoSequence results = new ZenoSequence();
+                // Plain list accumulator: the per-result ZenoSequence.Append is persistent (it
+                // re-copies the master list and last segment on every call), which turns a large
+                // map into quadratic-ish churn.
+                List<IItem> results = new List<IItem>();
                 foreach (KeyValuePair pair in map.KeyValuePairs())
                 {
                     ISequence seq = DynamicCall(fn, context, new ISequence[] { pair.key, pair.value });
-                    IGroundedValue val = seq.Materialize();
-                    if (val.GetLength() > 0)
+                    ISequenceIterator it = seq.Iterate();
+                    for (IItem item; (item = it.Next()) != null;)
                     {
-                        results = results.AppendSequence(val);
+                        results.Add(item);
                     }
                 }
 
-                return results;
+                return new SequenceExtent.Of<IItem>(results);
             }
         }
 
@@ -469,14 +485,13 @@ namespace OutSmart.DAXon.Values.Maps
             public override ISequence Call(IXPathContext context, ISequence[] arguments)
             {
                 MapItem map = (MapItem)arguments[0].Head();
-                ZenoSequence results = new ZenoSequence();
+                List<IItem> results = new List<IItem>();
                 foreach (KeyValuePair pair in map.KeyValuePairs())
                 {
-                    SingleEntryMap entry = new SingleEntryMap(pair.key, pair.value);
-                    results = results.Append(entry);
+                    results.Add(new SingleEntryMap(pair.key, pair.value));
                 }
 
-                return results;
+                return new SequenceExtent.Of<IItem>(results);
             }
         }
 
@@ -514,73 +529,6 @@ namespace OutSmart.DAXon.Values.Maps
                 }
 
                 return results;
-            }
-        }
-
-        /// <summary>
-        /// Implementation of the proposed 4.0 function map:pairs(IMap) =&gt; record(key, value)*
-        /// </summary>
-        internal class MapBuild : SystemFunction
-        {
-            public override Expression MakeFunctionCall(params Expression[] arguments)
-            {
-                Expression[] newArgs = new Expression[4];
-                newArgs[0] = arguments[0];
-                if (arguments.Length < 2 || arguments[1] is DefaultedArgumentExpression)
-                {
-                    newArgs[1] = FunctionLiteral.MakeLiteral(SystemFunction.MakeFunction40("identity", GetRetainedStaticContext(), 1));
-                }
-                else
-                {
-                    newArgs[1] = arguments[1];
-                }
-
-                if (arguments.Length < 3 || arguments[2] is DefaultedArgumentExpression)
-                {
-                    newArgs[2] = FunctionLiteral.MakeLiteral(SystemFunction.MakeFunction40("identity", GetRetainedStaticContext(), 1));
-                }
-                else
-                {
-                    newArgs[2] = arguments[2];
-                }
-
-                if (arguments.Length < 4 || arguments[3] is DefaultedArgumentExpression)
-                {
-                    newArgs[3] = FunctionLiteral.MakeLiteral(new CallableFunction(2, new CallableDelegate((context, args) => SequenceExtent.From(new InsertBefore.InsertIterator(args[1].Iterate(), args[0].Iterate(), 1))), new SpecificFunctionType(new SequenceType[] { SequenceType.ANY_SEQUENCE, SequenceType.ANY_SEQUENCE }, SequenceType.ANY_SEQUENCE)));
-                }
-                else
-                {
-                    newArgs[3] = arguments[3];
-                }
-
-                SetArity(4);
-                return base.MakeFunctionCall(newArgs);
-            }
-
-            public override ISequence Call(IXPathContext context, ISequence[] arguments)
-            {
-                HashTrieMap map = new HashTrieMap();
-                IFunctionItem keyFunction = (IFunctionItem)arguments[1].Head();
-                IFunctionItem valueFunction = (IFunctionItem)arguments[2].Head();
-                IFunctionItem combineFunction = (IFunctionItem)arguments[3].Head();
-                ISequenceIterator iter = arguments[0].Iterate();
-                for (IItem item; (item = iter.Next()) != null;)
-                {
-                    AtomicValue key = (AtomicValue)DynamicCall(keyFunction, context, item).Head();
-                    if (key != null)
-                    {
-                        IGroundedValue value = DynamicCall(valueFunction, context, item).Materialize();
-                        IGroundedValue existing = map[key];
-                        if (existing != null)
-                        {
-                            value = DynamicCall(combineFunction, context, existing, value).Materialize();
-                        }
-
-                        map.InitialPut(key, value);
-                    }
-                }
-
-                return map;
             }
         }
 
@@ -700,6 +648,90 @@ namespace OutSmart.DAXon.Values.Maps
                 else
                 {
                     return base.GetResultItemType(args);
+                }
+            }
+
+            public override Elaborator GetElaborator()
+            {
+                return new MapMergeElaborator();
+            }
+
+            // The dominant merge shape is `map:merge(for $x in SEQ return map:entry(K, V))` with the
+            // default keep-existing policy: pump (K, V) pairs straight into the owned accumulator,
+            // skipping the per-pair SingleEntryMap allocation and its per-map pair extraction. Any
+            // other shape or policy falls back to the generic function-call path.
+            private sealed class MapMergeElaborator : ItemElaborator
+            {
+                public override IItemEvaluator ElaborateForItem()
+                {
+                    SystemFunctionCall call = (SystemFunctionCall)GetExpression();
+                    MapMerge fn = call.TargetFunction as MapMerge;
+                    if (fn != null
+                        && call.GetArity() == 1
+                        && ("use-first".Equals(fn.duplicates) || "unspecified".Equals(fn.duplicates) || "use-any".Equals(fn.duplicates))
+                        && fn.onDuplicates == null
+                        && !(fn.treatAsFinal && fn.allStringKeys)
+                        && call.GetArg(0) is ForExpression forex
+                        && forex.GetAction() is SystemFunctionCall entryCall
+                        && entryCall.TargetFunction is MapEntry
+                        && entryCall.GetArity() == 2
+                        && entryCall.GetArg(0).GetCardinality() == StaticProperty.EXACTLY_ONE
+                        && entryCall.GetArg(1).GetCardinality() == StaticProperty.EXACTLY_ONE
+                        && !ErrorExpression.IsContainedIn(entryCall.GetArg(0))
+                        && !ErrorExpression.IsContainedIn(entryCall.GetArg(1)))
+                    {
+                        IPullEvaluator baseEval = forex.Sequence.MakeElaborator().ElaborateForPull();
+                        IItemEvaluator keyEval = entryCall.GetArg(0).MakeElaborator().ElaborateForItem();
+                        IItemEvaluator valEval = entryCall.GetArg(1).MakeElaborator().ElaborateForItem();
+                        int slot = forex.LocalSlotNumber;
+                        return (context) =>
+                        {
+                            try
+                            {
+                                ISequenceIterator it = baseEval.Iterate(context);
+                                IItem first = it.Next();
+                                if (first == null)
+                                {
+                                    return new HashTrieMap();
+                                }
+
+                                context.SetLocalVariable(slot, first);
+                                AtomicValue k = (AtomicValue)keyEval.Eval(context);
+                                IGroundedValue v = (IGroundedValue)valEval.Eval(context);
+                                IItem cur = it.Next();
+                                if (cur == null)
+                                {
+                                    // Classic parity: a single input map is returned as-is.
+                                    return new SingleEntryMap(k, v);
+                                }
+
+                                HashTrieMap.MergeBuilder acc = new HashTrieMap.MergeBuilder();
+                                acc.PutFirst(k, v);
+                                do
+                                {
+                                    context.SetLocalVariable(slot, cur);
+                                    k = (AtomicValue)keyEval.Eval(context);
+                                    v = (IGroundedValue)valEval.Eval(context);
+                                    acc.PutFirst(k, v);
+                                }
+                                while ((cur = it.Next()) != null);
+
+                                return acc.ToMap();
+                            }
+                            catch (UncheckedXPathException e)
+                            {
+                                throw e.GetXPathException().MaybeWithLocation(call.GetLocation()).MaybeWithContext(context);
+                            }
+                            catch (XPathException err)
+                            {
+                                throw err.MaybeWithLocation(call.GetLocation()).MaybeWithContext(context);
+                            }
+                        };
+                    }
+
+                    SystemFunctionCall.SystemFunctionCallElaborator generic = new SystemFunctionCall.SystemFunctionCallElaborator();
+                    generic.SetExpression(call);
+                    return generic.ElaborateForItem();
                 }
             }
 
@@ -879,6 +911,17 @@ namespace OutSmart.DAXon.Values.Maps
             // the per-pair duplicates policy. Extracted verbatim from the fast-path loop above.
             private static void MergeOnePair(HashTrieMap.MergeBuilder acc, AtomicValue key, IGroundedValue value, IXPathContext context, string duplicates, string duplicatesErrorCode, IFunctionItem onDuplicates)
             {
+                switch (duplicates)
+                {
+                    case "use-first":
+                    case "unspecified":
+                    case "use-any":
+                        // Keep-existing policies need no existing VALUE — put-if-absent folds the
+                        // probe and the insert into one trie descent.
+                        acc.PutFirst(key, value);
+                        return;
+                }
+
                 ISequence existing = acc.GetExisting(key, out IAtomicMatchKey amk);
                 if (existing != null)
                 {

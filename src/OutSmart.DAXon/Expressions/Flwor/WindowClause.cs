@@ -154,11 +154,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return windowVars[role];
         }
 
-        public virtual bool IsWindowMustBeSingleton()
-        {
-            return windowMustBeSingleton;
-        }
-
         public override void TypeCheck(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             SequenceType requiredType = GetVariableBinding(WindowClause.WINDOW_VAR).GetRequiredType();

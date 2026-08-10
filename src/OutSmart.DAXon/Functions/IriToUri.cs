@@ -41,8 +41,6 @@ namespace OutSmart.DAXon.Functions
             allowedASCII[(int)'}'] = false;
         }
 
-        public static Func<IriToUri> New() => () => new IriToUri();
-
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
             return new StringValue(IriToUriFn(arg.UnicodeStringValue));

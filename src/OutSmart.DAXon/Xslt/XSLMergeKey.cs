@@ -20,11 +20,6 @@ namespace OutSmart.DAXon.Xslt
     /// </summary>
     internal class XSLMergeKey : XSLSortOrMergeKey
     {
-
-        //    protected boolean seesAvuncularVariables() {
-        //    public SourceBinding bindVariable(StructuredQName qName) {
-        //    }
-        protected virtual ItemType ReturnedItemType => null;
         public override void PrepareAttributes()
         {
             base.PrepareAttributes();

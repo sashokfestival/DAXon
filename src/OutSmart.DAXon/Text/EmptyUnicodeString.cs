@@ -16,7 +16,6 @@ namespace OutSmart.DAXon.Text
     internal sealed class EmptyUnicodeString : UnicodeString
     {
         private static readonly EmptyUnicodeString _instance = new EmptyUnicodeString();
-        public static readonly EmptyUnicodeString INSTANCE = _instance;
         public override int Width => 8;
         public static EmptyUnicodeString GetInstance() => _instance;
         public override long Length() => 0;

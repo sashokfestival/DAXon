@@ -35,15 +35,5 @@ namespace OutSmart.DAXon.Model
         {
             counter = initialValue;
         }
-
-        public virtual long IncrementAndGet()
-        {
-            return AndIncrement + 1;
-        }
-
-        public virtual long Get()
-        {
-            return Interlocked.Read(ref counter);
-        }
     }
 }

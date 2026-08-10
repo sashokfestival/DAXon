@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "Exists";
-
-        public static Func<Exists> New() => () => new Exists();
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
 

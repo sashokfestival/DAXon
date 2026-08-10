@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Average : FoldingFunction
     {
-
-        public static Func<Average> New() => () => new Average();
         public override int GetCardinality(Expression[] arguments)
         {
             if (!Cardinality.AllowsZero(arguments[0].GetCardinality()))

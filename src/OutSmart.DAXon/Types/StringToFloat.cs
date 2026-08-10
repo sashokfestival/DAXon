@@ -16,7 +16,6 @@ namespace OutSmart.DAXon.Types
     internal class StringToFloat : StringConverter
     {
         private readonly StringConverter inner;
-        public StringToFloat() { }
         public StringToFloat(object x) : base(x as ConversionRules) { inner = new StringConverter.StringToFloat(x as ConversionRules); }
         // Delegates to the proven nested converter (BuiltInAtomicType binds that one; this top-level
         // copy is what ConversionRules binds - it used to throw NIE if that registry path went live).

@@ -87,11 +87,6 @@ namespace OutSmart.DAXon.Functions
             return null;
         }
 
-        public virtual bool IsInHigherOrderOperand()
-        {
-            return inHigherOrderOperand;
-        }
-
         /// <summary>
         /// Determine the item type of the value returned by the function
         /// </summary>

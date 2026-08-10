@@ -38,16 +38,10 @@ namespace OutSmart.DAXon.Types
         public override int Fingerprint => StandardNames.XS_ANY_TYPE;
         public ComplexVariety Variety => ComplexVariety.MIXED;
         public ISimpleType SimpleContentType => AnySimpleType.GetInstance(); // upstream AnyType.getSimpleContentType()
-        public string PreferredJsonLayout => "mixed";
         public static AnyType GetInstance() => _instance;
         public override bool IsComplexType() => true;
-        public bool IsAbstract() => false;
-        public bool IsComplexContent() => true;
         public bool IsSimpleContent() => false;
-        public bool IsAllContent() => false;
-        public bool IsRestricted() => false;
         public bool IsEmptyContent() => false;
-        public bool IsEmptiable() => true;
         public bool IsMixedContent() => true;
         public ISchemaType GetElementParticleType(int elementName, bool considerExtensions) => this;
         public int GetElementParticleCardinality(int elementName, bool considerExtensions) => StaticProperty.ALLOWS_ZERO_OR_MORE;

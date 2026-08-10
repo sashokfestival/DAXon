@@ -25,14 +25,6 @@ namespace OutSmart.DAXon.Xslt
     internal class XSLSequence : StyleElement
     {
         private Expression select;
-
-        public virtual Expression SelectExpression
-        {
-            get => select; set
-            {
-                this.select = value;
-            }
-        }
         public override bool IsInstruction()
         {
             return true;

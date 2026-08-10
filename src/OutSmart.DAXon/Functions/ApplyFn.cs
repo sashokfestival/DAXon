@@ -31,8 +31,6 @@ namespace OutSmart.DAXon.Functions
         {
         }
 
-        public static Func<ApplyFn> New() => () => new ApplyFn();
-
         public override ItemType GetResultItemType(Expression[] args)
         {
 

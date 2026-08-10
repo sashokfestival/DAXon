@@ -18,8 +18,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
     {
         private readonly IAtomicComparer baseComparer;
 
-        public virtual IAtomicComparer BaseComparer => baseComparer;
-
         public virtual IStringCollator Collator => baseComparer.Collator;
 
         public EmptyGreatestComparer(IAtomicComparer baseComparer)

@@ -31,7 +31,6 @@ namespace OutSmart.DAXon.XQuery
     internal class QueryResult
     {
         public const string RESULT_NS = "http://saxon.sf.net/2009/serialization/result";
-        public QueryResult() { }
 
         public static void Serialize(NodeInfo node, IResultTarget destination, Properties outputProperties)
         {
@@ -64,9 +63,6 @@ namespace OutSmart.DAXon.XQuery
         // Legacy no-op shapes for the DAXonDeepEqual "undocumented diagnostic option" debug path,
         // whose input is the still-hollow Wrap(). Typed calls above always win overload resolution.
         public static void Serialize(object node, object destination, object props) { }
-        public static void Serialize(object node, object destination) { }
-        public static string Serialize(object node) => string.Empty;
-        public static void SerializeSequence(object iter, object config, object destination) { }
         public static object Wrap(object iterator, object config) => null;
     }
 }

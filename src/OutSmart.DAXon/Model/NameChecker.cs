@@ -61,17 +61,6 @@ namespace OutSmart.DAXon.Model
             return !atStart;
         }
 
-        public static string GetPrefix(string qname)
-        {
-            int colon = qname.IndexOf(':');
-            if (colon < 0)
-            {
-                return "";
-            }
-
-            return qname.Substring(0, colon);
-        }
-
         public static String[] GetQNameParts(string qname)
         {
             string[] parts = new string[2];

@@ -49,8 +49,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             }
         }
 
-        public virtual Operand SequenceOp => this.sequenceOp;
-
         public virtual LocalVariableBinding RangeVariable
         {
             get => rangeVariable; set

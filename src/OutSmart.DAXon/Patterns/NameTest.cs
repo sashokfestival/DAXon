@@ -48,8 +48,6 @@ namespace OutSmart.DAXon.Patterns
         public override int PrimitiveType => nodeKind;
 
         public override IntSet RequiredNodeNames => (new IntSingletonSet(fingerprint));
-
-        public string FullAlphaCode => BasicAlphaCode + " n" + MatchingNodeName.EQName;
         public NameTest(int nodeKind, NamespaceUri uri, string localName, NamePool namePool)
         {
             this.uri = uri;
@@ -166,12 +164,6 @@ namespace OutSmart.DAXon.Patterns
         {
             ComputeUriAndLocal();
             return uri;
-        }
-
-        public virtual string GetLocalPart()
-        {
-            ComputeUriAndLocal();
-            return localName;
         }
 
         public override string ToString()

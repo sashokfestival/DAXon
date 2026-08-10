@@ -149,11 +149,6 @@ namespace OutSmart.DAXon.Model
                 return this;
             }
         }
-
-        public virtual IEnumerator<AtomicValue> IIterator()
-        {
-            return content.GetEnumerator();
-        }
         ISequenceIterator IGroundedValue.Iterate() => Iterate();
         IItem IGroundedValue.ItemAt(int arg0) => ItemAt(arg0);
         IItem IGroundedValue.Head() => Head();

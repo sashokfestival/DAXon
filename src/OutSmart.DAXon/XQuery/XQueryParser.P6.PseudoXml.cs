@@ -1211,7 +1211,6 @@ namespace OutSmart.DAXon.XQuery
             IList<Expression> components = new List<Expression>();
             components.Add(new StringLiteral(t.currentTokenValue));
             t.Next();
-        outer:
             while (true)
             {
                 bool emptyExpression = t.currentToken == Token.RCURLY;

@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Sort_2 : Sort_1
     {
-
-        public static Func<Sort_2> New() => () => new Sort_2();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             List<ItemToBeSorted> inputList = GetItemsToBeSorted(arguments[0]);

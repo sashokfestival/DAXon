@@ -62,10 +62,6 @@ namespace OutSmart.DAXon.Values
         {
         }
 
-        public GYearValue(int year, int tz, IAtomicType type) : this(new MutableGDateValue(year, 1, 1, false, tz, type))
-        {
-        }
-
         public static IConversionResult MakeGYearValue(UnicodeString value, ConversionRules rules)
         {
             MutableGDateValue g = new MutableGDateValue();

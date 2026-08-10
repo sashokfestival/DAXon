@@ -39,24 +39,6 @@ namespace OutSmart.DAXon.Values.Maps
             hashMap[key] = value;
         }
 
-        public virtual void InitialAppend(string key, IGroundedValue value)
-        {
-            IGroundedValue existingValue = hashMap.GetOrDefault(key);
-            if (existingValue == null)
-            {
-                InitialPut(key, value);
-            }
-            else
-            {
-                hashMap[key] = existingValue.Concatenate(value);
-            }
-        }
-
-        public virtual bool ContainsStringKey(string key)
-        {
-            return hashMap.ContainsKey(key);
-        }
-
         public override IGroundedValue Get(AtomicValue key)
         {
             if (key is StringValue)

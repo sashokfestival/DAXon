@@ -35,23 +35,6 @@ namespace OutSmart.DAXon.Lib
         public const string CDATA_SECTION_ELEMENTS = "cdata-section-elements";
         public const string INDENT = "indent";
         public const string MEDIA_TYPE = "media-type";
-
-        /// <summary>
-        /// String constant representing the saxon:xquery output method name
-        /// </summary>
-        public const string SAXON_XQUERY_METHOD = "Q{http://saxon.sf.net/}xquery";
-        /// <summary>
-        /// String constant representing the saxon:base64Binary output method name
-        /// </summary>
-        public const string SAXON_BASE64_BINARY_METHOD = "Q{http://saxon.sf.net/}base64Binary";
-        /// <summary>
-        /// String constant representing the saxon:hexBinary output method name
-        /// </summary>
-        public const string SAXON_HEX_BINARY_METHOD = "Q{http://saxon.sf.net/}hexBinary";
-        /// <summary>
-        /// String constant representing the saxon:xml-to-json output method name
-        /// </summary>
-        public const string SAXON_XML_TO_JSON_METHOD = "Q{http://saxon.sf.net/}xml-to-json";
         public const string ALLOW_DUPLICATE_NAMES = "allow-duplicate-names";
         public const string ESCAPE_SOLIDUS = "escape-solidus";
         public const string BUILD_TREE = "build-tree";
@@ -83,14 +66,7 @@ namespace OutSmart.DAXon.Lib
         public const string RECOGNIZE_BINARY = "{http://saxon.sf.net/}recognize-binary";
         public const string REQUIRE_WELL_FORMED = "{http://saxon.sf.net/}require-well-formed";
         public const string SUPPLY_SOURCE_LOCATOR = "{http://saxon.sf.net/}supply-source-locator";
-        public const string WRAP = "{http://saxon.sf.net/}wrap-result-sequence";
         public const string UNFAILING = "{http://saxon.sf.net/}unfailing";
-        /// <summary>
-        /// This class is not instantiated
-        /// </summary>
-        private DAXonOutputKeys()
-        {
-        }
         public static string ParseListOfNodeNames(string value, INamespaceResolver nsResolver, bool useDefaultNS, bool prevalidated, bool allowStar, string errorCode)
         {
             StringBuilder s = new StringBuilder();
@@ -172,18 +148,6 @@ namespace OutSmart.DAXon.Lib
             {
                 return true; // Change in 10.0 to make HTML5 the default
             }
-        }
-
-        public static bool IsBuildTree(Properties properties)
-        {
-            string buildTreeProperty = properties.GetProperty("build-tree");
-            if (buildTreeProperty != null)
-            {
-                return "yes".Equals(buildTreeProperty);
-            }
-
-            string method = properties.GetProperty("method");
-            return !("json".Equals(method) || "adaptive".Equals(method));
         }
     }
 }

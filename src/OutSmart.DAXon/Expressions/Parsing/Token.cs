@@ -736,9 +736,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             tokens[NEGATE] = "-";
             tokens[PERCENT] = "%";
         }
-        private Token()
-        {
-        }
 
         private static void InitMapDoubles()
         {

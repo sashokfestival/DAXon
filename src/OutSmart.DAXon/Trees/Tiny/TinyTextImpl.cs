@@ -42,6 +42,13 @@ namespace OutSmart.DAXon.Trees.Tiny
             return tree.textBuffer.Substring(start, start + len);
         }
 
+        // In-place whiteness for whitespace stripping (no Substring per node).
+        internal static bool IsWhitespaceOnly(TinyTree tree, int nodeNr)
+        {
+            int start = tree.alpha[nodeNr];
+            return tree.textBuffer.IsAllWhite(start, start + tree.beta[nodeNr]);
+        }
+
         public override int GetNodeKind()
         {
             return Types.Type.TEXT;

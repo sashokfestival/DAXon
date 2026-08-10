@@ -29,9 +29,6 @@ namespace OutSmart.DAXon.Patterns
         public static readonly MultipleNodeKindTest CHILD_NODE =
             new MultipleNodeKindTest(UType.ELEMENT.Union(UType.TEXT).Union(UType.COMMENT).Union(UType.PI));
 
-        public static readonly MultipleNodeKindTest DESCENDANT_NODE =
-            new MultipleNodeKindTest(UType.ELEMENT.Union(UType.TEXT).Union(UType.COMMENT).Union(UType.PI));
-
         private readonly UType uType;
         private readonly int nodeKindMask;
 

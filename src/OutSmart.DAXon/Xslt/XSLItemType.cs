@@ -87,12 +87,6 @@ namespace OutSmart.DAXon.Xslt
             return itemTypeName;
         }
 
-        public virtual void IndexTypeAlias(ComponentDeclaration decl, PrincipalStylesheetModule top)
-        {
-            PrepareAttributes();
-            top.GetTypeAliasManager().ProcessDeclaration(decl);
-        }
-
         public override void Validate(ComponentDeclaration decl)
         {
             CheckEmpty();

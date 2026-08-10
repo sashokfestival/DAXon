@@ -46,16 +46,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             preservingTypes = schemaType == null && validation == Validation.PRESERVE;
         }
 
-        public virtual void SetCopyNamespaces(bool copy)
-        {
-            copyNamespaces = copy;
-        }
-
-        public virtual bool IsCopyNamespaces()
-        {
-            return copyNamespaces;
-        }
-
         public override Expression Simplify()
         {
             preservingTypes |= !GetPackageData().IsSchemaAware();
@@ -118,11 +108,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             copy.SetContentExpression(GetContentExpression().Copy(rebindings));
             copy.resultItemType = resultItemType;
             return copy;
-        }
-
-        public virtual void SetSelectItemType(ItemType type)
-        {
-            selectItemType = type;
         }
 
         public override IEnumerable<Operand> Operands()
@@ -333,26 +318,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return exp;
         }
 
-        /// <summary>
-        /// Callback to output namespace nodes for the new element.
-        /// </summary>
-        public override void OutputNamespaceNodes(Outputter receiver, INodeName nodeName, ElementCreationDetails details)
-        {
-            if (copyNamespaces)
-            {
-                receiver.Namespaces(((CopyElementDetails)details).CopiedNode.AllNamespaces, ReceiverOption.NAMESPACE_OK);
-            }
-            else
-            {
-                // Always output the namespace of the element name itself
-                NamespaceBinding ns = nodeName.GetNamespaceBinding();
-                if (!ns.IsDefaultUndeclaration())
-                {
-                    receiver.Namespace(ns.GetPrefix(), ns.GetNamespaceUri(), ReceiverOption.NONE);
-                }
-            }
-        }
-
         public static void CopyUnparsedEntities(NodeInfo source, Outputter @out)
         {
             IEnumerator<string> unparsedEntities = source.GetTreeInfo().UnparsedEntityNames;
@@ -408,35 +373,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         public override Elaborator GetElaborator()
         {
             return new CopyElaborator();
-        }
-
-        internal class CopyElementDetails : ElementCreationDetails
-        {
-            private readonly IPushEvaluator contentEvaluator;
-            private readonly NodeInfo copiedNode;
-
-            public NodeInfo CopiedNode => copiedNode;
-
-            public CopyElementDetails(IPushEvaluator contentEvaluator, NodeInfo copiedNode)
-            {
-                this.contentEvaluator = contentEvaluator;
-                this.copiedNode = copiedNode;
-            }
-
-            public override INodeName GetNodeName(IXPathContext context)
-            {
-                return NameOfNode.MakeName(copiedNode);
-            }
-
-            public override string GetSystemId(IXPathContext context)
-            {
-                return copiedNode.GetBaseURI();
-            }
-
-            public override void ProcessContent(Outputter @out, IXPathContext context)
-            {
-                Expression.DispatchTailCall(contentEvaluator.ProcessLeavingTail(@out, context));
-            }
         }
 
         internal class CopyElaborator : PushElaborator

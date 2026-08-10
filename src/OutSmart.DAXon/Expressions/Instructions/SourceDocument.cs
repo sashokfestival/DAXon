@@ -66,16 +66,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             this.accumulators = options.ApplicableAccumulators;
         }
 
-        public virtual void SetSpaceStrippingRule(ISpaceStrippingRule rule)
-        {
-            parseOptions = parseOptions.WithSpaceStrippingRule(rule);
-        }
-
-        public virtual void SetUsedAccumulators(HashSet<Accumulator> used)
-        {
-            accumulators = used;
-        }
-
         public override IEnumerable<Operand> Operands()
         {
             return OperandList(hrefOp, bodyOp);
@@ -213,24 +203,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             exp.SetRetainedStaticContext(GetRetainedStaticContext());
             ExpressionTool.CopyLocationInfo(this, exp);
             return exp;
-        }
-
-        public virtual void IPush(Outputter output, IXPathContext context)
-        {
-            string href = hrefOp.GetChildExpression().EvaluateAsString(context).ToString();
-            NodeInfo doc = DocumentFn.MakeDoc(href, StaticBaseURIString, GetPackageData(), parseOptions, context, GetLocation(), false);
-            if (doc != null)
-            {
-                Controller controller = context.GetController();
-                if (accumulators != null && controller is XsltController)
-                {
-                    ((XsltController)controller).GetAccumulatorManager().SetApplicableAccumulators(doc.GetTreeInfo(), accumulators);
-                }
-
-                IXPathContext c2 = context.NewMinorContext();
-                c2.SetCurrentIterator(new ManualIterator(doc));
-                bodyOp.GetChildExpression().Process(output, c2);
-            }
         }
 
         public override Elaborator GetElaborator()

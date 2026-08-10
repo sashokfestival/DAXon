@@ -31,8 +31,6 @@ namespace OutSmart.DAXon.Functions
         private readonly object syncLock = new object();
 
         private ResultNamesAndTypes vocab = new ResultNamesAndTypes();
-
-        public static Func<AnalyzeStringFn> New() => () => new AnalyzeStringFn();
         protected override bool AllowRegexMatchingEmptyString()
         {
             return false;

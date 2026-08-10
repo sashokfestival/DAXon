@@ -39,8 +39,6 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        public static Func<CollatingFunctionFree> New() => () => new CollatingFunctionFree();
-
         public override Expression MakeOptimizedFunctionCall(ExpressionVisitor visitor, ContextItemStaticInfo contextInfo, params Expression[] arguments)
         {
             Expression c = arguments[CollationArgument];

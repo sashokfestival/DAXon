@@ -42,8 +42,6 @@ namespace OutSmart.DAXon.Trees.Tiny
                 return tree.commentBuffer.Substring(start, start + len);
             }
         }
-
-        public UnicodeString Data => UnicodeStringValue;
         public TinyProcInstImpl(TinyTree tree, int nodeNr) : base(tree, nodeNr)
         {
         }
@@ -69,11 +67,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         public override void Copy(IReceiver @out, int copyOptions, ILocation locationId)
         {
             @out.ProcessingInstruction(DisplayName, UnicodeStringValue, locationId, ReceiverOption.NONE);
-        }
-
-        public string GetTarget()
-        {
-            return DisplayName;
         }
     }
 }

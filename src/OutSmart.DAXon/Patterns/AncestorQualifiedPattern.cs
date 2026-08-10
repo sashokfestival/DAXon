@@ -27,9 +27,6 @@ namespace OutSmart.DAXon.Patterns
         private Pattern upperPattern;
         private int upwardsAxis = AxisInfo.PARENT;
         private bool testUpperPatternFirst = false;
-
-        public Pattern BasePattern => basePattern;
-        public Pattern UpperPattern => upperPattern;
         public int UpwardsAxis => upwardsAxis;
 
         public override int Dependencies => basePattern.Dependencies | upperPattern.Dependencies;

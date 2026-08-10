@@ -15,9 +15,7 @@ namespace OutSmart.DAXon.Lib
     internal class CatalogResourceResolver : IResourceResolver
     {
         public CatalogResourceResolver() { }
-        public CatalogResourceResolver(string catalogFiles) { }
         public ResolvedResource Resolve(ResourceRequest request) => null;
         public void SetFeature(string name, object value) { }
-        public void SetAllowedProtocols(string protocols) { }
     }
 }

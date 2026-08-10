@@ -103,11 +103,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return StaticProperty.ALLOWS_ZERO_OR_ONE;
         }
 
-        public bool IsAllowNameAsQName()
-        {
-            return allowNameAsQName;
-        }
-
         protected override int ComputeSpecialProperties()
         {
             return base.ComputeSpecialProperties() | StaticProperty.SINGLE_DOCUMENT_NODESET;

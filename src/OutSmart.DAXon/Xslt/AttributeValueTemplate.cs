@@ -23,9 +23,6 @@ namespace OutSmart.DAXon.Xslt
 {
     internal abstract class AttributeValueTemplate
     {
-        private AttributeValueTemplate()
-        {
-        }
 
         public static Expression Make(string avt, IStaticContext env)
         {

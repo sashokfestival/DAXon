@@ -167,17 +167,21 @@ namespace OutSmart.DAXon.Regex
         }
 
         // One backtracking step (round BE): called per pull on an ambiguous repeat and per
-        // sequence backtrack, at every nesting level. The deadline check is unconditional -
-        // with the limit disabled it is the only brake on catastrophic backtracking - and
-        // the active token throttles clock sampling itself.
+        // sequence backtrack, at every nesting level. The step counter now advances even with
+        // the limit disabled, so the deadline stays braked at a fixed 64-step stride either
+        // way (a step is a few ns; the active token throttles actual clock reads further).
         internal void CountBacktrackStep()
         {
-            if (backtrackLimit >= 0 && ++backtrackSteps > backtrackLimit)
+            int n = ++backtrackSteps;
+            if (backtrackLimit >= 0 && n > backtrackLimit)
             {
                 throw new OutSmart.DAXon.Transformation.UncheckedXPathException(new OutSmart.DAXon.Transformation.XPathException("Regex backtracking limit exceeded processing " + operation.Display() + ". Simplify the regular expression, " + "or set Feature<int>.REGEX_BACKTRACKING_LIMIT to -1 to remove this limit."));
             }
 
-            OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
+            if ((n & 63) == 0)
+            {
+                OutSmart.DAXon.Core.Controller.CheckActiveTimeout();
+            }
         }
 
         protected virtual bool MatchAt(int i, bool anchored)
@@ -454,6 +458,85 @@ namespace OutSmart.DAXon.Regex
             return false;
         }
 
+        // Flat matcher for the unanchored two-segment shape C1 C2{m,n} (REProgram.FastShape.Seq2):
+        // C1 consumes exactly one codepoint, so an attempt at i is a single deterministic probe —
+        // C1 at i, then the greedy C2 run capped by max; a run under min fails the attempt and the
+        // scan advances to i+1 (C1 and C2 may overlap, so no run-skipping). With Seq2Captures the
+        // segments publish as groups 1 and 2. Byte/char indexing as in FastClassMatch.
+        private bool FastSeq2Match(int i, REProgram.FastShape fast)
+        {
+            anchoredMatch = false;
+            UnicodeString s = search;
+            int len = s.Length32();
+            IIntPredicateProxy p1 = fast.Pred1;
+            IIntPredicateProxy p2 = fast.Pred2;
+            int min = fast.Min2;
+            int max = fast.Max2;
+
+            string cs = null;
+            byte[] cb = null;
+            int off = 0;
+            if (s is BMPString)
+            {
+                cs = s.ToString();
+            }
+            else if (s is BMPSlice sl)
+            {
+                cs = sl.Backing;
+                off = sl.Start;
+            }
+            else if (s is Slice8 s8)
+            {
+                cb = s8.ByteArray;
+                off = s8.Start;
+            }
+            else if (s is Twine8 t8)
+            {
+                cb = t8.ByteArray;
+            }
+
+            for (; i < len - 1; i++)
+            {
+                int c = cs != null ? cs[off + i] : cb != null ? (cb[off + i] & 0xff) : s.CodePointAt(i);
+                if (!p1.Test(c))
+                {
+                    continue;
+                }
+
+                int k = i + 1;
+                while (k < len && k - i - 1 < max)
+                {
+                    c = cs != null ? cs[off + k] : cb != null ? (cb[off + k] & 0xff) : s.CodePointAt(k);
+                    if (!p2.Test(c))
+                    {
+                        break;
+                    }
+
+                    k++;
+                }
+
+                if (k - i - 1 < min)
+                {
+                    continue;
+                }
+
+                _captureState.parenCount = fast.Seq2Captures ? 3 : 1;
+                SetParenStart(0, i);
+                SetParenEnd(0, k);
+                if (fast.Seq2Captures)
+                {
+                    SetParenStart(1, i);
+                    SetParenEnd(1, i + 1);
+                    SetParenStart(2, i + 1);
+                    SetParenEnd(2, k);
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
         public virtual bool Match(UnicodeString search, int i)
         {
 
@@ -484,6 +567,11 @@ namespace OutSmart.DAXon.Regex
             if (fast.Captures2)
             {
                 return FastCaptures2Match(i, fast);
+            }
+
+            if (fast.Seq2)
+            {
+                return FastSeq2Match(i, fast);
             }
 
             // Can we optimize the search by looking for new lines?
@@ -580,6 +668,124 @@ namespace OutSmart.DAXon.Regex
                 UnicodeString prefix = program.prefix;
                 int prefixLength = prefix.Length32();
                 bool ignoreCase = program.flags.IsCaseIndependent();
+
+                // Byte/char lanes: an 8-bit subject scans its backing byte[] (IndexOf on the first
+                // prefix byte), a string-backed subject scans with string.IndexOf - both replace
+                // the per-position virtual CodePointAt loop below. Latin1 codepoints equal their
+                // byte values, so the comparisons are exact; case-blind stays on the generic loop.
+                if (!ignoreCase && prefixLength > 0)
+                {
+                    bool prefixIsLatin1 = true;
+                    for (int k = 0; k < prefixLength; k++)
+                    {
+                        if (prefix.CodePointAt(k) > 0xFF)
+                        {
+                            prefixIsLatin1 = false;
+                            break;
+                        }
+                    }
+
+                    byte[] sBytes = null;
+                    int sOff = 0;
+                    int sLen = 0;
+                    if (prefixIsLatin1 && search is Text.Slice8 sl8)
+                    {
+                        sBytes = sl8.ByteArray;
+                        sOff = sl8.Start;
+                        sLen = sl8.End - sl8.Start;
+                    }
+                    else if (prefixIsLatin1 && search is Text.Twine8 tw8)
+                    {
+                        sBytes = tw8.ByteArray;
+                        sLen = sBytes.Length;
+                    }
+
+                    if (sBytes != null)
+                    {
+                        byte first8 = (byte)prefix.CodePointAt(0);
+                        for (; i + prefixLength <= sLen; i++)
+                        {
+                            int at = Array.IndexOf(sBytes, first8, sOff + i, sLen - i - (prefixLength - 1));
+                            if (at < 0)
+                            {
+                                return false;
+                            }
+
+                            i = at - sOff;
+                            bool restOK = true;
+                            for (int k = 1; k < prefixLength; k++)
+                            {
+                                if (sBytes[at + k] != (byte)prefix.CodePointAt(k))
+                                {
+                                    restOK = false;
+                                    break;
+                                }
+                            }
+
+                            if (restOK && MatchAt(i, false))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+
+                    string sChars = null;
+                    int cOff = 0;
+                    if (search is Text.BMPString bstr)
+                    {
+                        sChars = bstr.ToString();
+                    }
+                    else if (search is Text.BMPSlice bslice)
+                    {
+                        sChars = bslice.Backing;
+                        cOff = bslice.Start;
+                    }
+
+                    bool prefixIsBmp = true;
+                    for (int k = 0; k < prefixLength; k++)
+                    {
+                        if (prefix.CodePointAt(k) > 0xFFFF)
+                        {
+                            prefixIsBmp = false;
+                            break;
+                        }
+                    }
+
+                    if (sChars != null && prefixIsBmp)
+                    {
+                        char firstC = (char)prefix.CodePointAt(0);
+                        int cLen = search.Length32();
+                        for (; i + prefixLength <= cLen; i++)
+                        {
+                            int at = sChars.IndexOf(firstC, cOff + i, cLen - i - (prefixLength - 1));
+                            if (at < 0)
+                            {
+                                return false;
+                            }
+
+                            i = at - cOff;
+                            bool restOK = true;
+                            for (int k = 1; k < prefixLength; k++)
+                            {
+                                if (sChars[at + k] != (char)prefix.CodePointAt(k))
+                                {
+                                    restOK = false;
+                                    break;
+                                }
+                            }
+
+                            if (restOK && MatchAt(i, false))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
+                }
+
                 for (; !(i + prefixLength - 1 >= search.Length()); i++)
                 {
                     bool prefixOK = true;
@@ -661,56 +867,6 @@ namespace OutSmart.DAXon.Regex
             }
 
             return true;
-        }
-
-        public virtual bool Match(string search)
-        {
-            return Match(StringView.Of(search).Tidy(), 0);
-        }
-
-        public virtual IList<UnicodeString> Split(UnicodeString s)
-        {
-
-            // Create new vector
-            IList<UnicodeString> v = new List<UnicodeString>();
-
-            // Start at position 0 and search the whole string
-            int pos = 0;
-            int len = s.Length32();
-
-            // Try a match at each position
-            while (pos < len && Match(s, pos))
-            {
-
-                // Get start of match
-                int start = GetParenStart(0);
-
-                // Get end of match
-                int newpos = GetParenEnd(0);
-
-                // Check if no progress was made
-                if (newpos == pos)
-                {
-                    v.Add(s.Substring(pos, start + 1));
-                    newpos++;
-                }
-                else
-                {
-                    v.Add(s.Substring(pos, start));
-                }
-
-
-                // Move to new position
-                pos = newpos;
-            }
-
-
-            // IPush remainder even if it's empty
-            UnicodeString remainder = s.Substring(pos, len);
-            v.Add(remainder);
-
-            // Return the list
-            return v;
         }
 
         public virtual UnicodeString Replace(UnicodeString @in, UnicodeString replacement)

@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "Subsequence";
-
-        public static Func<Subsequence_3> New() => () => new Subsequence_3();
         public override int GetSpecialProperties(Expression[] arguments)
         {
             return arguments[0].GetSpecialProperties();

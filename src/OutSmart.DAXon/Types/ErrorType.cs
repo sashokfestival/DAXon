@@ -47,8 +47,6 @@ namespace OutSmart.DAXon.Types
 
         public ISchemaType BaseType => AnySimpleType.INSTANCE;
 
-        public ISchemaType KnownBaseType => BaseType;
-
         public override int Fingerprint => StandardNames.XS_ERROR;
 
         public override StructuredQName MatchingNodeName => StandardNames.GetStructuredQName(StandardNames.XS_ERROR);
@@ -86,11 +84,6 @@ namespace OutSmart.DAXon.Types
         public override UType GetUType()
         {
             return UType.VOID;
-        }
-
-        public bool ContainsListType()
-        {
-            return false;
         }
 
         public bool IsBuiltInType()
@@ -242,14 +235,6 @@ namespace OutSmart.DAXon.Types
         public override bool IsAtomizable(TypeHierarchy th)
         {
             return false;
-        }
-
-        // The return type is chosen so that use of the error() function will never give a static type error,
-        // on the basis that item()? overlaps every other type, and it's almost impossible to make any
-        // unwarranted inferences from it, except perhaps count(error()) lt 2.
-        public string ToExportString()
-        {
-            return ToString();
         }
 
         public override string ToString()

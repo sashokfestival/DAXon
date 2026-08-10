@@ -891,47 +891,6 @@ namespace OutSmart.DAXon.Expressions
             }
         }
 
-        internal class ConditionalUnwrapExternalObject : PJConverter
-        {
-            public static readonly ConditionalUnwrapExternalObject INSTANCE = new ConditionalUnwrapExternalObject();
-            public override object Convert(ISequence value, System.Type targetClass, IXPathContext context)
-            {
-                ISequenceIterator iter = value.Iterate();
-                IItem head = iter.Next();
-                if (head == null)
-                {
-                    if (targetClass.IsAssignableFrom(typeof(EmptySequence)))
-                    {
-                        return EmptySequence.GetInstance();
-                    }
-                    else
-                    {
-                        throw new XPathException("Supplied value is empty: expected + " + targetClass.FullName);
-                    }
-                }
-
-                if (head is IAnyExternalObject)
-                {
-                    object obj = ((IAnyExternalObject)head).WrappedObject;
-                    if (!targetClass.IsAssignableFrom(obj.GetType()))
-                    {
-                        throw new XPathException("External object has wrong class (is " + obj.GetType().FullName + ", expected " + targetClass.FullName + ")");
-                    }
-
-                    if (iter.Next() != null)
-                    {
-                        throw new XPathException("Supplied sequence has more than one item: expected a single instance of " + targetClass.FullName);
-                    }
-
-                    return obj;
-                }
-                else
-                {
-                    return value;
-                }
-            }
-        }
-
         internal class StringItemToString : PJConverter
         {
             public static readonly StringItemToString INSTANCE = new StringItemToString();

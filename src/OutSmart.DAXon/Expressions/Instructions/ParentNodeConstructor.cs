@@ -184,11 +184,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             return new PathMap.PathMapNodeSet(pathMap.MakeNewRoot(this));
         }
 
-        public virtual bool IsPreservingTypes()
-        {
-            return preservingTypes;
-        }
-
         public virtual bool IsLocal()
         {
             return ExpressionTool.IsLocalConstructor(this);

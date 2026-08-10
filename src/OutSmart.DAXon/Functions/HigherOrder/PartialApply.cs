@@ -55,8 +55,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
         }
 
-        public virtual int NumberOfArguments => boundArgumentsOp.Length;
-
         public override int ImplementationMethod => EVALUATE_METHOD;
 
         //
@@ -167,12 +165,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             }
 
             return operanda;
-        }
-
-        public virtual Expression GetArgument(int n)
-        {
-            Operand o = boundArgumentsOp[n];
-            return o == null ? null : o.GetChildExpression();
         }
 
         public override bool Equals(object other)

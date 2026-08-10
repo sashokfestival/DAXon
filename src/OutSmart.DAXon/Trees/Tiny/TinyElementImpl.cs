@@ -87,21 +87,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
         }
 
-        public virtual bool HasUniformNamespaces()
-        {
-            // Conservative always-false (callers fall back to a full namespace walk).
-            // Upstream answers !tree.usesNamespaces; enabling that fast path is a perf-phase item.
-            return false;
-            //                return !tree.usesNamespaces;
-            //            } else {
-            //                nr = parent.nodeNr;
-            //                ns = tree.beta[nr];
-            //                anc = (TinyElementImpl)parent;
-            //        // Find the first namespace binding with a different parent
-            //        // Return true if none is found, or if the element owning this namespace binding
-            //        // is outside the subtree
-        }
-
         public override string GetAttributeValue(NamespaceUri uri, string local)
         {
             int a = tree.alpha[nodeNr];
@@ -151,22 +136,6 @@ namespace OutSmart.DAXon.Trees.Tiny
             return null;
         }
 
-        private int SubtreeSize()
-        {
-            int next = tree.next[nodeNr];
-            while (next < nodeNr)
-            {
-                if (next < 0)
-                {
-                    return tree.numberOfNodes - nodeNr;
-                }
-
-                next = tree.next[next];
-            }
-
-            return nodeNr - next;
-        }
-
         public override void Copy(IReceiver receiver, int copyOptions, ILocation location)
         {
             bool copyTypes = CopyOptions.Includes(copyOptions, CopyOptions.TYPE_ANNOTATIONS);
@@ -179,6 +148,9 @@ namespace OutSmart.DAXon.Trees.Tiny
             NamePool pool = config.GetNamePool();
             int next = nodeNr;
             Func<NodeInfo, Object> informee = receiver.GetPipelineConfiguration().CopyInformee;
+            // The instruction location can be a live stylesheet tree node whose GetLineNumber is a
+            // line-map search - resolve it once, not per copied element (it only changes below).
+            int locationLine = location.GetLineNumber();
             ISchemaType elementType = Untyped.INSTANCE;
             ISimpleType attributeType = BuiltInAtomicType.UNTYPED_ATOMIC;
             do
@@ -241,16 +213,18 @@ namespace OutSmart.DAXon.Trees.Tiny
                                 if (loc != null)
                                 {
                                     location = loc;
+                                    locationLine = loc.GetLineNumber();
                                 }
                             }
 
                             int nameCode = tree.nameCode[next];
                             int fp = nameCode & NamePool.FP_MASK;
                             string prefix = tree.GetPrefix(next);
-                            if (location.GetLineNumber() < tree.GetLineNumber(next))
+                            if (locationLine < tree.GetLineNumber(next))
                             {
                                 string systemId = location.GetSystemId() == null ? GetSystemId() : location.GetSystemId();
                                 location = new Loc(systemId, tree.GetLineNumber(next), GetColumnNumber());
+                                locationLine = location.GetLineNumber();
                             }
 
 
@@ -530,11 +504,6 @@ namespace OutSmart.DAXon.Trees.Tiny
         {
             return tree.IsIdrefElement(nodeNr);
         }
-
-        private bool IsSkipValidator(IReceiver r)
-        {
-            return false;
-        } //    private class LocalAttributeMap implements IAttributeMap {
         //
         //        private final boolean typed;
         //

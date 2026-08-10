@@ -34,10 +34,6 @@ namespace OutSmart.DAXon.Expressions
 
         public int RequiredCardinality => requiredCardinality;
 
-        public RoleDiagnostic RoleLocator => roleSupplier();
-
-        public Func<RoleDiagnostic> RoleSupplier => roleSupplier;
-
         public override int ImplementationMethod
         {
             get

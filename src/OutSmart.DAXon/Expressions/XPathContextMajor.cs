@@ -262,6 +262,14 @@ namespace OutSmart.DAXon.Expressions
 
         public virtual void OpenStackFrame(int numberOfVariables)
         {
+            // Same zero-slot shortcut as the SlotManager overload: this one runs per
+            // apply-templates evaluation and allocated a SlotManager + frame even for 0 slots.
+            if (numberOfVariables == 0)
+            {
+                stackFrame = StackFrame.EMPTY;
+                return;
+            }
+
             stackFrame = new StackFrame(new SlotManager(numberOfVariables), SequenceTool.MakeSequenceArray(numberOfVariables));
         }
 

@@ -21,8 +21,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class AvailableEnvironmentVariables : SystemFunction
     {
-
-        public static Func<AvailableEnvironmentVariables> New() => () => new AvailableEnvironmentVariables();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             IEnvironmentVariableResolver resolver = context.GetConfiguration().GetConfigurationProperty(Feature<IEnvironmentVariableResolver>.ENVIRONMENT_VARIABLE_RESOLVER);

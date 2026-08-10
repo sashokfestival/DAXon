@@ -23,6 +23,55 @@ namespace OutSmart.DAXon.Expressions.Sorting
         private readonly ISequenceIterator iterator;
         private readonly List<NodeInfo> sequence; // explicit type ArrayList used so C# List.Sort() is available
         private NodeInfo current = null;
+
+        // Peeked factory for the hot docOrder sites: 0/1-item inputs return the Empty/Singleton
+        // iterator ITSELF - no wrapper allocation and no per-item dedup Equals on the way out
+        // (typical shape: docOrder around a singleton path inside a per-item lambda). The non-node
+        // XPTY0004 check matches the constructor's.
+        internal static ISequenceIterator Of(ISequenceIterator @base, IComparer<NodeInfo> comparer)
+        {
+            IItem first = @base.Next();
+            if (first == null)
+            {
+                return EmptyIterator.GetInstance();
+            }
+
+            if (!(first is NodeInfo))
+            {
+                throw new XPathException("Item in input for sorting is not a node: " + Err.Depict(first), "XPTY0004");
+            }
+
+            IItem second = @base.Next();
+            if (second == null)
+            {
+                return SingletonIterator.MakeIterator(first);
+            }
+
+            return new DocumentOrderIterator(@base, (NodeInfo)first, second, comparer);
+        }
+
+        private DocumentOrderIterator(ISequenceIterator @base, NodeInfo first, IItem second, IComparer<NodeInfo> comparer)
+        {
+            int len = SequenceTool.SupportsGetLength(@base) ? SequenceTool.GetLength(@base) : 50;
+            sequence = new List<NodeInfo>(len < 2 ? 2 : len);
+            sequence.Add(first);
+            IItemConsumer<IItem> add = (item) =>
+            {
+                if (item is NodeInfo)
+                {
+                    sequence.Add((NodeInfo)item);
+                }
+                else
+                {
+                    throw new XPathException("Item in input for sorting is not a node: " + Err.Depict(item), "XPTY0004");
+                }
+            };
+            add(second);
+            SequenceTool.Supply(@base, add);
+            sequence.Sort(comparer);
+            iterator = new NodeListIterator(sequence);
+        }
+
         public DocumentOrderIterator(ISequenceIterator @base, IComparer<NodeInfo> comparer)
         {
             // 0/1-item inputs (typical: a docOrder wrapper around a singleton path inside a per-item

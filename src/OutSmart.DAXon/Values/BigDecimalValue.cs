@@ -439,6 +439,73 @@ namespace OutSmart.DAXon.Values
         public static StringBuilder DecimalToString(BigDecimal value, StringBuilder fsb)
         {
 
+            // Compact mantissa: format the long directly — no BigInteger boxing, no intermediate
+            // strings (format-number prints one decimal per row on hot text pipelines). Same
+            // digits/point/zero placement as the general path below.
+            if (value.TryGetCompactParts(out long compact, out int cscale))
+            {
+                if (compact == 0)
+                {
+                    fsb.Append('0');
+                    return fsb;
+                }
+
+                if (compact < 0)
+                {
+                    fsb.Append('-');
+                }
+
+                char[] digits = new char[20];
+                ulong u = compact < 0 ? (ulong)(-compact) : (ulong)compact;   // INFLATED is long.MinValue, never delivered
+                int n = 0;
+                while (u > 0)
+                {
+                    digits[n++] = (char)('0' + (int)(u % 10));
+                    u /= 10;
+                }
+
+                if (cscale <= 0)
+                {
+                    for (int i = n - 1; i >= 0; i--)
+                    {
+                        fsb.Append(digits[i]);
+                    }
+
+                    for (int i = 0; i < -cscale; i++)
+                    {
+                        fsb.Append('0');
+                    }
+                }
+                else if (cscale >= n)
+                {
+                    fsb.Append("0.");
+                    for (int i = n; i < cscale; i++)
+                    {
+                        fsb.Append('0');
+                    }
+
+                    for (int i = n - 1; i >= 0; i--)
+                    {
+                        fsb.Append(digits[i]);
+                    }
+                }
+                else
+                {
+                    for (int i = n - 1; i >= cscale; i--)
+                    {
+                        fsb.Append(digits[i]);
+                    }
+
+                    fsb.Append('.');
+                    for (int i = cscale - 1; i >= 0; i--)
+                    {
+                        fsb.Append(digits[i]);
+                    }
+                }
+
+                return fsb;
+            }
+
             // Can't use BigDecimal#toString() under JDK 1.5 because this produces values like "1E-5".
             // Can't use BigDecimal#toPlainString() because it retains trailing zeroes to represent the scale
             int scale = value.Scale();

@@ -82,8 +82,6 @@ namespace OutSmart.DAXon.Functions
 
             return new StringValue(FormatNumberFn(number, memo.pics, memo.dfs));
         }
-
-        public static Func<FormatNumber> New() => () => new FormatNumber();
         public override Expression FixArguments(params Expression[] arguments)
         {
             if (arguments[1] is Literal && (arguments.Length == 2 || arguments[2] is StringLiteral))
@@ -251,6 +249,25 @@ namespace OutSmart.DAXon.Functions
             if (value == Math.Floor(value) && Math.Abs(value) < 9007199254740992.0)
             {
                 return new BigDecimal((long)value);
+            }
+
+            // Fast path 2 (double precision only): build the BigDecimal straight from Dragon4's
+            // own shortest digits (long twin), skipping the exponential string, its BigDecimal
+            // parse, DecimalToString and the zeros/nines scan. Shape mirrors the string parse
+            // exactly: scale = fracDigits - exponent, single significant digit prints as "d.0E…"
+            // (unscaled d*10). The 9-char zeros/nines scan is provably a no-op at <= 16
+            // significant digits (two distinct decimals that short cannot both round-trip to one
+            // double); 17-digit forms and the float path (precision 1, 5-char runs are live on
+            // short forms) fall through to the general path. Differential-tested against the
+            // pre-fix pipeline in javacompat-tests.
+            if (precision != 1 && OutSmart.DAXon.Values.FloatingPointConverter.TryShortestDigits(Math.Abs(value), out long dg, out int nd, out int h))
+            {
+                int scale = (nd == 1 ? 1 : nd - 1) - h;
+                if (nd <= 16 && scale >= 1)
+                {
+                    long unscaled = nd == 1 ? dg * 10 : dg;
+                    return BigDecimal.FromCompact(value < 0 ? -unscaled : unscaled, scale);
+                }
             }
 
             string zeros = precision == 1 ? "00000" : "000000000";
@@ -504,17 +521,6 @@ namespace OutSmart.DAXon.Functions
             copy.decimalSymbols = decimalSymbols;
             copy.subPictures = subPictures;
             return copy;
-        }
-
-        /* 4.7.4 Rule 3 */
-        /* 4.7.4 Rule 8 */
-        /* 4.7.4 Rule 9 */
-        /* 4.7.4 Rule 10 */
-        public static Func<double, String> GetFormatter(string picture)
-        {
-            DecimalSymbols symbols = new DecimalSymbols(HostLanguage.XSLT, 30);
-            SubPicture[] subPictures = GetSubPictures(picture, symbols);
-            return (dbl) => FormatNumberFn(new DoubleValue(dbl), subPictures, symbols);
         }
         ISequence ICallable.Call(IXPathContext arg0, ISequence[] arg1) => Call(arg0, arg1);
         SystemFunction IStatefulSystemFunction.Copy() => Copy();
@@ -971,6 +977,56 @@ namespace OutSmart.DAXon.Functions
                 }
 
 
+                // Direct assembly for the common picture shape (default '0' digits, BMP separators,
+                // no exponent, no fractional grouping, regular whole-part grouping): emits straight
+                // from the digit buffer, skipping the codepoint-array expand + per-separator array
+                // Insert + rebuild below. Separator positions replicate the legacy Insert loop
+                // (before raw index p = point - k*g, 0 < p < point, sign counted as a char).
+                if (minExponentSize == 0 && fractionalPartGroupingPositions == null
+                    && dfs.GetZeroDigit() == '0'
+                    && dfs.GetDecimalSeparator() < 0x10000
+                    && (wholePartGroupingPositions == null || (regular && dfs.GetGroupingSeparator() < 0x10000)))
+                {
+                    int fpoint = -1;
+                    for (int i = 0; i < sb.Length; i++)
+                    {
+                        if (sb[i] == '.')
+                        {
+                            fpoint = i;
+                            break;
+                        }
+                    }
+
+                    if (fpoint < 0 || maxFractionPartSize != 0 || fpoint == sb.Length - 1)
+                    {
+                        int end = fpoint >= 0 && maxFractionPartSize == 0 ? sb.Length - 1 : sb.Length;
+                        int intLen = fpoint < 0 ? end : fpoint;
+                        StringBuilder fast = new StringBuilder(minusSign.Length + prefix.Length + end + 6 + suffix.Length);
+                        fast.Append(minusSign);
+                        fast.Append(prefix);
+                        int gsize = wholePartGroupingPositions == null ? 0 : wholePartGroupingPositions[0];
+                        for (int i = 0; i < end; i++)
+                        {
+                            if (i == fpoint)
+                            {
+                                fast.Append((char)dfs.GetDecimalSeparator());
+                            }
+                            else
+                            {
+                                if (gsize > 0 && i > 0 && i < intLen && (intLen - i) % gsize == 0)
+                                {
+                                    fast.Append((char)dfs.GetGroupingSeparator());
+                                }
+
+                                fast.Append(sb[i]);
+                            }
+                        }
+
+                        fast.Append(suffix);
+                        return fast.ToString();
+                    }
+                }
+
                 // IMap the digits and decimal point to use the selected characters
                 string raw = sb.ToString();
                 int[] ib = StringTool.Expand(StringView.Of(raw));
@@ -1098,7 +1154,15 @@ namespace OutSmart.DAXon.Functions
                 }
 
                 BigDecimalValue.DecimalToString(dval, fsb);
-                int point = fsb.ToString().IndexOf(".", global::System.StringComparison.Ordinal);
+                int point = -1;
+                for (int i = 0; i < fsb.Length; i++)
+                {
+                    if (fsb[i] == '.')
+                    {
+                        point = i;
+                        break;
+                    }
+                }
                 int intDigits;
                 if (point >= 0)
                 {

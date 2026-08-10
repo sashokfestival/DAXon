@@ -27,8 +27,6 @@ namespace OutSmart.DAXon.Events
         private readonly IReceiver nextReceiver;
         private int level = 0;
         private bool[] isDocumentLevel = new bool[20];
-
-        public virtual IReceiver NextReceiver => nextReceiver;
         public TreeReceiver(IReceiver nextInChain) : base(nextInChain.GetPipelineConfiguration())
         {
             nextReceiver = nextInChain;

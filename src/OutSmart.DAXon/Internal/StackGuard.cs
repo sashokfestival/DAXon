@@ -59,29 +59,20 @@ namespace OutSmart.DAXon.Internal
         /// re-codes an exception re-enters exception dispatch from inside its catch, so the stack
         /// grows while unwinding instead of shrinking. A caller that pays that per level must
         /// reserve for it here - a fixed margin cannot, since the shortfall scales with depth.
+        /// NoInlining is load-bearing: every caller is a recursion entry whose frame PERSISTS down
+        /// the descent, and inlining moves the address-taken probe local into that frame — the
+        /// few bytes per level break the depth-2000-on-1MB contract (sof_depth_fused_hof).
+        /// This dedicated frame is transient: it pops before the level descends. The EH-carrying
+        /// init stays split out in ProbeSlow so this body remains one TLS read + compare.
         /// </summary>
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void Probe(ulong extraMargin)
         {
-            if (noApi)
-            {
-                FallbackProbe();
-                return;
-            }
-
             ulong low = stackLow;
             if (low == 0)
             {
-                try
-                {
-                    GetCurrentThreadStackLimits(out UIntPtr lo, out _);
-                    stackLow = low = (ulong)lo;
-                }
-                catch (EntryPointNotFoundException)
-                {
-                    noApi = true;
-                    FallbackProbe();
-                    return;
-                }
+                ProbeSlow(extraMargin);
+                return;
             }
 
             unsafe
@@ -103,6 +94,34 @@ namespace OutSmart.DAXon.Internal
                     throw new RecursionDepthError();
                 }
             }
+        }
+
+        // Once-per-thread init plus the pre-Windows-8 route (noApi leaves stackLow at 0, so
+        // those threads land here on every probe, as before). Holds the EH that must not sit
+        // in the inlined hot body.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void ProbeSlow(ulong extraMargin)
+        {
+            if (!noApi)
+            {
+                try
+                {
+                    GetCurrentThreadStackLimits(out UIntPtr lo, out _);
+                    stackLow = (ulong)lo;
+                }
+                catch (EntryPointNotFoundException)
+                {
+                    noApi = true;
+                }
+            }
+
+            if (noApi)
+            {
+                FallbackProbe();
+                return;
+            }
+
+            Probe(extraMargin);
         }
 
         // Pre-Windows-8 fallback: the BCL probe (conservative — 512 KB on 64-bit Framework).

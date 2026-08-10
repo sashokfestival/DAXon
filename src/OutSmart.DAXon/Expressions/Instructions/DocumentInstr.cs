@@ -37,9 +37,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
 
         public override int ImplementationMethod => Expression.EVALUATE_METHOD;
 
-        public virtual
-UnicodeString ConstantText => constantText;
-
         public virtual Expression StringValueExpression
         {
             get

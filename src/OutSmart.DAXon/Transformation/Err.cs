@@ -392,18 +392,6 @@ namespace OutSmart.DAXon.Transformation
             }
         }
 
-        public static string Wrap(Expression exp)
-        {
-            if (ExpressionTool.ExpressionSize(exp) < 10 && !(exp is Instruction))
-            {
-                return "{" + exp + "}";
-            }
-            else
-            {
-                return exp.ExpressionName;
-            }
-        }
-
         public static string DescribeGenre(Genre genre)
         {
             switch (genre)

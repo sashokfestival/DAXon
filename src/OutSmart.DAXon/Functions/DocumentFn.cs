@@ -60,11 +60,6 @@ namespace OutSmart.DAXon.Functions
             return expr == null ? base.MakeFunctionCall(arguments) : expr;
         }
 
-        public static bool SourceIsTree(ResolvedResource source)
-        {
-            return source != null && source.Node != null;
-        }
-
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             int numArgs = GetArity();
@@ -239,7 +234,7 @@ namespace OutSmart.DAXon.Functions
                     }
                     catch (XPathException err)
                     {
-                        if (err.ErrorCodeQName == null || err.HasErrorCode("SXXP0003"))
+                        if (err.ErrorCodeQName == null || err.HasErrorCode(DAXonErrorCode.SXXP0003))
                         {
                             err.SetErrorCode("FODC0002");
                         }
@@ -606,7 +601,7 @@ namespace OutSmart.DAXon.Functions
             }
             catch (XPathException e)
             {
-                throw e.MaybeWithLocation(locator).MaybeWithErrorCode("FODC0002").ReplacingErrorCode("SXXP0003", "FODC0002");
+                throw e.MaybeWithLocation(locator).MaybeWithErrorCode("FODC0002").ReplacingErrorCode(DAXonErrorCode.SXXP0003, "FODC0002");
             }
         }
 

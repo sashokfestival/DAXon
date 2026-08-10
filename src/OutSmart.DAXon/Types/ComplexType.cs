@@ -19,14 +19,9 @@ namespace OutSmart.DAXon.Types
     internal interface IComplexType : ISchemaType
     {
         ComplexVariety Variety { get; }
-        bool IsAbstract();
-        bool IsComplexContent();
         bool IsSimpleContent();
-        bool IsAllContent();
         ISimpleType SimpleContentType { get; }
-        bool IsRestricted();
         bool IsEmptyContent();
-        bool IsEmptiable();
         bool IsMixedContent();
         ISchemaType GetElementParticleType(int elementName, bool considerExtensions);
         int GetElementParticleCardinality(int elementName, bool considerExtensions);
@@ -39,6 +34,5 @@ namespace OutSmart.DAXon.Types
         int GetDescendantElementCardinality(int elementFingerprint);
         bool ContainsElementWildcard();
         bool HasAssertions();
-        string PreferredJsonLayout { get; }
     }
 }

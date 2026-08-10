@@ -151,8 +151,8 @@ namespace OutSmart.DAXon.Functions
             {
                 if ((flags & JOIN_ADJACENT_TEXT_NODES) != 0)
                 {
-                    op1 = MergeAdjacentTextNodes(op1);
-                    op2 = MergeAdjacentTextNodes(op2);
+                    op1 = OutSmart.DAXon.Functions.DeepEqual.MergeAdjacentTextNodes(op1);
+                    op2 = OutSmart.DAXon.Functions.DeepEqual.MergeAdjacentTextNodes(op2);
                 }
 
                 int pos1 = 0;
@@ -303,7 +303,7 @@ namespace OutSmart.DAXon.Functions
             IErrorReporter reporter = context.GetErrorReporter();
             if (n1.GetNodeKind() != n2.GetNodeKind())
             {
-                string reason = "node kinds differ: comparing " + ShowKind(n1) + " to " + ShowKind(n2);
+                string reason = "node kinds differ: comparing " + OutSmart.DAXon.Functions.DeepEqual.ShowKind(n1) + " to " + OutSmart.DAXon.Functions.DeepEqual.ShowKind(n2);
                 Explain(reporter, reason, flags, n1, n2);
                 return reason;
             }
@@ -662,88 +662,5 @@ namespace OutSmart.DAXon.Functions
             }
         }
 
-        /*
-     * Determine whether two nodes are deep-equal
-     * @return null if they are deep equal, or an explanation of the reason if not
-     */
-        private static string ShowKind(IItem item)
-        {
-            if (item is NodeInfo && ((NodeInfo)item).GetNodeKind() == Types.Type.TEXT && Whitespace.IsAllWhite(item.UnicodeStringValue))
-            {
-                return "whitespace text() node";
-            }
-            else
-            {
-                return Types.Type.DisplayTypeName(item);
-            }
-        }
-
-        /*
-     * Determine whether two nodes are deep-equal
-     * @return null if they are deep equal, or an explanation of the reason if not
-     */
-        private static string ShowNamespaces(HashSet<NamespaceBinding> bindings)
-        {
-            StringBuilder sb = new StringBuilder(256);
-            foreach (NamespaceBinding binding in bindings)
-            {
-                sb.Append(binding.GetPrefix());
-                sb.Append('=');
-                sb.Append(binding.GetNamespaceUri());
-                sb.Append(' ');
-            }
-
-            sb.Length = sb.Length - 1;
-            return sb.ToString();
-        }
-
-        /*
-     * Determine whether two nodes are deep-equal
-     * @return null if they are deep equal, or an explanation of the reason if not
-     */
-        private static ISequenceIterator MergeAdjacentTextNodes(ISequenceIterator @in)
-        {
-            IList<IItem> items = new List<IItem>(20);
-            bool prevIsText = false;
-            UnicodeBuilder textBuffer = new UnicodeBuilder();
-            while (true)
-            {
-                IItem next = @in.Next();
-                if (next == null)
-                {
-                    break;
-                }
-
-                if (next is NodeInfo && ((NodeInfo)next).GetNodeKind() == Types.Type.TEXT)
-                {
-                    textBuffer.Accept(next.UnicodeStringValue);
-                    prevIsText = true;
-                }
-                else
-                {
-                    if (prevIsText)
-                    {
-                        Orphan textNode = new Orphan(null);
-                        textNode.SetNodeKind(Types.Type.TEXT);
-                        textNode.SetStringValue(textBuffer.ToUnicodeString());
-                        items.Add(textNode);
-                        textBuffer.Clear();
-                    }
-
-                    prevIsText = false;
-                    items.Add(next);
-                }
-            }
-
-            if (prevIsText)
-            {
-                Orphan textNode = new Orphan(null);
-                textNode.SetNodeKind(Types.Type.TEXT);
-                textNode.SetStringValue(textBuffer.ToUnicodeString());
-                items.Add(textNode);
-            }
-
-            return new ListIterator.Of<IItem>(items);
-        }
     }
 }

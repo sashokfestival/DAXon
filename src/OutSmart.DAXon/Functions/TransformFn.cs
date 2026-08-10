@@ -550,7 +550,7 @@ namespace OutSmart.DAXon.Functions
                 // The fn:transform spec requires FOXT0002 for a stylesheet compile error
                 throw XPathException.FromXmlProcessingError(te)
                         .MaybeWithErrorCode("FOXT0002")
-                        .ReplacingErrorCode("SXXP0003", "FOXT0002");
+                        .ReplacingErrorCode(DAXonErrorCode.SXXP0003, "FOXT0002");
             }
 
             if (e.InnerException is XPathException)

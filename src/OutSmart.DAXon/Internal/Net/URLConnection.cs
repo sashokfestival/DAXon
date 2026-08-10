@@ -42,10 +42,7 @@ namespace OutSmart.DAXon.Internal.Net
             }
         }
         public virtual string ContentType { get { try { return _url == null || IsFile ? null : Response().ContentType; } catch { return null; } } }
-        public virtual long ContentLength { get { try { return Response()?.ContentLength ?? 0; } catch { return 0; } } }
-        public virtual long LastModified => 0;
         public virtual string ContentEncoding { get { try { if (IsFile) return null; return (Response() as global::System.Net.HttpWebResponse)?.ContentEncoding; } catch { return null; } } }
-        public URLConnection() { }
         public URLConnection(global::System.Uri url) { _url = url; }
         protected global::System.Net.WebResponse Response()
         {
@@ -69,7 +66,6 @@ namespace OutSmart.DAXon.Internal.Net
 
             return _resp;
         }
-        public virtual void Connect() { Response(); }
         // java.net.HttpURLConnection.disconnect(): release a response this connection opened but whose
         // body nobody will read. Needed because a redirect hop and a content-type probe each open a
         // response and abandon it - without this the socket stays checked out of the ServicePoint pool

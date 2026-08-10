@@ -18,12 +18,6 @@ namespace OutSmart.DAXon.Collections
     {
         private readonly IIntPredicateProxy p1;
         private readonly IIntPredicateProxy p2;
-
-        public virtual IIntPredicateProxy[] Operands => new IIntPredicateProxy[]
-            {
-                p1,
-                p2
-            };
         private IntUnionPredicate(IIntPredicateProxy p1, IIntPredicateProxy p2)
         {
             this.p1 = p1;

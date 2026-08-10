@@ -27,7 +27,6 @@ namespace OutSmart.DAXon.Values
     {
         public static readonly DoubleValue ZERO = new DoubleValue(0);
         public static readonly DoubleValue NEGATIVE_ZERO = new DoubleValue(-0.0);
-        public static readonly DoubleValue ONE = new DoubleValue(1);
         public static readonly DoubleValue NaN = new DoubleValue(double.NaN);
         private readonly double value;
 
@@ -45,11 +44,6 @@ namespace OutSmart.DAXon.Values
         public DoubleValue(double value, IAtomicType typeLabel) : base(typeLabel)
         {
             this.value = value;
-        }
-
-        public static DoubleValue MakeDoubleValue(double value)
-        {
-            return new DoubleValue(value);
         }
 
         public override AtomicValue CopyAsSubType(IAtomicType typeLabel)

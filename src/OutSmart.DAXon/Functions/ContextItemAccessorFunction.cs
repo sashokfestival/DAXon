@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class ContextItemAccessorFunction : ContextAccessorFunction
     {
-
-        public static Func<ContextItemAccessorFunction> New() => () => new ContextItemAccessorFunction();
         public override IFunctionItem BindContext(IXPathContext context)
         {
             IItem ci = context.GetContextItem();
@@ -81,15 +79,6 @@ namespace OutSmart.DAXon.Functions
             {
                 return SystemFunction.MakeCall(GetFunctionName().GetLocalPart(), GetRetainedStaticContext(), arg);
             }
-        }
-
-        public virtual Expression MakeContextItemExplicit()
-        {
-            Expression[] args = new Expression[]
-            {
-                new ContextItemExpression()
-            };
-            return SystemFunction.MakeCall(GetFunctionName().GetLocalPart(), GetRetainedStaticContext(), args);
         }
 
         internal class StringAccessor : ContextItemAccessorFunction

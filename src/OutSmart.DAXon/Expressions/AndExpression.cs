@@ -109,29 +109,6 @@ namespace OutSmart.DAXon.Expressions
             return GetLhsExpression().EffectiveBooleanValue(c) && GetRhsExpression().EffectiveBooleanValue(c);
         }
 
-        public static Expression Distribute(Collection<Expression> exprs)
-        {
-            Expression result = null;
-            if (exprs != null)
-            {
-                bool first = true;
-                foreach (Expression e in exprs)
-                {
-                    if (first)
-                    {
-                        first = false;
-                        result = e;
-                    }
-                    else
-                    {
-                        result = new AndExpression(result, e);
-                    }
-                }
-            }
-
-            return result;
-        }
-
         public override Elaborator GetElaborator()
         {
             return new AndElaborator();

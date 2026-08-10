@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Matches : RegexFunction
     {
-
-        public static Func<Matches> New() => () => new Matches();
         protected override bool AllowRegexMatchingEmptyString()
         {
             return true;

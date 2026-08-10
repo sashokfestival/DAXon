@@ -18,7 +18,6 @@ namespace OutSmart.DAXon.Serialization.CharCodes
     {
         private static readonly UTF8CharacterSet _instance = new UTF8CharacterSet();
         public string CanonicalName => "UTF-8";
-        public string CharacterSetName => "UTF-8";
         public static UTF8CharacterSet GetInstance() => _instance;
         public bool InCharset(int ch) => true;
         // 2026-06-10: faithful encode(IntIterator) (upstream UTF8CharacterSet.java:103, used by

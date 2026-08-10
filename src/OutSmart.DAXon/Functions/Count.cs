@@ -13,7 +13,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class Count
     {
-        public Count() { }
         // Java's static Count.count(iter) -> static method (same name as class).
         public static int CountFn(ISequenceIterator iter) { int n = 0; if (iter != null) { while (iter.Next() != null) n++; } return n; }
         public static int CountLocal(ISequenceIterator iter)

@@ -26,10 +26,8 @@ namespace OutSmart.DAXon.Core
         // Engine-base version, NOT this distribution's: tracks the Saxon-HE 12.9 base for the SEF
         // guard, the fn:transform version match, xsl:product-version and the trace header.
         public static string ProductVersion => "12.9";
-        public static int[] StructuredVersionNumber => new int[] { 12, 9, 0 };
         // THIS distribution's own version and release date (the engine base above stays 12.9).
         public static string DistributionVersion => "1.0";
-        public static string ReleaseDate => "2026-07-19";
         public static string SoftwarePlatform => ".NET";
         // xsl:vendor-url. Points at THIS distribution's site (OutSmart), not the Saxon base's.
         public static string WebSiteAddress => "https://outsmartteam.com/";

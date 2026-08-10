@@ -110,6 +110,47 @@ namespace OutSmart.DAXon.Functions
                     op2 = MergeAdjacentTextNodes(op2);
                 }
 
+                // codepoints-vs-range (the astral round-trip shape): both operands are primitive
+                // integer streams, so compare the ints directly — the generic loop below boxes an
+                // Int64Value PAIR per position. Exact for the shape: integers have no NaN,
+                // collation does not apply to numbers, and both item types are xs:integer so the
+                // annotation gate cannot fire. RawCodepoints is valid: no Next() was issued yet.
+                {
+                    Text.CodepointIterator cpSide = op1 as Text.CodepointIterator ?? op2 as Text.CodepointIterator;
+                    Expressions.AscendingRangeIterator rangeSide =
+                        op2 as Expressions.AscendingRangeIterator ?? op1 as Expressions.AscendingRangeIterator;
+                    if (cpSide != null && rangeSide != null && rangeSide.GetStep().LongValue() == 1)
+                    {
+                        Collections.IIntIterator raw = cpSide.RawCodepoints;
+                        long v = rangeSide.GetMin().LongValue();
+                        long limit = rangeSide.GetMax().LongValue();
+                        long steps = 0;
+                        while (raw.MoveNext())
+                        {
+                            if ((++steps & 0xffff) == 0)
+                            {
+                                Core.Controller.CheckActiveTimeout();
+                            }
+
+                            if (v > limit || raw.Current != v)
+                            {
+                                Explain(reporter, "codepoint sequence and range differ", options, null, null);
+                                return false;
+                            }
+
+                            v++;
+                        }
+
+                        if (v <= limit)
+                        {
+                            Explain(reporter, "range is longer than the codepoint sequence", options, null, null);
+                            return false;
+                        }
+
+                        return true;
+                    }
+                }
+
                 int pos1 = 0;
                 int pos2 = 0;
                 while (true)
@@ -203,6 +244,23 @@ namespace OutSmart.DAXon.Functions
                         }
                         else
                         {
+                            // Plain-integer pair: eq is one long compare. NaN is impossible,
+                            // collation does not apply to numbers, and the annotation gate
+                            // cannot fire (both item types are xs:integer by the guard).
+                            if (item1 is Int64Value i1 && item2 is Int64Value i2
+                                && ReferenceEquals(i1.GetItemType(), BuiltInAtomicType.INTEGER)
+                                && ReferenceEquals(i2.GetItemType(), BuiltInAtomicType.INTEGER))
+                            {
+                                if (i1.LongValue() != i2.LongValue())
+                                {
+                                    result = false;
+                                    reason = "atomic values at position " + pos1 + " differ";
+                                    break;
+                                }
+
+                                continue;
+                            }
+
                             AtomicValue av1 = (AtomicValue)item1;
                             AtomicValue av2 = (AtomicValue)item2;
                             if (av1.IsNaN() && av2.IsNaN())
@@ -715,61 +773,6 @@ namespace OutSmart.DAXon.Functions
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
      */
-        private static long HashCodeOfSequence(IGroundedValue value, Func<IItem, long> hash)
-        {
-            long h = 0;
-            foreach (IItem it in value.AsIterable())
-            {
-                h ^= hash(it);
-            }
-
-            return h;
-        }
-
-        /*
-     * Determine whether two nodes are deep-equal
-     * @return null if they are deep equal, or an explanation of the reason if not
-     */
-        private static long HashCodeOfNode(NodeInfo node, DeepEqualOptions options, IXPathContext context)
-        {
-            int kind = node.GetNodeKind();
-            long h = 0x7876ABCD2345DCBA;
-            h ^= ((long)node.Fingerprint << 25);
-            if (options.namespacePrefixesSignificant)
-            {
-                h ^= ((long)node.GetPrefix().GetHashCode() << 13);
-            }
-
-            if (kind == Types.Type.TEXT && !Whitespace.IsAllWhite(node.UnicodeStringValue))
-            {
-                string s = node.GetStringValue();
-                if (options.normalizeSpace)
-                {
-                    s = Whitespace.CollapseWhitespace(s);
-                }
-
-                if (options.normalizationForm != null)
-                {
-                    try
-                    {
-                        s = NormalizeUnicode.Normalize(s, options.normalizationForm);
-                    }
-                    catch (XPathException e)
-                    {
-                        throw new ArgumentException(e.Message, e);
-                    }
-                }
-
-                h ^= (long)s.GetHashCode() << 5;
-            }
-
-            return h;
-        }
-
-        /*
-     * Determine whether two nodes are deep-equal
-     * @return null if they are deep equal, or an explanation of the reason if not
-     */
         private static bool CompareStrings(string s1, string s2, DeepEqualOptions options, IXPathContext context)
         {
             if (options.normalizeSpace)
@@ -833,7 +836,7 @@ namespace OutSmart.DAXon.Functions
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
      */
-        private static string ShowKind(IItem item)
+        internal static string ShowKind(IItem item)
         {
             if (item is NodeInfo && ((NodeInfo)item).GetNodeKind() == Types.Type.TEXT && Whitespace.IsAllWhite(item.UnicodeStringValue))
             {
@@ -849,26 +852,7 @@ namespace OutSmart.DAXon.Functions
      * Determine whether two nodes are deep-equal
      * @return null if they are deep equal, or an explanation of the reason if not
      */
-        private static string ShowNamespaces(HashSet<NamespaceBinding> bindings)
-        {
-            StringBuilder sb = new StringBuilder(256);
-            foreach (NamespaceBinding binding in bindings)
-            {
-                sb.Append(binding.GetPrefix());
-                sb.Append('=');
-                sb.Append(binding.GetNamespaceUri());
-                sb.Append(' ');
-            }
-
-            sb.Length = sb.Length - 1;
-            return sb.ToString();
-        }
-
-        /*
-     * Determine whether two nodes are deep-equal
-     * @return null if they are deep equal, or an explanation of the reason if not
-     */
-        private static ISequenceIterator MergeAdjacentTextNodes(ISequenceIterator @in)
+        internal static ISequenceIterator MergeAdjacentTextNodes(ISequenceIterator @in)
         {
             IList<IItem> items = new List<IItem>(20);
             bool prevIsText = false;

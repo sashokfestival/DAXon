@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Types
     // promoters TypeChecker instantiates are the top-level Values.PromoterTo* classes.)
     internal abstract class UnfailingConverter : Converter
     {
-        protected UnfailingConverter() { }
-        protected UnfailingConverter(object rules) : base(rules) { }
         // Ported 2026-07-06 from upstream Converter.DownCastingConverter (was a hollow stub whose null Convert
         // NRE'd CastExpression.PreEvaluate for downcasts like xs:integer -> xs:positiveInteger). Checks that a
         // value belonging to a supertype is a valid instance of the subtype, returning the subtype instance or
@@ -34,7 +32,6 @@ namespace OutSmart.DAXon.Types
             private readonly IAtomicType newType;
             private readonly string errorCode = null;
             public new ISimpleType TargetType => newType;
-            public DownCastingConverter() { }
             public DownCastingConverter(object target, object rules) { newType = (IAtomicType)target; SetConversionRules(rules); }
             public DownCastingConverter(object target, object rules, object errorCode) { newType = (IAtomicType)target; SetConversionRules(rules); this.errorCode = (string)errorCode; } // ASC.MakeDownCaster 3-arg form (target, rules, "XPTY0004")
 

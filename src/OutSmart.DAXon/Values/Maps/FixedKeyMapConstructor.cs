@@ -63,11 +63,6 @@ namespace OutSmart.DAXon.Values.Maps
             operanda = new OperandArray(this, kids, OperandRole.NAVIGATE);
         }
 
-        public virtual OperandArray GetOperanda()
-        {
-            return operanda;
-        }
-
         public override IEnumerable<Operand> Operands()
         {
             return operanda;

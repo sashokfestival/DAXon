@@ -372,18 +372,6 @@ namespace OutSmart.DAXon.Text
             return new string(Array.ConvertAll(bytes, (b) => (char)b));
         }
 
-        private void Write(TextWriter writer, long start, long len)
-        {
-            if (writer is UTF8Writer)
-            {
-                ((UTF8Writer)writer).WriteLatin1(bytes, RequireInt(start), RequireInt(len));
-            }
-            else
-            {
-                writer.Write(ToString().Substring(RequireInt(start), RequireInt(len)) /*Java substring(begin,END) -> C# (start,LENGTH)*/);
-            }
-        }
-
         public override long IndexWhere(Func<int, bool> predicate, long from)
         {
             for (int i = requireNonNegativeInt(from); i < Length(); i++)
@@ -395,11 +383,6 @@ namespace OutSmart.DAXon.Text
             }
 
             return -1;
-        }
-
-        public virtual string Details()
-        {
-            return "Twine8 bytes.length = " + bytes.Length;
         }
 
         private sealed class AnonymousIntIterator : AbstractIntIterator

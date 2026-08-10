@@ -157,17 +157,143 @@ namespace OutSmart.DAXon.Text
             } //showSegmentLengths();
         }
 
-        // Diagnostic method
-        private void ShowSegmentLengths()
+        // Single-pass fast lane for the dominant case: Latin1 text into an existing 8-bit segment
+        // with no spill. Scans and copies in one loop; bailing on the first wide char leaves only
+        // dead bytes beyond lastSegmentLength (never bumped), so the caller can rerun the generic
+        // two-pass route. Returns false without side effects visible to any reader.
+        internal bool TryAppendLatin1(char[] chars, int len)
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (ISegment s in completeSegments)
+            // EMPTY_SEGMENT is itself a (shared, static) Segment8 — stretching it would corrupt the
+            // sentinel for every buffer. First appends take the generic route, which replaces it.
+            if (lastSegment == EMPTY_SEGMENT || !(lastSegment is Segment8) || len >= SEGLEN - lastSegmentLength)
             {
-                sb.Append(s.AsUnicodeString().Length()).Append(", ");
+                return false;
             }
 
-            sb.Append(lastSegmentLength);
-            Console.Error.WriteLine(sb);
+            lastSegment = lastSegment.Stretch(lastSegmentLength, lastSegmentLength + len, 8);
+            byte[] b = ((Segment8)lastSegment).bytes;
+            int off = lastSegmentLength;
+            for (int j = 0; j < len; j++)
+            {
+                char c = chars[j];
+                if (c > 255)
+                {
+                    return false;
+                }
+
+                b[off + j] = (byte)c;
+            }
+
+            lastSegmentLength += len;
+            return true;
+        }
+
+        // Fused append from the pump's raw char buffer (XmlReaderToReceiver -> TinyBuilder): same
+        // content and Length() outcome as Compress-to-Twine + AppendUnicodeString, minus that
+        // intermediate allocation+copy. max/surrogates come from the caller's scan (the same scan
+        // Compress performs), so the width verdict per append is identical.
+        internal void AppendCharSpan(char[] chars, int len, int max, int surrogates)
+        {
+            if (len == 0)
+            {
+                return;
+            }
+
+            int width = max < 256 ? 8 : (surrogates == 0 ? 16 : 24);
+            int cpLeft = len - surrogates / 2;
+            if (lastSegment == EMPTY_SEGMENT)
+            {
+                int newLength = Math.Max(initialSize, cpLeft) & 65535;
+                if (width == 8)
+                {
+                    lastSegment = new Segment8(new byte[newLength]);
+                }
+                else if (width == 16)
+                {
+                    lastSegment = new Segment16(new char[newLength]);
+                }
+                else
+                {
+                    lastSegment = new Segment24(new byte[newLength * 3]);
+                }
+            }
+
+            int i = 0;
+            while (cpLeft > 0)
+            {
+                int take = Math.Min(cpLeft, SEGLEN - lastSegmentLength);
+                lastSegment = lastSegment.Stretch(lastSegmentLength, lastSegmentLength + take, width);
+                if (lastSegment is Segment8 s8)
+                {
+                    byte[] b = s8.bytes;
+                    for (int j = lastSegmentLength, e = lastSegmentLength + take; j < e;)
+                    {
+                        b[j++] = (byte)chars[i++];
+                    }
+                }
+                else if (lastSegment is Segment16 s16)
+                {
+                    Array.Copy(chars, i, s16.chars, lastSegmentLength, take);
+                    i += take;
+                }
+                else
+                {
+                    byte[] b = ((Segment24)lastSegment).bytes;
+                    int o = lastSegmentLength * 3;
+                    for (int j = 0; j < take; j++)
+                    {
+                        char c = chars[i++];
+                        int cp = Serialization.CharCodes.UTF16CharacterSet.IsSurrogate(c)
+                            ? Serialization.CharCodes.UTF16CharacterSet.CombinePair(c, chars[i++]) : c;
+                        b[o++] = (byte)((cp & 0xffffff) >> 16);
+                        b[o++] = (byte)((cp & 0xffff) >> 8);
+                        b[o++] = (byte)(cp & 0xff);
+                    }
+                }
+
+                lastSegmentLength += take;
+                cpLeft -= take;
+                if (lastSegmentLength == SEGLEN)
+                {
+                    AddSegment(lastSegment);
+                    lastSegment = new Segment8(new byte[1024]);
+                    lastSegmentLength = 0;
+                }
+            }
+        }
+
+        // Whiteness test without materializing the text: the stripped-view walk asked this of
+        // every text node via Substring + IsAllWhite, allocating a string per node. Scans the
+        // byte segments in place; non-white content fails on its first codepoint.
+        public bool IsAllWhite(int start, int end)
+        {
+            int i = start;
+            while (i < end)
+            {
+                int segNr = i >> BITS;
+                int offset = i & MASK;
+                int segEnd = Math.Min(end - (segNr << BITS), SEGLEN);
+                ISegment seg = GetSegment(segNr);
+                if (seg is Segment8 s8)
+                {
+                    byte[] bytes = s8.bytes;
+                    for (int k = offset; k < segEnd; k++)
+                    {
+                        if (!Values.Whitespace.IsWhite(bytes[k] & 0xff))
+                        {
+                            return false;
+                        }
+                    }
+                }
+                else if (!Values.Whitespace.IsAllWhite(seg.Substring(offset, segEnd)))
+                {
+                    return false;
+                }
+
+                i = (segNr << BITS) + segEnd;
+            }
+
+            return true;
         }
 
         public UnicodeString Substring(int start, int end)
@@ -210,6 +336,31 @@ namespace OutSmart.DAXon.Text
                 ub.Accept(GetSegment(lastSeg).Substring(0, lastCP));
                 return ub.ToUnicodeString();
             }
+        }
+
+        // Span accessor for fused byte-path consumers: the backing byte array and local offsets
+        // when [start,end) lies within one 8-bit segment; false otherwise (16/24-bit text or a
+        // segment split), sending the caller down the generic string route.
+        internal bool TryGetByteSpan(int start, int end, out byte[] bytes, out int off, out int len)
+        {
+            bytes = null;
+            off = 0;
+            len = 0;
+            if (start >= end)
+            {
+                return false;
+            }
+
+            int firstSeg = start >> BITS;
+            if (firstSeg != (end - 1) >> BITS || !(GetSegment(firstSeg) is Segment8 s8))
+            {
+                return false;
+            }
+
+            bytes = s8.bytes;
+            off = start & MASK;
+            len = end - start;
+            return true;
         }
 
         public void Dispose()

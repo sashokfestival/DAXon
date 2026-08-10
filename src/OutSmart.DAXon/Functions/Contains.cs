@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Contains : CollatingFunctionFixed
     {
-
-        public static Func<Contains> New() => () => new Contains();
         public override bool IsSubstringMatchingFunction()
         {
             return true;

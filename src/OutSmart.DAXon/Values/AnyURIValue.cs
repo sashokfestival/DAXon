@@ -20,7 +20,6 @@ namespace OutSmart.DAXon.Values
 {
     internal sealed class AnyURIValue : StringValue
     {
-        public static readonly AnyURIValue EMPTY_URI = new AnyURIValue(""); // Used in bytecode
 
         public override BuiltInAtomicType PrimitiveType => BuiltInAtomicType.ANY_URI;
         public AnyURIValue(UnicodeString value) : base(value == null ? EmptyUnicodeString.GetInstance() : Whitespace.CollapseWhitespace(value), BuiltInAtomicType.ANY_URI)

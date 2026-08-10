@@ -112,22 +112,6 @@ namespace OutSmart.DAXon.Values.Arrays
             }
         }
 
-        public virtual void MakeGrounded()
-        {
-            if (!knownToBeGrounded)
-            {
-                lock (this)
-                {
-                    for (int i = 0; i < _members.Count; i++)
-                    {
-                        _members[i] = ((ISequence)_members[i]).Materialize();
-                    }
-
-                    knownToBeGrounded = true;
-                }
-            }
-        }
-
         public override AnnotationList GetAnnotations()
         {
             return AnnotationList.EMPTY;

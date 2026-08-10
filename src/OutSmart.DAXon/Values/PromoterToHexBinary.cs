@@ -18,6 +18,5 @@ namespace OutSmart.DAXon.Values
     internal class PromoterToHexBinary : Converter
     {
         public PromoterToHexBinary() { }
-        public PromoterToHexBinary(object rules) { }
     }
 }

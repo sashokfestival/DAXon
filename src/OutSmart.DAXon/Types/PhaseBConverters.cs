@@ -35,12 +35,6 @@ namespace OutSmart.DAXon.Types
                 case "ToUntypedAtomicConverter":
                     return StringValue.MakeUntypedAtomic(item.UnicodeStringValue);
                 case "ToStringConverter":
-                case "NumericToString":
-                case "IntegerToString":
-                case "DecimalToString":
-                case "FloatToString":
-                case "DoubleToString":
-                case "BooleanToString":
                     return new StringValue(item.UnicodeStringValue.Tidy());
                 default:
                     if (System.Environment.GetEnvironmentVariable("SAXON_DBG_CONV") != null)

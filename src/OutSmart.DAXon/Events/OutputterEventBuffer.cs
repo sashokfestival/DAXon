@@ -27,11 +27,6 @@ namespace OutSmart.DAXon.Events
         {
         }
 
-        public virtual void SetBuffer(IList<OutputterEvent> buffer)
-        {
-            this.buffer = buffer;
-        }
-
         public override void StartDocument(int properties)
         {
             buffer.Add(new OutputterEvent.StartDocument(properties));
@@ -118,16 +113,6 @@ namespace OutSmart.DAXon.Events
             {
                 @event.Replay(@out);
             }
-        }
-
-        public virtual bool IsEmpty()
-        {
-            return buffer.Count == 0;
-        }
-
-        public virtual void Reset()
-        {
-            buffer.Clear();
         }
     }
 }

@@ -140,37 +140,5 @@ namespace OutSmart.DAXon.Lib
                 }
             }
         }
-
-        public virtual void Dispose(IResultTarget result)
-        {
-            if (result is StreamResult)
-            {
-                System.IO.Stream stream = ((StreamResult)result).GetOutputStream();
-                if (stream != null)
-                {
-                    try
-                    {
-                        stream.Dispose();
-                    }
-                    catch (IOException err)
-                    {
-                        throw new XPathException("Failed while closing output file", err);
-                    }
-                }
-
-                TextWriter writer = ((StreamResult)result).GetWriter(); // Path not used, but there for safety
-                if (writer != null)
-                {
-                    try
-                    {
-                        writer.Dispose();
-                    }
-                    catch (IOException err)
-                    {
-                        throw new XPathException("Failed while closing output file", err);
-                    }
-                }
-            }
-        }
     }
 }

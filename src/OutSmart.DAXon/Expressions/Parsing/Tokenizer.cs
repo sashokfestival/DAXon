@@ -1327,11 +1327,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             }
         }
 
-        private bool IsLessThanChar(char c)
-        {
-            return c == '<' || (languageLevel >= 40 && c == FULL_WIDTH_LT);
-        }
-
         private bool IsGreaterThanChar(char c)
         {
             return c == '>' || (languageLevel >= 40 && c == FULL_WIDTH_GT);

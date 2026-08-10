@@ -87,8 +87,6 @@ namespace OutSmart.DAXon.Functions
             "PST",
             "PDT"
         };
-
-        public static Func<ParseIetfDate> New() => () => new ParseIetfDate();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue stringValue = (StringValue)arguments[0].Head();

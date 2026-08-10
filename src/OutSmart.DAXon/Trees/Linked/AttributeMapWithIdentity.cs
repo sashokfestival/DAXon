@@ -55,11 +55,6 @@ namespace OutSmart.DAXon.Trees.Linked
             return new NodeListIterator(list);
         }
 
-        private bool IsDeleted(AttributeInfo info)
-        {
-            return (info is AttributeInfo.Deleted);
-        }
-
         public virtual AttributeInfo Get(INodeName name)
         {
             foreach (AttributeInfo info in attributes)
@@ -133,11 +128,6 @@ namespace OutSmart.DAXon.Trees.Linked
             }
 
             return null;
-        }
-
-        public virtual IEnumerator<AttributeInfo> IIterator()
-        {
-            return attributes.Where((info) => !(info is AttributeInfo.Deleted)).GetEnumerator();
         }
 
         public virtual List<AttributeInfo> AsList()

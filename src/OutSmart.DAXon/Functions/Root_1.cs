@@ -25,8 +25,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         public override string StreamerName => "Root";
-
-        public static Func<Root_1> New() => () => new Root_1();
         public override int GetSpecialProperties(Expression[] arguments)
         {
             int prop = StaticProperty.ORDERED_NODESET | StaticProperty.SINGLE_DOCUMENT_NODESET | StaticProperty.NO_NODES_NEWLY_CREATED;

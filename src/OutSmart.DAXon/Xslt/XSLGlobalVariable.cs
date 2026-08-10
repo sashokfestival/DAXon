@@ -59,11 +59,6 @@ namespace OutSmart.DAXon.Xslt
             return true;
         }
 
-        public virtual bool IsGlobal()
-        {
-            return IsTopLevel(); // might be called before the "global" field is initialized
-        }
-
         public override void PostValidate()
         {
             sourceBinding.PostValidate();

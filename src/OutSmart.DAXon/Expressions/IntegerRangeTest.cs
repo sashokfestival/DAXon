@@ -59,19 +59,9 @@ namespace OutSmart.DAXon.Expressions
             return minOp.GetChildExpression();
         }
 
-        public virtual void SetMin(Expression min)
-        {
-            minOp.SetChildExpression(min);
-        }
-
         public virtual Expression GetMax()
         {
             return maxOp.GetChildExpression();
-        }
-
-        public virtual void SetMax(Expression max)
-        {
-            maxOp.SetChildExpression(max);
         }
 
         /// <summary>

@@ -56,9 +56,6 @@ namespace OutSmart.DAXon.Trees.Iterators
                 default: return EmptySequence.GetInstance();
             }
         }
-
-        public virtual void Close() { }
-        public virtual void Discharge() { }
         public virtual void Dispose() { }
     }
 }

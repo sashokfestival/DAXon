@@ -32,8 +32,6 @@ namespace OutSmart.DAXon.Functions
     {
 
         private const int errorValue = 0;
-
-        public static Func<UnparsedText> New() => () => new UnparsedText();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue hrefVal = (StringValue)arguments[0].Head();
@@ -180,37 +178,6 @@ namespace OutSmart.DAXon.Functions
             }
 
             return result;
-        }
-
-        // diagnostic method to output the octets of a file
-        public static void Main(string[] args)
-        {
-            StringBuilder sb1 = new StringBuilder(256);
-            StringBuilder sb2 = new StringBuilder(256);
-            string file = args[0];
-            System.IO.Stream @is = File.OpenRead(file);
-            while (true)
-            {
-                int b = @is.ReadByte();
-                if (b < 0)
-                {
-                    Console.Out.WriteLine(sb1);
-                    Console.Out.WriteLine(sb2);
-                    break;
-                }
-
-                sb1.Append((b).ToString("x") + " ");
-                sb2.Append((char)b + " ");
-                if (sb1.Length > 80)
-                {
-                    Console.Out.WriteLine(sb1);
-                    Console.Out.WriteLine(sb2);
-                    sb1 = new StringBuilder(256);
-                    sb2 = new StringBuilder(256);
-                }
-            }
-
-            @is.Dispose();
         }
     }
 }

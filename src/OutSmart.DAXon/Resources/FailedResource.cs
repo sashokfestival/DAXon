@@ -36,7 +36,5 @@ namespace OutSmart.DAXon.Resources
             this.uri = uri;
             this.error = error;
         }
-
-        public XPathException GetError() => error;
     }
 }

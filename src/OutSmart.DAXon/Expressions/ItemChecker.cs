@@ -31,8 +31,6 @@ namespace OutSmart.DAXon.Expressions
         private readonly ItemType requiredItemType;
         private readonly Func<RoleDiagnostic> roleSupplier;
 
-        public RoleDiagnostic RoleLocator => roleSupplier();
-
         public override int ImplementationMethod
         {
             get
@@ -162,14 +160,6 @@ namespace OutSmart.DAXon.Expressions
             return MakeElaborator().ElaborateForPull().Iterate(context);
         }
 
-        /// <summary>
-        /// Iterate over the sequence of values
-        /// </summary>
-        private ISequenceIterator CheckSequence(ISequenceIterator @base, IXPathContext context)
-        {
-            return new ItemCheckingIterator(@base, MakeHoistedChecker());
-        }
-
         // TypeHierarchy and the checking closure are per-Configuration constants: build them once at
         // elaboration time so the per-evaluation cost is just the ItemCheckingIterator allocation.
         internal Action<IItem> MakeHoistedChecker()
@@ -192,11 +182,6 @@ namespace OutSmart.DAXon.Expressions
         public override IItem EvaluateItem(IXPathContext context)
         {
             return MakeElaborator().ElaborateForItem().Eval(context);
-        }
-
-        public IItem CheckItem(IItem item, IXPathContext context)
-        {
-            return CheckItem(item, context.GetConfiguration().GetTypeHierarchy(), context);
         }
 
         internal IItem CheckItem(IItem item, TypeHierarchy th, IXPathContext context)

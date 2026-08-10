@@ -89,6 +89,34 @@ namespace OutSmart.DAXon.Internal.Net
             {
                 if (disposing)
                 {
+                    // Closing an HTTP response mid-body aborts the pooled connection, so every later
+                    // fetch pays a fresh connect (+TLS); Java drains small remainders and reuses the
+                    // socket. Mirror that, bounded by 64KB and by the run deadline — and only when a
+                    // deadline is armed, so a host that asked for no time limit cannot be parked on
+                    // close by a trickling server (the socket-level timeouts follow the deadline too).
+                    if (OutSmart.DAXon.Core.Controller.RemainingMillis() >= 0)
+                    {
+                        try
+                        {
+                            byte[] sink = new byte[8192];
+                            int budget = 64 * 1024;
+                            while (budget > 0)
+                            {
+                                OutSmart.DAXon.Core.Controller.CheckActiveTimeoutNow();
+                                int n = inner.Read(sink, 0, System.Math.Min(sink.Length, budget));
+                                if (n <= 0)
+                                {
+                                    break;
+                                }
+
+                                budget -= n;
+                            }
+                        }
+                        catch (System.Exception)
+                        {
+                        }
+                    }
+
                     inner.Dispose();
                 }
 

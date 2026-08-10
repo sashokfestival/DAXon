@@ -9,7 +9,6 @@ using OutSmart.DAXon.Values.Arrays;
 using OutSmart.DAXon.Values.Maps;
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Patterns;
-using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Values;
 using System;

@@ -21,8 +21,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Unordered : SystemFunction
     {
-
-        public static Func<Unordered> New() => () => new Unordered();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             return arguments[0];

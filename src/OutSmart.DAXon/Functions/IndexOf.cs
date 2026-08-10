@@ -33,8 +33,6 @@ namespace OutSmart.DAXon.Functions
 
         public override string StreamerName => "IndexOf";
 
-        public static Func<IndexOf> New() => () => new IndexOf();
-
         public override void SupplyTypeInformation(ExpressionVisitor visitor, ContextItemStaticInfo contextItemType, Expression[] arguments)
         {
             ItemType type0 = arguments[0].GetItemType();

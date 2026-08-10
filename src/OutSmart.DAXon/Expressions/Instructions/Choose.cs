@@ -872,7 +872,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
         {
             private IBooleanEvaluator[] conditions;
             private readonly object conditionsLock = new object();
-            public virtual IBooleanEvaluator[] ConditionEvaluators => conditions;
 
             public virtual IBooleanEvaluator[] MakeConditionEvaluators(Choose expr)
             {

@@ -42,12 +42,6 @@ namespace OutSmart.DAXon.Lib
         /// Code indicating that validation against a named type was requested
         /// </summary>
         public const int BY_TYPE = 8;
-        /// <summary>
-        /// This class is never instantiated
-        /// </summary>
-        private Validation()
-        {
-        }
 
         public static int GetCode(string value)
         {

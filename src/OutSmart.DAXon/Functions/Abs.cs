@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal sealed class Abs : ScalarSystemFunction
     {
-
-        public static Func<Abs> New() => () => new Abs();
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
             return ((NumericValue)arg).Abs();

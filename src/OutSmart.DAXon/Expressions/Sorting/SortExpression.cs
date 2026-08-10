@@ -35,11 +35,7 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public override string ExpressionName => "sort";
 
-        public virtual Operand BaseOperand => selectOp;
-
         public virtual Expression BaseExpression => Select;
-
-        public virtual IAtomicComparer[] Comparators => comparators;
 
         public override int ImplementationMethod => ITERATE_METHOD;
 
@@ -245,20 +241,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             return se2;
         }
 
-        public virtual bool IsSortKey(Expression child)
-        {
-            foreach (SortKeyDefinition sortKeyDefinition in GetSortKeyDefinitionList())
-            {
-                Expression exp = sortKeyDefinition.SortKey;
-                if (exp == child)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         protected override int ComputeCardinality()
         {
             return Select.GetCardinality();
@@ -299,6 +281,41 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
 
             return IterateSorted(iter, context);
+        }
+
+        // True when the single sort key is the context item's atomized value (`xsl:sort select="."`,
+        // with or without the standard coercion layers). In that shape sorting the atomized VALUES
+        // yields the same order as sorting the nodes: each node's key equals its converted value,
+        // and equal keys keep input order either way (the stability tie-break).
+        internal bool HasSingleSelfAtomizedKey()
+        {
+            if (GetSortKeyDefinitionList().Count != 1)
+            {
+                return false;
+            }
+
+            Expression k = GetSortKeyDefinition(0).SortKey;
+            while (true)
+            {
+                if (k is AtomicSequenceConverter asc)
+                {
+                    k = asc.BaseExpression;
+                }
+                else if (k is Atomizer at)
+                {
+                    k = at.BaseExpression;
+                }
+                else if (k is CardinalityChecker cc)
+                {
+                    k = cc.BaseExpression;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return k is ContextItemExpression;
         }
 
         public virtual ISequenceIterator IterateSorted(ISequenceIterator iter, IXPathContext context)
@@ -369,11 +386,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
         public virtual SortKeyDefinition GetSortKeyDefinition(int i)
         {
             return GetSortKeyDefinitionList().GetSortKeyDefinition(i);
-        }
-
-        public virtual void SetSortKeyDefinitionList(SortKeyDefinitionList skd)
-        {
-            sortOp.SetChildExpression(skd);
         }
 
         public override Elaborator GetElaborator()

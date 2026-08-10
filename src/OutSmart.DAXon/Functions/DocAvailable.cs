@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class DocAvailable : SystemFunction
     {
-
-        public static Func<DocAvailable> New() => () => new DocAvailable();
         private bool IsDocAvailable(AtomicValue hrefVal, IXPathContext context)
         {
             if (hrefVal == null)

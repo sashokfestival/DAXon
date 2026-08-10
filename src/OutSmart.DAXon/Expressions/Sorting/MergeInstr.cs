@@ -43,8 +43,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
 
         public override int InstructionNameCode => StandardNames.XSL_MERGE;
 
-        public virtual Expression GroupingKey => mergeSources[0].mergeKeyDefinitions.GetSortKeyDefinition(0).SortKey;
-
         public override string StreamerName => "MergeInstr";
 
         public MergeInstr()
@@ -600,7 +598,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
             public ISchemaType schemaType;
             public bool streamable;
             public HashSet<Accumulator> accumulators;
-            public object invertedAction; // used when streaming
 
             public virtual Expression ForEachItem => forEachItemOp == null ? null : forEachItemOp.GetChildExpression();
 

@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal sealed class Ceiling : ScalarSystemFunction
     {
-
-        public static Func<Ceiling> New() => () => new Ceiling();
         public override AtomicValue Evaluate(IItem arg, IXPathContext context)
         {
             return ((NumericValue)arg).Ceiling();

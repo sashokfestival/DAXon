@@ -19,8 +19,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class Adjust_1 : SystemFunction
     {
-
-        public static Func<Adjust_1> New() => () => new Adjust_1();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             CalendarValue @in = (CalendarValue)arguments[0].Head();

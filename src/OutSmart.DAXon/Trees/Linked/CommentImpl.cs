@@ -19,10 +19,7 @@ namespace OutSmart.DAXon.Trees.Linked
     internal class CommentImpl : NodeImpl
     {
         private UnicodeString content = EmptyUnicodeString.GetInstance();
-
-        public CommentImpl() { }
         public CommentImpl(object data) { content = data as UnicodeString ?? BMPString.Of(data?.ToString() ?? ""); }
-        public void SetLocation(object _loc) { }
         public void SetLocation(string systemId, int line, int column) { } /* location tracking not kept for linked-tree comments */
 
         public override UnicodeString UnicodeStringValue => content;

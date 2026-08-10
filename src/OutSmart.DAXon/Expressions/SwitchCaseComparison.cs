@@ -148,16 +148,6 @@ namespace OutSmart.DAXon.Expressions
             return BuiltInAtomicType.BOOLEAN;
         }
 
-        public virtual bool IsKnownToBeComparable()
-        {
-            return knownToBeComparable;
-        }
-
-        public virtual IAtomicComparer GetComparer()
-        {
-            return comparer;
-        }
-
         public override Expression Copy(RebindingMap rebindings)
         {
             SwitchCaseComparison sc = new SwitchCaseComparison(GetLhsExpression().Copy(rebindings), @operator, GetRhsExpression().Copy(rebindings), allowMultiple);

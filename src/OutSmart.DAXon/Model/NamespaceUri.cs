@@ -15,6 +15,7 @@ using System.Linq;
 using System.Text;
 using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
+using OutSmart.DAXon.Lib;
 namespace OutSmart.DAXon.Model
 {
     public class NamespaceUri
@@ -47,89 +48,89 @@ namespace OutSmart.DAXon.Model
         /// </summary>
         public static readonly NamespaceUri NULL = NamespaceUri.Of("");
         /// <summary>
-        /// Fixed namespace name for XML: "http://www.w3.org/XML/1998/namespace".
+        /// Fixed namespace name for XML: NamespaceConstant.XML.
         /// </summary>
-        public static readonly NamespaceUri XML = NamespaceUri.Of("http://www.w3.org/XML/1998/namespace");
+        public static readonly NamespaceUri XML = NamespaceUri.Of(NamespaceConstant.XML);
         /// <summary>
-        /// Fixed namespace name for XSLT: "http://www.w3.org/1999/XSL/Transform"
+        /// Fixed namespace name for XSLT: NamespaceConstant.XSLT
         /// </summary>
-        public static readonly NamespaceUri XSLT = NamespaceUri.Of("http://www.w3.org/1999/XSL/Transform");
+        public static readonly NamespaceUri XSLT = NamespaceUri.Of(NamespaceConstant.XSLT);
         /// <summary>
-        /// Current namespace name for SAXON (from 7.0 onwards): "http://saxon.sf.net/"
+        /// Current namespace name for SAXON (from 7.0 onwards): NamespaceConstant.SAXON
         /// </summary>
-        public static readonly NamespaceUri SAXON = NamespaceUri.Of("http://saxon.sf.net/");
+        public static readonly NamespaceUri SAXON = NamespaceUri.Of(NamespaceConstant.SAXON);
         /// <summary>
-        /// Old namespace name for SAXON6: "http://icl.com/saxon"
+        /// Old namespace name for SAXON6: NamespaceConstant.SAXON6
         /// </summary>
-        public static readonly NamespaceUri SAXON6 = NamespaceUri.Of("http://icl.com/saxon");
+        public static readonly NamespaceUri SAXON6 = NamespaceUri.Of(NamespaceConstant.SAXON6);
         /// <summary>
         /// Fixed namespace name for the export of a Saxon stylesheet package
         /// </summary>
-        public static readonly NamespaceUri SAXON_XSLT_EXPORT = NamespaceUri.Of("http://ns.saxonica.com/xslt/export");
+        public static readonly NamespaceUri SAXON_XSLT_EXPORT = NamespaceUri.Of(NamespaceConstant.SAXON_XSLT_EXPORT);
         /// <summary>
-        /// Namespace name for XML Schema: "http://www.w3.org/2001/XMLSchema"
+        /// Namespace name for XML Schema: NamespaceConstant.SCHEMA
         /// </summary>
-        public static readonly NamespaceUri SCHEMA = NamespaceUri.Of("http://www.w3.org/2001/XMLSchema");
+        public static readonly NamespaceUri SCHEMA = NamespaceUri.Of(NamespaceConstant.SCHEMA);
         /// <summary>
         /// XML-schema-defined namespace for use in instance documents ("xsi")
         /// </summary>
-        public static readonly NamespaceUri SCHEMA_INSTANCE = NamespaceUri.Of("http://www.w3.org/2001/XMLSchema-instance");
+        public static readonly NamespaceUri SCHEMA_INSTANCE = NamespaceUri.Of(NamespaceConstant.SCHEMA_INSTANCE);
         /// <summary>
         /// Namespace defined in XSD 1.1 for schema versioning
         /// </summary>
-        public static readonly NamespaceUri SCHEMA_VERSIONING = NamespaceUri.Of("http://www.w3.org/2007/XMLSchema-versioning");
+        public static readonly NamespaceUri SCHEMA_VERSIONING = NamespaceUri.Of(NamespaceConstant.SCHEMA_VERSIONING);
         /// <summary>
-        /// Fixed namespace name for SAXON SQL extension: "http://saxon.sf.net/sql"
+        /// Fixed namespace name for SAXON SQL extension: NamespaceConstant.SQL
         /// </summary>
-        public static readonly NamespaceUri SQL = NamespaceUri.Of("http://saxon.sf.net/sql");
+        public static readonly NamespaceUri SQL = NamespaceUri.Of(NamespaceConstant.SQL);
         /// <summary>
-        /// Fixed namespace name for EXSLT/Common: "http://exslt.org/common"
+        /// Fixed namespace name for EXSLT/Common: NamespaceConstant.EXSLT_COMMON
         /// </summary>
-        public static readonly NamespaceUri EXSLT_COMMON = NamespaceUri.Of("http://exslt.org/common");
+        public static readonly NamespaceUri EXSLT_COMMON = NamespaceUri.Of(NamespaceConstant.EXSLT_COMMON);
         /// <summary>
-        /// Fixed namespace name for EXSLT/math: "http://exslt.org/math"
+        /// Fixed namespace name for EXSLT/math: NamespaceConstant.EXSLT_MATH
         /// </summary>
-        public static readonly NamespaceUri EXSLT_MATH = NamespaceUri.Of("http://exslt.org/math");
+        public static readonly NamespaceUri EXSLT_MATH = NamespaceUri.Of(NamespaceConstant.EXSLT_MATH);
         /// <summary>
-        /// Fixed namespace name for EXSLT/sets: "http://exslt.org/sets"
+        /// Fixed namespace name for EXSLT/sets: NamespaceConstant.EXSLT_SETS
         /// </summary>
-        public static readonly NamespaceUri EXSLT_SETS = NamespaceUri.Of("http://exslt.org/sets");
+        public static readonly NamespaceUri EXSLT_SETS = NamespaceUri.Of(NamespaceConstant.EXSLT_SETS);
         /// <summary>
-        /// Fixed namespace name for EXSLT/date: "http://exslt.org/dates-and-times"
+        /// Fixed namespace name for EXSLT/date: NamespaceConstant.EXSLT_DATES_AND_TIMES
         /// </summary>
-        public static readonly NamespaceUri EXSLT_DATES_AND_TIMES = NamespaceUri.Of("http://exslt.org/dates-and-times");
+        public static readonly NamespaceUri EXSLT_DATES_AND_TIMES = NamespaceUri.Of(NamespaceConstant.EXSLT_DATES_AND_TIMES);
         /// <summary>
-        /// Fixed namespace name for EXSLT/random: "http://exslt.org/random"
+        /// Fixed namespace name for EXSLT/random: NamespaceConstant.EXSLT_RANDOM
         /// </summary>
-        public static readonly NamespaceUri EXSLT_RANDOM = NamespaceUri.Of("http://exslt.org/random");
+        public static readonly NamespaceUri EXSLT_RANDOM = NamespaceUri.Of(NamespaceConstant.EXSLT_RANDOM);
         /// <summary>
         /// The standard namespace for functions and operators
         /// </summary>
-        public static readonly NamespaceUri FN = NamespaceUri.Of("http://www.w3.org/2005/xpath-functions");
+        public static readonly NamespaceUri FN = NamespaceUri.Of(NamespaceConstant.FN);
         /// <summary>
         /// The standard namespace for XQuery output declarations
         /// </summary>
-        public static readonly NamespaceUri OUTPUT = NamespaceUri.Of("http://www.w3.org/2010/xslt-xquery-serialization");
+        public static readonly NamespaceUri OUTPUT = NamespaceUri.Of(NamespaceConstant.OUTPUT);
         /// <summary>
         /// The standard namespace for system error codes
         /// </summary>
-        public static readonly NamespaceUri ERR = NamespaceUri.Of("http://www.w3.org/2005/xqt-errors");
+        public static readonly NamespaceUri ERR = NamespaceUri.Of(NamespaceConstant.ERR);
         /// <summary>
         /// Predefined XQuery namespace for local functions
         /// </summary>
-        public static readonly NamespaceUri LOCAL = NamespaceUri.Of("http://www.w3.org/2005/xquery-local-functions");
+        public static readonly NamespaceUri LOCAL = NamespaceUri.Of(NamespaceConstant.LOCAL);
         /// <summary>
         /// Math namespace for the XPath 3.0 math functions
         /// </summary>
-        public static readonly NamespaceUri MATH = NamespaceUri.Of("http://www.w3.org/2005/xpath-functions/math");
+        public static readonly NamespaceUri MATH = NamespaceUri.Of(NamespaceConstant.MATH);
         /// <summary>
         /// Namespace URI for XPath 3.0 functions associated with maps
         /// </summary>
-        public static readonly NamespaceUri MAP_FUNCTIONS = NamespaceUri.Of("http://www.w3.org/2005/xpath-functions/map");
+        public static readonly NamespaceUri MAP_FUNCTIONS = NamespaceUri.Of(NamespaceConstant.MAP_FUNCTIONS);
         /// <summary>
         /// Namespace URI for XPath 3.1 functions associated with arrays
         /// </summary>
-        public static readonly NamespaceUri ARRAY_FUNCTIONS = NamespaceUri.Of("http://www.w3.org/2005/xpath-functions/array");
+        public static readonly NamespaceUri ARRAY_FUNCTIONS = NamespaceUri.Of(NamespaceConstant.ARRAY_FUNCTIONS);
         /// <summary>
         /// Namespace URI for the EXPath Binary module
         /// </summary>
@@ -141,93 +142,93 @@ namespace OutSmart.DAXon.Model
         /// <summary>
         /// The XHTML namespace http://www.w3.org/1999/xhtml
         /// </summary>
-        public static readonly NamespaceUri XHTML = NamespaceUri.Of("http://www.w3.org/1999/xhtml");
+        public static readonly NamespaceUri XHTML = NamespaceUri.Of(NamespaceConstant.XHTML);
         /// <summary>
         /// The SVG namespace http://www.w3.org/2000/svg
         /// </summary>
-        public static readonly NamespaceUri SVG = NamespaceUri.Of("http://www.w3.org/2000/svg");
+        public static readonly NamespaceUri SVG = NamespaceUri.Of(NamespaceConstant.SVG);
         /// <summary>
         /// The MathML namespace http://www.w3.org/1998/Math/MathML
         /// </summary>
-        public static readonly NamespaceUri MATHML = NamespaceUri.Of("http://www.w3.org/1998/Math/MathML");
+        public static readonly NamespaceUri MATHML = NamespaceUri.Of(NamespaceConstant.MATHML);
         /// <summary>
         /// The XMLNS namespace http://www.w3.org/2000/xmlns/ (used in DOM)
         /// </summary>
-        public static readonly NamespaceUri XMLNS = NamespaceUri.Of("http://www.w3.org/2000/xmlns/");
+        public static readonly NamespaceUri XMLNS = NamespaceUri.Of(NamespaceConstant.XMLNS);
         /// <summary>
         /// The XLink namespace http://www.w3.org/1999/xlink
         /// </summary>
-        public static readonly NamespaceUri XLINK = NamespaceUri.Of("http://www.w3.org/1999/xlink");
+        public static readonly NamespaceUri XLINK = NamespaceUri.Of(NamespaceConstant.XLINK);
         /// <summary>
         /// The xquery namespace http://www.w3.org/2012/xquery for the XQuery 3.0 declare option
         /// </summary>
-        public static readonly NamespaceUri XQUERY = NamespaceUri.Of("http://www.w3.org/2012/xquery");
+        public static readonly NamespaceUri XQUERY = NamespaceUri.Of(NamespaceConstant.XQUERY);
         /// <summary>
         /// Namespace for types representing external Java objects: http://saxon.sf.net/java-type
         /// </summary>
-        public static readonly NamespaceUri JAVA_TYPE = NamespaceUri.Of("http://saxon.sf.net/java-type");
+        public static readonly NamespaceUri JAVA_TYPE = NamespaceUri.Of(NamespaceConstant.JAVA_TYPE);
         /// <summary>
         /// Namespace for types representing external .NET objects
         /// </summary>
-        public static readonly NamespaceUri DOT_NET_TYPE = NamespaceUri.Of("http://saxon.sf.net/clitype");
-        public static readonly NamespaceUri ANONYMOUS = NamespaceUri.Of("http://ns.saxonica.com/anonymous-type");
+        public static readonly NamespaceUri DOT_NET_TYPE = NamespaceUri.Of(NamespaceConstant.DOT_NET_TYPE);
+        public static readonly NamespaceUri ANONYMOUS = NamespaceUri.Of(NamespaceConstant.ANONYMOUS);
         /// <summary>
         /// Namespace for the Saxon serialization of the schema component model
         /// </summary>
-        public static readonly NamespaceUri SCM = NamespaceUri.Of("http://ns.saxonica.com/schema-component-model");
+        public static readonly NamespaceUri SCM = NamespaceUri.Of(NamespaceConstant.SCM);
         /// <summary>
         /// URI identifying the Saxon object model for use in the JAXP 1.3 XPath API
         /// </summary>
-        public static readonly NamespaceUri OBJECT_MODEL_SAXON = NamespaceUri.Of("http://saxon.sf.net/jaxp/xpath/om");
+        public static readonly NamespaceUri OBJECT_MODEL_SAXON = NamespaceUri.Of(NamespaceConstant.OBJECT_MODEL_SAXON);
         /// <summary>
         /// URI identifying the XOM object model for use in the JAXP 1.3 XPath API
         /// </summary>
-        public static readonly NamespaceUri OBJECT_MODEL_XOM = NamespaceUri.Of("http://www.xom.nu/jaxp/xpath/xom");
+        public static readonly NamespaceUri OBJECT_MODEL_XOM = NamespaceUri.Of(NamespaceConstant.OBJECT_MODEL_XOM);
         /// <summary>
         /// URI identifying the JDOM object model for use in the JAXP 1.3 XPath API
         /// </summary>
-        public static readonly NamespaceUri OBJECT_MODEL_JDOM = NamespaceUri.Of("http://jdom.org/jaxp/xpath/jdom");
+        public static readonly NamespaceUri OBJECT_MODEL_JDOM = NamespaceUri.Of(NamespaceConstant.OBJECT_MODEL_JDOM);
         /// <summary>
         /// URI identifying the AXIOM object model for use in the JAXP 1.3 XPath API
         /// </summary>
         // Note: this URI is a Saxon invention
-        public static readonly NamespaceUri OBJECT_MODEL_AXIOM = NamespaceUri.Of("http://ws.apache.org/jaxp/xpath/axiom");
+        public static readonly NamespaceUri OBJECT_MODEL_AXIOM = NamespaceUri.Of(NamespaceConstant.OBJECT_MODEL_AXIOM);
         /// <summary>
         /// URI identifying the DOM4J object model for use in the JAXP 1.3 XPath API
         /// </summary>
-        public static readonly NamespaceUri OBJECT_MODEL_DOM4J = NamespaceUri.Of("http://www.dom4j.org/jaxp/xpath/dom4j");
+        public static readonly NamespaceUri OBJECT_MODEL_DOM4J = NamespaceUri.Of(NamespaceConstant.OBJECT_MODEL_DOM4J);
         /// <summary>
         /// URI identifying the .NET DOM object model (not used, but needed for consistency)
         /// </summary>
-        public static readonly NamespaceUri OBJECT_MODEL_DOT_NET_DOM = NamespaceUri.Of("http://saxon.sf.net/object-model/dotnet/dom");
+        public static readonly NamespaceUri OBJECT_MODEL_DOT_NET_DOM = NamespaceUri.Of(NamespaceConstant.OBJECT_MODEL_DOT_NET_DOM);
         /// <summary>
         /// URI identifying the DOMINO object model (not used, but needed for consistency)
         /// </summary>
-        public static readonly NamespaceUri OBJECT_MODEL_DOMINO = NamespaceUri.Of("http://saxon.sf.net/object-model/domino");
+        public static readonly NamespaceUri OBJECT_MODEL_DOMINO = NamespaceUri.Of(NamespaceConstant.OBJECT_MODEL_DOMINO);
         /// <summary>
         /// URI for the names of generated variables
         /// </summary>
-        public static readonly NamespaceUri SAXON_GENERATED_VARIABLE = NamespaceUri.Of("http://saxon.sf.net/generated-variable");
+        public static readonly NamespaceUri SAXON_GENERATED_VARIABLE = NamespaceUri.Of(NamespaceConstant.SAXON_GENERATED_VARIABLE);
         /// <summary>
         /// URI for the Saxon configuration file
         /// </summary>
-        public static readonly NamespaceUri SAXON_CONFIGURATION = NamespaceUri.Of("http://saxon.sf.net/ns/configuration");
+        public static readonly NamespaceUri SAXON_CONFIGURATION = NamespaceUri.Of(NamespaceConstant.SAXON_CONFIGURATION);
         /// <summary>
         /// URI for the EXPath zip module
         /// </summary>
-        public static readonly NamespaceUri EXPATH_ZIP = NamespaceUri.Of("http://expath.org/ns/zip");
+        public static readonly NamespaceUri EXPATH_ZIP = NamespaceUri.Of(NamespaceConstant.EXPATH_ZIP);
         /// <summary>
         /// URI for the user extension calls in SaxonJS
         /// </summary>
-        public static readonly NamespaceUri GLOBAL_JS = NamespaceUri.Of("http://saxonica.com/ns/globalJS");
+        public static readonly NamespaceUri GLOBAL_JS = NamespaceUri.Of(NamespaceConstant.GLOBAL_JS);
         /// <summary>
         /// URI for the user extension calls in SaxonC for C++ and PHP
         /// </summary>
-        public static readonly NamespaceUri PHP = NamespaceUri.Of("http://php.net/xsl");
+        public static readonly NamespaceUri PHP = NamespaceUri.Of(NamespaceConstant.PHP);
         /// <summary>
         /// URI for interactive XSLT extensions in Saxon-CE and SaxonJS
         /// </summary>
-        public static readonly NamespaceUri IXSL = NamespaceUri.Of("http://saxonica.com/ns/interactiveXSLT");
+        public static readonly NamespaceUri IXSL = NamespaceUri.Of(NamespaceConstant.IXSL);
 
         private readonly string stringContent;
         private readonly UnicodeString unicodeStringContent;

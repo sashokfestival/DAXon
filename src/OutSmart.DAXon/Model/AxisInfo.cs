@@ -108,23 +108,6 @@ namespace OutSmart.DAXon.Model
             Types.Type.ELEMENT,
             Types.Type.ELEMENT
         };
-        public static readonly UType[] principalNodeUType = new[]
-        {
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.ATTRIBUTE,
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.NAMESPACE,
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.ELEMENT,
-            UType.ELEMENT
-        };
         /// <summary>
         /// Table indicating for each axis whether it @is in forwards document order
         /// </summary>
@@ -198,22 +181,6 @@ namespace OutSmart.DAXon.Model
             "preceding-sibling",
             "self",
             "preceding-or-ancestor"
-        };
-        private static readonly int[] voidAxisTable = new[]
-        {
-            DOC,
-            0,
-            DOC | ATT | TEX | PIN | COM | NAM,
-            ATT | TEX | PIN | COM | NAM,
-            ATT | TEX | PIN | COM | NAM,
-            0,
-            DOC,
-            DOC | ATT | NAM,
-            DOC | ATT | TEX | PIN | COM | NAM,
-            DOC,
-            DOC,
-            DOC | ATT | NAM,
-            0
         };
 
         /// <summary>
@@ -368,12 +335,6 @@ namespace OutSmart.DAXon.Model
             E(PrimitiveUType.NAMESPACE, PRECEDING_SIBLING, UType.VOID);
             E(PrimitiveUType.NAMESPACE, SELF, UType.NAMESPACE);
         }
-        /// <summary>
-        /// The class is never instantiated
-        /// </summary>
-        private AxisInfo()
-        {
-        }
 
         public static int GetAxisNumber(string name)
         {
@@ -410,10 +371,6 @@ namespace OutSmart.DAXon.Model
                 default:
                     throw new XPathException("Unknown axis name: " + name);
             }
-        }
-        public static bool IsAlwaysEmpty(int axis, int nodeKind)
-        {
-            return (voidAxisTable[axis] & (1 << nodeKind)) != 0;
         }
         public static bool ContainsNodeKind(int axis, int nodeKind)
         {

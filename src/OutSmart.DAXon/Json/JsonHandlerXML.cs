@@ -32,7 +32,6 @@ namespace OutSmart.DAXon.Json
     internal class JsonHandlerXML : JsonHandler
     {
         public const string PREFIX = "";
-        private static readonly string SCHEMA_URI = "http://www.w3.org/2005/xpath-functions.xsd";
         private static readonly NamespaceUri JSON_NS = NamespaceUri.FN;
         private static readonly ISimpleType SIMPLE_TYPE = AnySimpleType.INSTANCE;
         private static readonly ISimpleType BOOLEAN_TYPE = BuiltInAtomicType.BOOLEAN;

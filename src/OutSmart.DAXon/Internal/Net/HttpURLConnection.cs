@@ -12,13 +12,10 @@ namespace OutSmart.DAXon.Internal.Net
     // so the first response is already the terminal one and the loop's redirect arm never re-enters.
     internal class HttpURLConnection : URLConnection
     {
-        public const int HTTP_OK = 200;
         public const int HTTP_MOVED_PERM = 301;
         public const int HTTP_MOVED_TEMP = 302;
-        public const int HTTP_SEE_OTHER = 303;
         private readonly global::System.Collections.Generic.Dictionary<string, string> _headers = new global::System.Collections.Generic.Dictionary<string, string>();
         public virtual int ResponseCode { get { var r = Response() as global::System.Net.HttpWebResponse; return r == null ? 200 : (int)r.StatusCode; } }
-        public HttpURLConnection() { }
         public HttpURLConnection(global::System.Uri url) : base(url) { }
         public virtual void SetInstanceFollowRedirects(bool follow) { }
         public virtual void SetRequestProperty(string key, string value) { _headers[key] = value; }

@@ -64,13 +64,5 @@ namespace OutSmart.DAXon.Api
         {
             return GetItemType().GetHashCode() ^ (GetOccurrenceIndicator().GetHashCode() << 17);
         }
-
-        public static SequenceType FromUnderlyingSequenceType(Processor processor, Values.SequenceType st)
-        {
-            ItemTypeFactory factory = new ItemTypeFactory(processor);
-            ItemType it = (ItemType)(factory.ExposeItemType(st.PrimaryType));
-            OccurrenceIndicator oc = OccurrenceIndicatorHelper.GetOccurrenceIndicator(st.GetCardinality());
-            return MakeSequenceType(it, oc);
-        }
     }
 }

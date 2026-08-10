@@ -25,10 +25,6 @@ namespace OutSmart.DAXon.Expressions
         private readonly OutSmart.DAXon.Core.Controller controller;   // null: no deadline check
         private bool oneToOne = false;
 
-        protected virtual ISequenceIterator BaseIterator => @base;
-
-        protected virtual IItemMappingFunction MappingFunction => action;
-
         public virtual bool HasNext => ((ILookaheadIterator)@base).HasNext;
         public ItemMappingIterator(ISequenceIterator @base, IItemMappingFunction action)
         {
@@ -45,10 +41,11 @@ namespace OutSmart.DAXon.Expressions
 
         // Overload used by producers of potentially unbounded mapped sequences (e.g. the pull form
         // of a 'for' expression) so the pull loop honours the transformation's cooperative deadline.
-        public ItemMappingIterator(ISequenceIterator @base, IItemMappingFunction action, OutSmart.DAXon.Core.Controller controller)
+        public ItemMappingIterator(ISequenceIterator @base, IItemMappingFunction action, bool oneToOne, OutSmart.DAXon.Core.Controller controller)
         {
             this.@base = @base;
             this.action = action;
+            this.oneToOne = oneToOne;
             this.controller = controller;
         }
 
@@ -60,16 +57,6 @@ namespace OutSmart.DAXon.Expressions
         public static ItemMappingIterator Filter(ISequenceIterator @base, ItemFilter.ILambda filterExpression)
         {
             return new ItemMappingIterator(@base, ItemFilter.Of(filterExpression));
-        }
-
-        public virtual void SetOneToOne(bool oneToOne)
-        {
-            this.oneToOne = oneToOne;
-        }
-
-        public virtual bool IsOneToOne()
-        {
-            return oneToOne;
         }
 
         public virtual bool SupportsHasNext()

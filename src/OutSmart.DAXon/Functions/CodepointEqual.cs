@@ -19,8 +19,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class CodepointEqual : SystemFunction, ICallable
     {
-
-        public static Func<CodepointEqual> New() => () => new CodepointEqual();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue op1 = (StringValue)arguments[0].Head();

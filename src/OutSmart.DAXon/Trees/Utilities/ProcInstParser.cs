@@ -37,7 +37,7 @@ namespace OutSmart.DAXon.Trees.Utilities
             }
             catch (Exception)
             {
-                throw new XPathException("Invalid syntax for pseudo-attributes: '" + content + "'. ", "SXCH0005");
+                throw new XPathException("Invalid syntax for pseudo-attributes: '" + content + "'. ", DAXonErrorCode.SXCH0005);
             }
         }
     }

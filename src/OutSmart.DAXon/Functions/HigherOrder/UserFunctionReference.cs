@@ -65,11 +65,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             this.functionName = name;
         }
 
-        public UserFunctionReference(SymbolicName.F name)
-        {
-            this.functionName = name;
-        }
-
         public void SetFunction(UserFunction function)
         {
             if (!function.GetSymbolicName().ComponentName.Equals(functionName.ComponentName))
@@ -147,11 +142,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         public SymbolicName GetSymbolicName()
         {
             return functionName;
-        }
-
-        public virtual IFunctionItemType GetFunctionItemType(TypeHierarchy th)
-        {
-            return nominalTarget.FunctionItemType;
         }
 
         public virtual StructuredQName GetFunctionName()
@@ -301,11 +291,6 @@ namespace OutSmart.DAXon.Functions.HigherOrder
                 this.arity = arity;
                 this.component = component;
                 this.controller = controller;
-            }
-
-            public virtual Controller GetController()
-            {
-                return controller;
             }
 
             public override IXPathContext MakeNewContext(IXPathContext oldContext, IContextOriginator originator)

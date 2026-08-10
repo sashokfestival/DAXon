@@ -21,9 +21,6 @@ namespace OutSmart.DAXon.Patterns
         private readonly NodeTest nodeTest;
         private readonly int position;
 
-        public int Position => position;
-        public NodeTest NodeTest => nodeTest;
-
         public override int Fingerprint => nodeTest.Fingerprint;
 
         public SimplePositionalPattern(NodeTest nodeTest, int position)

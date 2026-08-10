@@ -26,11 +26,8 @@ namespace OutSmart.DAXon.Serialization
 {
     internal class HTMLIndenter : ProxyReceiver
     {
-        /*"link" -- excluded, see bug 3877,*/
         private const int IS_INLINE = 1;
-        /*"link" -- excluded, see bug 3877,*/
         private const int IS_FORMATTED = 2;
-        /*"link" -- excluded, see bug 3877,*/
         private const int IS_SUPPRESSED = 4;
         private static readonly string[] formattedTags = new[]
         {
@@ -47,6 +44,7 @@ namespace OutSmart.DAXon.Serialization
         // the HTML4 and HTML5 lists, on the basis that no harm is done treating an element as inline
         // even if the spec doesn't require us to do so. This also means we include elements such as
         // "ins", "del", and "area" that are sometimes inline and sometimes not.
+        // "link" is excluded from inlineTags, see Saxon bug 3877
         private static readonly string[] inlineTags = new[]
         {
             "a",
@@ -110,67 +108,30 @@ namespace OutSmart.DAXon.Serialization
             "video",
             "wbr"
         };
-        /*"link" -- excluded, see bug 3877,*/
         private static readonly HashSet<string> inlineTable = new HashSet<string>(70);
-        /*"link" -- excluded, see bug 3877,*/
         private static readonly HashSet<string> formattedTable = new HashSet<string>(10);
-
-        /*"link" -- excluded, see bug 3877,*/
-        protected char[] indentChars = new[]
-        {
-            '\n',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' ',
-            ' '
-        };
-        /*"link" -- excluded, see bug 3877,*/
-        private string method;
-        /*"link" -- excluded, see bug 3877,*/
         private int level = 0;
-        /*"link" -- excluded, see bug 3877,*/
         private bool sameLine = false;
-        /*"link" -- excluded, see bug 3877,*/
         private bool inFormattedTag = false;
-        /*"link" -- excluded, see bug 3877,*/
         private bool afterInline = false;
-        /*"link" -- excluded, see bug 3877,*/
         private bool afterEndElement = false;
-        /*"link" -- excluded, see bug 3877,*/
         private int[] propertyStack = new int[20];
-        /*"link" -- excluded, see bug 3877,*/
         private HashSet<string> suppressed = null;
 
-        /*"link" -- excluded, see bug 3877,*/
         /*!afterFormatted &&*/
         protected virtual int LineLength => 80;
 
-        /*"link" -- excluded, see bug 3877,*/
         /*!afterFormatted &&*/
         protected virtual int Indentation => 3;
-        /*"link" -- excluded, see bug 3877,*/
         static HTMLIndenter()
         {
             inlineTable.UnionWith(inlineTags);
             formattedTable.UnionWith(formattedTags);
         }
-        /*"link" -- excluded, see bug 3877,*/
         public HTMLIndenter(IReceiver next, string method) : base(next)
         {
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         public virtual void SetOutputProperties(Properties props)
         {
             string s = props.GetProperty(DAXonOutputKeys.SUPPRESS_INDENTATION);
@@ -184,7 +145,6 @@ namespace OutSmart.DAXon.Serialization
             }
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         public virtual int ClassifyTag(INodeName name)
         {
             int r = 0;
@@ -206,7 +166,6 @@ namespace OutSmart.DAXon.Serialization
             return r;
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         public override void StartElement(INodeName elemName, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)
         {
             int withinSuppressed = level == 0 ? 0 : (propertyStack[level - 1] & IS_SUPPRESSED);
@@ -233,7 +192,6 @@ namespace OutSmart.DAXon.Serialization
             afterEndElement = false;
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         /*!afterFormatted &&*/
         /// <summary>
         /// Output element end tag
@@ -260,7 +218,6 @@ namespace OutSmart.DAXon.Serialization
             afterEndElement = true;
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         /*!afterFormatted &&*/
         /// <summary>
         /// Output character data
@@ -311,7 +268,6 @@ namespace OutSmart.DAXon.Serialization
             afterEndElement = false;
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         /*!afterFormatted &&*/
         /// <summary>
         /// Output a processing instruction
@@ -327,7 +283,6 @@ namespace OutSmart.DAXon.Serialization
             afterEndElement = false;
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         /*!afterFormatted &&*/
         public override void Comment(UnicodeString chars, ILocation locationId, int properties)
         {
@@ -340,7 +295,6 @@ namespace OutSmart.DAXon.Serialization
             afterEndElement = false;
         }
 
-        /*"link" -- excluded, see bug 3877,*/
         /*!afterFormatted &&*/
         private void Indent()
         {

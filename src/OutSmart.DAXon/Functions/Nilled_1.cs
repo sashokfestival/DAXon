@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Nilled_1 : SystemFunction, ICallable
     {
-
-        public static Func<Nilled_1> New() => () => new Nilled_1();
         private static BooleanValue GetNilledProperty(NodeInfo node)
         {
             if (node == null || node.GetNodeKind() != Types.Type.ELEMENT)

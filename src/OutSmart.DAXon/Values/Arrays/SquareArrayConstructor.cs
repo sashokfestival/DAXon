@@ -58,11 +58,6 @@ namespace OutSmart.DAXon.Values.Arrays
             return operanda;
         }
 
-        public virtual Operand GetOperand(int i)
-        {
-            return operanda.GetOperand(i);
-        }
-
         public override IEnumerable<Operand> Operands()
         {
             return operanda;

@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class StartsWith : CollatingFunctionFixed
     {
-
-        public static Func<StartsWith> New() => () => new StartsWith();
         public override bool IsSubstringMatchingFunction()
         {
             return true;

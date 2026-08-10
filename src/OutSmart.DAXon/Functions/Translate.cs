@@ -30,8 +30,6 @@ namespace OutSmart.DAXon.Functions
         private IIntToIntMap staticMap = null;
 
         public virtual IIntToIntMap StaticMap => staticMap;
-
-        public static Func<Translate> New() => () => new Translate();
         public override Expression FixArguments(params Expression[] arguments)
         {
             if (arguments[1] is StringLiteral && arguments[2] is StringLiteral)
@@ -89,6 +87,81 @@ namespace OutSmart.DAXon.Functions
             }
 
             return map;
+        }
+
+        // Flat byte table distilled from a static map: table[c] = replacement codepoint for every
+        // 8-bit input codepoint (-1 = delete). Null when some replacement falls outside Latin1
+        // (the output could not stay a byte string). Map keys > 255 can never match a byte input,
+        // so they are irrelevant here.
+        internal static int[] TryBuildByteMap(IIntToIntMap map)
+        {
+            int[] table = new int[256];
+            for (int c = 0; c < 256; c++)
+            {
+                int m = map.Get(c);
+                int r = m == int.MaxValue ? c : m;
+                if (r > 255)
+                {
+                    return null;
+                }
+
+                table[c] = r;
+            }
+
+            return table;
+        }
+
+        // Byte-for-byte translate over a single-span 8-bit value; null sends the caller to the
+        // generic map route (16/24-bit content or a cross-segment slice).
+        internal static StringValue TryTranslateBytes(StringValue @in, int[] table)
+        {
+            UnicodeString us = @in.Content;
+            byte[] b;
+            int off, len;
+            if (us is Slice8 s8)
+            {
+                b = s8.ByteArray;
+                off = s8.Start;
+                len = s8.End - s8.Start;
+            }
+            else if (us is Twine8 t8)
+            {
+                b = t8.ByteArray;
+                off = 0;
+                len = b.Length;
+            }
+            else
+            {
+                return null;
+            }
+
+            byte[] outBytes = new byte[len];
+            int w = 0;
+            bool changed = false;
+            for (int k = 0; k < len; k++)
+            {
+                int m = table[b[off + k]];
+                if (m < 0)
+                {
+                    changed = true;
+                    continue;
+                }
+
+                if (m != b[off + k])
+                {
+                    changed = true;
+                }
+
+                outBytes[w++] = (byte)m;
+            }
+
+            if (!changed)
+            {
+                // Fresh xs:string wrapper: @in itself may carry a subtype label (untypedAtomic/NCName)
+                return new StringValue(us);
+            }
+
+            return new StringValue(w == len ? new Twine8(outBytes) : (UnicodeString)new Slice8(outBytes, 0, w));
         }
 
         public static StringValue TranslateUsingMap(StringValue @in, IIntToIntMap map)
@@ -171,12 +244,22 @@ namespace OutSmart.DAXon.Functions
 
                 if (staticMap != null)
                 {
+                    int[] byteMap = TryBuildByteMap(staticMap);
                     return (context) =>
                     {
                         StringValue s0 = (StringValue)arg0Eval.Eval(context);
                         if (s0 == null || s0.IsEmpty())
                         {
                             return StringValue.EMPTY_STRING;
+                        }
+
+                        if (byteMap != null)
+                        {
+                            StringValue fast = TryTranslateBytes(s0, byteMap);
+                            if (fast != null)
+                            {
+                                return fast;
+                            }
                         }
 
                         return TranslateUsingMap(s0, staticMap);

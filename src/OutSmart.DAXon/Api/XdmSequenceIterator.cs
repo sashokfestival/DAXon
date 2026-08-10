@@ -7,7 +7,6 @@
 using OutSmart.DAXon.Model;
 using OutSmart.DAXon.Functions;
 
-using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Internal.Collections;
@@ -95,11 +94,6 @@ namespace OutSmart.DAXon.Api
         {
             closed = true;
             @base.Dispose();
-        }
-
-        public virtual XdmStream<T> Stream()
-        {
-            return new XdmStream<T>(this);
         }
         bool System.Collections.IEnumerator.MoveNext() => false;
         void System.Collections.IEnumerator.Reset() { }

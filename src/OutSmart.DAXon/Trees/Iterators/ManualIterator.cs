@@ -53,11 +53,6 @@ namespace OutSmart.DAXon.Trees.Iterators
             this.lengthFinder = finder;
         }
 
-        public virtual void IncrementPosition()
-        {
-            _position++;
-        }
-
         public virtual void SetPosition(int position)
         {
             this._position = position;

@@ -111,7 +111,7 @@ namespace OutSmart.DAXon.Events
             if (rootElement)
             {
                 rootElement = false;
-                bool scm_schema = elemName.GetNamespaceUri() == NamespaceUri.Of("http://ns.saxonica.com/schema-component-model") && "schema".Equals(elemName.GetLocalPart());
+                bool scm_schema = elemName.GetNamespaceUri() == NamespaceUri.Of(NamespaceConstant.SCM) && "schema".Equals(elemName.GetLocalPart());
 
                 // A digest is required for version 12.5+
                 string version = attributes.GetValue("saxonVersion");
@@ -251,18 +251,6 @@ namespace OutSmart.DAXon.Events
             }
 
             base.ProcessingInstruction(target, data, locationId, properties);
-        }
-
-        //
-        public virtual bool IsChecksumFound()
-        {
-            return checksumFound;
-        }
-
-        //
-        public virtual bool IsDigestFound()
-        {
-            return digestFound;
         }
 
         //

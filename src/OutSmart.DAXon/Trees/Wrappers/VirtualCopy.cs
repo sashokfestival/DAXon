@@ -195,7 +195,6 @@ namespace OutSmart.DAXon.Trees.Wrappers
             }
         }
         public virtual string GetStringValue() => original.GetStringValue();
-        public virtual NodeInfo Head() => this;
         public virtual Genre GetGenre() => Genre.NODE;
 
         public virtual string GetLocalPart() => original.GetLocalPart();

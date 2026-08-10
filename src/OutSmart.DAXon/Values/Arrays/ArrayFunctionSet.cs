@@ -74,6 +74,15 @@ namespace OutSmart.DAXon.Values.Arrays
             Register("subarray", 3, (e) => e.Populate(() => new ArraySubarray(), ArrayItemType.ANY_ARRAY_TYPE, ONE, 0).Arg(0, ArrayItemType.ANY_ARRAY_TYPE, ONE | INS, null).Arg(1, BuiltInAtomicType.INTEGER, ONE | ABS, null).Arg(2, BuiltInAtomicType.INTEGER, (version >= 40 ? OPT : ONE) | ABS, null));
             Register("tail", 1, (e) => e.Populate(() => new ArrayTail(), ArrayItemType.ANY_ARRAY_TYPE, ONE, 0).Arg(0, ArrayItemType.ANY_ARRAY_TYPE, ONE | INS, null));
 
+            if (version >= 40)
+            {
+                ItemType replaceActionType = new SpecificFunctionType(new SequenceType[] { SequenceType.ANY_SEQUENCE }, SequenceType.ANY_SEQUENCE);
+                Register("empty", 1, (e) => e.Populate(() => new ArrayEmpty(), BuiltInAtomicType.BOOLEAN, ONE, 0).Arg(0, ArrayItemType.ANY_ARRAY_TYPE, ONE | INS, null));
+                Register("exists", 1, (e) => e.Populate(() => new ArrayExists(), BuiltInAtomicType.BOOLEAN, ONE, 0).Arg(0, ArrayItemType.ANY_ARRAY_TYPE, ONE | INS, null));
+                Register("foot", 1, (e) => e.Populate(() => new ArrayFoot(), AnyItemType.GetInstance(), STAR, 0).Arg(0, ArrayItemType.ANY_ARRAY_TYPE, ONE | INS, null));
+                Register("replace", 3, (e) => e.Populate(() => new ArrayReplace(), ArrayItemType.ANY_ARRAY_TYPE, ONE, 0).Arg(0, ArrayItemType.ANY_ARRAY_TYPE, ONE | INS, null).Arg(1, BuiltInAtomicType.INTEGER, ONE | ABS, null).Arg(2, replaceActionType, ONE | INS, null));
+            }
+
             // TODO: the following functions should be private
             Register("_to-sequence", 1, (e) => e.Populate(() => new ArrayToSequence(), AnyItemType.GetInstance(), STAR, 0).Arg(0, ArrayItemType.ANY_ARRAY_TYPE, ONE | INS, null));
             Register("_from-sequence", 1, (e) => e.Populate(() => new ArrayFromSequence(), ArrayItemType.ANY_ARRAY_TYPE, ONE, 0).Arg(0, AnyItemType.GetInstance(), STAR | INS, null));

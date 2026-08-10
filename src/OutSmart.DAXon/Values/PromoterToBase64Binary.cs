@@ -18,6 +18,5 @@ namespace OutSmart.DAXon.Values
     internal class PromoterToBase64Binary : Converter
     {
         public PromoterToBase64Binary() { }
-        public PromoterToBase64Binary(object rules) { }
     }
 }

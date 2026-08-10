@@ -86,11 +86,6 @@ namespace OutSmart.DAXon.Expressions
             return StaticProperty.ORDERED_NODESET | StaticProperty.CONTEXT_DOCUMENT_NODESET | StaticProperty.SINGLE_DOCUMENT_NODESET | StaticProperty.NO_NODES_NEWLY_CREATED;
         }
 
-        public virtual bool IsContextPossiblyUndefined()
-        {
-            return contextMaybeUndefined;
-        }
-
         protected virtual string NoContextMessage()
         {
             return "Leading '/' selects nothing";

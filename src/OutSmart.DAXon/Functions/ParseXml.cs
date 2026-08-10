@@ -27,8 +27,6 @@ namespace OutSmart.DAXon.Functions
 {
     internal class ParseXml : SystemFunction, ICallable
     {
-
-        public static Func<ParseXml> New() => () => new ParseXml();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue input = (StringValue)arguments[0].Head();

@@ -11,6 +11,7 @@ using OutSmart.DAXon.Functions;
 using OutSmart.DAXon.Lib;
 using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Transformation;
+using OutSmart.DAXon.Text;
 using OutSmart.DAXon.Trees.Iterators;
 using OutSmart.DAXon.Trees.Tiny;
 using OutSmart.DAXon.Values;
@@ -54,8 +55,264 @@ namespace OutSmart.DAXon.Expressions.Sorting
             }
         }
 
-        public GroupByIterator()
+        // Fused build for the tiny group-by shape (single Tiny parent population via a child axis,
+        // fused child key, codepoint collation): rows are walked by node number (no node objects),
+        // keys are hashed straight off the text-buffer bytes, and group members are node numbers
+        // materialized on demand — allocations scale with the number of GROUPS, not the population.
+        // Off-span keys (16/24-bit text, mixed content, segment splits) take the generic string
+        // route inside the same loop, so grouping results are identical either way.
+        internal GroupByIterator(TinyParentNodeImpl parent, int rowFp, int keyFp, Expression keyExpression, IXPathContext keyContext, IStringCollator collator)
         {
+            this.population = null;
+            this.keyExpression = keyExpression;
+            this.keyContext = keyContext;
+            this.collator = collator;
+            this.composite = false;
+            BuildTinyGroups(parent, rowFp, keyFp);
+        }
+
+        private void BuildTinyGroups(TinyParentNodeImpl parent, int rowFp, int keyFp)
+        {
+            TinyTree tree = parent.tree;
+            int p = parent.nodeNr;
+            int firstChild = p + 1;
+            if (firstChild >= tree.numberOfNodes || tree.depth[firstChild] != tree.depth[p] + 1)
+            {
+                return;
+            }
+
+            byte[] kinds = tree.nodeKind;
+            int[] nextArr = tree.next;
+            int[] nameCodes = tree.nameCode;
+            int[] alphaArr = tree.alpha;
+            int[] betaArr = tree.beta;
+            LargeTextBuffer buffer = tree.textBuffer;
+
+            // open-addressing key table: slot empty while tKey is null; hashes follow the
+            // Slice8/UnicodeString algorithm (h = 31*h + codepoint) so span and string probes agree
+            int cap = 128;
+            int mask = cap - 1;
+            int used = 0;
+            int[] tHash = new int[cap];
+            UnicodeString[] tKey = new UnicodeString[cap];
+            TinyGrp[] tGroup = new TinyGrp[cap];
+
+            int row = firstChild;
+            while (true)
+            {
+                // textual-element rows can hold no element children, hence no keys and no group
+                int rk = kinds[row];
+                if (rk == Types.Type.ELEMENT && (rowFp < 0 || (nameCodes[row] & NamePool.FP_MASK) == rowFp))
+                {
+                    int c = row + 1;
+                    if (c < tree.numberOfNodes && tree.depth[c] == tree.depth[row] + 1)
+                    {
+                        int n = c;
+                        while (n >= 0)
+                        {
+                            int cur = n;
+                            int n2 = nextArr[cur];
+                            n = n2 > cur ? n2 : -1;
+                            int ck = kinds[cur];
+                            if ((ck == Types.Type.ELEMENT || ck == Types.Type.TEXTUAL_ELEMENT) && (nameCodes[cur] & NamePool.FP_MASK) == keyFp)
+                            {
+                                // contiguous Latin-1 span when the key is inline text or a single text child
+                                int spanStart = -1;
+                                int spanEnd = -1;
+                                if (ck == Types.Type.TEXTUAL_ELEMENT)
+                                {
+                                    spanStart = alphaArr[cur];
+                                    spanEnd = spanStart + betaArr[cur];
+                                }
+                                else
+                                {
+                                    int cc = cur + 1;
+                                    if (cc < tree.numberOfNodes && tree.depth[cc] == tree.depth[cur] + 1
+                                        && kinds[cc] == Types.Type.TEXT && nextArr[cc] <= cc)
+                                    {
+                                        spanStart = alphaArr[cc];
+                                        spanEnd = spanStart + betaArr[cc];
+                                    }
+                                }
+
+                                int h;
+                                byte[] spanBytes = null;
+                                int spanOff = 0;
+                                int spanLen = 0;
+                                UnicodeString genericKey = null;
+                                if (spanStart >= 0 && buffer.TryGetByteSpan(spanStart, spanEnd, out spanBytes, out spanOff, out spanLen))
+                                {
+                                    h = 0;
+                                    for (int i = 0; i < spanLen; i++)
+                                    {
+                                        h = 31 * h + (spanBytes[i + spanOff] & 0xff);
+                                    }
+                                }
+                                else
+                                {
+                                    spanBytes = null;
+                                    genericKey = TinyParentNodeImpl.GetStringValue(tree, cur);
+                                    h = genericKey.GetHashCode();
+                                }
+
+                                int slot = h & mask;
+                                TinyGrp grp = null;
+                                while (tKey[slot] != null)
+                                {
+                                    if (tHash[slot] == h
+                                        && (spanBytes != null
+                                            ? (tKey[slot] is Slice8 s8 ? s8.ContentEqualsSpan(spanBytes, spanOff, spanLen)
+                                                                       : new Slice8(spanBytes, spanOff, spanOff + spanLen).Equals(tKey[slot]))
+                                            : genericKey.Equals(tKey[slot])))
+                                    {
+                                        grp = tGroup[slot];
+                                        break;
+                                    }
+
+                                    slot = (slot + 1) & mask;
+                                }
+
+                                if (grp == null)
+                                {
+                                    UnicodeString keyString = spanBytes != null ? new Slice8(spanBytes, spanOff, spanOff + spanLen) : genericKey;
+                                    grp = new TinyGrp(tree, row);
+                                    groups.Add(grp);
+                                    groupKeys.Add(StringValue.MakeUntypedAtomic(keyString));
+                                    tHash[slot] = h;
+                                    tKey[slot] = keyString;
+                                    tGroup[slot] = grp;
+                                    if (++used * 3 > cap * 2)
+                                    {
+                                        int newCap = cap << 1;
+                                        int newMask = newCap - 1;
+                                        int[] nHash = new int[newCap];
+                                        UnicodeString[] nKey = new UnicodeString[newCap];
+                                        TinyGrp[] nGroup = new TinyGrp[newCap];
+                                        for (int i = 0; i < cap; i++)
+                                        {
+                                            if (tKey[i] != null)
+                                            {
+                                                int s = tHash[i] & newMask;
+                                                while (nKey[s] != null)
+                                                {
+                                                    s = (s + 1) & newMask;
+                                                }
+
+                                                nHash[s] = tHash[i];
+                                                nKey[s] = tKey[i];
+                                                nGroup[s] = tGroup[i];
+                                            }
+                                        }
+
+                                        cap = newCap;
+                                        mask = newMask;
+                                        tHash = nHash;
+                                        tKey = nKey;
+                                        tGroup = nGroup;
+                                    }
+                                }
+                                else if (grp.LastNode != row)
+                                {
+                                    grp.AddNode(row);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                int r2 = nextArr[row];
+                if (r2 <= row)
+                {
+                    break;
+                }
+
+                row = r2;
+            }
+        }
+
+        // Group members held as node numbers; nodes materialize on access (the group consumers —
+        // current-group() iteration, count(), the body's context item — each touch a member once).
+        private sealed class TinyGrp : IList<IItem>
+        {
+            private readonly TinyTree tree;
+            private int[] nodes;
+            private int count;
+
+            internal TinyGrp(TinyTree tree, int first)
+            {
+                this.tree = tree;
+                nodes = new int[4];
+                nodes[0] = first;
+                count = 1;
+            }
+
+            internal int LastNode => nodes[count - 1];
+
+            internal void AddNode(int nr)
+            {
+                if (count == nodes.Length)
+                {
+                    Array.Resize(ref nodes, count * 2);
+                }
+
+                nodes[count++] = nr;
+            }
+
+            public int Count => count;
+            public bool IsReadOnly => true;
+
+            public IItem this[int index]
+            {
+                get
+                {
+                    if (index < 0 || index >= count)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(index));
+                    }
+
+                    return tree.GetNode(nodes[index]);
+                }
+                set => throw new NotSupportedException();
+            }
+
+            public IEnumerator<IItem> GetEnumerator()
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    yield return tree.GetNode(nodes[i]);
+                }
+            }
+
+            System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() => GetEnumerator();
+
+            public int IndexOf(IItem item)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    if (Equals(tree.GetNode(nodes[i]), item))
+                    {
+                        return i;
+                    }
+                }
+
+                return -1;
+            }
+
+            public bool Contains(IItem item) => IndexOf(item) >= 0;
+
+            public void CopyTo(IItem[] array, int arrayIndex)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    array[arrayIndex + i] = tree.GetNode(nodes[i]);
+                }
+            }
+
+            public void Add(IItem item) => throw new NotSupportedException();
+            public void Insert(int index, IItem item) => throw new NotSupportedException();
+            public void RemoveAt(int index) => throw new NotSupportedException();
+            public bool Remove(IItem item) => throw new NotSupportedException();
+            public void Clear() => throw new NotSupportedException();
         }
 
         private void BuildIndexedGroups()
@@ -227,11 +484,6 @@ namespace OutSmart.DAXon.Expressions.Sorting
         public virtual IGroundedValue CurrentGroup()
         {
             return SequenceExtent.MakeSequenceExtent(groups[position - 1]);
-        }
-
-        public virtual IList<IItem> GetCurrentGroup()
-        {
-            return groups[position - 1];
         }
 
         public virtual bool SupportsHasNext()

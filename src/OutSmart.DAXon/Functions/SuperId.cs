@@ -121,8 +121,6 @@ namespace OutSmart.DAXon.Functions
         internal class ElementWithId : SuperId
         {
             public override int Op => ELEMENT_WITH_ID;
-
-            public static Func<ElementWithId> New() => () => new ElementWithId();
         }
     }
 }

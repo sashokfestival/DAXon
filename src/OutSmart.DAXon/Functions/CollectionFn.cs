@@ -33,9 +33,6 @@ namespace OutSmart.DAXon.Functions
         /// <summary>URI representing a collection that is always empty.</summary>
         public static string EMPTY_COLLECTION_URI = "http://saxon.sf.net/collection/empty";
 
-        /// <summary>An empty collection.</summary>
-        public static readonly IResourceCollection EMPTY_COLLECTION = new EmptyCollection(EMPTY_COLLECTION_URI);
-
         public override int GetSpecialProperties(Expression[] arguments)
         {
             // See redmine bug 1652. We cannot assume the nodes will be in document order, distinct, or newly created.

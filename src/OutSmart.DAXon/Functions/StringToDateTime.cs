@@ -25,9 +25,7 @@ namespace OutSmart.DAXon.Functions
     internal class StringToDateTime : StringConverter
     {
         private readonly StringConverter inner;
-        public StringToDateTime() { }
         public StringToDateTime(object rules) : base(rules as ConversionRules) { inner = new StringConverter.StringToDateTime(rules as ConversionRules); }
-        public static Func<Functions.StringToDateTime> New() => () => new Functions.StringToDateTime();
         // Delegates to the proven nested converter (this top-level copy is what ConversionRules binds).
         public override IConversionResult ConvertString(UnicodeString input) => inner.ConvertString(input);
     }

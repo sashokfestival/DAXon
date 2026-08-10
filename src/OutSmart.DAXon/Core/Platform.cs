@@ -30,34 +30,20 @@ namespace OutSmart.DAXon.Core
     internal interface IPlatform
     {
         void Initialize(Configuration config);
-        bool IsJava();
         bool IsDotNet();
-        string PlatformVersion { get; }
-        /// <summary>
-        /// Ask whether we are on Windows
-        /// </summary>
-        bool IsWindows();
         string PlatformSuffix { get; }
         IIDynamicLoader DefaultDynamicLoader { get; }
         string GetDefaultLanguage();
         string DefaultCountry { get; }
         System.IO.Stream LocateResource(string filename, IList<string> messages);
-        /// <summary>
-        /// Diagnostic method to list the embedded resources contained in the loaded software
-        /// </summary>
-        void ShowEmbeddedResources();
 
 
         IStringCollator MakeCollation(Configuration config, Properties props, string uri);
         bool CanReturnCollationKeys(IStringCollator collation);
         IAtomicMatchKey GetCollationKey(SimpleCollation namedCollation, string value);
-        bool HasICUCollator();
-        bool HasICUNumberer();
         IStringCollator MakeUcaCollator(string uri, Configuration config);
         IRegularExpression CompileRegularExpression(Configuration config, UnicodeString regex, string flags, string hostLanguage, IList<string> warnings);
         ExternalObjectType GetExternalObjectType(Configuration config, NamespaceUri uri, string localName);
-        string GetInstallationDirectory(string edition, Configuration config);
-        void RegisterAllBuiltInObjectModels(Configuration config);
         bool JAXPStaticContextCheck(RetainedStaticContext retainedStaticContext, IStaticContext sc);
         IModuleURIResolver MakeStandardModuleURIResolver(Configuration config);
     }

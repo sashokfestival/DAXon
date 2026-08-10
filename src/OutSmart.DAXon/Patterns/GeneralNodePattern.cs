@@ -37,8 +37,6 @@ namespace OutSmart.DAXon.Patterns
         public override int Dependencies => equivalentExpr.Dependencies & (StaticProperty.DEPENDS_ON_LOCAL_VARIABLES | StaticProperty.DEPENDS_ON_USER_FUNCTIONS);
 
         public override int Fingerprint => itemType.Fingerprint;
-
-        public Expression EquivalentExpr => equivalentExpr;
         public GeneralNodePattern(Expression expr, NodeTest itemType)
         {
             equivalentExpr = expr;

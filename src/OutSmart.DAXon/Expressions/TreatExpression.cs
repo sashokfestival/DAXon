@@ -18,7 +18,6 @@ namespace OutSmart.DAXon.Expressions
     // so the operand's type is checked at runtime.
     internal abstract class TreatExpression
     {
-        private TreatExpression() { }
 
         public static Expression Make(Expression sequence, OutSmart.DAXon.Values.SequenceType type)
         {

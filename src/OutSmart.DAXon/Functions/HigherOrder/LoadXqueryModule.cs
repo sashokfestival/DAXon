@@ -270,7 +270,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
         {
             public void Export(OutSmart.DAXon.Tracing.ExpressionPresenter @out)
             {
-                XPathException err = new XPathException("Cannot export a stylesheet that statically incorporates XQuery functions", "SXST0069");
+                XPathException err = new XPathException("Cannot export a stylesheet that statically incorporates XQuery functions", DAXonErrorCode.SXST0069);
                 err.SetIsStaticError(true);
                 throw err;
             }

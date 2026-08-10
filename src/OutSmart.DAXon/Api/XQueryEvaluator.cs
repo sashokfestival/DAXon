@@ -8,7 +8,6 @@ using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Expressions.Instructions;
 using OutSmart.DAXon.Expressions.Parsing;
 using OutSmart.DAXon.XQuery;
-using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.Serialization;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Trees.Tiny;
@@ -352,11 +351,6 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiUncheckedException(e.ToXPathException());
             }
-        }
-
-        public virtual XdmStream<XdmItem> Stream()
-        {
-            return IIterator().Stream();
         }
 
         private IReceiver GetDestinationReceiver(IDestination destination)

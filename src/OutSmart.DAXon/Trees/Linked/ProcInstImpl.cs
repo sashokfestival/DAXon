@@ -20,14 +20,11 @@ namespace OutSmart.DAXon.Trees.Linked
     {
         private string target = "";
         private UnicodeString content = EmptyUnicodeString.GetInstance();
-
-        public ProcInstImpl() { }
         public ProcInstImpl(object target, object data)
         {
             this.target = target?.ToString() ?? "";
             content = data as UnicodeString ?? BMPString.Of(data?.ToString() ?? "");
         }
-        public void SetLocation(object _loc) { }
         public void SetLocation(string systemId, int line, int column) { } /* location tracking not kept for linked-tree PIs */
 
         public override string GetLocalPart() => target;

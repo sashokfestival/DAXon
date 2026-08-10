@@ -28,8 +28,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Sum : FoldingFunction
     {
-
-        public static Func<Sum> New() => () => new Sum();
         public override Expression MakeFunctionCall(params Expression[] arguments)
         {
             Expression[] newArgs = new Expression[2];
@@ -122,20 +120,6 @@ namespace OutSmart.DAXon.Functions
             else
             {
                 return new SumFold(context, Int64Value.ZERO);
-            }
-        }
-
-        public static AtomicValue Total(ISequenceIterator @in, IXPathContext context, ILocation locator)
-        {
-            try
-            {
-                SumFold fold = new SumFold(context, null);
-                SequenceTool.Supply(@in, (IItemConsumer<IItem>)fold.ProcessItem);
-                return (AtomicValue)fold.Result().Head();
-            }
-            catch (XPathException e)
-            {
-                throw e.MaybeWithLocation(locator).MaybeWithContext(context);
             }
         }
 
@@ -370,47 +354,226 @@ namespace OutSmart.DAXon.Functions
                 bool defaultSecondArg = fnc.GetArity() < 2 || fnc.GetArg(1) is DefaultedArgumentExpression;
                 IItemEvaluator zero = defaultSecondArg ? (context) => Int64Value.ZERO : fnc.GetArg(1).MakeElaborator().ElaborateForItem();
 
-                // sum(m to n) with a statically visible range: evaluate the two bounds as single
-                // items and run the closed form (IntegerRange.TrySum) — without constructing the
-                // range iterator per call at all. Empty bound or m > n is the empty range (the
-                // zero argument); non-Int64 bounds or overflow fall back to the generic fold
-                // below, which reproduces the BigInteger promotion.
-                if (fnc.GetArg(0) is RangeExpression range
-                    && !ErrorExpression.IsContainedIn(range.StartExpression)
-                    && !ErrorExpression.IsContainedIn(range.EndExpression))
+                // Each lane returns null when the argument shape is not its own; any runtime bail
+                // inside a lane replays the whole sum on the generic path, which is pure.
+                return TryLiteralRangeSum(fnc, puller, zero)
+                    ?? TryLongTermSum(fnc, puller, zero)
+                    ?? TryLeafLengthSum(fnc, puller, zero)
+                    ?? TryRangeBoundsSum(fnc, puller, zero)
+                    ?? BuildGenericSum(puller, zero);
+            }
+
+            // sum over a LITERAL integer range mapped by a long-compilable body — both the
+            // simple-map form `RANGE!(.*.)` (body over the context item) and `for $i in RANGE
+            // return f($i)` once the optimizer folds the range to a literal. The bounds are
+            // known at elaboration, so the loop runs over bare longs: no range iterator, no
+            // per-term box, no per-term closure re-dispatch.
+            private static IItemEvaluator TryLiteralRangeSum(SystemFunctionCall fnc, IPullEvaluator puller, IItemEvaluator zero)
+            {
+                Expression seq = null;
+                HigherOrder.FusedArity2Caller.LongBody body = null;
+                if (fnc.GetArg(0) is Expressions.Instructions.ForEach feMap && feMap.SeparatorExpression == null)
                 {
-                    IItemEvaluator loEval = range.StartExpression.MakeElaborator().ElaborateForItem();
-                    IItemEvaluator hiEval = range.EndExpression.MakeElaborator().ElaborateForItem();
-                    IItemEvaluator genericSum = BuildGenericSum(puller, zero);
-                    return (context) =>
+                    seq = feMap.GetSelectExpression();
+                    body = HigherOrder.FusedArity2Caller.CompileLongForContext(feMap.GetActionExpression());
+                }
+                else if (fnc.GetArg(0) is ForExpression forRange
+                    && forRange.GetAction().GetCardinality() == StaticProperty.EXACTLY_ONE)
+                {
+                    seq = forRange.Sequence;
+                    body = HigherOrder.FusedArity2Caller.CompileLongFor(forRange.GetAction(), forRange);
+                }
+
+                if (body == null || !(seq is Literal rangeLit) || !(rangeLit.GroundedValue is IntegerRange ir) || ir.step != 1)
+                {
+                    return null;
+                }
+
+                IItemEvaluator genericSum = BuildGenericSum(puller, zero);
+                long lo = ir.start;
+                long hi = ir.end;   // lo <= hi by IntegerRange construction — never empty
+                return (context) =>
+                {
+                    long total = 0;
+                    for (long v = lo; v <= hi; v++)
                     {
-                        IItem lo = loEval.Eval(context);
-                        IItem hi = hiEval.Eval(context);
-                        if (lo == null || hi == null)
+                        if ((v & 0xfff) == 0)
+                        {
+                            Core.Controller.CheckActiveTimeout();
+                        }
+
+                        if (!body(v, 0, out long term)
+                            || HigherOrder.FusedArity2Caller.NearOverflow(total)
+                            || HigherOrder.FusedArity2Caller.NearOverflow(term))
+                        {
+                            return genericSum.Eval(context);
+                        }
+
+                        total += term;
+                    }
+
+                    return Int64Value.MakeIntegerValue(total);
+                };
+            }
+
+            // sum(for $x in SEQ return int-arith): terms come from the long lane, the total
+            // stays a long — no mapped Int64Value per item. Any deviation (non-plain-integer
+            // item, lane guard, near-overflow total) replays the WHOLE sum on the generic
+            // path, which is pure, so the result is the generic one by construction.
+            private static IItemEvaluator TryLongTermSum(SystemFunctionCall fnc, IPullEvaluator puller, IItemEvaluator zero)
+            {
+                if (!(fnc.GetArg(0) is ForExpression forex)
+                    || forex.GetAction().GetCardinality() != StaticProperty.EXACTLY_ONE
+                    || ErrorExpression.IsContainedIn(forex.Sequence))
+                {
+                    return null;
+                }
+
+                HigherOrder.FusedArity2Caller.LongBody bodyLane =
+                    HigherOrder.FusedArity2Caller.CompileLongFor(forex.GetAction(), forex);
+                if (bodyLane == null)
+                {
+                    return null;
+                }
+
+                IPullEvaluator baseEval = forex.Sequence.MakeElaborator().ElaborateForPull();
+                IItemEvaluator genericSum = BuildGenericSum(puller, zero);
+                return (context) =>
+                {
+                    ISequenceIterator it = baseEval.Iterate(context);
+                    long total = 0;
+
+                    // Range base: the terms come from the range's own longs — no boxed
+                    // base item per step at all (mirrors the fold range lane).
+                    if (it is Expressions.AscendingRangeIterator ari && ari.GetStep().LongValue() == 1)
+                    {
+                        long start = ari.GetMin().LongValue();
+                        long limit = ari.GetMax().LongValue();
+                        long n = limit - start + 1;   // <= 2^31 by range construction
+                        long v = start;
+                        for (long i = 0; i < n; i++, v++)
+                        {
+                            Core.Controller.CheckActiveTimeout();
+                            if (!bodyLane(v, 0, out long rterm)
+                                || HigherOrder.FusedArity2Caller.NearOverflow(total)
+                                || HigherOrder.FusedArity2Caller.NearOverflow(rterm))
+                            {
+                                return genericSum.Eval(context);
+                            }
+
+                            total += rterm;
+                        }
+
+                        return Int64Value.MakeIntegerValue(total);
+                    }
+
+                    bool any = false;
+                    for (IItem item; (item = it.Next()) != null;)
+                    {
+                        Core.Controller.CheckActiveTimeout();
+                        if (!(item is Int64Value iv)
+                            || !ReferenceEquals(iv.GetItemType(), BuiltInAtomicType.INTEGER)
+                            || !bodyLane(iv.LongValue(), 0, out long term)
+                            || HigherOrder.FusedArity2Caller.NearOverflow(total)
+                            || HigherOrder.FusedArity2Caller.NearOverflow(term))
+                        {
+                            it.Dispose();
+                            return genericSum.Eval(context);
+                        }
+
+                        total += term;
+                        any = true;
+                    }
+
+                    return any ? Int64Value.MakeIntegerValue(total) : zero.Eval(context);
+                };
+            }
+
+            // sum(//*[not(*)]/string-length(.)): each term is the structural string-value
+            // length of a leaf element, read straight off the Tiny arrays — no element
+            // wrappers, no per-item Int64Value boxes. Terms are non-negative and bounded by
+            // the codepoint-addressed text buffer, so the long total cannot overflow (the
+            // generic fold's BigInteger promotion is unreachable on this data).
+            private static IItemEvaluator TryLeafLengthSum(SystemFunctionCall fnc, IPullEvaluator puller, IItemEvaluator zero)
+            {
+                if (!(fnc.GetArg(0) is SlashExpression pathArg)
+                    || !(pathArg.GetSelectExpression() is FilterExpression leafFilter)
+                    || !Expressions.Elaboration.FusedLeafFilter.MatchLeafElements(leafFilter)
+                    || !Expressions.Elaboration.FusedLeafFilter.IsStringLengthOfSelf(pathArg.GetActionExpression()))
+                {
+                    return null;
+                }
+
+                IItemEvaluator genericSum = BuildGenericSum(puller, zero);
+                return (context) =>
+                {
+                    if (context.GetContextItem() is Trees.Tiny.TinyParentNodeImpl tiny && tiny.tree.TypeArray == null)
+                    {
+                        Trees.Tiny.TinyTree tree = tiny.tree;
+                        short[] d = tree.depth;
+                        int stop = d[tiny.nodeNr];
+                        int nn = tree.numberOfNodes;
+                        long total = 0;
+                        bool any = false;
+                        for (int n = tiny.nodeNr + 1; n < nn && d[n] > stop; n++)
+                        {
+                            if (Expressions.Elaboration.FusedLeafFilter.IsLeafElement(tree, n))
+                            {
+                                total += Trees.Tiny.TinyParentNodeImpl.GetStringValueLength(tree, n);
+                                any = true;
+                            }
+                        }
+
+                        return any ? Int64Value.MakeIntegerValue(total) : zero.Eval(context);
+                    }
+
+                    return genericSum.Eval(context);
+                };
+            }
+
+            // sum(m to n) with a statically visible range: evaluate the two bounds as single
+            // items and run the closed form (IntegerRange.TrySum) — without constructing the
+            // range iterator per call at all. Empty bound or m > n is the empty range (the
+            // zero argument); non-Int64 bounds or overflow fall back to the generic fold,
+            // which reproduces the BigInteger promotion.
+            private static IItemEvaluator TryRangeBoundsSum(SystemFunctionCall fnc, IPullEvaluator puller, IItemEvaluator zero)
+            {
+                if (!(fnc.GetArg(0) is RangeExpression range)
+                    || ErrorExpression.IsContainedIn(range.StartExpression)
+                    || ErrorExpression.IsContainedIn(range.EndExpression))
+                {
+                    return null;
+                }
+
+                IItemEvaluator loEval = range.StartExpression.MakeElaborator().ElaborateForItem();
+                IItemEvaluator hiEval = range.EndExpression.MakeElaborator().ElaborateForItem();
+                IItemEvaluator genericSum = BuildGenericSum(puller, zero);
+                return (context) =>
+                {
+                    IItem lo = loEval.Eval(context);
+                    IItem hi = hiEval.Eval(context);
+                    if (lo == null || hi == null)
+                    {
+                        return zero.Eval(context);
+                    }
+
+                    if (lo is Int64Value l64 && hi is Int64Value h64)
+                    {
+                        long m = l64.LongValue();
+                        long n = h64.LongValue();
+                        if (m > n)
                         {
                             return zero.Eval(context);
                         }
 
-                        if (lo is Int64Value l64 && hi is Int64Value h64)
+                        if (IntegerRange.TrySum(m, 1, n, out long total))
                         {
-                            long m = l64.LongValue();
-                            long n = h64.LongValue();
-                            if (m > n)
-                            {
-                                return zero.Eval(context);
-                            }
-
-                            if (IntegerRange.TrySum(m, 1, n, out long total))
-                            {
-                                return Int64Value.MakeIntegerValue(total);
-                            }
+                            return Int64Value.MakeIntegerValue(total);
                         }
+                    }
 
-                        return genericSum.Eval(context);
-                    };
-                }
-
-                return BuildGenericSum(puller, zero);
+                    return genericSum.Eval(context);
+                };
             }
 
             private static IItemEvaluator BuildGenericSum(IPullEvaluator puller, IItemEvaluator zero)

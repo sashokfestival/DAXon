@@ -11,7 +11,6 @@ namespace OutSmart.DAXon.Trees.Linked
 {
     internal class AxisFilter : IAxisIterator
     {
-        public AxisFilter() { }
         public AxisFilter(object iter, object filter) { }
         public NodeInfo Next() => null;
         IItem ISequenceIterator.Next() => null;

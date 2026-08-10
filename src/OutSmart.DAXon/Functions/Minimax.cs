@@ -31,23 +31,11 @@ namespace OutSmart.DAXon.Functions
         private IPlainType argumentType = BuiltInAtomicType.ANY_ATOMIC;
         private bool ignoreNaN = false;
 
-        public virtual IPlainType ArgumentType => argumentType;
-
         public override string StreamerName => "Minimax";
         public abstract bool IsMaxFunction();
         public virtual void SetIgnoreNaN(bool ignore)
         {
             ignoreNaN = ignore;
-        }
-
-        public virtual bool IsIgnoreNaN()
-        {
-            return ignoreNaN;
-        }
-
-        public virtual IAtomicComparer GetComparer()
-        {
-            return PreAllocatedAtomicComparer;
         }
 
         /// <summary>
@@ -414,8 +402,6 @@ namespace OutSmart.DAXon.Functions
         /// </summary>
         internal class Max : Minimax
         {
-
-            public static Func<Max> New() => () => new Max();
             public override bool IsMaxFunction()
             {
                 return true;

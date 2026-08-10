@@ -59,9 +59,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                 return currentDirectoryURL.ToString();
             }
         }
-        private ExpressionTool()
-        {
-        }
 
         public static Expression Make(string expression, IStaticContext env, int start, int terminator, ICodeInjector codeInjector)
         {
@@ -174,17 +171,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             return exp.MarkTailFunctionCalls(qName, arity);
         }
 
-        public static string Indent(int level)
-        {
-            StringBuilder fsb = new StringBuilder(level);
-            for (int i = 0; i < level; i++)
-            {
-                fsb.Append("  ");
-            }
-
-            return fsb.ToString();
-        }
-
         public static bool Contains(Expression a, Expression b)
         {
             Expression temp = b;
@@ -201,11 +187,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             }
 
             return false;
-        }
-
-        public static bool ContainsLocalParam(Expression exp)
-        {
-            return Contains(exp, true, (e) => e is LocalParam);
         }
 
         public static bool ContainsLocalVariableReference(Expression exp)
@@ -775,11 +756,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             return Contains(exp, sameFocusOnly, (e) => e is FunctionCall && qName.Equals(((FunctionCall)e).GetFunctionName()));
         }
 
-        public static bool ContainsSubexpression(Expression exp, System.Type subClass)
-        {
-            return Contains(exp, false, (e) => subClass.IsAssignableFrom(e.GetType()));
-        }
-
         public static void GatherCalledFunctions(Expression e, IList<UserFunction> list)
         {
             if (e is UserFunctionCall)
@@ -911,16 +887,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
                     ((LocalParam)expression).ComputeEvaluationMode();
                 }
 
-                return false;
-            });
-        }
-
-        public static void ClearStreamabilityData(Expression exp)
-        {
-            ExpressionTool.ProcessExpressionTree(exp, null, (expression, result) =>
-            {
-                expression.SetExtraProperty("P+S", null);
-                expression.SetExtraProperty("inversion", null);
                 return false;
             });
         }
@@ -1083,29 +1049,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             }
 
             return rcount;
-        }
-
-        public static int ExpressionSize(Expression exp)
-        {
-            int total = 1;
-            foreach (Operand o in exp.Operands())
-            {
-                total += ExpressionSize(o.GetChildExpression());
-                if (o.GetChildExpression() is UserFunctionReference)
-                {
-
-                    // bug 5054, bug 5786
-                    UserFunction uf = ((UserFunctionReference)o.GetChildExpression()).NominalTarget;
-                    if (uf.GetFunctionName() == null)
-                    {
-
-                        // anonymous inline function
-                        total += ExpressionSize(uf.GetBody());
-                    }
-                }
-            }
-
-            return total;
         }
 
         public static void RebindVariableReferences(Expression exp, IBinding oldBinding, IBinding newBinding)
@@ -1479,21 +1422,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
         private static bool HasTwoOrMoreOperands(Expression exp)
         {
             return exp.Operands().Skip(1).Any();
-        }
-
-        public static void ValidateTree(Expression exp)
-        {
-            try
-            {
-                foreach (Operand o in exp.CheckedOperands())
-                {
-                    ValidateTree(o.GetChildExpression());
-                }
-            }
-            catch (InvalidOperationException e)
-            {
-                e.ToString();
-            }
         }
 
         public static bool IsLocalConstructor(Expression child)

@@ -309,6 +309,84 @@ namespace OutSmart.DAXon.Values
             }
         }
 
+        // Latin1 fast path mirroring StringToDouble.StringToNumber: tree text (Slice8) and 8-bit
+        // strings (Twine8) parse straight from their byte buffer - no ToString per xs:integer()
+        // cast. Byte-identical: every character this parser inspects is ASCII, and for these widths
+        // CodePointAt returns exactly (byte & 0xff); other widths take the CodePointAt fallback.
+        public static IConversionResult StringToInteger(UnicodeString s)
+        {
+            int len = s.Length32();
+            byte[] b8 = null;
+            int off8 = 0;
+            if (s is Slice8 sl)
+            {
+                b8 = sl.ByteArray;
+                off8 = sl.Start;
+            }
+            else if (s is Twine8 tw)
+            {
+                b8 = tw.ByteArray;
+            }
+
+            int start = 0;
+            int last = len - 1;
+            while (start < len && (b8 != null ? (b8[off8 + start] & 0xff) : s.CodePointAt(start)) <= 0x20)
+            {
+                start++;
+            }
+
+            while (last > start && (b8 != null ? (b8[off8 + last] & 0xff) : s.CodePointAt(last)) <= 0x20)
+            {
+                last--;
+            }
+
+            if (start > last)
+            {
+                return new ValidationFailure("Cannot convert zero-length string to an integer");
+            }
+
+            if (last - start >= 16)
+            {
+                // 16+ digits are rare - keep the library/BigInteger path on the string form.
+                return StringToInteger(s.ToString());
+            }
+
+            bool negative = false;
+            long value = 0;
+            int i = start;
+            int c = b8 != null ? (b8[off8 + i] & 0xff) : s.CodePointAt(i);
+            if (c == '+')
+            {
+                i++;
+            }
+            else if (c == '-')
+            {
+                negative = true;
+                i++;
+            }
+
+            if (i > last)
+            {
+                return new ValidationFailure("Cannot convert string " + Err.Wrap(s.ToString(), Err.VALUE) + " to integer: no digits after the sign");
+            }
+
+            while (i <= last)
+            {
+                int d = b8 != null ? (b8[off8 + i] & 0xff) : s.CodePointAt(i);
+                i++;
+                if (d >= '0' && d <= '9')
+                {
+                    value = 10 * value + (d - '0');
+                }
+                else
+                {
+                    return new ValidationFailure("Cannot convert string " + Err.Wrap(s.ToString(), Err.VALUE) + " to an integer");
+                }
+            }
+
+            return Int64Value.MakeIntegerValue(negative ? -value : value);
+        }
+
         public static ValidationFailure CastableAsInteger(UnicodeString input)
         {
             IIntIterator iter = input.CodePoints();

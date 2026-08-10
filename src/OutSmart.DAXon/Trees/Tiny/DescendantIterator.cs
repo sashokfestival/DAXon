@@ -20,7 +20,7 @@ using OutSmart.DAXon.Internal;
 using OutSmart.DAXon.Internal.Collections;
 namespace OutSmart.DAXon.Trees.Tiny
 {
-    sealed class DescendantIterator : IAxisIterator
+    sealed class DescendantIterator : IAxisIterator, IFastCountable
     {
         private readonly TinyTree tree;
         private int nextNodeNr;
@@ -68,6 +68,33 @@ namespace OutSmart.DAXon.Trees.Tiny
             }
             while (!matcher.Test(nextNodeNr));
             return tree.GetNode(nextNodeNr);
+        }
+        // Same walk as Next() minus GetNode/virtual-text materialization. A TEXTUAL_ELEMENT always
+        // queues its inline text as `pending`, and pending is returned without a matcher test, so it
+        // contributes one item unconditionally — on top of the element's own matcher verdict.
+        public bool TryFastCount(out int count)
+        {
+            short[] d = tree.depth;
+            byte[] nk = tree.nodeKind;
+            int nn = tree.numberOfNodes;
+            int c = pending != null ? 1 : 0;
+            pending = null;
+            for (int n = nextNodeNr + 1; n < nn && d[n] > startDepth; n++)
+            {
+                if (nk[n] == Types.Type.TEXTUAL_ELEMENT)
+                {
+                    c++;
+                }
+
+                if (matcher.Test(n))
+                {
+                    c++;
+                }
+            }
+
+            nextNodeNr = -1;
+            count = c;
+            return true;
         }
         IItem ISequenceIterator.Next() => Next(); // redirect StubGen hollow to the real covariant Next(); default = silent empty iteration
         public void Dispose() { }

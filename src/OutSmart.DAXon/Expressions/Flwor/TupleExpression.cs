@@ -69,11 +69,6 @@ namespace OutSmart.DAXon.Expressions.Flwor
             return (LocalVariableReference)Operanda.GetOperandExpression(i);
         }
 
-        public virtual void SetSlot(int i, LocalVariableReference @ref)
-        {
-            Operanda.SetOperand(i, @ref);
-        }
-
         public virtual bool IncludesBinding(IBinding binding)
         {
             foreach (Operand o in Operands())

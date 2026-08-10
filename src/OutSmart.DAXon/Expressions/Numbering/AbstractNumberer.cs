@@ -155,11 +155,6 @@ namespace OutSmart.DAXon.Expressions.Numbering
             this.language = language;
         }
 
-        public virtual string GetLanguage()
-        {
-            return language;
-        }
-
         public string Format(long number, UnicodeString picture, int groupSize, string groupSeparator, string letterValue, string cardinal, string ordinal)
         {
             return Format(number, picture, new RegularGroupFormatter(groupSize, groupSeparator, EmptyUnicodeString.GetInstance()), letterValue, cardinal, ordinal);
@@ -202,12 +197,14 @@ namespace OutSmart.DAXon.Expressions.Numbering
             {
                 case '0':
                 case '1':
-                    sb.Append(ToRadical(number, digits, pictureLength, numGroupFormatter));
-                    if (ordinal != null && !(ordinal.Length == 0))
+                    string radical = ToRadical(number, digits, pictureLength, numGroupFormatter);
+                    if (ordinal == null || ordinal.Length == 0)
                     {
-                        sb.Append(OrdinalSuffix(ordinal, number));
+                        return radical;
                     }
 
+                    sb.Append(radical);
+                    sb.Append(OrdinalSuffix(ordinal, number));
                     break;
                 case 'A':
                     if (number == 0)
@@ -662,6 +659,15 @@ namespace OutSmart.DAXon.Expressions.Numbering
         /*if (formchar == 'w')*/
         public static string ConvertDigitSystem(long number, int[] digits, int requiredLength)
         {
+            if (ReferenceEquals(digits, westernDigits))
+            {
+                // ASCII decimal pictures (format="1"/"000001"): long.ToString + pad replaces the
+                // per-digit PrependWideChar loop. number == 0 stays the empty radical (all-pad),
+                // matching the generic loop below.
+                string w = number == 0 ? "" : number.ToString(System.Globalization.CultureInfo.InvariantCulture);
+                return w.Length >= requiredLength ? w : w.PadLeft(requiredLength, '0');
+            }
+
             StringBuilder temp = new StringBuilder(16);
             int @base = digits.Length;
             StringBuilder s = new StringBuilder(16);

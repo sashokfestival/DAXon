@@ -18,6 +18,5 @@ namespace OutSmart.DAXon.Values
     internal class PromoterToAnyURI : Converter
     {
         public PromoterToAnyURI() { }
-        public PromoterToAnyURI(object rules) { }
     }
 }

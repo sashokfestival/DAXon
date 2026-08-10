@@ -32,8 +32,6 @@ namespace OutSmart.DAXon.Types
         public virtual string BasicAlphaCode => "";
 
         public virtual int PrimitiveType => Type.ITEM;
-
-        public virtual double DefaultPriority => -2;
         private AnyItemType()
         {
         }
@@ -67,22 +65,12 @@ namespace OutSmart.DAXon.Types
             return true;
         }
 
-        public virtual ItemType GetPrimitiveItemType()
-        {
-            return this;
-        }
-
         public virtual IAtomicType GetAtomizedItemType()
         {
             return BuiltInAtomicType.ANY_ATOMIC;
         }
 
         IPlainType IItemTypeWithSequenceTypeCache.GetAtomizedItemType() => GetAtomizedItemType();
-
-        public virtual bool IsAtomizable(TypeHierarchy th)
-        {
-            return true;
-        }
 
         public override string ToString()
         {

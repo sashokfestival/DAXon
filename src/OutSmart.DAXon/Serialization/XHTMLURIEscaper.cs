@@ -80,25 +80,6 @@ namespace OutSmart.DAXon.Serialization
         }
 
         /// <summary>
-        /// Determine whether a given attribute is a URL attribute (case-sensitive, xhtml namespace)
-        /// </summary>
-        private static bool IsURLAttribute(INodeName elcode, INodeName atcode)
-        {
-            if (!elcode.HasURI(NamespaceUri.XHTML))
-            {
-                return false;
-            }
-
-            if (!atcode.HasURI(NamespaceUri.NULL))
-            {
-                return false;
-            }
-
-            string attName = atcode.GetLocalPart();
-            return attTable.Contains(attName) && urlTable.Contains(elcode.GetLocalPart() + "+" + attName);
-        }
-
-        /// <summary>
         /// Notify the start of an element
         /// </summary>
         public override void StartElement(INodeName nameCode, ISchemaType type, IAttributeMap attributes, NamespaceMap namespaces, ILocation location, int properties)

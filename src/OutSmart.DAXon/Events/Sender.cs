@@ -27,10 +27,6 @@ namespace OutSmart.DAXon.Events
     /// </summary>
     internal abstract class Sender
     {
-        // Converted to an abstract static class in Saxon 9.3
-        private Sender()
-        {
-        }
 
         // P5: deliver a resolved resource (the native Stream/TextReader/NodeInfo carrier that replaced the JAXP
         // Source hierarchy). Its parse-time filters are folded into the ParseOptions (so WrapForParse applies

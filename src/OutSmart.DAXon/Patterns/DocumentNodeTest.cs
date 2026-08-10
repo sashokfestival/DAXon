@@ -35,8 +35,6 @@ namespace OutSmart.DAXon.Patterns
         public override int PrimitiveType => Types.Type.DOCUMENT;
 
         public virtual NodeTest ElementTest => elementTest;
-
-        public string FullAlphaCode => BasicAlphaCode + " e[" + elementTest.GetFullAlphaCode() + "]";
         public DocumentNodeTest(NodeTest elementTest)
         {
             this.elementTest = elementTest;

@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class EndsWith : CollatingFunctionFixed
     {
-
-        public static Func<EndsWith> New() => () => new EndsWith();
         public override bool IsSubstringMatchingFunction()
         {
             return true;

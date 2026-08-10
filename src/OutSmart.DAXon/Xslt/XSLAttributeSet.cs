@@ -40,8 +40,6 @@ namespace OutSmart.DAXon.Xslt
 
         public virtual StructuredQName AttributeSetName => GetObjectName();
 
-        public virtual StructuredQName[] UseAttributeSetNames => useAttributeSetNames;
-
         public virtual IList<Expression> ContainedInstructions => containedInstructions;
         public AttributeSet GetActor()
         {

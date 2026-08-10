@@ -72,27 +72,6 @@ namespace OutSmart.DAXon.Types
 
             public override Converter SetNamespaceResolver(object resolver) => SetNamespaceResolver((INamespaceResolver)resolver);
 
-            public virtual IConversionResult Convert(UnicodeString input)
-            {
-                UnicodeString @in = input;
-                try
-                {
-                    @in = phaseTwo.TargetType.Preprocess(@in);
-                }
-                catch (ValidationException err)
-                {
-                    return err.GetValidationFailure();
-                }
-
-                IConversionResult temp = phaseOne.ConvertString(@in);
-                if (temp is ValidationFailure)
-                {
-                    return temp;
-                }
-
-                return phaseTwo.Convert((AtomicValue)temp, @in);
-            }
-
             public override IConversionResult ConvertString(UnicodeString input)
             {
                 try
@@ -568,14 +547,10 @@ namespace OutSmart.DAXon.Types
         internal class StringToInteger : StringConverter
         {
             public static readonly StringToInteger INSTANCE = new StringToInteger();
-            public virtual IConversionResult Convert(StringValue input)
-            {
-                return IntegerValue.StringToInteger(input.ToString());
-            }
 
             public override IConversionResult ConvertString(UnicodeString input)
             {
-                return IntegerValue.StringToInteger(input.ToString());
+                return IntegerValue.StringToInteger(input);
             }
 
             public override ValidationFailure Validate(UnicodeString input)
@@ -828,11 +803,6 @@ namespace OutSmart.DAXon.Types
             // Converter.SetNamespaceResolver(GetRetainedStaticContext())) hit the hollow one and dropped
             // the resolver -> "Cannot validate a QName without a namespace resolver". Forward it.
             public override Converter SetNamespaceResolver(object resolver) => SetNamespaceResolver((INamespaceResolver)resolver);
-
-            public INamespaceResolver GetNamespaceResolver()
-            {
-                return nsResolver;
-            }
 
             public override IConversionResult ConvertString(UnicodeString input)
             {

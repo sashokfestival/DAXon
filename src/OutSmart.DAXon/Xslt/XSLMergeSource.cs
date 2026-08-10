@@ -37,15 +37,9 @@ namespace OutSmart.DAXon.Xslt
         private bool streamable = false;
         private HashSet<Accumulator> accumulators = new HashSet<Accumulator>();
 
-        public virtual Expression ForEachItem => forEachItem;
-
-        public virtual Expression ForEachSource => forEachSource;
-
         public virtual Expression Select => select;
 
         public virtual string SourceName => sourceName;
-
-        public virtual ISchemaType SchemaTypeAttribute => schemaType;
         public override bool IsInstruction()
         {
             return false;
@@ -59,11 +53,6 @@ namespace OutSmart.DAXon.Xslt
         public virtual bool IsSortBeforeMerge()
         {
             return sortBeforeMerge;
-        }
-
-        public virtual int GetValidationAction()
-        {
-            return validationAction;
         }
 
         public virtual MergeInstr.MergeSource MakeMergeSource(MergeInstr mi, Expression select)

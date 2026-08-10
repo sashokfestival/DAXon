@@ -36,14 +36,12 @@ namespace OutSmart.DAXon.Events
         public const int NAMESPACE_OK = 0x40;
         public const int DISINHERIT_NAMESPACES = 0x80;
         public const int USE_NULL_MARKERS = 0x100;
-        public const int NILLABLE_ELEMENT = 0x200;
         public const int WHOLE_TEXT_NODE = 0x400;
         /// <summary>
         /// Flag indicating an element or attribute that has the is-id property
         /// </summary>
         public const int IS_ID = 0x800;
         public const int IS_IDREF = 0x1000;
-        public const int ID_IDREF_CHECKED = 0x2000;
         /// <summary>
         /// Flag set on startDocument() in relation to an xsl:message call with terminate="yes"
         /// </summary>
@@ -55,10 +53,6 @@ namespace OutSmart.DAXon.Events
         public const int REFUSE_NAMESPACES = 0x10000;
         public const int BEQUEATH_INHERITED_NAMESPACES_ONLY = 0x20000;
         /// <summary>
-        /// Flag set on startElement() if the element is known to have children
-        /// </summary>
-        public const int HAS_CHILDREN = 0x40000;
-        /// <summary>
         /// Flag set on append() to indicate that all in-scope namespaces should be copied
         /// </summary>
         public const int ALL_NAMESPACES = 0x80000;
@@ -66,14 +60,6 @@ namespace OutSmart.DAXon.Events
         /// Flag set on attribute() to indicate that there is no need to check for duplicate attributes
         /// </summary>
         public const int NOT_A_DUPLICATE = 0x100000;
-        /// <summary>
-        /// Flag set on characters() to indicate that the text node is a separator space between atomic values
-        /// </summary>
-        public const int SEPARATOR = 0x100000;
-        /// <summary>
-        /// Flag set on startElement() to indicate that it's in a validation=skip wildcard
-        /// </summary>
-        public const int SKIP_VALIDATION = 0x200000;
         public static bool Contains(int options, int option)
         {
             return (options & option) != 0;

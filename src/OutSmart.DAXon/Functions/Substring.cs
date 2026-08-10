@@ -26,8 +26,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class Substring : SystemFunction, ICallable
     {
-
-        public static Func<Substring> New() => () => new Substring();
         public override Expression TypeCheckCaller(FunctionCall caller, ExpressionVisitor visitor, ContextItemStaticInfo contextInfo)
         {
             Expression e2 = base.TypeCheckCaller(caller, visitor, contextInfo);
@@ -173,19 +171,23 @@ namespace OutSmart.DAXon.Functions
                 }
             }
 
+            // Upstream returns EMPTY when lstart+llen wraps and truncates lend through (int) before
+            // the min — both give wrong answers (or a raw crash) for the everyday rest-of-string
+            // idiom substring($s, $pos, 999999999999). Spec arithmetic is xs:double, which cannot
+            // overflow, so the honest reading of a wrapped/huge end is "past the end of the string".
             long lend = lstart + llen;
             if (lend < lstart)
             {
-                return StringValue.EMPTY_STRING;
+                lend = long.MaxValue;
             }
 
-            int a1 = (int)lstart - 1;
+            int a1 = (int)lstart - 1;   // lstart <= slength <= int.MaxValue by the guards above
             if (a1 >= slength)
             {
                 return StringValue.EMPTY_STRING;
             }
 
-            long a2 = Math.Min(slength, (int)lend - 1);
+            long a2 = Math.Min(slength, lend - 1);
             if (a1 < 0)
             {
                 if (a2 < 0)
@@ -251,6 +253,59 @@ namespace OutSmart.DAXon.Functions
                 IItemEvaluator arg0Eval = fnc.GetArg(0).MakeElaborator().ElaborateForItem();
                 IItemEvaluator arg1Eval = fnc.GetArg(1).MakeElaborator().ElaborateForItem();
                 bool nullable = Cardinality.AllowsZero(fnc.GetArg(0).GetCardinality());
+
+                // substring($s, 1, 1) / substring($s, 2) — literal integer positions (the
+                // per-character recursion idiom): the spec's round/NaN/infinity ladder collapses
+                // at elaboration time to a bounds check + one slice. Only in-range literals take
+                // the lane (start >= 1, length >= 1); the generic evaluator keeps every edge.
+                if (fnc.GetArg(1) is Literal startLit && startLit.GroundedValue is Int64Value startVal && startVal.LongValue() >= 1)
+                {
+                    long lstart = startVal.LongValue();
+                    if (fnc.GetArity() == 2)
+                    {
+                        return (context) =>
+                        {
+                            StringValue sv = (StringValue)arg0Eval.Eval(context);
+                            if (nullable && sv == null)
+                            {
+                                return StringValue.EMPTY_STRING;
+                            }
+
+                            long slength = sv.Length();
+                            return lstart > slength
+                                ? StringValue.EMPTY_STRING
+                                : new StringValue(sv.Content.Substring((int)lstart - 1, slength));
+                        };
+                    }
+
+                    if (fnc.GetArg(2) is Literal lenLit && lenLit.GroundedValue is Int64Value lenVal && lenVal.LongValue() >= 1)
+                    {
+                        long llen = lenVal.LongValue();
+                        return (context) =>
+                        {
+                            StringValue sv = (StringValue)arg0Eval.Eval(context);
+                            if (nullable && sv == null)
+                            {
+                                return StringValue.EMPTY_STRING;
+                            }
+
+                            long slength = sv.Length();
+                            if (lstart > slength)
+                            {
+                                return StringValue.EMPTY_STRING;
+                            }
+
+                            long end = lstart - 1 + llen;   // exclusive, codepoints
+                            if (end > slength || end < lstart)   // second arm: lstart-1+llen wrapped past long.MaxValue
+                            {
+                                end = slength;
+                            }
+
+                            return new StringValue(sv.Content.Substring((int)lstart - 1, end));
+                        };
+                    }
+                }
+
                 if (fnc.GetArity() == 2)
                 {
                     return (context) =>

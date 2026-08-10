@@ -34,8 +34,6 @@ namespace OutSmart.DAXon.Types
         public const int PROCESSING_INSTRUCTION = 7;
         public const int NAMESPACE = 13;
         public const int FUNCTION = 11;
-        public const int MAP = 12;
-        public const int ARRAY = 14;
         public const int WHITESPACE_TEXT = 4;
         // MUST be 17: the TinyTree invariant is "kind & 0x0f == ELEMENT" (17 & 0xf == 1 == ELEMENT), relied on
         // by NamedChildIterator/NodeKindTest/etc to recognise a collapsed text-only element as an element.
@@ -213,10 +211,8 @@ namespace OutSmart.DAXon.Types
             return t is ISimpleType ? (object)t : null;
         }
         public static object GetBuiltInSimpleType(string ns, string local) => GetBuiltInSimpleType(StandardNames.GetFingerprint(NamespaceUri.Of(ns), local));
-        public static bool IsPossiblyComparable(ItemType t1, ItemType t2, bool ordered) => true;
         // Int-version overload (paulirwin passes XPathVersion int).
         public static bool IsPossiblyComparable(ItemType t1, ItemType t2, int xpathVersion) => true;
-        public static bool IsComparable(ItemType t1, ItemType t2, bool ordered) => true;
         // Faithful port of upstream Type.isSubType(AtomicType,AtomicType): walk the atomic base-type
         // chain. Was a hollow `=> false`, which defeated BuiltInAtomicType.Matches so every atomic
         // instance-of/treat-as gave false positives. Non-atomic operands keep the old `false` (unchanged).
@@ -257,7 +253,6 @@ namespace OutSmart.DAXon.Types
                 || fingerprint == StandardNames.XS_DAY_TIME_DURATION
                 || fingerprint == StandardNames.XS_YEAR_MONTH_DURATION
                 || fingerprint == StandardNames.XS_ANY_SIMPLE_TYPE);
-        public static bool IsGenerallyComparable(ItemType t1, ItemType t2, bool ordered) => true;
         // Faithful port of upstream Type.isGuaranteedComparable (Type.java:520): the per-pair runtime guard
         // behind ValueComparison.Compare(checkTypes:true) plus the index-of/switch equality paths. Args are
         // the operands' PRIMITIVE types (AtomicValue.GetPrimitiveType); untypedAtomic counts as string here

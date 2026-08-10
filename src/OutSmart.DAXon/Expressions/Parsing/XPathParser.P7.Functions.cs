@@ -406,20 +406,6 @@ namespace OutSmart.DAXon.Expressions.Parsing
             parserExtension.NeedExtension(p, "External function declarations");
         }
 
-        private Expression MakeMapExpression(Dictionary<string, Expression> keywordArgs)
-        {
-            Expression[] block = new Expression[keywordArgs.Count];
-            int i = 0;
-            foreach (KeyValuePair<string, Expression> entry in keywordArgs)
-            {
-                StringLiteral key = new StringLiteral(entry.Key);
-                block[i++] = MapFunctionSet.GetInstance(31).MakeFunction("entry", 2).MakeFunctionCall(key, entry.Value);
-            }
-
-            Block entries = new Block(block);
-            return MapFunctionSet.GetInstance(31).MakeFunction("merge", 1).MakeFunctionCall(entries);
-        }
-
         public virtual Expression ReportMissingFunction(int offset, StructuredQName functionName, Expression[] arguments, IList<string> reasons)
         {
             StringBuilder sb = new StringBuilder();

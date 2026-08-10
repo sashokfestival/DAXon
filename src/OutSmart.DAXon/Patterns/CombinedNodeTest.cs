@@ -28,25 +28,6 @@ namespace OutSmart.DAXon.Patterns
         private readonly NodeTest nodetest2;
         private readonly int @operator;
 
-        public virtual string ContentTypeForAlphaCode
-        {
-            get
-            {
-                if (nodetest1 is NameTest && @operator == Token.INTERSECT && nodetest2 is ContentTypeTest)
-                {
-                    return GetContentTypeForAlphaCode((NameTest)nodetest1, (ContentTypeTest)nodetest2);
-                }
-                else if (nodetest2 is NameTest && @operator == Token.INTERSECT && nodetest1 is ContentTypeTest)
-                {
-                    return GetContentTypeForAlphaCode((NameTest)nodetest2, (ContentTypeTest)nodetest1);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-        }
-
         public override int PrimitiveType
         {
             get
@@ -318,59 +299,6 @@ namespace OutSmart.DAXon.Patterns
             }
         }
 
-        public string ToExportString()
-        {
-            return MakeString(true);
-        }
-
-        private static string GetContentTypeForAlphaCode(NameTest nodetest1, ContentTypeTest nodetest2)
-        {
-            if (nodetest1.GetNodeKind() == Types.Type.ELEMENT)
-            {
-                if (nodetest2.ContentType == Untyped.INSTANCE && nodetest2.IsNillable())
-                {
-                    return null;
-                }
-                else
-                {
-                    ISchemaType contentType = nodetest2.ContentType;
-                    return contentType.EQName;
-                }
-            }
-            else if (nodetest1.GetNodeKind() == Types.Type.ATTRIBUTE)
-            {
-                if (nodetest2.ContentType == BuiltInAtomicType.UNTYPED_ATOMIC)
-                {
-                    return null;
-                }
-                else
-                {
-                    ISchemaType contentType = nodetest2.ContentType;
-                    return contentType.EQName;
-                }
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-        }
-
-        public virtual void AddTypeDetails(DictionaryMap map)
-        {
-            if (nodetest1 is NameTest && @operator == Token.INTERSECT)
-            {
-                map.InitialPut("n", new StringValue(nodetest1.MatchingNodeName.EQName));
-                if (nodetest2 is ContentTypeTest)
-                {
-                    ISchemaType schemaType = ((ContentTypeTest)nodetest2).GetSchemaType();
-                    if (schemaType != Untyped.INSTANCE && schemaType != BuiltInAtomicType.UNTYPED_ATOMIC)
-                    {
-                        map.InitialPut("c", new StringValue(schemaType.EQName + (nodetest2.IsNillable() ? "?" : "")));
-                    }
-                }
-            }
-        }
-
         public override IAtomicType GetAtomizedItemType()
         {
             IAtomicType type1 = nodetest1.GetAtomizedItemType();
@@ -429,11 +357,6 @@ namespace OutSmart.DAXon.Patterns
         public override bool Equals(object other)
         {
             return other is CombinedNodeTest && ((CombinedNodeTest)other).nodetest1.Equals(nodetest1) && ((CombinedNodeTest)other).nodetest2.Equals(nodetest2) && ((CombinedNodeTest)other).@operator == @operator;
-        }
-
-        public virtual NodeTest GetOperand(int which)
-        {
-            return which == 0 ? nodetest1 : nodetest2;
         }
 
         public override string ExplainMismatch(IItem item, TypeHierarchy th)

@@ -19,21 +19,9 @@ namespace OutSmart.DAXon.Transformation
     /// </summary>
     internal class LicenseException : Exception
     {
-        public const int EXPIRED = 1;
-        public const int INVALID = 2;
         public const int NOT_FOUND = 3;
-        public const int WRONG_FEATURES = 4;
-        public const int CANNOT_READ = 5;
         public const int WRONG_CONFIGURATION = 6;
         private int reason;
-
-        public virtual int Reason
-        {
-            get => reason; set
-            {
-                this.reason = value;
-            }
-        }
         public LicenseException(string message, int reason) : base(message)
         {
             this.reason = reason;

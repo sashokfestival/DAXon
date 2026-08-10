@@ -328,20 +328,5 @@ namespace OutSmart.DAXon.Xslt
         private void CheckRuleStreamability(XSLAccumulatorRule rule, Patterns.Pattern pattern, Expression newValueExp)
         {
         }
-
-        private void NotStreamable(StyleElement rule, string message)
-        {
-            bool fallback = GetConfiguration().GetBooleanProperty(Feature<bool>.STREAMING_FALLBACK);
-            if (fallback)
-            {
-                message += ". Falling back to non-streaming implementation";
-                rule.IssueWarning(message, "XTSE3430");
-                rule.GetCompilation().SetFallbackToNonStreaming(true);
-            }
-            else
-            {
-                rule.CompileError(message, "XTSE3430");
-            }
-        }
     }
 }

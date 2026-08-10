@@ -24,10 +24,6 @@ namespace OutSmart.DAXon.Types
     {
         StructuredQName TypeName { get; }
         StructuredQName GetStructuredQName();
-
-
-
-        bool ContainsListType();
         IList<IPlainType> PlainMemberTypes { get; }
         SequenceType ResultTypeOfCast { get; }
         IAtomicSequence GetTypedValue(UnicodeString value, INamespaceResolver resolver, ConversionRules rules);

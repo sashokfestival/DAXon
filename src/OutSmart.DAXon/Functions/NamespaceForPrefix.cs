@@ -23,8 +23,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class NamespaceForPrefix : SystemFunction, ICallable
     {
-
-        public static Func<NamespaceForPrefix> New() => () => new NamespaceForPrefix();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             AnyURIValue result = NamespaceUriForPrefix((StringValue)arguments[0].Head(), (NodeInfo)arguments[1].Head());

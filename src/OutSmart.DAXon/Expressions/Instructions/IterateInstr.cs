@@ -69,16 +69,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             onCompletionOp = new Operand(this, onCompletion, new OperandRole(OperandRole.USES_NEW_FOCUS, OperandUsage.TRANSMISSION));
         }
 
-        public void SetSelect(Expression select)
-        {
-            selectOp.SetChildExpression(select);
-        }
-
-        public void SetAction(Expression action)
-        {
-            actionOp.SetChildExpression(action);
-        }
-
         public override IEnumerable<Operand> Operands()
         {
             return OperandList(selectOp, actionOp, initiallyOp, onCompletionOp);
@@ -136,34 +126,6 @@ namespace OutSmart.DAXon.Expressions.Instructions
             }
 
             return this;
-        }
-
-        public bool IsCompilable()
-        {
-            return !ContainsBreakOrNextIterationWithinTryCatch(this, false);
-        }
-
-        private static bool ContainsBreakOrNextIterationWithinTryCatch(Expression exp, bool withinTryCatch)
-        {
-            if (exp is BreakInstr || exp is NextIteration)
-            {
-                return withinTryCatch;
-            }
-            else
-            {
-                bool found = false;
-                bool inTryCatch = withinTryCatch || exp is TryCatch;
-                foreach (Operand o in exp.Operands())
-                {
-                    if (ContainsBreakOrNextIterationWithinTryCatch(o.GetChildExpression(), inTryCatch))
-                    {
-                        found = true;
-                        break;
-                    }
-                }
-
-                return found;
-            }
         }
 
         public override ItemType GetItemType()

@@ -8,7 +8,6 @@ using OutSmart.DAXon.Core;
 using OutSmart.DAXon.Functions;
 
 using OutSmart.DAXon.Lib;
-using OutSmart.DAXon.Api.Streams;
 using OutSmart.DAXon.XPath;
 using OutSmart.DAXon.Transformation;
 using OutSmart.DAXon.Internal.Collections;
@@ -195,11 +194,6 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiUncheckedException(e.ToXPathException());
             }
-        }
-
-        public virtual XdmStream<XdmItem> Stream()
-        {
-            return IIterator().Stream();
         }
 
         public virtual bool EffectiveBooleanValue()

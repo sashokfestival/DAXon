@@ -340,6 +340,13 @@ namespace OutSmart.DAXon.Values
                     }
 
                     state = 9;
+                    if (!tok.HasMoreTokens())
+                    {
+                        // Upstream lets StringTokenizer throw here and the crash escapes the cast;
+                        // a dangling ':' is a lexical error.
+                        return BadTime("no minutes in timezone", s);
+                    }
+
                     part = tok.NextToken();
                     value = DurationValue.SimpleInteger(part);
                     if (value < 0)

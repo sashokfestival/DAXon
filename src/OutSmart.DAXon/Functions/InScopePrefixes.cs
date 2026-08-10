@@ -22,8 +22,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class InScopePrefixes : SystemFunction
     {
-
-        public static Func<InScopePrefixes> New() => () => new InScopePrefixes();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             NodeInfo element = (NodeInfo)arguments[0].Head();

@@ -143,17 +143,28 @@ namespace OutSmart.DAXon.Regex
             return 0;
         }
 
+        // Memoized: IterateMatches asks per position, but the tree is immutable once matching
+        // starts (Optimize runs at compile). Benign race on a shared program: idempotent int write.
+        private int containsCaptures = -1;
+
         public override bool ContainsCapturingExpressions()
         {
-            foreach (Operation o in operations)
+            if (containsCaptures < 0)
             {
-                if (o is OpCapture || o.ContainsCapturingExpressions())
+                bool found = false;
+                foreach (Operation o in operations)
                 {
-                    return true;
+                    if (o is OpCapture || o.ContainsCapturingExpressions())
+                    {
+                        found = true;
+                        break;
+                    }
                 }
+
+                containsCaptures = found ? 1 : 0;
             }
 
-            return false;
+            return containsCaptures == 1;
         }
 
         public override ICharacterClass GetInitialCharacterClass(bool caseBlind)

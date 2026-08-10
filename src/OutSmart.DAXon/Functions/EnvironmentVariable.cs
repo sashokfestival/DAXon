@@ -24,8 +24,6 @@ namespace OutSmart.DAXon.Functions
     /// </summary>
     internal class EnvironmentVariable : SystemFunction
     {
-
-        public static Func<EnvironmentVariable> New() => () => new EnvironmentVariable();
         public override ISequence Call(IXPathContext context, ISequence[] arguments)
         {
             StringValue value = GetVariable((StringValue)arguments[0].Head(), context);

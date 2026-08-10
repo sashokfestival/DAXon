@@ -61,9 +61,5 @@ namespace OutSmart.DAXon.Api
                 }
             }
         }
-        // Select used by XdmNode.Children() etc. — returns object
-        // (callers chain .AsListOfNodes(); the result type doesn't matter for
-        // compile gating since XdmStream/Step are excluded).
-        public virtual object Select(object step) => throw new NotImplementedException("STUB: XdmValue.Select not ported (excluded stub)");
     }
 }

@@ -19,7 +19,6 @@ namespace OutSmart.DAXon.Lib
     {
         private static readonly Dictionary<string, FeatureData> byName = new Dictionary<string, FeatureData>();
         private static readonly IntHashMap<FeatureData> byCode = new IntHashMap<FeatureData>();
-        public static IEnumerable<string> Names => new SortedSet<string>(byName.Keys);
 
         static FeatureIndex()
         {

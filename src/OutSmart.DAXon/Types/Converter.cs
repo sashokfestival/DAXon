@@ -95,35 +95,6 @@ namespace OutSmart.DAXon.Types
             public static readonly DecimalToInteger INSTANCE = new DecimalToInteger();
             public override IConversionResult Convert(object value) => (IConversionResult)OutSmart.DAXon.Values.IntegerValue.MakeIntegerValue(((NumericValue)value).GetDecimalValue().ToBigInteger());
         }
-        internal class IntegerToFloat : Converter
-        {
-            public static readonly IntegerToFloat INSTANCE = new IntegerToFloat();
-            public override IConversionResult Convert(object value) => (IConversionResult)new FloatValue((float)((NumericValue)value).GetDoubleValue());
-        }
-        internal class IntegerToDouble : Converter
-        {
-            public static readonly IntegerToDouble INSTANCE = new IntegerToDouble();
-        }
-        // No nested StringToDouble here: bare `StringToDouble` refs (Configuration.cs, ItemType.cs) must
-        // resolve to the real Types.StringToDouble — a nested namesake shadowed it (CS1503).
-        // Java: parse with INF/NaN forms.
-        internal class StringToFloat : Converter
-        {
-            public static readonly StringToFloat INSTANCE = new StringToFloat();
-            public override IConversionResult Convert(object value) { string s = ((AtomicValue)value).GetStringValue().Trim(); float f; switch (s) { case "INF": case "+INF": f = float.PositiveInfinity; break; case "-INF": f = float.NegativeInfinity; break; case "NaN": f = float.NaN; break; default: f = float.Parse(s, System.Globalization.CultureInfo.InvariantCulture); break; } return (IConversionResult)new FloatValue(f); }
-        }
-        internal class StringToInteger : Converter
-        {
-            public static readonly StringToInteger INSTANCE = new StringToInteger();
-        }
-        internal class StringToBoolean : Converter
-        {
-            public static readonly StringToBoolean INSTANCE = new StringToBoolean();
-        }
-        internal class StringToDecimal : Converter
-        {
-            public static readonly StringToDecimal INSTANCE = new StringToDecimal();
-        }
 
         // ConversionRules dispatches date->gYear/gYearMonth/gMonth/gDay/gMonthDay as two-phase DATE->DATE_TIME->gXxx,
         // plus subtype-via-primitive casts. Faithful Java: run phaseOne, then phaseTwo on the intermediate result.
@@ -131,10 +102,7 @@ namespace OutSmart.DAXon.Types
         {
             private readonly Converter phaseOne;
             private readonly Converter phaseTwo;
-            public TwoPhaseConverter() { }
             public TwoPhaseConverter(Converter a, Converter b) { phaseOne = a; phaseTwo = b; }
-            public static TwoPhaseConverter MakeTwoPhaseConverter(Converter a, Converter b) => new TwoPhaseConverter(a, b);
-            public static Converter MakeTwoPhaseConverter(object a, object b, object c) => new TwoPhaseConverter();
             // 4-arg (inputType, viaType, outputType, rules): resolve each phase from the ConversionRules, exactly like the
             // upstream factory `new TwoPhaseConverter(rules.getConverter(in,via), rules.getConverter(via,out))`.
             public static Converter MakeTwoPhaseConverter(object inputType, object viaType, object outputType, object rules)
@@ -219,33 +187,6 @@ namespace OutSmart.DAXon.Types
             public static readonly BooleanToDecimal INSTANCE = new BooleanToDecimal();
             public override IConversionResult Convert(object value) => new BigDecimalValue(((BooleanValue)value).GetBooleanValue() ? 1.0 : 0.0);
         }
-        internal class DecimalToFloat : Converter
-        {
-            public static readonly DecimalToFloat INSTANCE = new DecimalToFloat();
-        }
-        internal class DecimalToDouble : Converter
-        {
-            public static readonly DecimalToDouble INSTANCE = new DecimalToDouble();
-        }
-        internal class FloatToDouble : Converter { public static readonly FloatToDouble INSTANCE = new FloatToDouble(); }
-        internal class DoubleToFloat : Converter { public static readonly DoubleToFloat INSTANCE = new DoubleToFloat(); }
-        internal class IntegerToString : Converter
-        {
-            public static readonly IntegerToString INSTANCE = new IntegerToString();
-        }
-        internal class DecimalToString : Converter
-        {
-            public static readonly DecimalToString INSTANCE = new DecimalToString();
-        }
-        internal class FloatToString : Converter { public static readonly FloatToString INSTANCE = new FloatToString(); }
-        internal class DoubleToString : Converter
-        {
-            public static readonly DoubleToString INSTANCE = new DoubleToString();
-        }
-        internal class BooleanToString : Converter
-        {
-            public static readonly BooleanToString INSTANCE = new BooleanToString();
-        }
         internal class BooleanToFloat : Converter
         {
             public static readonly BooleanToFloat INSTANCE = new BooleanToFloat();
@@ -303,17 +244,6 @@ namespace OutSmart.DAXon.Types
         // to a gXxx type is dispatched as a TwoPhaseConverter(DateToDateTime, DateTimeToGXxx), so these names are never
         // instantiated by ConversionRules.GetConverter (verified: zero refs outside this file). Implementing DateToDateTime
         // + the DateTimeToGXxx family above makes the real xs:gYear(xs:date(..)) etc. casts work through the two-phase path.
-        internal class DateToGYearMonth : Converter
-        {
-            public static readonly DateToGYearMonth INSTANCE = new DateToGYearMonth();
-        }
-        internal class DateToGYear : Converter { public static readonly DateToGYear INSTANCE = new DateToGYear(); }
-        internal class DateToGMonthDay : Converter
-        {
-            public static readonly DateToGMonthDay INSTANCE = new DateToGMonthDay();
-        }
-        internal class DateToGMonth : Converter { public static readonly DateToGMonth INSTANCE = new DateToGMonth(); }
-        internal class DateToGDay : Converter { public static readonly DateToGDay INSTANCE = new DateToGDay(); }
         // Faithful Java: new HexBinaryValue(base64.getBinaryValue()) / new Base64BinaryValue(hex.getBinaryValue()).
         internal class Base64BinaryToHexBinary : Converter
         {
@@ -336,17 +266,6 @@ namespace OutSmart.DAXon.Types
         {
             public static readonly NumericToBoolean INSTANCE = new NumericToBoolean();
             public override IConversionResult Convert(object value) => (IConversionResult)BooleanValue.Get(((AtomicValue)value).EffectiveBooleanValue());
-        }
-        // PHANTOM stubs: no NumericToString / NumericToBigDecimal class exists in Saxon 12.9. numeric->string routes through
-        // ToStringConverter (and the engine PhaseBConverters wrapper also name-covers the *ToString family); numeric->decimal
-        // routes through NumericToDecimal. Never instantiated -> safe to leave hollow.
-        internal class NumericToString : Converter
-        {
-            public static readonly NumericToString INSTANCE = new NumericToString();
-        }
-        internal class NumericToBigDecimal : Converter
-        {
-            public static readonly NumericToBigDecimal INSTANCE = new NumericToBigDecimal();
         }
         // Java: ToUntyped -> StringValue.makeUntypedAtomic(input.getUnicodeStringValue());
         // ToString -> new StringValue(input.getUnicodeStringValue().tidy()). Matches the PhaseBConverters
