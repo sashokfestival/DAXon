@@ -244,7 +244,7 @@ namespace OutSmart.DAXon.XQuery
                 ComplexContentOutputter @out = Destination;
                 @out.StartElement(resultMap, Untyped.INSTANCE, locationId, ReceiverOption.NONE);
                 MapItem map = (MapItem)item;
-                foreach (KeyValuePair pair in map.KeyValuePairs())
+                foreach (OutSmart.DAXon.Values.Maps.KeyValuePair pair in map.KeyValuePairs())
                 {
                     @out.StartElement(resultMapEntry, Untyped.INSTANCE, locationId, ReceiverOption.NONE);
                     @out.StartElement(resultMapKey, Untyped.INSTANCE, locationId, ReceiverOption.NONE);

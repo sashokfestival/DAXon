@@ -286,7 +286,7 @@ namespace OutSmart.DAXon.Types
                 // Bug 4692: Adds the condition that the empty sequence must be an instance of Y.
                 if (GetArity() == 1 && argTypes[0].GetCardinality() == StaticProperty.EXACTLY_ONE && argTypes[0].PrimaryType.IsPlainType() && Cardinality.AllowsZero(resultType.GetCardinality()))
                 {
-                    foreach (KeyValuePair pair in ((MapItem)item).KeyValuePairs())
+                    foreach (OutSmart.DAXon.Values.Maps.KeyValuePair pair in ((MapItem)item).KeyValuePairs())
                     {
                         if (!resultType.Matches(pair.value, th))
                         {

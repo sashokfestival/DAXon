@@ -197,7 +197,7 @@ namespace OutSmart.DAXon.Functions
         private void SetRequestedProperties(Dictionary<string, IGroundedValue> options)
         {
             MapItem requestedProps = (MapItem)options.GetOrDefault("requested-properties").Head();
-            foreach (KeyValuePair entry in requestedProps.KeyValuePairs())
+            foreach (OutSmart.DAXon.Values.Maps.KeyValuePair entry in requestedProps.KeyValuePairs())
             {
                 if (!(entry.key is QNameValue))
                 {
@@ -301,7 +301,7 @@ namespace OutSmart.DAXon.Functions
         private void SetStaticParams(Dictionary<string, IGroundedValue> options, XsltCompiler xsltCompiler)
         {
             MapItem staticParamsMap = (MapItem)options.GetOrDefault("static-params").Head();
-            foreach (KeyValuePair entry in staticParamsMap.KeyValuePairs())
+            foreach (OutSmart.DAXon.Values.Maps.KeyValuePair entry in staticParamsMap.KeyValuePairs())
             {
                 if (!(entry.key is QNameValue))
                 {
@@ -941,7 +941,7 @@ namespace OutSmart.DAXon.Functions
 
         private void ProcessParams(MapItem suppliedParams, Dictionary<QName, XdmValue> checkedParams)
         {
-            foreach (KeyValuePair entry in suppliedParams.KeyValuePairs())
+            foreach (OutSmart.DAXon.Values.Maps.KeyValuePair entry in suppliedParams.KeyValuePairs())
             {
                 if (!(entry.key is QNameValue))
                 {
@@ -1046,7 +1046,7 @@ namespace OutSmart.DAXon.Functions
                 Serializer serializer = processor.NewSerializer();
                 if (serializationParamsMap != null)
                 {
-                    foreach (KeyValuePair entry in serializationParamsMap.KeyValuePairs())
+                    foreach (OutSmart.DAXon.Values.Maps.KeyValuePair entry in serializationParamsMap.KeyValuePairs())
                     {
                         AtomicValue param = entry.key;
                         QName paramName;

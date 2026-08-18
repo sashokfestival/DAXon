@@ -78,7 +78,7 @@ namespace OutSmart.DAXon.Transformation.Rules
                     // If it's a singleton map, we can't break it down any further
                     AtomicValue key = null;
                     IGroundedValue singletonValue = null;
-                    foreach (KeyValuePair pair in ((MapItem)item).KeyValuePairs())
+                    foreach (OutSmart.DAXon.Values.Maps.KeyValuePair pair in ((MapItem)item).KeyValuePairs())
                     {
                         key = pair.key;
                         singletonValue = pair.value;

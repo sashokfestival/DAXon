@@ -36,7 +36,7 @@ namespace OutSmart.DAXon.Functions
         public static CharacterMap ToCharacterMap(MapItem charMap)
         {
             var intHashMap = new OutSmart.DAXon.Collections.IntHashMap<string>();
-            foreach (KeyValuePair pair in charMap.KeyValuePairs())
+            foreach (OutSmart.DAXon.Values.Maps.KeyValuePair pair in charMap.KeyValuePairs())
             {
                 UnicodeString ch = pair.key.UnicodeStringValue;
                 string str = pair.value.Head().GetStringValue();
@@ -109,7 +109,7 @@ namespace OutSmart.DAXon.Functions
                 // Read options by iterating KeyValuePairs and matching the key's string value. HashTrieMap.Get with a
                 // freshly-constructed StringValue key does NOT match a stored key (the StringValue/UnicodeString
                 // match-key is not value-equal across construction paths); iterating sidesteps that.
-                foreach (KeyValuePair __opt in paramMap.KeyValuePairs())
+                foreach (OutSmart.DAXon.Values.Maps.KeyValuePair __opt in paramMap.KeyValuePairs())
                 {
                     // Standard serialization parameters have xs:string keys; a QName key denotes an
                     // implementation-defined parameter (unsupported here). key.GetStringValue() on
@@ -204,7 +204,7 @@ namespace OutSmart.DAXon.Functions
                         {
                             throw new XPathException("The value of the use-character-maps serialization parameter must be a map", "XPTY0004");
                         }
-                        foreach (KeyValuePair __ce in __cmap.KeyValuePairs())
+                        foreach (OutSmart.DAXon.Values.Maps.KeyValuePair __ce in __cmap.KeyValuePairs())
                         {
                             IItem __ck = __ce.key;
                             IItem __cv = __ce.value == null ? null : __ce.value.Head();

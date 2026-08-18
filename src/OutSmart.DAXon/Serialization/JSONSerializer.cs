@@ -130,7 +130,7 @@ namespace OutSmart.DAXon.Serialization
                     // Map keys are unique as ATOMS; SERE0022 only catches distinct atoms with the same
                     // string image (1 vs '1'), impossible when every key is already a string.
                     HashSet<string> keys = allowDuplicateKeys || map.KeyUType == UType.STRING ? null : new HashSet<string>();
-                    foreach (KeyValuePair pair in map.KeyValuePairs())
+                    foreach (OutSmart.DAXon.Values.Maps.KeyValuePair pair in map.KeyValuePairs())
                     {
                         string stringKey = pair.key.GetStringValue();
                         emitter.WriteKey(stringKey);
@@ -146,7 +146,7 @@ namespace OutSmart.DAXon.Serialization
                 {
                     HashSet<string> keys = allowDuplicateKeys ? null : new HashSet<string>();
                     List<AtomicValue> keyList = new List<AtomicValue>();
-                    foreach (KeyValuePair pair in map.KeyValuePairs())
+                    foreach (OutSmart.DAXon.Values.Maps.KeyValuePair pair in map.KeyValuePairs())
                     {
                         keyList.Add(pair.key);
                     }
@@ -228,7 +228,7 @@ namespace OutSmart.DAXon.Serialization
                 return true;
             }
 
-            foreach (KeyValuePair entry in map.KeyValuePairs())
+            foreach (OutSmart.DAXon.Values.Maps.KeyValuePair entry in map.KeyValuePairs())
             {
                 if (entry.value is AtomicValue)
                 {
