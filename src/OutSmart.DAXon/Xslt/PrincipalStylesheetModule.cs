@@ -267,7 +267,7 @@ namespace OutSmart.DAXon.Xslt
             GetStylesheetPackage().SetDefaultOutputProperties(props);
 
             // Handle named output formats for use at run-time
-            HashSet<StructuredQName> outputNames = new HashSet<StructuredQName>(5);
+            HashSet<StructuredQName> outputNames = new HashSet<StructuredQName>();
             foreach (ComponentDeclaration outputDecl in topLevel)
             {
                 if (outputDecl.SourceElement is XSLOutput)
@@ -959,7 +959,7 @@ namespace OutSmart.DAXon.Xslt
         private void CollectNamespaceAliases()
         {
             namespaceAliasMap = new Dictionary<NamespaceUri, NamespaceBinding>(numberOfAliases);
-            aliasResultUriSet = new HashSet<NamespaceUri>(numberOfAliases);
+            aliasResultUriSet = new HashSet<NamespaceUri>();
             HashSet<NamespaceUri> aliasesAtThisPrecedence = new HashSet<NamespaceUri>();
             int currentPrecedence = -1;
 

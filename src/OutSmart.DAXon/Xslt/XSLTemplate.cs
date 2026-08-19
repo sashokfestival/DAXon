@@ -148,7 +148,7 @@ namespace OutSmart.DAXon.Xslt
             get
             {
                 StructuredQName[] names = ModeNames;
-                HashSet<Mode> modes = new HashSet<Mode>(names.Length);
+                HashSet<Mode> modes = new HashSet<Mode>();
                 RuleManager mgr = GetPrincipalStylesheetModule().GetRuleManager();
                 foreach (StructuredQName name in names)
                 {

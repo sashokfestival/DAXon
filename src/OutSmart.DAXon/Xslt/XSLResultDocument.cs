@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Xslt
 {
     internal class XSLResultDocument : StyleElement
     {
-        public static readonly HashSet<string> fans = new HashSet<string>(40); // formatting attribute names
+        public static readonly HashSet<string> fans = new HashSet<string>(); // formatting attribute names
 
         public static StructuredQName METHOD = NamespaceUri.NULL.QName("method");
         public static StructuredQName BUILD_TREE = new StructuredQName("", NamespaceUri.NULL, "build-tree");
@@ -290,7 +290,7 @@ namespace OutSmart.DAXon.Xslt
             }
 
             Properties localProps = new Properties();
-            HashSet<StructuredQName> @fixed = new HashSet<StructuredQName>(10);
+            HashSet<StructuredQName> @fixed = new HashSet<StructuredQName>();
             INamespaceResolver namespaceResolver = GetStaticContext().GetNamespaceResolver();
             foreach (StructuredQName property in serializationAttributes.Keys)
             {

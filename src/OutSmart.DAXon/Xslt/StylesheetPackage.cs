@@ -49,7 +49,7 @@ namespace OutSmart.DAXon.Xslt
         private StructuredQName defaultMode;
         private bool declaredModes;
         protected Dictionary<StructuredQName, Properties> namedOutputProperties = new Dictionary<StructuredQName, Properties>(4);
-        protected HashSet<NamespaceUri> schemaIndex = new HashSet<NamespaceUri>(10);
+        protected HashSet<NamespaceUri> schemaIndex = new HashSet<NamespaceUri>();
         private FunctionLibraryList functionLibrary;
         private XQueryFunctionLibrary queryFunctions;
         private ExecutableFunctionLibrary overriding;

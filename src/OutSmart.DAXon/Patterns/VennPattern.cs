@@ -127,9 +127,9 @@ namespace OutSmart.DAXon.Patterns
         {
             if (other is VennPattern)
             {
-                HashSet<Pattern> s0 = new HashSet<Pattern>(10);
+                HashSet<Pattern> s0 = new HashSet<Pattern>();
                 GatherComponentPatterns(s0);
-                HashSet<Pattern> s1 = new HashSet<Pattern>(10);
+                HashSet<Pattern> s1 = new HashSet<Pattern>();
                 ((VennPattern)other).GatherComponentPatterns(s1);
                 return s0.Equals(s1);
             }

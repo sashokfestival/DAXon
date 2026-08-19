@@ -571,9 +571,9 @@ namespace OutSmart.DAXon.Expressions
                 {
 
                     // These are commutative and associative, so for example (A|B)|C equals B|(A|C)
-                    HashSet<Expression> s0 = new HashSet<Expression>(10);
+                    HashSet<Expression> s0 = new HashSet<Expression>();
                     GatherComponents(@operator, s0);
-                    HashSet<Expression> s1 = new HashSet<Expression>(10);
+                    HashSet<Expression> s1 = new HashSet<Expression>();
                     ((VennExpression)other).GatherComponents(@operator, s1);
                     return s0.Equals(s1);
                 }

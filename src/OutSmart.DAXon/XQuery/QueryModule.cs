@@ -160,7 +160,7 @@ namespace OutSmart.DAXon.XQuery
                 }
 
                 NamespaceMap result = NamespaceMap.EmptyMap();
-                HashSet<string> prefixes = new HashSet<string>(10);
+                HashSet<string> prefixes = new HashSet<string>();
                 for (int n = activeNamespaces.Size() - 1; n >= 0; n--)
                 {
                     NamespaceBinding an = activeNamespaces[n];
@@ -265,9 +265,9 @@ namespace OutSmart.DAXon.XQuery
                 libraryVariables = new Dictionary<StructuredQName, GlobalVariable>(10);
             }
 
-            importedSchemata = new HashSet<NamespaceUri>(5);
+            importedSchemata = new HashSet<NamespaceUri>();
 
-            importedModuleNamespaces = new HashSet<NamespaceUri>(5);
+            importedModuleNamespaces = new HashSet<NamespaceUri>();
             moduleNamespace = null;
             activeNamespaces = new IndexedStack<NamespaceBinding>();
             explicitPrologNamespaces = new Dictionary<string, NamespaceUri>(10);
@@ -513,7 +513,7 @@ namespace OutSmart.DAXon.XQuery
         {
             if (importedModuleNamespaces == null)
             {
-                importedModuleNamespaces = new HashSet<NamespaceUri>(5);
+                importedModuleNamespaces = new HashSet<NamespaceUri>();
             }
 
             importedModuleNamespaces.Add(uri);
@@ -824,7 +824,7 @@ namespace OutSmart.DAXon.XQuery
         {
             if (importedSchemata == null)
             {
-                importedSchemata = new HashSet<NamespaceUri>(5);
+                importedSchemata = new HashSet<NamespaceUri>();
             }
 
             importedSchemata.Add(targetNamespace);
@@ -838,7 +838,7 @@ namespace OutSmart.DAXon.XQuery
             HashSet<string> entries = loadedSchemata.GetOrDefault(targetNamespace);
             if (entries == null)
             {
-                entries = new HashSet<string>(locationURIs.Count);
+                entries = new HashSet<string>();
                 loadedSchemata[targetNamespace] = entries;
             }
 
@@ -1061,7 +1061,7 @@ namespace OutSmart.DAXon.XQuery
                 return result;
             }
 
-            HashSet<string> prefixes = new HashSet<string>(10);
+            HashSet<string> prefixes = new HashSet<string>();
             for (int n = activeNamespaces.Size() - 1; n >= 0; n--)
             {
                 NamespaceBinding an = activeNamespaces[n];

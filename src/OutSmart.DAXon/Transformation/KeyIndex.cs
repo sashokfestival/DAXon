@@ -161,7 +161,7 @@ namespace OutSmart.DAXon.Transformation
                     {
                         if (untypedKeys == null)
                         {
-                            untypedKeys = new HashSet<UnicodeString>(20);
+                            untypedKeys = new HashSet<UnicodeString>();
                         }
 
                         untypedKeys.Add(keyVal.UnicodeStringValue);

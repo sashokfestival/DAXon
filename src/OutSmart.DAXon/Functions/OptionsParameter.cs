@@ -26,7 +26,7 @@ namespace OutSmart.DAXon.Functions
     {
         private readonly Dictionary<string, SequenceType> allowedOptions = new Dictionary<string, SequenceType>(8);
         private readonly Dictionary<string, IGroundedValue> defaultValues = new Dictionary<string, IGroundedValue>(8);
-        private readonly HashSet<string> requiredOptions = new HashSet<string>(4);
+        private readonly HashSet<string> requiredOptions = new HashSet<string>();
         private readonly Dictionary<string, HashSet<string>> allowedValues = new Dictionary<string, HashSet<string>>(8);
         private string errorCodeForDisallowedValue;
         private string errorCodeForAbsentValue = "SXJE9999";

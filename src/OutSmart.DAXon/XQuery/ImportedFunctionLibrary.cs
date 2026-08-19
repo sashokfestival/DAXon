@@ -23,7 +23,7 @@ namespace OutSmart.DAXon.XQuery
     {
         private QueryModule importingModule;
         private readonly XQueryFunctionLibrary baseLibrary;
-        private readonly HashSet<NamespaceUri> namespaces = new HashSet<NamespaceUri>(5);
+        private readonly HashSet<NamespaceUri> namespaces = new HashSet<NamespaceUri>();
         public ImportedFunctionLibrary(QueryModule importingModule, XQueryFunctionLibrary baseLibrary)
         {
             this.importingModule = importingModule;
