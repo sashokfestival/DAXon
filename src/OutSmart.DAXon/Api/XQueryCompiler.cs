@@ -266,6 +266,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         // IO-removal: CompileLibrary(string) deleted (uncalled; collided with CompileLibrary(string) source overload under string->string).
@@ -292,6 +296,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual void CompileLibrary(System.IO.Stream query)
@@ -316,6 +324,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XQueryExecutable Compile(string query)
@@ -335,6 +347,10 @@ namespace OutSmart.DAXon.Api
             catch (XmlProcessingAbort e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
         }
 
@@ -358,6 +374,10 @@ namespace OutSmart.DAXon.Api
             {
                 throw new DAXonApiException(e);
             }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
+            }
         }
 
         public virtual XQueryExecutable Compile(TextReader query)
@@ -377,6 +397,10 @@ namespace OutSmart.DAXon.Api
             catch (XmlProcessingAbort e)
             {
                 throw new DAXonApiException(e);
+            }
+            catch (RecursionDepthError e)
+            {
+                throw new DAXonApiException(e.ToXPathException());
             }
         }
 

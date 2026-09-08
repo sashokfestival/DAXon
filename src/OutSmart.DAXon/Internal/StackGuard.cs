@@ -25,12 +25,18 @@ namespace OutSmart.DAXon.Internal
     /// </summary>
     internal static class StackGuard
     {
-        // Headroom kept in reserve when RecursionDepthError is raised. Must cover the deepest
-        // single engine descent between two probes PLUS the error path itself: unwinding a
-        // 1000+-frame stack runs every finally funclet and each converting rethrow re-enters
-        // EH dispatch from near the deep point — measured >127KB on the call-template cycle
-        // (probe threw at 127KB remaining, process still died), comfortable at 256KB.
-        private static readonly ulong Margin = IntPtr.Size == 8 ? 256UL * 1024 : 128UL * 1024;
+        // Headroom kept in reserve when RecursionDepthError is raised. The original x64 value was
+        // 256KB, measured while the abort was still converted to XPathException inside the deep
+        // engine stack. That conversion made ~185 decorating catches re-enter exception dispatch
+        // during the unwind. RecursionDepthError is now deliberately foreign until the API boundary,
+        // so that depth-proportional cascade no longer exists. Keeping its obsolete reserve made every
+        // probe fail immediately on a 256KB D365 Batch thread, even at logical depth zero.
+        //
+        // Re-calibrated against every hostile recursion shape after the foreign-exception change:
+        // 64KB still allowed a real StackOverflowException on a 256KB thread, while 96KB survived.
+        // Keep the next 32KB tier as safety margin. This is a fixed abort/unwind reserve, not a
+        // percentage of the host stack; depth-proportional error paths add their own extraMargin.
+        private const ulong Margin = 128UL * 1024;
 
         [ThreadStatic]
         private static ulong stackLow;   // low bound of this thread's reserved stack region
