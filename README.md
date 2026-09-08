@@ -1,6 +1,6 @@
 # OutSmart DAXon — a native C# port of Saxon-HE 12.9
 
-[![build](https://github.com/sashokfestival/DAXon/actions/workflows/build.yml/badge.svg)](https://github.com/sashokfestival/DAXon/actions/workflows/build.yml)
+[![build](https://github.com/outbridge-apps/DAXon/actions/workflows/build.yml/badge.svg)](https://github.com/outbridge-apps/DAXon/actions/workflows/build.yml)
 
 **OutSmart DAXon** is a pure-managed XSLT 3.0 / XPath 3.1 / XQuery 3.1 engine for the classic
 **.NET Framework (4.7.2+)** — a complete C# port of **Saxon-HE 12.9** (© Saxonica, MPL 2.0).
@@ -16,7 +16,7 @@ Saxonica at <https://github.com/Saxonica/Saxon-HE> (see also <https://www.saxoni
 
 ## Build
 
-Prebuilt assembly: [latest release](https://github.com/sashokfestival/DAXon/releases/latest).
+Prebuilt assembly: [latest release](https://github.com/outbridge-apps/DAXon/releases/latest).
 
 Or build it yourself:
 

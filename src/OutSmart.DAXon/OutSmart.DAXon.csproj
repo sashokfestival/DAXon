@@ -42,8 +42,8 @@
     <Description>Native C# port of Saxon-HE 12.9: XSLT 3.0 / XPath 3.1 / XQuery 3.1 for .NET Framework 4.7.2+.</Description>
     <Copyright>Copyright (c) 2026 OutSmart; portions copyright (c) Saxonica Limited</Copyright>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/sashokfestival/DAXon</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/sashokfestival/DAXon</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/outbridge-apps/DAXon</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/outbridge-apps/DAXon</RepositoryUrl>
     <PackageTags>xslt xpath xquery xml transformation saxon xslt3 netframework net472</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
