@@ -215,7 +215,7 @@ namespace OutSmart.DAXon.Expressions
             readonly LookupAllExpression expr;
             readonly ISequenceIterator level0;
             IEnumerator<IGroundedValue> level1forArrays;
-            IEnumerator<KeyValuePair> level1forMaps;
+            IEnumerator<OutSmart.DAXon.Values.Maps.KeyValuePair> level1forMaps;
             ISequenceIterator level2;
             public LookupAllIterator(LookupAllExpression expr, ISequenceIterator baseIterator)
             {
@@ -268,7 +268,7 @@ namespace OutSmart.DAXon.Expressions
                     }
                     else if (level1forMaps != null && level1forMaps.MoveNext())
                     {
-                        KeyValuePair nextEntry = level1forMaps.Current;
+                        OutSmart.DAXon.Values.Maps.KeyValuePair nextEntry = level1forMaps.Current;
                         IGroundedValue value = nextEntry.value;
                         level2 = value.Iterate();
                     }

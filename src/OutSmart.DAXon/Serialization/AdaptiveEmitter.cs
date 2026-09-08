@@ -325,7 +325,7 @@ namespace OutSmart.DAXon.Serialization
         {
             Emit("map{");
             bool first = true;
-            foreach (KeyValuePair pair in map.KeyValuePairs())
+            foreach (OutSmart.DAXon.Values.Maps.KeyValuePair pair in map.KeyValuePairs())
             {
                 if (first)
                 {

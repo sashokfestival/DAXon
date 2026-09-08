@@ -25,8 +25,8 @@ namespace OutSmart.DAXon.Serialization
         /// <summary>
         /// Table of attributes whose value is a URL
         /// </summary>
-        private static readonly HashSet<string> urlTable = new HashSet<string>(70);
-        private static readonly HashSet<string> attTable = new HashSet<string>(20);
+        private static readonly HashSet<string> urlTable = new HashSet<string>();
+        private static readonly HashSet<string> attTable = new HashSet<string>();
 
         static XHTMLURIEscaper()
         {

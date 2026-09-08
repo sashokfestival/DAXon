@@ -601,7 +601,7 @@ namespace OutSmart.DAXon.Expressions
             {
                 @out.StartElement("map");
                 @out.EmitAttribute("size", "" + ((MapItem)value).Count);
-                foreach (KeyValuePair kvp in ((MapItem)value).KeyValuePairs())
+                foreach (OutSmart.DAXon.Values.Maps.KeyValuePair kvp in ((MapItem)value).KeyValuePairs())
                 {
                     ExportAtomicValue(kvp.key, @out);
                     ExportValue(kvp.value, @out);

@@ -65,11 +65,11 @@ namespace OutSmart.DAXon.XQuery
         private bool foundContextItemDeclaration = false;
         private bool foundDefaultDecimalFormat = false;
         private bool preambleProcessed = false;
-        public readonly HashSet<NamespaceUri> importedModules = new HashSet<NamespaceUri>(5);
+        public readonly HashSet<NamespaceUri> importedModules = new HashSet<NamespaceUri>();
         readonly IList<NamespaceUri> namespacesToBeSealed = new List<NamespaceUri>(10);
         readonly IList<Import> schemaImports = new List<Import>(5);
         readonly IList<Import> moduleImports = new List<Import>(5);
-        private readonly HashSet<StructuredQName> outputPropertiesSeen = new HashSet<StructuredQName>(4);
+        private readonly HashSet<StructuredQName> outputPropertiesSeen = new HashSet<StructuredQName>();
         private Properties parameterDocProperties;
         public XQueryParser(IStaticContext env) : base(env)
         {

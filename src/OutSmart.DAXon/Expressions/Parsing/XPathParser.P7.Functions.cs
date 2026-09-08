@@ -753,7 +753,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             inlineFunctionStack.IPush(details);
 
             RangeVariables = new IndexedStack<ILocalBinding>();
-            HashSet<StructuredQName> paramNameSet = new HashSet<StructuredQName>(8);
+            HashSet<StructuredQName> paramNameSet = new HashSet<StructuredQName>();
             foreach (UserFunctionParameter arg in @params)
             {
                 if (!scanOnly)

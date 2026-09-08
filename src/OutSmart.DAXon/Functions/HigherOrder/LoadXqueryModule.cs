@@ -149,7 +149,7 @@ namespace OutSmart.DAXon.Functions.HigherOrder
             if (variablesOption != null)
             {
                 MapItem extVariables = (MapItem)variablesOption.Head();
-                foreach (KeyValuePair kv in extVariables.KeyValuePairs())
+                foreach (OutSmart.DAXon.Values.Maps.KeyValuePair kv in extVariables.KeyValuePairs())
                 {
                     if (kv.key is QNameValue qk)
                     {

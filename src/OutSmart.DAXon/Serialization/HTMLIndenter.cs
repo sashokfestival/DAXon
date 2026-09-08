@@ -108,8 +108,8 @@ namespace OutSmart.DAXon.Serialization
             "video",
             "wbr"
         };
-        private static readonly HashSet<string> inlineTable = new HashSet<string>(70);
-        private static readonly HashSet<string> formattedTable = new HashSet<string>(10);
+        private static readonly HashSet<string> inlineTable = new HashSet<string>();
+        private static readonly HashSet<string> formattedTable = new HashSet<string>();
         private int level = 0;
         private bool sameLine = false;
         private bool inFormattedTag = false;
@@ -137,7 +137,7 @@ namespace OutSmart.DAXon.Serialization
             string s = props.GetProperty(DAXonOutputKeys.SUPPRESS_INDENTATION);
             if (s != null)
             {
-                suppressed = new HashSet<string>(8);
+                suppressed = new HashSet<string>();
                 foreach (string eqName in s.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     suppressed.Add(FingerprintedQName.FromEQName(eqName).GetLocalPart().ToLowerInvariant());

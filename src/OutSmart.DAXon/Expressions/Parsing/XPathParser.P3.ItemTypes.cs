@@ -747,7 +747,7 @@ namespace OutSmart.DAXon.Expressions.Parsing
             // The initial "enum(" has been read
             CheckLanguageVersion40();
             NextToken();
-            HashSet<string> values = new HashSet<string>(6);
+            HashSet<string> values = new HashSet<string>();
             while (true)
             {
                 Expect(Token.STRING_LITERAL);

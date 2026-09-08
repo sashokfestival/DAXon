@@ -25,7 +25,7 @@ namespace OutSmart.DAXon.Model
         private readonly Dictionary<DocumentKey, ITreeInfo> documentNameMap = new Dictionary<DocumentKey, ITreeInfo>(10);
         // The set of documents known to be unavailable. These documents must remain
         // unavailable for the duration of a transformation or query!
-        private readonly HashSet<DocumentKey> unavailableDocuments = new HashSet<DocumentKey>(10);
+        private readonly HashSet<DocumentKey> unavailableDocuments = new HashSet<DocumentKey>();
 
         /// <summary>
         /// True when this pool holds nothing at all. Lets the end-of-run release skip its work

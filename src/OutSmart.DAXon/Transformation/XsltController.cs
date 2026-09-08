@@ -260,7 +260,7 @@ namespace OutSmart.DAXon.Transformation
 
                 if (allOutputDestinations == null)
                 {
-                    allOutputDestinations = new HashSet<DocumentKey>(20);
+                    allOutputDestinations = new HashSet<DocumentKey>();
                 }
 
                 return !allOutputDestinations.Contains(uri);
@@ -273,7 +273,7 @@ namespace OutSmart.DAXon.Transformation
             {
                 if (allOutputDestinations == null)
                 {
-                    allOutputDestinations = new HashSet<DocumentKey>(20);
+                    allOutputDestinations = new HashSet<DocumentKey>();
                 }
 
                 allOutputDestinations.Add(uri);

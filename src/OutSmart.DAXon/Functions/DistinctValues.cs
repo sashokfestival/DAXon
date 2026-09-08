@@ -338,7 +338,7 @@ namespace OutSmart.DAXon.Functions
             private readonly ISequenceIterator @base;
             private readonly IStringCollator collator;
             private readonly IXPathContext context;
-            private readonly HashSet<IAtomicMatchKey> lookup = new HashSet<IAtomicMatchKey>(40);
+            private readonly HashSet<IAtomicMatchKey> lookup = new HashSet<IAtomicMatchKey>();
             private IAction onDuplicates = null;
             public DistinctIterator(ISequenceIterator @base, IStringCollator collator, IXPathContext context)
             {

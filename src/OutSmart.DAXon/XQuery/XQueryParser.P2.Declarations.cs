@@ -1421,7 +1421,7 @@ namespace OutSmart.DAXon.XQuery
             DecimalFormatManager dfm = env.GetDecimalFormatManager();
             DecimalSymbols dfs = formatName == null ? dfm.DefaultDecimalFormat : dfm.ObtainNamedDecimalFormat(formatName);
             dfs.SetHostLanguage(HostLanguage.XQUERY, 31);
-            HashSet<string> propertyNames = new HashSet<string>(10);
+            HashSet<string> propertyNames = new HashSet<string>();
             while (t.currentToken != Token.SEMICOLON)
             {
                 int offset = t.currentTokenStartOffset;
@@ -1940,7 +1940,7 @@ namespace OutSmart.DAXon.XQuery
             func.SetUpdating(annotations.Includes(Annotation.UPDATING));
             func.Annotations = annotations;
             NextToken();
-            HashSet<StructuredQName> paramNames = new HashSet<StructuredQName>(8);
+            HashSet<StructuredQName> paramNames = new HashSet<StructuredQName>();
             bool external = false;
             bool foundDefault = false;
             if (t.currentToken != Token.RPAR)
