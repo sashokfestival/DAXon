@@ -94,4 +94,4 @@ the MPL 2.0 (source: <https://github.com/Saxonica/Saxon-HE>). Per-file Saxonica 
 retained as required by the license. Files modified in the course of this port carry the same MPL 2.0
 terms; the modified source is published here in full. The engine has no third-party dependencies.
 
-OutSmart DAXon is maintained by OutSmart (<https://outsmartteam.com/>) and is independent of Saxonica.
+OutSmart DAXon is maintained by Outbridge (<https://outbridge.app/>) and is independent of Saxonica.
