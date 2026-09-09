@@ -28,19 +28,19 @@
   <PropertyGroup>
     <!-- Assembly identity. AssemblyVersion is the binding identity: bump only on a breaking
          change, so consumers are not forced to re-bind on every patch. -->
-    <Version>1.3.1</Version>
+    <Version>1.3.2</Version>
     <AssemblyVersion>1.3.0.0</AssemblyVersion>
-    <FileVersion>1.3.1.0</FileVersion>
+    <FileVersion>1.3.2.0</FileVersion>
     <!-- Derived from Version, not spelled out: a literal here silently went stale in 1.3.0. -->
     <InformationalVersion>$(Version) (port of Saxon-HE 12.9)</InformationalVersion>
     <!-- Off: the SDK would otherwise append the building repository's commit SHA to
          InformationalVersion, putting an internal revision id into a public artifact. -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <Authors>OutSmart</Authors>
-    <Company>OutSmart</Company>
+    <Authors>Outbridge</Authors>
+    <Company>Outbridge</Company>
     <Product>OutSmart DAXon</Product>
     <Description>Native C# port of Saxon-HE 12.9: XSLT 3.0 / XPath 3.1 / XQuery 3.1 for .NET Framework 4.7.2+.</Description>
-    <Copyright>Copyright (c) 2026 OutSmart; portions copyright (c) Saxonica Limited</Copyright>
+    <Copyright>Copyright (c) 2026 Outbridge; portions copyright (c) Saxonica Limited</Copyright>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/outbridge-apps/DAXon</PackageProjectUrl>
     <RepositoryUrl>https://github.com/outbridge-apps/DAXon</RepositoryUrl>
